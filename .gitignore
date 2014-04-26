@@ -1,0 +1,9 @@
+*.class
+target/*
+\.vagrant*
+*\.idea
+# Package Files #
+*.jar
+*.war
+*.ear
+*.bin

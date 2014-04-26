@@ -9,18 +9,11 @@
 		
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		
-		<!-- <class>com.ubiquity.identity.domain.User</class>
+		<class>com.ubiquity.identity.domain.User</class>
 		<class>com.ubiquity.social.domain.Contact</class>
 		<class>com.ubiquity.social.domain.Event</class>
 		<class>com.ubiquity.social.domain.SocialIdentity</class>
-		<class>com.ubiquity.commerce.domain.Store</class>
-		<class>com.ubiquity.commerce.domain.Item</class>
-		<class>com.ubiquity.commerce.domain.PaymentMethod</class>
-		<class>com.ubiquity.commerce.domain.ItemOption</class>
-		<class>com.ubiquity.commerce.domain.ItemStringOption</class>
-		<class>com.ubiquity.commerce.domain.ItemDoubleOption</class>
-		<class>com.ubiquity.commerce.domain.ItemOptionType</class>
-		<class>com.ubiquity.commerce.domain.Order</class> -->
+		
 		
 		
 		<properties>

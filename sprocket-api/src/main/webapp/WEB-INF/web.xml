@@ -12,7 +12,7 @@
     <listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>
   </listener>
   <listener>
-    <listener-class>com.ubiquity.sprocket.ServicesInitializer</listener-class>
+    <listener-class>com.ubiquity.sprocket.api.ServicesInitializer</listener-class>
   </listener>
   <servlet>
     <servlet-name>Resteasy</servlet-name>
