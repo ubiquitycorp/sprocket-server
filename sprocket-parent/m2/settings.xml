@@ -1,0 +1,65 @@
+<settings>
+	<profiles>
+	
+		<!-- Builds Sprocket back-end for vm installations -->
+		<profile>
+			<id>env-vm</id>
+			<properties>
+				<syslog.host>localhost</syslog.host>
+				<redis.host>localhost</redis.host>
+				<hibernate.debug>true</hibernate.debug>
+				<db.pool.maxActive>50</db.pool.maxActive>
+				<db.pool.maxIdle>3</db.pool.maxIdle>
+				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
+				<db.pool.maxWait>10000</db.pool.maxWait>
+				<db.pool.idleConnectionTestPeriod>60
+				</db.pool.idleConnectionTestPeriod>
+				<db.username>netappusr</db.username>
+				<db.password>sprocket9801</db.password>
+				<db.host>localhost</db.host>
+				<hibernate.schema.auto>update</hibernate.schema.auto>
+				<stripe.api.client>pk_test_ujJiLWzAZymWRzD10MqT2tej</stripe.api.client>
+				<stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO</stripe.api.secret>
+				<repo.env>dev</repo.env>
+			</properties>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>vm</value>
+				</property>
+			</activation>
+		</profile>
+		
+		<!-- Builds Giftsender back-end for QA installation -->
+		<profile>
+			<id>env-qa</id>
+			<properties>
+				<syslog.host>localhost</syslog.host>
+				<redis.host>localhost</redis.host>
+				<hibernate.debug>true</hibernate.debug>
+				<db.pool.maxActive>50</db.pool.maxActive>
+				<db.pool.maxIdle>3</db.pool.maxIdle>
+				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
+				<db.pool.maxWait>10000</db.pool.maxWait>
+				<db.pool.idleConnectionTestPeriod>60
+				</db.pool.idleConnectionTestPeriod>
+				<db.username>netappusr</db.username>
+				<db.password>sprocket9801</db.password>
+				<db.host>localhost</db.host>
+				<hibernate.schema.auto>update</hibernate.schema.auto>
+				<stripe.api.client>pk_test_ujJiLWzAZymWRzD10MqT2tej</stripe.api.client>
+				<stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO</stripe.api.secret>
+				<repo.env>dev</repo.env>
+			</properties>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>qa</value>
+				</property>
+			</activation>
+		</profile>
+		
+	
+
+	</profiles>
+</settings>

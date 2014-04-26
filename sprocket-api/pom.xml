@@ -1,19 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>giftsender-api</artifactId>
-	<name>Gift Sender API</name>
+	<artifactId>sprocket-api</artifactId>
+	<name>Sprocket API</name>
 	<packaging>war</packaging>
 	<version>0.2.12</version>
 	<!-- Note, parameterize this -->
 	<properties>
-		<app.home>/var/lib/tomcat7/webapps/giftsender-api</app.home>
+		<app.home>/var/lib/tomcat7/webapps/sprocket-api</app.home>
 	</properties>
 
 	<!-- turns on resource filtering -->
 	<build>
 
-		<finalName>giftsender-api</finalName>
+		<finalName>sprocket-api</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -57,7 +57,7 @@
 							<directory>${app.home}</directory>
 							<sources>
 								<source>
-									<location>target/giftsender-api</location>
+									<location>target/sprocket-api</location>
 								</source>
 							</sources>
 						</mapping>
@@ -121,7 +121,6 @@
 
 
 
-
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jaxrs</artifactId>
@@ -135,10 +134,17 @@
 			<scope>provided</scope>
 		</dependency>
 
+        
 		<dependency>
-			<groupId>com.ubiquity</groupId>
-			<artifactId>giftsender-core</artifactId>
-			<version>0.1.0</version>
+		  <groupId>com.ubiquity</groupId>
+		  <artifactId>sprocket-core</artifactId>
+		  <version>0.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.niobium</groupId>
+			<artifactId>ubc-api</artifactId>
+			<version>0.1</version>
 		</dependency>
 
 
@@ -146,8 +152,8 @@
 	</dependencies>
 	<parent>
 		<groupId>com.ubiquity</groupId>
-		<artifactId>giftsender-parent</artifactId>
+		<artifactId>sprocket-parent</artifactId>
 		<version>0.1</version>
-		<relativePath>../giftsender-parent/pom.xml</relativePath>
+		<relativePath>../sprocket-parent/pom.xml</relativePath>
 	</parent>
 </project>
