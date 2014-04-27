@@ -4,10 +4,10 @@
 	<artifactId>ubc-commerce</artifactId>
 	<name>UBC Commerce</name>
 	<parent>
-		<groupId>com.niobium</groupId>
-		<artifactId>niobium-parent</artifactId>
+		<groupId>com.ubiquity</groupId>
+		<artifactId>ubc-parent</artifactId>
 		<version>0.1</version>
-		<relativePath>../niobium-parent/pom.xml</relativePath>
+		<relativePath>../ubc-parent/pom.xml</relativePath>
 	</parent>
 	
 	<dependencies>
@@ -25,13 +25,13 @@
 		
 		<dependency>
 		  <artifactId>ubc-media</artifactId>
-		  <groupId>com.niobium</groupId>
+		  <groupId>com.ubiquity</groupId>
 		  <version>0.1</version>
 		</dependency>
 		
 		<dependency>
 		  <artifactId>ubc-identity</artifactId>
-		  <groupId>com.niobium</groupId>
+		  <groupId>com.ubiquity</groupId>
 		  <version>0.1</version>
 		</dependency>
 		
