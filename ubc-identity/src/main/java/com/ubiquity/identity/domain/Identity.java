@@ -20,12 +20,6 @@ public class Identity {
 	@Column(name = "identity_id")
 	private Long identityId;
 
-	@Column(name = "username")
-	private String username;
-
-	@Column(name = "password")
-	private String password;
-
 	@Column(name = "is_active", nullable = false)
 	protected Boolean isActive;
 
@@ -45,11 +39,6 @@ public class Identity {
 	}
 
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-
 	public void setUser(User user) {
 		this.user = user;
 	}
@@ -59,17 +48,6 @@ public class Identity {
 		return identityId;
 	}
 
-	public String getUsername() {
-		return username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
 
 	public User getUser() {
 		return user;
@@ -93,24 +71,12 @@ public class Identity {
 
 	public static class Builder {
 		private Long identityId;
-		private String username;
-		private String password;
 		private Boolean isActive;
 		private Long lastUpdated;
 		private User user;
 
 		public Builder identityId(Long identityId) {
 			this.identityId = identityId;
-			return this;
-		}
-
-		public Builder username(String username) {
-			this.username = username;
-			return this;
-		}
-
-		public Builder password(String password) {
-			this.password = password;
 			return this;
 		}
 
@@ -137,8 +103,6 @@ public class Identity {
 
 	private Identity(Builder builder) {
 		this.identityId = builder.identityId;
-		this.username = builder.username;
-		this.password = builder.password;
 		this.isActive = builder.isActive;
 		this.lastUpdated = builder.lastUpdated;
 		this.user = builder.user;

@@ -1,5 +1,7 @@
 package com.ubiquity.identity.service;
 
+import java.util.UUID;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
@@ -7,16 +9,24 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.Cache;
 import com.niobium.repository.CacheRedisImpl;
+import com.niobium.repository.jpa.EntityManagerSupport;
+import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.NativeIdentity;
+import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.repository.UserRepository;
+import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
 
 public class AuthenticationService {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
-	
+
 	private Cache cache;
+	private UserRepository userRepository;
 
 	public AuthenticationService(Configuration configuration) {
 		cache = new CacheRedisImpl(
 				configuration.getInt("redis.user.session.database"));
+		userRepository = new UserRepositoryJpaImpl();
 	}
 
 	/***
@@ -32,6 +42,47 @@ public class AuthenticationService {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	public User authenticate(String username, String password) {
+		try {
+			User user = userRepository.searchUserByUsernameAndPassword(username, password);
+			return user;
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+	}
+	
+	public User register(String username, String password, String displayName, ClientPlatform platform) {
+		// first check if the user name is take
+		try {				
+			User user = userRepository.searchUserByUsername(username);
+			if(user != null)
+				throw new IllegalArgumentException("Username already taken");
+
+			user = new User.Builder()
+			.lastUpdated(System.currentTimeMillis())
+			.clientPlatform(ClientPlatform.Android)
+			.displayName(displayName)
+			.build();
+
+			NativeIdentity identity = new NativeIdentity.Builder()
+				.isActive(Boolean.TRUE)
+				.lastUpdated(System.currentTimeMillis())
+				.user(user)
+				.username(username)
+				.password(password)
+				.build();
+			user.getIdentities().add(identity);
+
+			EntityManagerSupport.beginTransaction();
+			userRepository.create(user);
+			EntityManagerSupport.commit();
+			
+			return user;
+		} finally {
+			EntityManagerSupport.closeEntityManager();
 		}
 	}
 
@@ -53,6 +104,10 @@ public class AuthenticationService {
 		log.debug("APIKey: {} ", APIKey);
 		APIKey += sessionToken;
 		return APIKey;
+	}
+	
+	public String generateApiKey() {
+		return UUID.randomUUID().toString();
 	}
 
 	public void saveAuthkey(Long userId, String apiKey) {

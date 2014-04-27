@@ -55,5 +55,32 @@ public class UserRepositoryJpaImpl extends BaseRepositoryJpaImpl <Long, User> im
 		return identity.getUser();
 
 	}
+
+	@Override
+	public User searchUserByUsername(String username) {
+		Query query = getEntityManager().createQuery("select ni from NativeIdentity ni where ni.username = :username");
+		query.setParameter("username", username);
+		Identity identity;
+		try {
+			identity = (Identity)query.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+		return identity.getUser();
+	}
+
+	@Override
+	public User searchUserByUsernameAndPassword(String username, String password) {
+		Query query = getEntityManager().createQuery("select ni from NativeIdentity ni where ni.username = :username and ni.password = :password");
+		query.setParameter("username", username);
+		query.setParameter("password", password);
+		Identity identity;
+		try {
+			identity = (Identity)query.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+		return identity.getUser();
+	}
 	
 }

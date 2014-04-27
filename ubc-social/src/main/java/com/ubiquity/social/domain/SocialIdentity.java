@@ -2,6 +2,7 @@ package com.ubiquity.social.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
@@ -13,6 +14,7 @@ import com.ubiquity.identity.domain.User;
  *
  */
 @Entity
+@Table(name = "social_identity")
 public class SocialIdentity extends Identity {
 
 	@Column(name = "identifier", nullable = false)

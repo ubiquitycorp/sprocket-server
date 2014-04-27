@@ -41,5 +41,22 @@ public interface UserRepository extends Repository <Long, User> {
 	 * @return A user or null if there is no user by that identity
 	 */
 	User getByIdentityId(Long identityId);
+	
+	/**
+	 * Searches for a user with this username in the default identity
+	 * 
+	 * @param username
+	 * @return
+	 */
+	User searchUserByUsername(String username);
+	
+	/***
+	 * Gets the user by username / password by comparing it against fields in the default identity
+	 * 
+	 * @param username
+	 * @param password
+	 * @return
+	 */
+	User searchUserByUsernameAndPassword(String username, String password);
 }
 
