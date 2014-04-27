@@ -33,7 +33,6 @@ public class GoogleAPI implements Social {
 	private static Social google = null;
 	OAuthService service = null;
 	
-	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private GooglePlusApiEndpoints googleApi;
@@ -57,8 +56,9 @@ public class GoogleAPI implements Social {
 		ClientResponse<String> response = null;
 		try {
 			response = googleApi.getMe(identity.getAccessToken());
+			log.debug("response code: {}", response.getResponseStatus().getStatusCode());
 			GooglePersonDto result = jsonConverter.parse(response.getEntity(), GooglePersonDto.class);
-			Contact contact = GooglePlusApiDtoAssembler.assembleContact(result);
+			Contact contact = GooglePlusApiDtoAssembler.assembleContact(identity, result);
 			return contact;
 		} finally {
 			if(response != null)
@@ -76,7 +76,7 @@ public class GoogleAPI implements Social {
 			
 			List<GooglePersonDto> peopleDtoList = jsonConverter.convertToListFromList(result.getItems(), GooglePersonDto.class);
 			for(GooglePersonDto personDto : peopleDtoList) {
-				Contact contact = GooglePlusApiDtoAssembler.assembleContact(personDto);
+				Contact contact = GooglePlusApiDtoAssembler.assembleContact(identity, personDto);
 				contacts.add(contact);
 			}
 			return contacts;

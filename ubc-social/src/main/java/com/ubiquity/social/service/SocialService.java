@@ -22,7 +22,6 @@ public class SocialService {
 	public SocialIdentity findSocialIdentity(String providerIdentifier, SocialProviderType providerType) {
 		SocialIdentity identity = socialIdentityRepository.findOneByProviderIdentifier(providerIdentifier, providerType);
 		return identity;
-	}
-	
+	}	
 
 }

@@ -20,15 +20,20 @@ public class GooglePlusApiDtoAssembler {
 	 * 
 	 * @return a contact entity without an internal pk
 	 */
-	public static Contact assembleContact(GooglePersonDto result) {
+	public static Contact assembleContact(SocialIdentity identity, GooglePersonDto result) {
+		
+		identity.setIdentifier(result.getId());
+		identity.setIsActive(Boolean.TRUE);
+		identity.setLastUpdated(System.currentTimeMillis());
+		identity.setSocialProviderType(SocialProviderType.Google);
+		
 		Contact contact = new Contact.Builder()
-			.socialIdentity(new SocialIdentity.Builder()
-				.identifier(result.getId())
-				.isActive(Boolean.TRUE)
-				.socialProviderType(SocialProviderType.Google).build())
+			.socialIdentity(identity)
 			.firstName(result.getFirstName())
 			.lastName(result.getLastName())
 			.displayName(result.getDisplayName())
+			.lastUpdated(System.currentTimeMillis())
+			.owner(identity.getUser())
 			.image(result.getImage())
 		.build();
 

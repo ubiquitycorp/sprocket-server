@@ -48,112 +48,7 @@ public class LinkedInAPIOAuth2Strategy implements Social {
 		return linkedin;
 	}
 
-	//	/***
-	//	 * This method authenticate user to LinkedIn using given token and secret
-	//	 * token returns true if successfully connects to Linked and gets user
-	//	 * profile, false if user is not authenticated or expired session token
-	//	 * 
-	//	 * @param token
-	//	 *            , @param secretToken
-	//	 * @return
-	//	 */
-	//	@Override
-	//	public Contact authenticateUser(String token, String secretToken) {
-	//		try {
-	//			String url = profileUrl + "?format=json&oauth2_access_token=" + token;
-	//			HttpResponse response = HttpUtility.sendGetRequest(url, null);
-	//			if (response.getStatusLine().getStatusCode() == 200){
-	//				AbstractContact profile = (AbstractContact) JsonConverter
-	//						.getInstance().convertFromPayload(response.getEntity().getContent(), LinkedInConnectionDto.class);
-	//				return profile.Convert();
-	//			} else
-	//				return null;
-	//		} catch (Exception ex) {
-	//			log.error("failed to send authentication request: " + ex.toString());
-	//			return null;
-	//		}
-	//	}
-
-	//	/***
-	//	 * This method retrieved LinkedIn connections from their APi then parsed it to list of our contact domain
-	//	 * @param token
-	//	 * @param secretToken
-	//	 * @return list of Contact domain
-	//	 */
-	//	@Override
-	//	public List<Contact> getContacts(String token, String secretToken,
-	//			Long userId) {
-	//		String url = connectionUrl + "?modified=new&format=json&oauth2_access_token=" + token;
-	//		List<Contact> contactsList = new ArrayList<Contact>();
-	//		try {
-	//			HttpResponse response = HttpUtility.sendGetRequest(url, null);
-	//			String contactsJson = HttpUtility.getResponseBodyAsString(response);
-	//			contactsJson = JsonConverter.getInstance().getValueByName(
-	//					contactsJson, "values");
-	//			List<LinkedInConnectionDto> contacts = new ArrayList<LinkedInConnectionDto>();
-	//			if (!contactsJson.isEmpty()) {
-	//				contacts = JsonConverter.getInstance()
-	//						.convertToListFromPayload(contactsJson,
-	//								LinkedInConnectionDto.class);
-	//				parseprofileImage(contacts, contactsJson);
-	//				for (LinkedInConnectionDto socialContact : contacts) {
-	//					socialContact.setOwnerId(userId); // set owner id of
-	//														// contacts to userId
-	//					contactsList.add(socialContact.Convert()); // convert to
-	//																// Contact JPA
-	//																// object
-	//				}
-	//			}
-	//
-	//		} catch (Exception ex) {
-	//			log.error("failed to send authentication request: " + ex.toString());
-	//		}
-	//		return contactsList;
-	//	}
-	//
-	//	public void parseprofileImage(List<LinkedInConnectionDto> contacts,
-	//			String jsonContacts) {
-	//		String url;
-	//		JsonArray array = JsonConverter.getInstance()
-	//				.parse(jsonContacts, JsonElement.class).getAsJsonArray();
-	//		for (int i = 0; i < contacts.size(); i++) {
-	//			if (array.get(i).getAsJsonObject().get("pictureUrl") != null) {
-	//				url = array.get(i).getAsJsonObject().get("pictureUrl")
-	//						.getAsString();
-	//				contacts.get(i).setImage(new Image(url));
-	//			}
-	//		}
-	//	}
-	//
-	//	@Override
-	//	public List<Event> findEvents(String token, String secretToken,
-	//			String socialIdentifier, List<Contact> contact) {
-	//		throw new UnsupportedOperationException();
-	//	}
-	//
-	//	@Override
-	//	public Boolean postToWall(String token, String secretToken,
-	//			String socialIdentifier, String toSocialIdentifier,String message) {
-	//		String url = messageUrl + "?oauth2_access_token=" + token;
-	//		try {
-	//			Message linkedInMessage = new Message();
-	//			linkedInMessage.setSubject("You received a gift!");
-	//			linkedInMessage.setBody(message);
-	//			linkedInMessage.setRecipients(new String[] {toSocialIdentifier});
-	//			Map<String, String> headerparameters = new HashMap<String, String>();
-	//			headerparameters.put("Content-Type", "application/json");
-	//			HttpResponse response = HttpUtility.sendPostRequest(url, JsonConverter.getInstance().convertToPayload(linkedInMessage), headerparameters);
-	//			
-	//			if(response.getStatusLine().getStatusCode() == 201){
-	//				return true;
-	//			} else {
-	//				return false;
-	//			}
-	//		} catch (Exception ex) {
-	//			log.error("failed to post to LinkedIn contact: " + ex.toString());
-	//			return false;
-	//		}
-	//	}
+	
 
 	@Override
 	public Contact authenticateUser(SocialIdentity identity) {
@@ -163,7 +58,7 @@ public class LinkedInAPIOAuth2Strategy implements Social {
 			// convert the raw json into a container
 			LinkedInConnectionDto result = jsonConverter.parse(response.getEntity(), LinkedInConnectionDto.class);
 			// create a strongly typed list from the generic data container
-			Contact contact = LinkedInApiDtoAssembler.assembleContact(result);
+			Contact contact = LinkedInApiDtoAssembler.assembleContact(identity, result);
 			return contact;
 
 		} finally {
@@ -187,7 +82,7 @@ public class LinkedInAPIOAuth2Strategy implements Social {
 			// assemble from dto to entity
 			for(LinkedInConnectionDto connectionDto : connectionsDtoList) {
 				log.debug("Assembling contact {}", connectionDto);
-				contacts.add(LinkedInApiDtoAssembler.assembleContact(connectionDto));
+				contacts.add(LinkedInApiDtoAssembler.assembleContact(identity, connectionDto));
 			}
 			return contacts;
 		} finally {

@@ -29,15 +29,45 @@ public class FacebookGraphApiDtoAssembler {
 	 * 
 	 * @return a contact entity without an internal pk
 	 */
+	public static Contact assembleContact(SocialIdentity identity, FacebookContactDto result) {
+		
+		identity.setIdentifier(result.getId());
+		identity.setIsActive(Boolean.TRUE);
+		identity.setLastUpdated(System.currentTimeMillis());
+		identity.setSocialProviderType(SocialProviderType.Facebook);
+		
+		// set the result and type on the 
+		Contact contact = new Contact.Builder()
+			.socialIdentity(identity)
+			.owner(identity.getUser())
+			.firstName(result.getFirstName())
+			.lastName(result.getLastName())
+			.displayName(result.getName())
+			.lastUpdated(System.currentTimeMillis())
+			.image(new Image(String.format("https://graph.facebook.com/%s/picture", result.getId())))
+		.build();
+
+		return contact;
+	}
+	
+	/***
+	 * Returns a contact 
+	 * 
+	 * @param result A "contact" result
+	 * 
+	 * @return a contact entity without an internal pk
+	 */
 	public static Contact assembleContact(FacebookContactDto result) {
 		Contact contact = new Contact.Builder()
 			.socialIdentity(new SocialIdentity.Builder()
 				.identifier(result.getId())
 				.isActive(Boolean.TRUE)
+				.lastUpdated(System.currentTimeMillis())
 				.socialProviderType(SocialProviderType.Facebook).build())
 			.firstName(result.getFirstName())
 			.lastName(result.getLastName())
 			.displayName(result.getName())
+			.lastUpdated(System.currentTimeMillis())
 			.image(new Image(String.format("https://graph.facebook.com/%s/picture", result.getId())))
 		.build();
 

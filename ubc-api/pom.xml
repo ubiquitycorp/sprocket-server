@@ -28,7 +28,7 @@
 		<dependency>
 		  <artifactId>niobium-common</artifactId>
 		  <groupId>com.niobium</groupId>
-		  <version>0.1</version>
+		  <version>0.2</version>
 		</dependency>
 		
 	</dependencies>

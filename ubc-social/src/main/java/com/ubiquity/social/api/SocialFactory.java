@@ -5,7 +5,6 @@ import com.ubiquity.social.api.facebook.FacebookAPI;
 import com.ubiquity.social.api.google.GoogleAPI;
 import com.ubiquity.social.api.linkedin.LinkedInAPIOAuth1Strategy;
 import com.ubiquity.social.api.linkedin.LinkedInAPIOAuth2Strategy;
-import com.ubiquity.social.api.yahoo.YahooAPI;
 import com.ubiquity.social.domain.SocialProviderType;
 
 
@@ -33,8 +32,7 @@ public class SocialFactory {
 			provider = FacebookAPI.getProviderAPI();
 			break;
 		case Yahoo:
-			provider = YahooAPI.getProviderAPI();
-			break;
+			throw new UnsupportedOperationException();
 		case LinkedIn:
 			if (client.equals(ClientPlatform.Android))
 				provider = LinkedInAPIOAuth1Strategy.getProviderAPI();

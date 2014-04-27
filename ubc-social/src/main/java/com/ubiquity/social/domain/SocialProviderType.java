@@ -21,11 +21,18 @@ public enum SocialProviderType
 
     public int getValue() { return value; }
 
-	public static String getName(int provider_id) {
-		return SocialProviderType.values()[(provider_id - 1)].name();
+	public static String getName(int providerId) {
+		validate(providerId);
+		return SocialProviderType.values()[(providerId - 1)].name();
 	}
 	
-	public static SocialProviderType getEnum(int provider_id) {
-		return SocialProviderType.values()[(provider_id - 1)];
+	public static SocialProviderType getEnum(int providerId) {
+		validate(providerId);
+		return SocialProviderType.values()[(providerId - 1)];
+	}
+	
+	private static void validate(int providerId) {
+		if(SocialProviderType.values().length == providerId - 1)
+		throw new IllegalArgumentException("Unknown provider id");
 	}
 }

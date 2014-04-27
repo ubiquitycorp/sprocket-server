@@ -39,6 +39,7 @@ public class SocialIdentity extends Identity {
 		super();
 	}
 
+	
 	public String getIdentifier() {
 		return identifier;
 	}

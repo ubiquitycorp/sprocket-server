@@ -55,8 +55,12 @@ public class FacebookAPI implements Social {
 		ClientResponse<String> response = null;
 		try {
 			response = graphApi.getMe(identity.getAccessToken());
+			if(response.getResponseStatus().getStatusCode() != 200)
+				throw new RuntimeException("Unable to authenticate with the provided credentials");
+				
 			FacebookContactDto contactDto = jsonConverter.parse(response.getEntity(), FacebookContactDto.class);
-			return FacebookGraphApiDtoAssembler.assembleContact(contactDto);
+			return FacebookGraphApiDtoAssembler.assembleContact(identity, contactDto);
+			
 		} finally {
 			if(response != null)
 				response.releaseConnection();

@@ -44,7 +44,7 @@ public class LinkedInAPIOAuth1Strategy implements Social {
 
 	private LinkedInAPIOAuth1Strategy() {
 		try {
-			Configuration configuration = new PropertiesConfiguration("giftsenderapi.properties");
+			Configuration configuration = new PropertiesConfiguration("sprocketapi.properties");
 			String consumerKey = configuration.getString("social.linkedin.app.consumerKey");
 			String consumerSecret = configuration.getString("social.linkedin.app.consumerSecret");
 			// start the oauth service; we can't use a rest easy proxy here to support the legacy protocols
@@ -78,10 +78,10 @@ public class LinkedInAPIOAuth1Strategy implements Social {
 		if (response.getCode() == 200) {
 			InputStream is = new ByteArrayInputStream(response.getBody().getBytes());
 			LinkedInConnectionDto contactDto = jsonConverter.convertFromPayload(is, LinkedInConnectionDto.class);
-			Contact contact = LinkedInApiDtoAssembler.assembleContact(contactDto);
+			Contact contact = LinkedInApiDtoAssembler.assembleContact(identity, contactDto);
 			return contact;
 		}	
-		return null;
+		throw new RuntimeException("Could not authenticate with social network");
 	}
 
 	@Override
@@ -91,6 +91,7 @@ public class LinkedInAPIOAuth1Strategy implements Social {
 		OAuthRequest request = new OAuthRequest(Verb.GET, CONNECTION_URL);
 		oAuthService.signRequest(accessToken, request);
 		Response response = request.send();
+		
 		String contactsJson = response.getBody();
 
 		// convert the raw json into a container
@@ -98,7 +99,7 @@ public class LinkedInAPIOAuth1Strategy implements Social {
 		// create a strongly typed list from the generic data container
 		List<LinkedInConnectionDto> connectionsDtoList = jsonConverter.convertToListFromList(result.getValues(), LinkedInConnectionDto.class);
 		for(LinkedInConnectionDto connectionDto : connectionsDtoList) {
-			Contact contact = LinkedInApiDtoAssembler.assembleContact(connectionDto);
+			Contact contact = LinkedInApiDtoAssembler.assembleContact(identity, connectionDto);
 			contacts.add(contact);
 		}
 		return contacts;

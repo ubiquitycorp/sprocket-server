@@ -8,15 +8,20 @@ import com.ubiquity.social.domain.SocialProviderType;
 
 public class LinkedInApiDtoAssembler {
 
-	public static Contact assembleContact(LinkedInConnectionDto result) {
+	public static Contact assembleContact(SocialIdentity identity, LinkedInConnectionDto result) {
+		
+		identity.setIdentifier(result.getId());
+		identity.setIsActive(Boolean.TRUE);
+		identity.setLastUpdated(System.currentTimeMillis());
+		identity.setSocialProviderType(SocialProviderType.LinkedIn);
+		
 		Contact.Builder contactBuilder = new Contact.Builder()
-		.socialIdentity(new SocialIdentity.Builder()
-		.identifier(result.getId())
-		.isActive(Boolean.TRUE)
-		.socialProviderType(SocialProviderType.LinkedIn).build())
+		.socialIdentity(identity)
 		.firstName(result.getFirstName())
 		.lastName(result.getLastName())
-		.displayName(result.getFormattedName());
+		.lastUpdated(System.currentTimeMillis())
+		.displayName(result.getFormattedName())
+		.owner(identity.getUser());
 
 		if(result.getPictureUrl() != null)
 			contactBuilder.image(new Image(result.getPictureUrl()));
