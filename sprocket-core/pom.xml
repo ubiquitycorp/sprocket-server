@@ -13,13 +13,13 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>com.niobium</groupId>
+			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-social</artifactId>
 			<version>0.1</version>
 		</dependency>
 
 		<dependency>
-			<groupId>com.niobium</groupId>
+			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-messaging</artifactId>
 			<version>0.1</version>
 		</dependency>
