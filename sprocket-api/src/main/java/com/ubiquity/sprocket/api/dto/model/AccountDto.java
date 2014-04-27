@@ -1,102 +1,54 @@
 package com.ubiquity.sprocket.api.dto.model;
 
-/***
- * 
- * @author peter.tadros
- *
- */
+import java.util.LinkedList;
+import java.util.List;
+
 public class AccountDto {
 
 	private Long userId;
-	
-	private String username;
-	
-	private String password;
-	
-	private String accessToken;
-		
-	private Integer providerId;
-	
-	private String secretToken;
-	
 	private String apiKey;
-	
-	private String displayName;
-	
-	private Integer clientPlatformId;
+	private List<IdentityDto> identities = new LinkedList<IdentityDto>();
 
 	public Long getUserId() {
 		return userId;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public String getAccessToken() {
-		return accessToken;
-	}
-
-	public Integer getProviderId() {
-		return providerId;
-	}
-
-	public String getSecretToken() {
-		return secretToken;
 	}
 
 	public String getApiKey() {
 		return apiKey;
 	}
 
-	public Integer getClientPlatformId() {
-		return clientPlatformId;
+	public List<IdentityDto> getIdentities() {
+		return identities;
 	}
 
-	public String getDisplayName() {
-		return displayName;
+	public static class Builder {
+		private Long userId;
+		private String apiKey;
+		private List<IdentityDto> identities;
+
+		public Builder userId(Long userId) {
+			this.userId = userId;
+			return this;
+		}
+
+		public Builder apiKey(String apiKey) {
+			this.apiKey = apiKey;
+			return this;
+		}
+
+		public Builder identities(List<IdentityDto> identities) {
+			this.identities = identities;
+			return this;
+		}
+
+		public AccountDto build() {
+			return new AccountDto(this);
+		}
 	}
 
-	public void setUserId(Long userId) {
-		this.userId = userId;
+	private AccountDto(Builder builder) {
+		this.userId = builder.userId;
+		this.apiKey = builder.apiKey;
+		this.identities = builder.identities;
 	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public void setAccessToken(String accessToken) {
-		this.accessToken = accessToken;
-	}
-
-	public void setProviderId(Integer providerId) {
-		this.providerId = providerId;
-	}
-
-	public void setSecretToken(String secretToken) {
-		this.secretToken = secretToken;
-	}
-
-	public void setApiKey(String apiKey) {
-		this.apiKey = apiKey;
-	}
-
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
-	}
-
-	public void setClientPlatformId(Integer clientPlatformId) {
-		this.clientPlatformId = clientPlatformId;
-	}
-	
-	
-	
 }

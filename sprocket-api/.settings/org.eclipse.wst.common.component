@@ -29,7 +29,7 @@
         <dependent-module archiveName="ubc-api-0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ubc-api/ubc-api">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="niobium-common-0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/niobium-common/niobium-common">
+        <dependent-module archiveName="niobium-common-0.2.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/niobium-common/niobium-common">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="java-output-path" value="/sprocket-api/target/classes"/>
