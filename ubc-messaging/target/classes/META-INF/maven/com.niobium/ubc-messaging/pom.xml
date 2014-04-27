@@ -1,0 +1,20 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>ubc-messaging</artifactId>
+	<name>UBC Messaging</name>
+	<parent>
+		<groupId>com.niobium</groupId>
+		<artifactId>niobium-parent</artifactId>
+		<version>0.1</version>
+		<relativePath>../niobium-parent/pom.xml</relativePath>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<artifactId>niobium-common</artifactId>
+			<groupId>com.niobium</groupId>
+			<version>0.1</version>
+		</dependency>
+	</dependencies>
+</project>
