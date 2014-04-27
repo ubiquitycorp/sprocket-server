@@ -15,11 +15,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.api.exception.HttpException;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
+import com.ubiquity.identity.service.UserService;
 import com.ubiquity.social.api.Social;
 import com.ubiquity.social.api.SocialFactory;
+import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.SocialIdentity;
 import com.ubiquity.social.domain.SocialProviderType;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
@@ -62,7 +65,6 @@ public class UsersEndpoint {
 				identityDto.getPassword(), identityDto.getDisplayName(), clientPlatform);
 		
 		// user now has a single, native identity
-		
 		String apiKey = authenticationService.generateApiKey();
 		
 		// set the passed-in DTO with an api key and new user id and send it back
@@ -96,19 +98,33 @@ public class UsersEndpoint {
 		SocialProviderType socialProvider = SocialProviderType.getEnum(identityDto.getIdentityProviderId());
 
 		// create the identity
-		User user = ServiceFactory.getUserService().getUserById(userId);
+		UserService userService = ServiceFactory.getUserService();
+		User user = userService.getUserById(userId);
 		SocialIdentity identity = new SocialIdentity.Builder()
 			.accessToken(identityDto.getAccessToken())
 			.secretToken(identityDto.getSecretToken())
 			.socialProviderType(socialProvider)
-			.user(user).build();
+			.user(user)
+			.build();
 		user.getIdentities().add(identity);
 		
 		// get the correct provider based on the social network we are activating
 		Social social = SocialFactory.createProvider(socialProvider, clientPlatform);
 		
-		// authenticate the user
-		social.authenticateUser(identity);
+		// authenticate the user; this will give the user a contact record specific for to this network
+		Contact contact;
+		try {
+			contact = social.authenticateUser(identity);
+		} catch (Exception e) {
+			throw new HttpException("Could not authenticate with provider", 401);
+		}
+		
+		ServiceFactory.getContactService().create(contact);
+		
+		// now update the user's identity
+		userService.update(user);
+		
+		
 		
 		IdentityDto result = new IdentityDto.Builder().providerIdentifier(identity.getIdentifier()).build();
 		return Response.ok()
