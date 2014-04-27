@@ -6,16 +6,18 @@
 
 	<persistence-unit name="manager" transaction-type="RESOURCE_LOCAL">
 
-		
+
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		
+
 		<class>com.ubiquity.identity.domain.User</class>
+		<class>com.ubiquity.identity.domain.Identity</class>
+		<class>com.ubiquity.identity.domain.NativeIdentity</class>
 		<class>com.ubiquity.social.domain.Contact</class>
 		<class>com.ubiquity.social.domain.Event</class>
 		<class>com.ubiquity.social.domain.SocialIdentity</class>
-		
-		
-		
+
+
+
 		<properties>
 
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
@@ -27,7 +29,7 @@
 			<property name="hibernate.format_sql" value="${hibernate.debug}" />
 			<property name="hibernate.transaction.flush_before_completion"
 				value="true" />
-			
+
 
 			<!-- Connection Pooling settings -->
 			<property name="hibernate.connection.provider_class"
@@ -45,7 +47,7 @@
 			<property name="bonecp.releaseHelperThreads" value="2" />
 			<property name="bonecp.statementCachePerConnection" value="10" />
 			<property name="acquireRetryAttempts" value="5" />
-			
+
 			<property name="hibernate.hbm2ddl.auto" value="${hibernate.schema.auto}" />
 
 
