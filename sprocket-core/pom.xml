@@ -10,6 +10,28 @@
 	<artifactId>sprocket-core</artifactId>
 	<name>Sprocket Core</name>
 
+	<build>
+
+		<finalName>giftsender-core</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
+
+	</build>
 	<dependencies>
 
 		<dependency>
@@ -28,6 +50,13 @@
 			<groupId>com.niobium</groupId>
 			<artifactId>niobium-amqp</artifactId>
 			<version>0.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.6</version>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
