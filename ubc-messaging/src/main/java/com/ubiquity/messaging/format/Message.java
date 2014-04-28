@@ -18,4 +18,11 @@ public class Message {
 		return content;
 	}
 
+	@Override
+	public String toString() {
+		return "Message [type=" + type + ", content=" + content + "]";
+	}
+	
+	
+
 }

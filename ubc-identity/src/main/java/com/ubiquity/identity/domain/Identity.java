@@ -107,4 +107,6 @@ public class Identity {
 		this.lastUpdated = builder.lastUpdated;
 		this.user = builder.user;
 	}
+	
+	
 }

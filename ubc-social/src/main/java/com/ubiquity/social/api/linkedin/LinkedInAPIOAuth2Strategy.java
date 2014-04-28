@@ -82,7 +82,7 @@ public class LinkedInAPIOAuth2Strategy implements Social {
 			// assemble from dto to entity
 			for(LinkedInConnectionDto connectionDto : connectionsDtoList) {
 				log.debug("Assembling contact {}", connectionDto);
-				contacts.add(LinkedInApiDtoAssembler.assembleContact(identity, connectionDto));
+				contacts.add(LinkedInApiDtoAssembler.assembleContact(identity.getUser(), connectionDto));
 			}
 			return contacts;
 		} finally {

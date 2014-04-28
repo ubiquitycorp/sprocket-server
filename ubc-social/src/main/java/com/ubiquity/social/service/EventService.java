@@ -113,72 +113,83 @@ public class EventService {
 		}
 	}
 
-	public int refreshEventsForUser(User user) {
-
-		// since this is only FB for now, we can set this specific to Facebook
-		Social social = SocialFactory.createProvider(SocialProviderType.Facebook, user.getClientPlatform());
-
+	
+	public int refreshEventsForSocialIdentity(SocialIdentity identity) {
 		
-		Set<Identity> identities = user.getIdentities();
-		for(Identity identity : identities) {
-			if(identity instanceof SocialIdentity) {
-				SocialIdentity socialIdentity = (SocialIdentity)identity;
-				// only process users who have an FB identity
-				if(socialIdentity.getSocialProviderType() == SocialProviderType.Facebook) {
+		if(identity.getSocialProviderType() != SocialProviderType.Facebook)
+			throw new UnsupportedOperationException();
+		
+		Social social = SocialFactory.createProvider(SocialProviderType.Facebook, identity.getUser().getClientPlatform());
 
-					// get the list of local contacts for this user
-					List<Contact> contacts = contactRepository.findByOwnerIdAndSocialIdentityProvider(user.getUserId(), SocialProviderType.Facebook);
-					// the returned list will be events will be events with no identifiers, but with contacts set
-					List<Event> events = social.findEventsCreatedByContacts(socialIdentity, contacts);
+		// get the list of local contacts for this user
+		List<Contact> contacts = contactRepository.findByOwnerIdAndSocialIdentityProvider(identity.getUser().getUserId(), SocialProviderType.Facebook);
+		// the returned list will be events will be events with no identifiers, but with contacts set
+		List<Event> events = social.findEventsCreatedByContacts(identity, contacts);
 
-					// get the cached list
-					List<Event> cached = eventRepository.findByUserId(user.getUserId());
+		// get the cached list
+		List<Event> cached = eventRepository.findByUserId(identity.getUser().getUserId());
 
-					// go through recently downloaded events
-					for(Event event : events) {
+		// go through recently downloaded events
+		for(Event event : events) {
 
-						// set the last modified date (whether it's a create or update)
-						event.setLastUpdated(System.currentTimeMillis());
+			// set the last modified date (whether it's a create or update)
+			event.setLastUpdated(System.currentTimeMillis());
 
-						// if any are within in the next month, let's process them
-						if(DateUtil.isWithinWeeksFromNow(event.getStartDate(), eventViewInWeeks)) {
+			// if any are within in the next month, let's process them
+			if(DateUtil.isWithinWeeksFromNow(event.getStartDate(), eventViewInWeeks)) {
+		
+				try {
+					// Start transaction
+					EntityManagerSupport.beginTransaction();
 					
-							try {
-								// Start transaction
-								EntityManagerSupport.beginTransaction();
-								
-								// search event cache by identifier provided by FB
-								int idx = cached.indexOf(event);
-								if(idx >= 0) {
-									log.debug("Found cached event, it's an update");
-									Event inCache = cached.get(idx);
-									// set the id so we replace the record with data that's coming from the social network
-									event.setEventId(inCache.getEventId());
-									eventRepository.update(event);
-								} else {
-									// it's a new one
-									log.debug("Creating a new event");
-									event.setUser(user);
-									eventRepository.create(event);
-								}
-								
-								// Commit 
-								EntityManagerSupport.commit();
-							} finally {
-								EntityManagerSupport.closeEntityManager();
-							}
-							
-							dataModificationCache.put(user.getUserId(), SocialCacheKeys.UserProperties.EVENTS, System.currentTimeMillis());
-						}
+					// search event cache by identifier provided by FB
+					int idx = cached.indexOf(event);
+					if(idx >= 0) {
+						log.debug("Found cached event, it's an update");
+						Event inCache = cached.get(idx);
+						// set the id so we replace the record with data that's coming from the social network
+						event.setEventId(inCache.getEventId());
+						eventRepository.update(event);
+					} else {
+						// it's a new one
+						log.debug("Creating a new event");
+						event.setUser(identity.getUser());
+						eventRepository.create(event);
 					}
+					
+					// Commit 
+					EntityManagerSupport.commit();
+				} finally {
+					EntityManagerSupport.closeEntityManager();
 				}
+				
+				dataModificationCache.put(identity.getUser().getUserId(), SocialCacheKeys.UserProperties.EVENTS, System.currentTimeMillis());
 			}
 		}
+		
+		return 0;
+	}
+	
+	public int refreshEventsForUser(User user) {
 		return 0;
 	}
 	
 	
+	/***
+	 * Sets the value of this cache to -1, which will tell the web tier to respond with a 204 to indicate a long
+	 * loading event that has not yet produced content
+	 * 
+	 * @param userId
+	 */
+	public void resetEventsCacheTime(Long userId) {
+		dataModificationCache.put(userId, SocialCacheKeys.UserProperties.EVENTS, -1l);
+	}
 
+	public void updateCacheTime(Long ownerId){
+		// Update last modified cache
+		dataModificationCache.put(ownerId, SocialCacheKeys.UserProperties.EVENTS, System.currentTimeMillis());
+	}
+	
 	public int refreshEvents() {
 
 		int numRefreshed = 0;
@@ -195,5 +206,9 @@ public class EventService {
 		return numRefreshed;
 
 	}
+
+
+
+	
 
 }

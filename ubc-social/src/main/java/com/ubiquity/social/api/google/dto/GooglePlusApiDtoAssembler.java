@@ -1,5 +1,6 @@
 package com.ubiquity.social.api.google.dto;
 
+import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.api.google.dto.model.GooglePersonDto;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.SocialIdentity;
@@ -38,6 +39,27 @@ public class GooglePlusApiDtoAssembler {
 		.build();
 
 		return contact;
+	}
+	
+	public static Contact assembleContact(User owner, GooglePersonDto result) {
+	
+		Contact contact = new Contact.Builder()
+		.socialIdentity(new SocialIdentity.Builder()
+			.identifier(result.getId())
+			.isActive(Boolean.TRUE)
+			.lastUpdated(System.currentTimeMillis())
+			.socialProviderType(SocialProviderType.Google).build())
+		.firstName(result.getFirstName())
+		.lastName(result.getLastName())
+		.displayName(result.getDisplayName())
+		.lastUpdated(System.currentTimeMillis())
+		.owner(owner)
+		.image(result.getImage())
+		.build();
+		
+		return contact;
+		
+		
 	}
 
 	

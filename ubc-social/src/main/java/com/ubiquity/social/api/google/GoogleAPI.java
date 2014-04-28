@@ -76,7 +76,7 @@ public class GoogleAPI implements Social {
 			
 			List<GooglePersonDto> peopleDtoList = jsonConverter.convertToListFromList(result.getItems(), GooglePersonDto.class);
 			for(GooglePersonDto personDto : peopleDtoList) {
-				Contact contact = GooglePlusApiDtoAssembler.assembleContact(identity, personDto);
+				Contact contact = GooglePlusApiDtoAssembler.assembleContact(identity.getUser(), personDto);
 				contacts.add(contact);
 			}
 			return contacts;

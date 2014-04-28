@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
+import com.ubiquity.identity.domain.User;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.social.api.facebook.dto.container.FacebookDataDto;
 import com.ubiquity.social.api.facebook.dto.model.FacebookContactDto;
@@ -23,11 +24,12 @@ import com.ubiquity.social.domain.SocialProviderType;
 public class FacebookGraphApiDtoAssembler {
 		
 	/***
-	 * Returns a contact 
+	 * Assembles a contact and sets the identity user property as the owner. It also sets the 
+	 * identitifer and social provider on the passed in identity reference.
 	 * 
-	 * @param result A "me" result
-	 * 
-	 * @return a contact entity without an internal pk
+	 * @param identity
+	 * @param result
+	 * @return
 	 */
 	public static Contact assembleContact(SocialIdentity identity, FacebookContactDto result) {
 		
@@ -50,14 +52,16 @@ public class FacebookGraphApiDtoAssembler {
 		return contact;
 	}
 	
+	
 	/***
-	 * Returns a contact 
+	 * Assembles a contact with this owner set as the owner in the return object
 	 * 
-	 * @param result A "contact" result
+	 * @param owner
+	 * @param result
 	 * 
-	 * @return a contact entity without an internal pk
+	 * @return
 	 */
-	public static Contact assembleContact(FacebookContactDto result) {
+	public static Contact assembleContact(User owner, FacebookContactDto result) {
 		Contact contact = new Contact.Builder()
 			.socialIdentity(new SocialIdentity.Builder()
 				.identifier(result.getId())
@@ -67,6 +71,7 @@ public class FacebookGraphApiDtoAssembler {
 			.firstName(result.getFirstName())
 			.lastName(result.getLastName())
 			.displayName(result.getName())
+			.owner(owner)
 			.lastUpdated(System.currentTimeMillis())
 			.image(new Image(String.format("https://graph.facebook.com/%s/picture", result.getId())))
 		.build();

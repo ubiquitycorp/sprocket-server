@@ -115,7 +115,16 @@ public class ContactService {
 		// Update last modified cache
 		updateCacheTime(contact.getOwner().getUserId());
 	}
-
+	
+	/***
+	 * Sets the value of this cache to -1, which will tell the web tier to respond with a 204 to indicate a long
+	 * loading event that has not yet produced content
+	 * 
+	 * @param userId
+	 */
+	public void resetContactsCacheTime(Long userId) {
+		dataModificationCache.put(userId, SocialCacheKeys.UserProperties.CONTACTS, -1l);
+	}
 
 	public void updateCacheTime(Long ownerId){
 		// Update last modified cache

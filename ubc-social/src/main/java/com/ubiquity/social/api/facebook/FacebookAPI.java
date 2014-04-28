@@ -82,7 +82,7 @@ public class FacebookAPI implements Social {
 			// assemble from dto to entity
 			for(FacebookContactDto contactDto : contactsDtoList) {
 				log.debug("Assembling contact {}", contactDto);
-				contacts.add(FacebookGraphApiDtoAssembler.assembleContact(contactDto));
+				contacts.add(FacebookGraphApiDtoAssembler.assembleContact(identity.getUser(), contactDto));
 			}
 			return contacts;
 		} finally {
@@ -100,6 +100,12 @@ public class FacebookAPI implements Social {
 			ClientResponse<String> response = null;
 			try {
 				response = graphApi.getEvents(Long.parseLong(contact.getSocialIdentity().getIdentifier()), identity.getAccessToken());
+				if(response.getResponseStatus().getStatusCode() != 200) {
+					// in this case, for now let's not kill the whole loop when it's possible only 1 request is failing (perhaps FB removed a pointer)
+					log.warn("Retrieving events for identity {} failed, reason: {}", contact.getSocialIdentity().getIdentifier(), response.getEntity());
+					continue;
+				}
+					
 				// convert the raw json into a container
 				FacebookDataDto result = jsonConverter.parse(response.getEntity(), FacebookDataDto.class);
 

@@ -99,7 +99,7 @@ public class LinkedInAPIOAuth1Strategy implements Social {
 		// create a strongly typed list from the generic data container
 		List<LinkedInConnectionDto> connectionsDtoList = jsonConverter.convertToListFromList(result.getValues(), LinkedInConnectionDto.class);
 		for(LinkedInConnectionDto connectionDto : connectionsDtoList) {
-			Contact contact = LinkedInApiDtoAssembler.assembleContact(identity, connectionDto);
+			Contact contact = LinkedInApiDtoAssembler.assembleContact(identity.getUser(), connectionDto);
 			contacts.add(contact);
 		}
 		return contacts;
