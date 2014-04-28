@@ -24,7 +24,6 @@ public class AccountDto {
 	public static class Builder {
 		private Long userId;
 		private String apiKey;
-		private List<IdentityDto> identities;
 
 		public Builder userId(Long userId) {
 			this.userId = userId;
@@ -36,11 +35,6 @@ public class AccountDto {
 			return this;
 		}
 
-		public Builder identities(List<IdentityDto> identities) {
-			this.identities = identities;
-			return this;
-		}
-
 		public AccountDto build() {
 			return new AccountDto(this);
 		}
@@ -49,6 +43,5 @@ public class AccountDto {
 	private AccountDto(Builder builder) {
 		this.userId = builder.userId;
 		this.apiKey = builder.apiKey;
-		this.identities = builder.identities;
 	}
 }

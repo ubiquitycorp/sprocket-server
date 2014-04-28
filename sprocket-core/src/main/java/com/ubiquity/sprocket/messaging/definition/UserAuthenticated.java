@@ -1,11 +1,11 @@
 package com.ubiquity.sprocket.messaging.definition;
 
 /**
- * A message indicating a registration event
+ * A message indicating an authentication event
  * @author chris
  *
  */
-public class UserRegistered {
+public class UserAuthenticated {
 	
 	private Long userId;
 
@@ -13,7 +13,7 @@ public class UserRegistered {
 		return userId;
 	}
 
-	public UserRegistered(Long userId) {
+	public UserAuthenticated(Long userId) {
 		super();
 		this.userId = userId;
 	}

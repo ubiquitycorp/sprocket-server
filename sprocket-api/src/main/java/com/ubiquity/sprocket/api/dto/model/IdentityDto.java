@@ -4,6 +4,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
+import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
 
 /***
@@ -13,12 +14,12 @@ import com.ubiquity.sprocket.api.validation.RegistrationValidation;
  */
 public class IdentityDto {
 
-	@NotNull(groups = RegistrationValidation.class)
-	@Size(min = 3, max = 80, groups = RegistrationValidation.class)
+	@NotNull(groups = {RegistrationValidation.class, AuthenticationValidation.class})
+	@Size(min = 3, max = 80, groups = {RegistrationValidation.class, AuthenticationValidation.class})
 	private String username;
 
-	@NotNull(groups = RegistrationValidation.class)
-	@Size(min = 6, max = 20, groups = RegistrationValidation.class)
+	@NotNull(groups = {RegistrationValidation.class, AuthenticationValidation.class})
+	@Size(min = 6, max = 20, groups = {RegistrationValidation.class, AuthenticationValidation.class})
 	private String password;
 
 	@NotNull(groups = RegistrationValidation.class)
@@ -26,7 +27,7 @@ public class IdentityDto {
 	private String displayName;
 
 	@NotNull(groups = { RegistrationValidation.class,
-			ActivationValidation.class })
+			ActivationValidation.class, AuthenticationValidation.class })
 	private Integer clientPlatformId;
 
 	@NotNull(groups = ActivationValidation.class)
@@ -36,10 +37,11 @@ public class IdentityDto {
 	@NotNull(groups = ActivationValidation.class)
 	private Integer identityProviderId;
 
-	private String identifier;
-
 	@Size(min = 10, max = 255, groups = ActivationValidation.class)
 	private String secretToken;
+	
+	private String identifier;
+
 
 	public String getUsername() {
 		return username;
