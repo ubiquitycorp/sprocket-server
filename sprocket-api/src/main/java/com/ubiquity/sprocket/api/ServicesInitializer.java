@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
-import com.ubiquity.sprocket.messaging.MessageQueueProducerFactory;
+import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 /***
@@ -49,7 +49,7 @@ public class ServicesInitializer implements ServletContextListener {
 			JedisConnectionFactory.initialize(configuration);
 			
 			// start MQ services
-			MessageQueueProducerFactory.initialize(configuration);
+			MessageQueueFactory.initialize(configuration);
 			
 			ServiceFactory.initialize(configuration);
 

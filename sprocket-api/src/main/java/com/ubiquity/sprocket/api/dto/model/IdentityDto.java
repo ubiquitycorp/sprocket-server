@@ -25,7 +25,8 @@ public class IdentityDto {
 	@Size(min = 3, max = 100, groups = RegistrationValidation.class)
 	private String displayName;
 
-	@NotNull(groups = {RegistrationValidation.class, ActivationValidation.class})
+	@NotNull(groups = { RegistrationValidation.class,
+			ActivationValidation.class })
 	private Integer clientPlatformId;
 
 	@NotNull(groups = ActivationValidation.class)
@@ -35,7 +36,7 @@ public class IdentityDto {
 	@NotNull(groups = ActivationValidation.class)
 	private Integer identityProviderId;
 
-	private String providerIdentifier;
+	private String identifier;
 
 	@Size(min = 10, max = 255, groups = ActivationValidation.class)
 	private String secretToken;
@@ -68,8 +69,8 @@ public class IdentityDto {
 		return secretToken;
 	}
 
-	public String getProviderIdentifier() {
-		return providerIdentifier;
+	public String getIdentifier() {
+		return identifier;
 	}
 
 	public static class Builder {
@@ -79,7 +80,7 @@ public class IdentityDto {
 		private Integer clientPlatformId;
 		private String accessToken;
 		private Integer identityProviderId;
-		private String providerIdentifier;
+		private String identifier;
 		private String secretToken;
 
 		public Builder username(String username) {
@@ -112,8 +113,8 @@ public class IdentityDto {
 			return this;
 		}
 
-		public Builder providerIdentifier(String providerIdentifier) {
-			this.providerIdentifier = providerIdentifier;
+		public Builder identifier(String identifier) {
+			this.identifier = identifier;
 			return this;
 		}
 
@@ -134,7 +135,7 @@ public class IdentityDto {
 		this.clientPlatformId = builder.clientPlatformId;
 		this.accessToken = builder.accessToken;
 		this.identityProviderId = builder.identityProviderId;
-		this.providerIdentifier = builder.providerIdentifier;
+		this.identifier = builder.identifier;
 		this.secretToken = builder.secretToken;
 	}
 }

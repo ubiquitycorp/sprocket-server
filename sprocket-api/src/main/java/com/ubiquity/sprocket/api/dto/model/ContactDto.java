@@ -3,17 +3,16 @@ package com.ubiquity.sprocket.api.dto.model;
 public class ContactDto {
 
 	private Long contactId;
-	private Long ownerId;
 	private Boolean active;
 	private String displayName;
-	private Integer socialProviderType;
 	private String firstName;
 	private String lastName;
 	private String email;
 	private String profileUrl;
 	private String imageUrl;
 	private String etag;
-	private String socialProviderIdenitifer;
+
+	private IdentityDto identity;
 
 	public String getEtag() {
 		return etag;
@@ -47,45 +46,28 @@ public class ContactDto {
 		return contactId;
 	}
 
-	public Long getOwnerId() {
-		return ownerId;
-	}
-
 	public String getDisplayName() {
 		return displayName;
 	}
 
-	public Integer getSocialProviderType() {
-		return socialProviderType;
+	public IdentityDto getIdentity() {
+		return identity;
 	}
-
-	public String getSocialProviderIdenitifer() {
-		return socialProviderIdenitifer;
-	}
-
-
 
 	public static class Builder {
 		private Long contactId;
-		private Long ownerId;
 		private Boolean active;
 		private String displayName;
-		private Integer socialProviderType;
 		private String firstName;
 		private String lastName;
 		private String email;
 		private String profileUrl;
 		private String imageUrl;
 		private String etag;
-		private String socialProviderIdenitifer;
+		private IdentityDto identity;
 
 		public Builder contactId(Long contactId) {
 			this.contactId = contactId;
-			return this;
-		}
-
-		public Builder ownerId(Long ownerId) {
-			this.ownerId = ownerId;
 			return this;
 		}
 
@@ -96,11 +78,6 @@ public class ContactDto {
 
 		public Builder displayName(String displayName) {
 			this.displayName = displayName;
-			return this;
-		}
-
-		public Builder socialProviderType(Integer socialProviderType) {
-			this.socialProviderType = socialProviderType;
 			return this;
 		}
 
@@ -133,9 +110,9 @@ public class ContactDto {
 			this.etag = etag;
 			return this;
 		}
-		
-		public Builder socialProviderIdenitifer(String socialProviderIdenitifer) {
-			this.socialProviderIdenitifer = socialProviderIdenitifer;
+
+		public Builder identity(IdentityDto identity) {
+			this.identity = identity;
 			return this;
 		}
 
@@ -146,16 +123,14 @@ public class ContactDto {
 
 	private ContactDto(Builder builder) {
 		this.contactId = builder.contactId;
-		this.ownerId = builder.ownerId;
 		this.active = builder.active;
 		this.displayName = builder.displayName;
-		this.socialProviderType = builder.socialProviderType;
 		this.firstName = builder.firstName;
 		this.lastName = builder.lastName;
 		this.email = builder.email;
 		this.profileUrl = builder.profileUrl;
 		this.imageUrl = builder.imageUrl;
 		this.etag = builder.etag;
-		this.socialProviderIdenitifer = builder.socialProviderIdenitifer;
+		this.identity = builder.identity;
 	}
 }

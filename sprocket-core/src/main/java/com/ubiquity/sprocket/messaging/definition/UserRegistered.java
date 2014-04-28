@@ -5,7 +5,7 @@ package com.ubiquity.sprocket.messaging.definition;
  * @author chris
  *
  */
-public class UserAuthenticated {
+public class UserRegistered {
 	
 	private Long userId;
 
@@ -13,7 +13,7 @@ public class UserAuthenticated {
 		return userId;
 	}
 
-	public UserAuthenticated(Long userId) {
+	public UserRegistered(Long userId) {
 		super();
 		this.userId = userId;
 	}

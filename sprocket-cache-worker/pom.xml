@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>sprocket-cache-worker</artifactId>
-	<name>Sprocket Cache Invalidation Worker</name>
+	<artifactId>sprocket-datasync-worker</artifactId>
+	<name>Sprocket Data Sync Worker</name>
 	<version>0.1</version>
 	<parent>
 		<groupId>com.ubiquity</groupId>
@@ -21,7 +21,7 @@
 
 	<!-- turns on resource filtering -->
 	<build>
-		<finalName>giftsender-cron-worker</finalName>
+		<finalName>giftsender-datasync-worker</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -45,7 +45,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>com.ubiquity.sprocket.worker.cache.CacheWorker</mainClass>
+							<mainClass>com.ubiquity.sprocket.worker.cache.DataSyncWorker</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -57,7 +57,7 @@
 						</goals>
 						<configuration>
 							<appendAssemblyId>false</appendAssemblyId>
-							<finalName>giftsender-cron-worker</finalName>
+							<finalName>sprocket-datasync-worker</finalName>
 							<attach>true</attach>
 							<outputDirectory>target/jar</outputDirectory>
 						</configuration>
@@ -89,7 +89,7 @@
 				</executions>
 				<configuration>
 					<copyright>2014, Ubiquity</copyright>
-					<distribution>Giftsender Cron Service</distribution>
+					<distribution>Sprocket Datasync Woker</distribution>
 					<group>Application/Mobile</group>
 					<packager>Ubiquity</packager>
 					<!-- <prefix>/var/lib/tomcat7</prefix> -->
@@ -170,8 +170,8 @@
 
 		<dependency>
 			<groupId>com.ubiquity</groupId>
-			<artifactId>giftsender-core</artifactId>
-			<version>0.1.0</version>
+			<artifactId>sprocket-core</artifactId>
+			<version>0.1</version>
 		</dependency>
 
 		<dependency>
