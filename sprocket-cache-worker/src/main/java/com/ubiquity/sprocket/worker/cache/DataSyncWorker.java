@@ -82,13 +82,14 @@ public class DataSyncWorker {
 
 	private void startServices(Configuration configuration) throws IOException {
 		JedisConnectionFactory.initialize(configuration);
-		ServiceFactory.initialize(configuration);
 		MessageQueueFactory.initialize(configuration);
+		ServiceFactory.initialize(configuration);
 	}
 
 	private void stopServices() {
 		JedisConnectionFactory.destroyPool();
 		EntityManagerSupport.closeEntityManagerFactory();
+		// TODO: we need an mq disconnect
 	}
 
 }

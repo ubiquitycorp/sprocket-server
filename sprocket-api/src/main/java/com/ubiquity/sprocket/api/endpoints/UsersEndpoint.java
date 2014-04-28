@@ -100,9 +100,13 @@ public class UsersEndpoint {
 		CollectionVariant<Contact> variant = ServiceFactory.getContactService().findAllContactsByOwnerId(userId, ifModifiedSince);
 
 		// Throw a 304 if there is no variant (no change)
-		if (variant == null) {
+		if (variant == null)
 			return Response.notModified().build();
-		}
+		
+		// Throw a 204 if the cache has been reset to indicate a long, background load
+		if(variant.getLastModified() == 1l)
+			return Response.noContent().build();
+		
 		// Convert entire list to DTO
 		ContactsDto result = new ContactsDto();
 		for (Contact contact : variant.getCollection()) {
