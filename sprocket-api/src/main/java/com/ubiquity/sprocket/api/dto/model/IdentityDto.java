@@ -35,7 +35,9 @@ public class IdentityDto {
 	private String accessToken;
 
 	@NotNull(groups = ActivationValidation.class)
-	private Integer identityProviderId;
+	private Integer socialIdentityProviderId;
+	
+	private Integer contentIdentityProviderId;
 
 	@Size(min = 10, max = 255, groups = ActivationValidation.class)
 	private String secretToken;
@@ -63,8 +65,8 @@ public class IdentityDto {
 		return accessToken;
 	}
 
-	public Integer getIdentityProviderId() {
-		return identityProviderId;
+	public Integer getSocialIdentityProviderId() {
+		return socialIdentityProviderId;
 	}
 
 	public String getSecretToken() {
@@ -74,6 +76,12 @@ public class IdentityDto {
 	public String getIdentifier() {
 		return identifier;
 	}
+
+	
+	public Integer getContentIdentityProviderId() {
+		return contentIdentityProviderId;
+	}
+
 
 	public static class Builder {
 		private String username;
@@ -136,7 +144,7 @@ public class IdentityDto {
 		this.displayName = builder.displayName;
 		this.clientPlatformId = builder.clientPlatformId;
 		this.accessToken = builder.accessToken;
-		this.identityProviderId = builder.identityProviderId;
+		this.socialIdentityProviderId = builder.identityProviderId;
 		this.identifier = builder.identifier;
 		this.secretToken = builder.secretToken;
 	}

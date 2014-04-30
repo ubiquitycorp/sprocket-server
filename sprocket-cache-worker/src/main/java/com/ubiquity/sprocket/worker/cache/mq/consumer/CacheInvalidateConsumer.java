@@ -12,14 +12,17 @@ import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
-import com.ubiquity.social.api.Social;
-import com.ubiquity.social.api.SocialFactory;
+import com.ubiquity.social.api.ContentAPI;
+import com.ubiquity.social.api.ContentAPIFactory;
+import com.ubiquity.social.api.SocialAPI;
+import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.SocialIdentity;
+import com.ubiquity.social.domain.ContentProvider;
+import com.ubiquity.social.domain.ExternalIdentity;
 import com.ubiquity.social.service.ContactService;
 import com.ubiquity.social.service.EventService;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
-import com.ubiquity.sprocket.messaging.definition.SocialIdentityActivated;
+import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 public class CacheInvalidateConsumer extends AbstractConsumerThread {
@@ -40,8 +43,8 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		try {
 			Message message = messageConverter.deserialize(msg, Message.class);
 			log.debug("message received: {}", message);
-			if(message.getType().equals(SocialIdentityActivated.class.getSimpleName()))
-				process((SocialIdentityActivated)message.getContent());
+			if(message.getType().equals(ExternalIdentityActivated.class.getSimpleName()))
+				process((ExternalIdentityActivated)message.getContent());
 
 
 		} catch (Exception e) {
@@ -53,42 +56,63 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 
 	}
 
-	private void process(SocialIdentityActivated content) {
+	private void process(ExternalIdentityActivated content) {
 		log.debug("found: {}", content);
-		createContacts(content);
-		createEvents(content);
-		createMessages(content);
-	}
-
-	private void createEvents(SocialIdentityActivated content) {
-		EventService eventService = ServiceFactory.getEventService();
-		eventService.resetEventsCacheTime(content.getUserId());
-
-		// now get this user and sync the contacts for this social identity
 		User user = ServiceFactory.getUserService().getUserById(content.getUserId());
-		SocialIdentity identity = getSocialIdentity(user, content.getIdentityId());
-
+		ExternalIdentity identity = getSocialIdentity(user, content.getIdentityId());
 		// break if the id is bad, possible if there is a reset in the data and the queue is not empty
 		if(identity == null) {
 			log.warn("Unrecognized social identity {} for user {}, skipping...", content.getIdentityId(), user.getUserId());
 			return;
 		}
 		
+		processVideos(identity);
+		
+		//createMessages(content);
+		
+	}
+
+	private void processVideos(ExternalIdentity identity) {
+		ContentProvider contentProviderType = identity.getContentProvider();
+		if(contentProviderType == null)
+			return;
+		
+		ContentAPI contentAPI = ContentAPIFactory.createProvider(contentProviderType);
+		contentAPI.findVideosByExternalIdentity(identity);
+		
+	}
+
+	@SuppressWarnings("unused")
+	private void createEvents(ExternalIdentityActivated content) {
+		EventService eventService = ServiceFactory.getEventService();
+		eventService.resetEventsCacheTime(content.getUserId());
+
+		// now get this user and sync the contacts for this social identity
+		User user = ServiceFactory.getUserService().getUserById(content.getUserId());
+		ExternalIdentity identity = getSocialIdentity(user, content.getIdentityId());
+
+		// break if the id is bad, possible if there is a reset in the data and the queue is not empty
+		if(identity == null) {
+			log.warn("Unrecognized social identity {} for user {}, skipping...", content.getIdentityId(), user.getUserId());
+			return;
+		}
+
 		eventService.refreshEventsForSocialIdentity(identity);
-		
-		
+
+
 
 
 	}
 
-	private void createContacts(SocialIdentityActivated content) {
+	@SuppressWarnings("unused")
+	private void createContacts(ExternalIdentityActivated content) {
 		// first, set the cache entry to -1 to indicate the cache is being reset
 		ContactService contactService = ServiceFactory.getContactService();
 		contactService.resetContactsCacheTime(content.getUserId());
 
 		// now get this user and sync the contacts for this social identity
 		User user = ServiceFactory.getUserService().getUserById(content.getUserId());
-		SocialIdentity identity = getSocialIdentity(user, content.getIdentityId());
+		ExternalIdentity identity = getSocialIdentity(user, content.getIdentityId());
 
 
 		// break if the id is bad, possible if there is a reset in the data and the queue is not empty
@@ -98,7 +122,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		}
 
 		ClientPlatform platform = ClientPlatform.getEnum(content.getClientPlatformId());
-		Social social = SocialFactory.createProvider(identity.getSocialProviderType(), platform);
+		SocialAPI social = SocialAPIFactory.createProvider(identity.getSocialProvider(), platform);
 		// returns contact entities prepared for insertion into db
 		List<Contact> contacts = social.findContactsByOwnerIdentity(identity);
 		for(Contact contact : contacts) 
@@ -108,16 +132,12 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		contactService.updateCacheTime(System.currentTimeMillis());
 	}
 
-	private void createMessages(SocialIdentityActivated content) {
-
-	}
-	
-	private SocialIdentity getSocialIdentity(User user, Long identityId) {
-		SocialIdentity socialIdentity = null;
+	private ExternalIdentity getSocialIdentity(User user, Long identityId) {
+		ExternalIdentity socialIdentity = null;
 		for(Identity identity : user.getIdentities()) {
 			if(identity.getIdentityId().longValue() == identityId.longValue()) {
 				// now we know which social network to sync
-				socialIdentity = (SocialIdentity)identity;
+				socialIdentity = (ExternalIdentity)identity;
 				break;
 			}
 		}

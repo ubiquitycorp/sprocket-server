@@ -5,7 +5,7 @@ package com.ubiquity.sprocket.messaging.definition;
  * @author chris
  *
  */
-public class SocialIdentityActivated {
+public class ExternalIdentityActivated {
 
 	private Long identityId;
 	private Long userId;
@@ -52,12 +52,12 @@ public class SocialIdentityActivated {
 			return this;
 		}
 
-		public SocialIdentityActivated build() {
-			return new SocialIdentityActivated(this);
+		public ExternalIdentityActivated build() {
+			return new ExternalIdentityActivated(this);
 		}
 	}
 
-	private SocialIdentityActivated(Builder builder) {
+	private ExternalIdentityActivated(Builder builder) {
 		this.identityId = builder.identityId;
 		this.userId = builder.userId;
 		this.clientPlatformId = builder.clientPlatformId;

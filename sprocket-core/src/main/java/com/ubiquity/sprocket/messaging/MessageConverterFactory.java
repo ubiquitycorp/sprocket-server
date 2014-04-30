@@ -1,7 +1,9 @@
 package com.ubiquity.sprocket.messaging;
 
 import com.ubiquity.messaging.MessageConverter;
-import com.ubiquity.sprocket.messaging.definition.SocialIdentityActivated;
+import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
+import com.ubiquity.sprocket.messaging.definition.UserAuthenticated;
+import com.ubiquity.sprocket.messaging.definition.UserRegistered;
 
 public class MessageConverterFactory {
 	
@@ -10,7 +12,9 @@ public class MessageConverterFactory {
 	public static MessageConverter getMessageConverter() {
 		if(converter == null) {
 			converter = new MessageConverter.Builder()
-				.registerMessageType(SocialIdentityActivated.class)
+				.registerMessageType(ExternalIdentityActivated.class)
+				.registerMessageType(UserAuthenticated.class)
+				.registerMessageType(UserRegistered.class)
 				.build();
 		}
 		return converter;

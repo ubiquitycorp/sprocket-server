@@ -25,11 +25,12 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.identity.service.UserService;
 import com.ubiquity.messaging.format.Message;
-import com.ubiquity.social.api.Social;
-import com.ubiquity.social.api.SocialFactory;
+import com.ubiquity.social.api.SocialAPI;
+import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.SocialIdentity;
-import com.ubiquity.social.domain.SocialProviderType;
+import com.ubiquity.social.domain.ContentProvider;
+import com.ubiquity.social.domain.ExternalIdentity;
+import com.ubiquity.social.domain.SocialProvider;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ContactsDto;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
@@ -40,7 +41,7 @@ import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
-import com.ubiquity.sprocket.messaging.definition.SocialIdentityActivated;
+import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.messaging.definition.UserAuthenticated;
 import com.ubiquity.sprocket.messaging.definition.UserRegistered;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -88,9 +89,9 @@ public class UsersEndpoint {
 		.build();
 
 		for(Identity identity : user.getIdentities()) {
-			if(identity instanceof SocialIdentity) {
-				SocialIdentity socialIdentity = (SocialIdentity)identity;
-				IdentityDto associatedIdentityDto = new IdentityDto.Builder().identifier(socialIdentity.getIdentifier()).identityProviderId(socialIdentity.getSocialProviderType().getValue()).build();
+			if(identity instanceof ExternalIdentity) {
+				ExternalIdentity socialIdentity = (ExternalIdentity)identity;
+				IdentityDto associatedIdentityDto = new IdentityDto.Builder().identifier(socialIdentity.getIdentifier()).identityProviderId(socialIdentity.getSocialProvider().getValue()).build();
 				accountDto.getIdentities().add(associatedIdentityDto);
 			}
 		}
@@ -177,6 +178,8 @@ public class UsersEndpoint {
 				.entity(jsonConverter.convertToPayload(result)).build();
 
 	}
+	
+	
 	@POST
 	@Path("/{userId}/identities")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -189,37 +192,50 @@ public class UsersEndpoint {
 
 
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto.getClientPlatformId());
-		SocialProviderType socialProvider = SocialProviderType.getEnum(identityDto.getIdentityProviderId());
-
+		Integer socialProviderTypeId = identityDto.getSocialIdentityProviderId();
+		Integer contentProviderTypeId = identityDto.getContentIdentityProviderId();
+		
+		SocialProvider socialProvider = null;
+		ContentProvider contentProvider = null;
+		if(socialProviderTypeId != null)
+			socialProvider = SocialProvider.getEnum(identityDto.getSocialIdentityProviderId());
+		if(contentProviderTypeId != null)
+			contentProvider = ContentProvider.values()[contentProviderTypeId];
+		
 		// create the identity
 		UserService userService = ServiceFactory.getUserService();
 		User user = userService.getUserById(userId);
-		SocialIdentity identity = new SocialIdentity.Builder()
-		.accessToken(identityDto.getAccessToken())
-		.secretToken(identityDto.getSecretToken())
-		.socialProviderType(socialProvider)
-		.user(user)
-		.build();
+		ExternalIdentity identity = new ExternalIdentity.Builder()
+			.accessToken(identityDto.getAccessToken())
+			.secretToken(identityDto.getSecretToken())
+			.socialProvider(socialProvider)
+			.contentProvider(contentProvider)
+			.user(user)
+			.build();
 		user.getIdentities().add(identity);
 
-		// get the correct provider based on the social network we are activating
-		Social social = SocialFactory.createProvider(socialProvider, clientPlatform);
+		// get the correct provider based on the social network we are activating; if we have content provider
+		// and a social provider, we use the social to auth (int the case of Google and YouTube); If we have 
+		// a single content provider we use that...
+		if(socialProvider != null) {
+			SocialAPI social = SocialAPIFactory.createProvider(socialProvider, clientPlatform);
 
-		// authenticate the user; this will give the user a contact record specific for to this network
-		Contact contact;
-		try {
-			contact = social.authenticateUser(identity);
-		} catch (Exception e) {
-			throw new HttpException("Could not authenticate with provider", 401);
+			// authenticate the user; this will give the user a contact record specific for to this network
+			Contact contact;
+			try {
+				contact = social.authenticateUser(identity);
+			} catch (Exception e) {
+				throw new HttpException("Could not authenticate with provider", 401);
+			}
+
+			ServiceFactory.getContactService().create(contact);
 		}
-
-		ServiceFactory.getContactService().create(contact);
 
 		// now update the user's identity
 		userService.update(user);
 
 		// send notification to the data sync that some stuff needs to be loaded for this user now....
-		SocialIdentityActivated content = new SocialIdentityActivated.Builder()
+		ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
 		.clientPlatformId(identityDto.getClientPlatformId())
 		.userId(userId)
 		.identityId(identity.getIdentityId())

@@ -14,7 +14,7 @@
 		<class>com.ubiquity.identity.domain.NativeIdentity</class>
 		<class>com.ubiquity.social.domain.Contact</class>
 		<class>com.ubiquity.social.domain.Event</class>
-		<class>com.ubiquity.social.domain.SocialIdentity</class>
+		<class>com.ubiquity.social.domain.ExternalIdentity</class>
 
 
 
