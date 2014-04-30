@@ -2,8 +2,6 @@ package com.ubiquity.media.domain;
 
 import java.io.InputStream;
 
-import com.ubiquity.media.domain.Media.Builder;
-
 public class Video extends Media {
 
 	/**
