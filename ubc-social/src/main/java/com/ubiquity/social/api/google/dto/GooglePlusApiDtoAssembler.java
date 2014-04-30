@@ -3,8 +3,8 @@ package com.ubiquity.social.api.google.dto;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.api.google.dto.model.GooglePersonDto;
 import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.SocialIdentity;
-import com.ubiquity.social.domain.SocialProviderType;
+import com.ubiquity.social.domain.ExternalIdentity;
+import com.ubiquity.social.domain.SocialProvider;
 
 /***
  * Assembler class for assembling a list of events from an FB graph result
@@ -21,12 +21,12 @@ public class GooglePlusApiDtoAssembler {
 	 * 
 	 * @return a contact entity without an internal pk
 	 */
-	public static Contact assembleContact(SocialIdentity identity, GooglePersonDto result) {
+	public static Contact assembleContact(ExternalIdentity identity, GooglePersonDto result) {
 		
 		identity.setIdentifier(result.getId());
 		identity.setIsActive(Boolean.TRUE);
 		identity.setLastUpdated(System.currentTimeMillis());
-		identity.setSocialProviderType(SocialProviderType.Google);
+		identity.setSocialProviderType(SocialProvider.Google);
 		
 		Contact contact = new Contact.Builder()
 			.socialIdentity(identity)
@@ -44,11 +44,11 @@ public class GooglePlusApiDtoAssembler {
 	public static Contact assembleContact(User owner, GooglePersonDto result) {
 	
 		Contact contact = new Contact.Builder()
-		.socialIdentity(new SocialIdentity.Builder()
+		.socialIdentity(new ExternalIdentity.Builder()
 			.identifier(result.getId())
 			.isActive(Boolean.TRUE)
 			.lastUpdated(System.currentTimeMillis())
-			.socialProviderType(SocialProviderType.Google).build())
+			.socialProvider(SocialProvider.Google).build())
 		.firstName(result.getFirstName())
 		.lastName(result.getLastName())
 		.displayName(result.getDisplayName())

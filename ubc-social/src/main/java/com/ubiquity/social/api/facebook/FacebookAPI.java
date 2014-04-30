@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
-import com.ubiquity.social.api.Social;
+import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.facebook.dto.FacebookGraphApiDtoAssembler;
 import com.ubiquity.social.api.facebook.dto.container.FacebookDataDto;
 import com.ubiquity.social.api.facebook.dto.model.FacebookContactDto;
@@ -19,7 +19,7 @@ import com.ubiquity.social.api.facebook.dto.model.FacebookEventDto;
 import com.ubiquity.social.api.facebook.endpoints.FacebookGraphApiEndpoints;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
-import com.ubiquity.social.domain.SocialIdentity;
+import com.ubiquity.social.domain.ExternalIdentity;
 
 /***
  * Facebook API class
@@ -27,9 +27,9 @@ import com.ubiquity.social.domain.SocialIdentity;
  * @author peter.tadros
  * 
  */
-public class FacebookAPI implements Social {
+public class FacebookAPI implements SocialAPI {
 
-	private static Social facebook = null;
+	private static SocialAPI facebook = null;
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
@@ -42,7 +42,7 @@ public class FacebookAPI implements Social {
 
 	}
 
-	public static Social getProviderAPI() {
+	public static SocialAPI getProviderAPI() {
 		if (facebook == null)
 			facebook = new FacebookAPI();
 		return facebook;
@@ -50,7 +50,7 @@ public class FacebookAPI implements Social {
 
 	
 	@Override
-	public Contact authenticateUser(SocialIdentity identity) {
+	public Contact authenticateUser(ExternalIdentity identity) {
 
 		ClientResponse<String> response = null;
 		try {
@@ -68,7 +68,7 @@ public class FacebookAPI implements Social {
 	}
 
 	@Override
-	public List<Contact> findContactsByOwnerIdentity(SocialIdentity identity) {
+	public List<Contact> findContactsByOwnerIdentity(ExternalIdentity identity) {
 		List<Contact> contacts = new LinkedList<Contact>();
 		
 		ClientResponse<String> response = null;
@@ -92,7 +92,7 @@ public class FacebookAPI implements Social {
 	}
 
 	@Override
-	public List<Event> findEventsCreatedByContacts(SocialIdentity identity,
+	public List<Event> findEventsCreatedByContacts(ExternalIdentity identity,
 			List<Contact> contacts) {
 		List<Event> events = new LinkedList<Event>();
 
@@ -123,8 +123,8 @@ public class FacebookAPI implements Social {
 	}
 
 	@Override
-	public Boolean postToWall(SocialIdentity fromIdentity,
-			SocialIdentity toIdentity, String message) {
+	public Boolean postToWall(ExternalIdentity fromIdentity,
+			ExternalIdentity toIdentity, String message) {
 		throw new UnsupportedOperationException();
 	}
 

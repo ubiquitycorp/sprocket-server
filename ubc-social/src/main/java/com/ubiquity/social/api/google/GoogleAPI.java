@@ -12,14 +12,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
-import com.ubiquity.social.api.Social;
+import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.google.dto.GooglePlusApiDtoAssembler;
 import com.ubiquity.social.api.google.dto.container.GoogleItemsDto;
 import com.ubiquity.social.api.google.dto.model.GooglePersonDto;
 import com.ubiquity.social.api.google.endpoints.GooglePlusApiEndpoints;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
-import com.ubiquity.social.domain.SocialIdentity;
+import com.ubiquity.social.domain.ExternalIdentity;
 
 /***
  * Google API class
@@ -28,9 +28,9 @@ import com.ubiquity.social.domain.SocialIdentity;
  * 
  */
 
-public class GoogleAPI implements Social {
+public class GoogleAPI implements SocialAPI {
 
-	private static Social google = null;
+	private static SocialAPI google = null;
 	OAuthService service = null;
 	
 	private Logger log = LoggerFactory.getLogger(getClass());
@@ -45,14 +45,14 @@ public class GoogleAPI implements Social {
 		googleApi = ProxyFactory.create(GooglePlusApiEndpoints.class, "https://www.googleapis.com/plus/v1");
 	}
 
-	public static Social getProviderAPI() {
+	public static SocialAPI getProviderAPI() {
 		if (google == null)
 			google = new GoogleAPI();
 		return google;
 	}
 
 	@Override
-	public Contact authenticateUser(SocialIdentity identity) {
+	public Contact authenticateUser(ExternalIdentity identity) {
 		ClientResponse<String> response = null;
 		try {
 			response = googleApi.getMe(identity.getAccessToken());
@@ -67,7 +67,7 @@ public class GoogleAPI implements Social {
 	}
 
 	@Override
-	public List<Contact> findContactsByOwnerIdentity(SocialIdentity identity) {
+	public List<Contact> findContactsByOwnerIdentity(ExternalIdentity identity) {
 		List<Contact> contacts = new LinkedList<Contact>();
 		ClientResponse<String> response = null;
 		try {
@@ -87,15 +87,15 @@ public class GoogleAPI implements Social {
 	}
 
 	@Override
-	public List<Event> findEventsCreatedByContacts(SocialIdentity identity,
+	public List<Event> findEventsCreatedByContacts(ExternalIdentity identity,
 			List<Contact> contacts) {
 		throw new UnsupportedOperationException();
 
 	}
 
 	@Override
-	public Boolean postToWall(SocialIdentity fromIdentity,
-			SocialIdentity toIdentity, String message) {
+	public Boolean postToWall(ExternalIdentity fromIdentity,
+			ExternalIdentity toIdentity, String message) {
 		throw new UnsupportedOperationException();
 	}
 }

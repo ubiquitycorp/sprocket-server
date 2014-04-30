@@ -18,18 +18,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
-import com.ubiquity.social.api.Social;
+import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.linkedin.dto.LinkedInApiDtoAssembler;
 import com.ubiquity.social.api.linkedin.dto.container.LinkedInValuesDto;
 import com.ubiquity.social.api.linkedin.dto.model.LinkedInConnectionDto;
 import com.ubiquity.social.api.linkedin.dto.model.LinkedInMessageDto;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
-import com.ubiquity.social.domain.SocialIdentity;
+import com.ubiquity.social.domain.ExternalIdentity;
 
-public class LinkedInAPIOAuth1Strategy implements Social {
+public class LinkedInAPIOAuth1Strategy implements SocialAPI {
 
-	private static Social linkedin = null;
+	private static SocialAPI linkedin = null;
 
 	private static final String PROFILE_URL = "https://api.linkedin.com/v1/people/~:(id,first-name,last-name,formatted-name,email-address,picture-url,public-profile-url)?format=json";
 	private static final String CONNECTION_URL = "https://api.linkedin.com/v1/people/~/connections:(id,first-name,last-name,formatted-name,picture-url,public-profile-url)?modified=new&format=json";
@@ -59,14 +59,14 @@ public class LinkedInAPIOAuth1Strategy implements Social {
 		}
 	}
 
-	public static Social getProviderAPI() {
+	public static SocialAPI getProviderAPI() {
 		if (linkedin == null)
 			linkedin = new LinkedInAPIOAuth1Strategy();
 		return linkedin;
 	}
 
 	@Override
-	public Contact authenticateUser(SocialIdentity identity) {
+	public Contact authenticateUser(ExternalIdentity identity) {
 
 		OAuthRequest request = new OAuthRequest(Verb.GET, PROFILE_URL);
 		Token accessToken = new Token(identity.getAccessToken(), identity.getSecretToken());
@@ -85,7 +85,7 @@ public class LinkedInAPIOAuth1Strategy implements Social {
 	}
 
 	@Override
-	public List<Contact> findContactsByOwnerIdentity(SocialIdentity identity) {
+	public List<Contact> findContactsByOwnerIdentity(ExternalIdentity identity) {
 		List<Contact> contacts = new LinkedList<Contact>();
 		Token accessToken = new Token(identity.getAccessToken(), identity.getSecretToken());
 		OAuthRequest request = new OAuthRequest(Verb.GET, CONNECTION_URL);
@@ -106,14 +106,14 @@ public class LinkedInAPIOAuth1Strategy implements Social {
 	}
 
 	@Override
-	public List<Event> findEventsCreatedByContacts(SocialIdentity identity,
+	public List<Event> findEventsCreatedByContacts(ExternalIdentity identity,
 			List<Contact> contacts) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Boolean postToWall(SocialIdentity fromIdentity,
-			SocialIdentity toIdentity, String message) {
+	public Boolean postToWall(ExternalIdentity fromIdentity,
+			ExternalIdentity toIdentity, String message) {
 		Token accessToken = new Token(fromIdentity.getAccessToken(), fromIdentity.getSecretToken());
 		OAuthRequest request = new OAuthRequest(Verb.POST, MESSAGE_URL);
 		LinkedInMessageDto linkedInMessage = new LinkedInMessageDto.Builder()

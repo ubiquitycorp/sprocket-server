@@ -5,7 +5,7 @@ import com.ubiquity.social.api.facebook.FacebookAPI;
 import com.ubiquity.social.api.google.GoogleAPI;
 import com.ubiquity.social.api.linkedin.LinkedInAPIOAuth1Strategy;
 import com.ubiquity.social.api.linkedin.LinkedInAPIOAuth2Strategy;
-import com.ubiquity.social.domain.SocialProviderType;
+import com.ubiquity.social.domain.SocialProvider;
 
 
 /***
@@ -13,7 +13,7 @@ import com.ubiquity.social.domain.SocialProviderType;
  * Social provider API object depending on the given social type
  * @author peter.tadros 
  */
-public class SocialFactory {
+public class SocialAPIFactory {
 
 	/***
 	 * Creates a social provider based on the type and the client platform. The client platform may determine
@@ -25,8 +25,8 @@ public class SocialFactory {
 	 * 
 	 * @throws IllegalArgumentException if the provider type is unknown
 	 */
-	public static Social createProvider(SocialProviderType providerType, ClientPlatform client) {
-		Social provider = null;
+	public static SocialAPI createProvider(SocialProvider providerType, ClientPlatform client) {
+		SocialAPI provider = null;
 		switch (providerType) {
 		case Facebook:
 			provider = FacebookAPI.getProviderAPI();

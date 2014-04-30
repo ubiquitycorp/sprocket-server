@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.niobium.repository.Repository;
 import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.SocialProviderType;
+import com.ubiquity.social.domain.SocialProvider;
 
 /***
  * 
@@ -39,7 +39,7 @@ public interface ContactRepository extends Repository <Long, Contact> {
 	 * @param type Type of provider (i.e. Facebook)
 	 * @return
 	 */
-	List<Contact> findByOwnerIdAndSocialIdentityProvider(Long ownerId, SocialProviderType type);
+	List<Contact> findByOwnerIdAndSocialIdentityProvider(Long ownerId, SocialProvider type);
 	
 	/***
 	 * Counts the number of contacts for this user
@@ -48,6 +48,6 @@ public interface ContactRepository extends Repository <Long, Contact> {
 	 * @param socialProviderType
 	 * @return
 	 */
-	int countAllContactsByOwnerIdAndSocialIdentityProvider(Long ownerId, SocialProviderType socialProviderType);
+	int countAllContactsByOwnerIdAndSocialIdentityProvider(Long ownerId, SocialProvider socialProviderType);
 }
 

@@ -51,7 +51,7 @@ public class Contact {
 	private User owner;
 
 	@OneToOne(cascade = CascadeType.ALL)
-	private SocialIdentity socialIdentity;
+	private ExternalIdentity socialIdentity;
 
 	
 	/***
@@ -133,7 +133,7 @@ public class Contact {
 		this.profileUrl = profileUrl;
 	}
 
-	public SocialIdentity getSocialIdentity() {
+	public ExternalIdentity getSocialIdentity() {
 		return socialIdentity;
 	}
 
@@ -147,7 +147,7 @@ public class Contact {
 		private String profileUrl;
 		private Long lastUpdated;
 		private User owner;
-		private SocialIdentity socialIdentity;
+		private ExternalIdentity socialIdentity;
 
 		public Builder contactId(Long contactId) {
 			this.contactId = contactId;
@@ -194,7 +194,7 @@ public class Contact {
 			return this;
 		}
 
-		public Builder socialIdentity(SocialIdentity socialIdentity) {
+		public Builder socialIdentity(ExternalIdentity socialIdentity) {
 			this.socialIdentity = socialIdentity;
 			return this;
 		}

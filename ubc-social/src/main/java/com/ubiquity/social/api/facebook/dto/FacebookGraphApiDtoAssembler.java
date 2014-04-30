@@ -12,8 +12,8 @@ import com.ubiquity.social.api.facebook.dto.model.FacebookContactDto;
 import com.ubiquity.social.api.facebook.dto.model.FacebookEventDto;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
-import com.ubiquity.social.domain.SocialIdentity;
-import com.ubiquity.social.domain.SocialProviderType;
+import com.ubiquity.social.domain.ExternalIdentity;
+import com.ubiquity.social.domain.SocialProvider;
 
 /***
  * Assembler class for assembling a list of events from an FB graph result
@@ -31,12 +31,12 @@ public class FacebookGraphApiDtoAssembler {
 	 * @param result
 	 * @return
 	 */
-	public static Contact assembleContact(SocialIdentity identity, FacebookContactDto result) {
+	public static Contact assembleContact(ExternalIdentity identity, FacebookContactDto result) {
 		
 		identity.setIdentifier(result.getId());
 		identity.setIsActive(Boolean.TRUE);
 		identity.setLastUpdated(System.currentTimeMillis());
-		identity.setSocialProviderType(SocialProviderType.Facebook);
+		identity.setSocialProviderType(SocialProvider.Facebook);
 		
 		// set the result and type on the 
 		Contact contact = new Contact.Builder()
@@ -63,11 +63,11 @@ public class FacebookGraphApiDtoAssembler {
 	 */
 	public static Contact assembleContact(User owner, FacebookContactDto result) {
 		Contact contact = new Contact.Builder()
-			.socialIdentity(new SocialIdentity.Builder()
+			.socialIdentity(new ExternalIdentity.Builder()
 				.identifier(result.getId())
 				.isActive(Boolean.TRUE)
 				.lastUpdated(System.currentTimeMillis())
-				.socialProviderType(SocialProviderType.Facebook).build())
+				.socialProvider(SocialProvider.Facebook).build())
 			.firstName(result.getFirstName())
 			.lastName(result.getLastName())
 			.displayName(result.getName())

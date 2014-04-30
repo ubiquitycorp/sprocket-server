@@ -8,20 +8,23 @@ import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 
 /***
- * Embeddable class encapsulating identifying information provided by an external social network
+ * Class encapsulating identifying information provided by an external network
  * 
  * @author chris
  *
  */
 @Entity
-@Table(name = "social_identity")
-public class SocialIdentity extends Identity {
+@Table(name = "external_identity")
+public class ExternalIdentity extends Identity {
 
 	@Column(name = "identifier", nullable = false)
 	private String identifier;
 
-	@Column(name = "social_provider_type", nullable = false)
-	private SocialProviderType socialProviderType;
+	@Column(name = "social_provider_type", nullable = true)
+	private SocialProvider socialProvider;
+
+	@Column(name = "content_provider_type", nullable = true)
+	private ContentProvider contentProvider;
 
 	@Column(name = "access_token", nullable = true)
 	private String accessToken;
@@ -35,17 +38,20 @@ public class SocialIdentity extends Identity {
 	@Column(name = "email", nullable = true)
 	private String email;
 
-	protected SocialIdentity() {
+	protected ExternalIdentity() {
 		super();
 	}
 
-	
+	public ContentProvider getContentProvider() {
+		return contentProvider;
+	}
+
 	public String getIdentifier() {
 		return identifier;
 	}
 
-	public SocialProviderType getSocialProviderType() {
-		return socialProviderType;
+	public SocialProvider getSocialProvider() {
+		return socialProvider;
 	}
 
 	public String getAccessToken() {
@@ -84,45 +90,53 @@ public class SocialIdentity extends Identity {
 		this.identifier = identifier;
 	}
 
-	public void setSocialProviderType(SocialProviderType socialProviderType) {
-		this.socialProviderType = socialProviderType;
+	public void setSocialProviderType(SocialProvider socialProviderType) {
+		this.socialProvider = socialProviderType;
 	}
 
-
+	public void setContentProviderType(ContentProvider contentProviderType) {
+		this.contentProvider = contentProviderType;
+	}
 
 	public static class Builder {
 		private String identifier;
-		private SocialProviderType socialProviderType;
+		private SocialProvider socialProviderType;
+		private ContentProvider contentProviderType;
 		private String accessToken;
 		private String secretToken;
 		private String refreshToken;
 		private String email;
-		private Long lastUpdated;
 		private Boolean isActive;
+		private Long lastUpdated;
 		private User user;
 
 		public Builder identifier(String identifier) {
 			this.identifier = identifier;
 			return this;
 		}
-		
-		public Builder isActive(Boolean isActive) {
-			this.isActive = isActive;
-			return this;
-		}
-		
-		public Builder lastUpdated(Long lastUpdated) {
-			this.lastUpdated = lastUpdated;
-			return this;
-		}
 
-		public Builder socialProviderType(SocialProviderType socialProviderType) {
+		public Builder socialProvider(SocialProvider socialProviderType) {
 			this.socialProviderType = socialProviderType;
 			return this;
 		}
 
+		public Builder contentProvider(
+				ContentProvider contentProviderType) {
+			this.contentProviderType = contentProviderType;
+			return this;
+		}
+
+		public Builder user(User user) {
+			this.user = user;
+			return this;
+		}
 		public Builder accessToken(String accessToken) {
 			this.accessToken = accessToken;
+			return this;
+		}
+		
+		public Builder isActive(Boolean isActive) {
+			this.isActive = isActive;
 			return this;
 		}
 
@@ -140,27 +154,27 @@ public class SocialIdentity extends Identity {
 			this.email = email;
 			return this;
 		}
-
-		public SocialIdentity build() {
-			return new SocialIdentity(this);
-		}
 		
-		public Builder user(User user) {
-			this.user = user;
+		public Builder lastUpdated(Long lastUpdated) {
+			this.lastUpdated = lastUpdated;
 			return this;
+		}
+
+		public ExternalIdentity build() {
+			return new ExternalIdentity(this);
 		}
 	}
 
-	private SocialIdentity(Builder builder) {
+	private ExternalIdentity(Builder builder) {
 		this.identifier = builder.identifier;
-		this.socialProviderType = builder.socialProviderType;
+		this.socialProvider = builder.socialProviderType;
+		this.contentProvider = builder.contentProviderType;
 		this.accessToken = builder.accessToken;
 		this.secretToken = builder.secretToken;
 		this.refreshToken = builder.refreshToken;
-		this.email = builder.email;	
+		this.email = builder.email;
 		super.isActive = builder.isActive;
 		super.lastUpdated = builder.lastUpdated;
 		super.user = builder.user;
-		
 	}
 }

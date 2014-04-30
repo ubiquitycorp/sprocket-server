@@ -6,7 +6,7 @@ package com.ubiquity.social.domain;
  * @author Peter
  * 
  */
-public enum SocialProviderType
+public enum SocialProvider
 {
     Facebook (1),
     Yahoo (2),
@@ -15,7 +15,7 @@ public enum SocialProviderType
     
     private final int value;
 
-    private SocialProviderType(final int newValue) {
+    private SocialProvider(final int newValue) {
         value = newValue;
     }
 
@@ -23,16 +23,16 @@ public enum SocialProviderType
 
 	public static String getName(int providerId) {
 		validate(providerId);
-		return SocialProviderType.values()[(providerId - 1)].name();
+		return SocialProvider.values()[(providerId - 1)].name();
 	}
 	
-	public static SocialProviderType getEnum(int providerId) {
+	public static SocialProvider getEnum(int providerId) {
 		validate(providerId);
-		return SocialProviderType.values()[(providerId - 1)];
+		return SocialProvider.values()[(providerId - 1)];
 	}
 	
 	private static void validate(int providerId) {
-		if(SocialProviderType.values().length == providerId - 1)
+		if(SocialProvider.values().length == providerId - 1)
 		throw new IllegalArgumentException("Unknown provider id");
 	}
 }

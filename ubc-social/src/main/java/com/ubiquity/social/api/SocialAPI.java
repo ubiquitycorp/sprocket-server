@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
-import com.ubiquity.social.domain.SocialIdentity;
+import com.ubiquity.social.domain.ExternalIdentity;
 
 /***
  * Social interface for all social providers
@@ -12,7 +12,7 @@ import com.ubiquity.social.domain.SocialIdentity;
  * @author Peter
  * 
  */
-public interface Social {
+public interface SocialAPI {
 
 	/***
 	 * Authenticates the user, returning the contact
@@ -24,7 +24,7 @@ public interface Social {
 	 * @throws UnsupportedOperationException if the underlying social network does not support this action
 	 * 
 	 */
-	Contact authenticateUser(SocialIdentity identity);
+	Contact authenticateUser(ExternalIdentity identity);
 	
 	/***
 	 * Finds a list of contacts for this identifier
@@ -35,7 +35,7 @@ public interface Social {
 	 * @throws IllegalArgumentException if the passed in identity does not match the provider
 	 * @throws UnsupportedOperationException if the underlying social network does not support this action
 	 */
-	List<Contact> findContactsByOwnerIdentity(SocialIdentity identity);
+	List<Contact> findContactsByOwnerIdentity(ExternalIdentity identity);
 	
 	/***
 	 * Returns a list of events the passed in contacts created
@@ -47,7 +47,7 @@ public interface Social {
 	 * 
 	 * @throws UnsupportedOperationException if the underlying social network does not support this action
 	 */
-	List<Event> findEventsCreatedByContacts(SocialIdentity identity, List<Contact> contacts);
+	List<Event> findEventsCreatedByContacts(ExternalIdentity identity, List<Contact> contacts);
 	
 	
 	/***
@@ -61,5 +61,5 @@ public interface Social {
 	 * 
 	 * @throws UnsupportedOperationException if the underlying social network does not support this action
 	 */
-	Boolean postToWall(SocialIdentity fromIdentity, SocialIdentity toIdentity, String message);
+	Boolean postToWall(ExternalIdentity fromIdentity, ExternalIdentity toIdentity, String message);
 }

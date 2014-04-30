@@ -10,7 +10,7 @@ import com.niobium.repository.cache.UserDataModificationCache;
 import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.SocialProviderType;
+import com.ubiquity.social.domain.SocialProvider;
 import com.ubiquity.social.repository.ContactRepository;
 import com.ubiquity.social.repository.ContactRepositoryJpaImpl;
 import com.ubiquity.social.repository.cache.SocialCacheKeys;
@@ -90,7 +90,7 @@ public class ContactService {
 	 * @param type
 	 * @return
 	 */
-	public boolean hasContactsForProvider(Long userId, SocialProviderType type) {
+	public boolean hasContactsForProvider(Long userId, SocialProvider type) {
 		try {
 			int count = contactRepository.countAllContactsByOwnerIdAndSocialIdentityProvider(userId, type);
 			return count > 0 ? true : false;

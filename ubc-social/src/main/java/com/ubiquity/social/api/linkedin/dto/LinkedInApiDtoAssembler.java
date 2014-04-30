@@ -4,19 +4,19 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.social.api.linkedin.dto.model.LinkedInConnectionDto;
 import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.SocialIdentity;
-import com.ubiquity.social.domain.SocialProviderType;
+import com.ubiquity.social.domain.ExternalIdentity;
+import com.ubiquity.social.domain.SocialProvider;
 
 public class LinkedInApiDtoAssembler {
 
 	public static Contact assembleContact(User owner, LinkedInConnectionDto result) {
 
 		Contact.Builder contactBuilder = new Contact.Builder()
-		.socialIdentity(new SocialIdentity.Builder()
+		.socialIdentity(new ExternalIdentity.Builder()
 			.identifier(result.getId())
 			.isActive(Boolean.TRUE)
 			.lastUpdated(System.currentTimeMillis())
-			.socialProviderType(SocialProviderType.Google).build())
+			.socialProvider(SocialProvider.Google).build())
 		.firstName(result.getFirstName())
 		.lastName(result.getLastName())
 		.lastUpdated(System.currentTimeMillis())
@@ -30,12 +30,12 @@ public class LinkedInApiDtoAssembler {
 
 
 	}
-	public static Contact assembleContact(SocialIdentity identity, LinkedInConnectionDto result) {
+	public static Contact assembleContact(ExternalIdentity identity, LinkedInConnectionDto result) {
 
 		identity.setIdentifier(result.getId());
 		identity.setIsActive(Boolean.TRUE);
 		identity.setLastUpdated(System.currentTimeMillis());
-		identity.setSocialProviderType(SocialProviderType.LinkedIn);
+		identity.setSocialProviderType(SocialProvider.LinkedIn);
 
 		Contact.Builder contactBuilder = new Contact.Builder()
 		.socialIdentity(identity)

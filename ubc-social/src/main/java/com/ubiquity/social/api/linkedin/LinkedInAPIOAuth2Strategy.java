@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
-import com.ubiquity.social.api.Social;
+import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.linkedin.dto.LinkedInApiDtoAssembler;
 import com.ubiquity.social.api.linkedin.dto.container.LinkedInValuesDto;
 import com.ubiquity.social.api.linkedin.dto.model.LinkedInConnectionDto;
@@ -20,11 +20,11 @@ import com.ubiquity.social.api.linkedin.dto.model.LinkedInMessageDto;
 import com.ubiquity.social.api.linkedin.endpoints.LinkedInApiEndpoints;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
-import com.ubiquity.social.domain.SocialIdentity;
+import com.ubiquity.social.domain.ExternalIdentity;
 
-public class LinkedInAPIOAuth2Strategy implements Social {
+public class LinkedInAPIOAuth2Strategy implements SocialAPI {
 
-	private static Social linkedin = null;
+	private static SocialAPI linkedin = null;
 
 	private LinkedInApiEndpoints linkedInApi;
 
@@ -42,7 +42,7 @@ public class LinkedInAPIOAuth2Strategy implements Social {
 		linkedInApi = ProxyFactory.create(LinkedInApiEndpoints.class, "https://api.linkedin.com/v1");
 	}
 
-	public static Social getProviderAPI() {
+	public static SocialAPI getProviderAPI() {
 		if (linkedin == null)
 			linkedin = new LinkedInAPIOAuth2Strategy();
 		return linkedin;
@@ -51,7 +51,7 @@ public class LinkedInAPIOAuth2Strategy implements Social {
 	
 
 	@Override
-	public Contact authenticateUser(SocialIdentity identity) {
+	public Contact authenticateUser(ExternalIdentity identity) {
 		ClientResponse<String> response = null;
 		try {
 			response = linkedInApi.getProfile(identity.getAccessToken(), "json");
@@ -68,7 +68,7 @@ public class LinkedInAPIOAuth2Strategy implements Social {
 	}
 
 	@Override
-	public List<Contact> findContactsByOwnerIdentity(SocialIdentity identity) {
+	public List<Contact> findContactsByOwnerIdentity(ExternalIdentity identity) {
 
 		List<Contact> contacts = new LinkedList<Contact>();
 		ClientResponse<String> response = null;
@@ -92,14 +92,14 @@ public class LinkedInAPIOAuth2Strategy implements Social {
 	}
 
 	@Override
-	public List<Event> findEventsCreatedByContacts(SocialIdentity identity,
+	public List<Event> findEventsCreatedByContacts(ExternalIdentity identity,
 			List<Contact> contacts) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Boolean postToWall(SocialIdentity fromIdentity,
-			SocialIdentity toIdentity, String message) {
+	public Boolean postToWall(ExternalIdentity fromIdentity,
+			ExternalIdentity toIdentity, String message) {
 
 		LinkedInMessageDto linkedInMessageDto = new LinkedInMessageDto.Builder()
 			.subject("You received a gift!")

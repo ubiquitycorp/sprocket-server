@@ -3,8 +3,8 @@ package com.ubiquity.social.repository;
 import java.util.List;
 
 import com.niobium.repository.Repository;
-import com.ubiquity.social.domain.SocialIdentity;
-import com.ubiquity.social.domain.SocialProviderType;
+import com.ubiquity.social.domain.ExternalIdentity;
+import com.ubiquity.social.domain.SocialProvider;
 
 /***
  *
@@ -13,8 +13,8 @@ import com.ubiquity.social.domain.SocialProviderType;
  * @author peter.tadros
  *
  */
-public interface SocialIdentityRepository extends Repository <Long, SocialIdentity> {
-	List<SocialIdentity> findByUserId(Long ownerId);
-	SocialIdentity findOne(Long ownerId, SocialProviderType providerType);
-	SocialIdentity findOneByProviderIdentifier(String providerIdentifier, SocialProviderType providerType);
+public interface SocialIdentityRepository extends Repository <Long, ExternalIdentity> {
+	List<ExternalIdentity> findByUserId(Long ownerId);
+	ExternalIdentity findOne(Long ownerId, SocialProvider providerType);
+	ExternalIdentity findOneByProviderIdentifier(String providerIdentifier, SocialProvider providerType);
 }

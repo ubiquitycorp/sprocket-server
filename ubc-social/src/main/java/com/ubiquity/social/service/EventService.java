@@ -1,7 +1,6 @@
 package com.ubiquity.social.service;
 
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
 import org.joda.time.DateTime;
@@ -14,16 +13,15 @@ import com.niobium.repository.cache.DataCacheKeys;
 import com.niobium.repository.cache.UserDataModificationCache;
 import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
-import com.ubiquity.social.api.Social;
-import com.ubiquity.social.api.SocialFactory;
+import com.ubiquity.social.api.SocialAPI;
+import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
-import com.ubiquity.social.domain.SocialIdentity;
-import com.ubiquity.social.domain.SocialProviderType;
+import com.ubiquity.social.domain.ExternalIdentity;
+import com.ubiquity.social.domain.SocialProvider;
 import com.ubiquity.social.repository.ContactRepository;
 import com.ubiquity.social.repository.ContactRepositoryJpaImpl;
 import com.ubiquity.social.repository.EventRepository;
@@ -114,15 +112,15 @@ public class EventService {
 	}
 
 	
-	public int refreshEventsForSocialIdentity(SocialIdentity identity) {
+	public int refreshEventsForSocialIdentity(ExternalIdentity identity) {
 		
-		if(identity.getSocialProviderType() != SocialProviderType.Facebook)
+		if(identity.getSocialProvider() != SocialProvider.Facebook)
 			throw new UnsupportedOperationException();
 		
-		Social social = SocialFactory.createProvider(SocialProviderType.Facebook, identity.getUser().getClientPlatform());
+		SocialAPI social = SocialAPIFactory.createProvider(SocialProvider.Facebook, identity.getUser().getClientPlatform());
 
 		// get the list of local contacts for this user
-		List<Contact> contacts = contactRepository.findByOwnerIdAndSocialIdentityProvider(identity.getUser().getUserId(), SocialProviderType.Facebook);
+		List<Contact> contacts = contactRepository.findByOwnerIdAndSocialIdentityProvider(identity.getUser().getUserId(), SocialProvider.Facebook);
 		// the returned list will be events will be events with no identifiers, but with contacts set
 		List<Event> events = social.findEventsCreatedByContacts(identity, contacts);
 

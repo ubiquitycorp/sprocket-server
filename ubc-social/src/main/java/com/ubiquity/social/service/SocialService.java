@@ -2,8 +2,8 @@ package com.ubiquity.social.service;
 
 import org.apache.commons.configuration.Configuration;
 
-import com.ubiquity.social.domain.SocialIdentity;
-import com.ubiquity.social.domain.SocialProviderType;
+import com.ubiquity.social.domain.ExternalIdentity;
+import com.ubiquity.social.domain.SocialProvider;
 import com.ubiquity.social.repository.SocialIdentityRepository;
 import com.ubiquity.social.repository.SocialIdentityRepositoryJpaImpl;
 
@@ -15,12 +15,12 @@ public class SocialService {
 		this.socialIdentityRepository = new SocialIdentityRepositoryJpaImpl();
 	}
 	
-	public SocialIdentity findSocialIdentity(Long userId, SocialProviderType providerType) {
+	public ExternalIdentity findSocialIdentity(Long userId, SocialProvider providerType) {
 		return socialIdentityRepository.findOne(userId, providerType);
 	}
 
-	public SocialIdentity findSocialIdentity(String providerIdentifier, SocialProviderType providerType) {
-		SocialIdentity identity = socialIdentityRepository.findOneByProviderIdentifier(providerIdentifier, providerType);
+	public ExternalIdentity findSocialIdentity(String providerIdentifier, SocialProvider providerType) {
+		ExternalIdentity identity = socialIdentityRepository.findOneByProviderIdentifier(providerIdentifier, providerType);
 		return identity;
 	}	
 
