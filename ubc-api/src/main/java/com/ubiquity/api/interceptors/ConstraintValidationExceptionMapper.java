@@ -4,6 +4,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.jboss.resteasy.annotations.interception.ServerInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +21,7 @@ import com.ubiquity.api.dto.model.ErrorDto;
  *
  */
 @Provider
+@ServerInterceptor
 public class ConstraintValidationExceptionMapper implements ExceptionMapper<ConstraintValidationException>{
 
 	private Logger log = LoggerFactory.getLogger(getClass());
