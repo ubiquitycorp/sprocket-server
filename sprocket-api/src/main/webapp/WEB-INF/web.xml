@@ -10,7 +10,7 @@
   </context-param>
   <context-param>
       <param-name>resteasy.providers</param-name>
-      <param-value>com.ubiquity.api.interceptors.CatchAllExceptionMapper,com.ubiquity.api.interceptors.CrossOriginResourceInterceptor,com.ubiquity.api.interceptors.IOExceptionMapper,com.ubiquity.api.interceptors.ConstraintValidationExceptionMapper,com.ubiquity.api.interceptors.IllegalArgumentExceptionMapper,com.ubiquity.api.interceptors.HttpExceptionMapper
+      <param-value>com.ubiquity.api.interceptors.CatchAllExceptionMapper,com.ubiquity.api.interceptors.IOExceptionMapper,com.ubiquity.api.interceptors.ConstraintValidationExceptionMapper,com.ubiquity.api.interceptors.IllegalArgumentExceptionMapper,com.ubiquity.api.interceptors.HttpExceptionMapper
       </param-value>
 </context-param>
   <listener>
