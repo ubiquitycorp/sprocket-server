@@ -225,7 +225,7 @@ public class UsersEndpoint {
 			try {
 				contact = social.authenticateUser(identity);
 			} catch (Exception e) {
-				throw new HttpException("Could not authenticate with provider", 401);
+				throw new HttpException("Could not authenticate with provider: " + e.getMessage(), 401);
 			}
 
 			ServiceFactory.getContactService().create(contact);
