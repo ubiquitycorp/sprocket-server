@@ -23,6 +23,7 @@ import com.ubiquity.social.domain.SocialProvider;
  */
 public class FacebookGraphApiDtoAssembler {
 		
+	
 	/***
 	 * Assembles a contact and sets the identity user property as the owner. It also sets the 
 	 * identitifer and social provider on the passed in identity reference.
@@ -105,23 +106,6 @@ public class FacebookGraphApiDtoAssembler {
 	 */
 	public static List<Event> assembleEvents(Contact contact, FacebookDataDto result) {
 		List<Event> events = new LinkedList<Event>();
-//		List<Map<String, String>> data = result.getData();
-//
-//		for(Map<String, String> element : data) {
-//			String startTime = element.get("start_time");
-//			String endTime = element.get("end_time");
-//			String name = element.get("name");
-//			String identifier = element.get("id");
-//			
-//			Event event = new Event.Builder()
-//					.startDate(new DateTime(startTime).getMillis())
-//					.endDate(new DateTime(endTime).getMillis())
-//					.name(name)
-//					.socialProviderIdentifier(identifier)
-//					.contact(contact)
-//					.build();
-//			events.add(event);
-//		}
 		return events;
 	}
 	

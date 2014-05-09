@@ -15,6 +15,7 @@ import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.google.dto.GooglePlusApiDtoAssembler;
 import com.ubiquity.social.api.google.dto.container.GoogleItemsDto;
+import com.ubiquity.social.api.google.dto.container.GoogleRequestFailureDto;
 import com.ubiquity.social.api.google.dto.model.GooglePersonDto;
 import com.ubiquity.social.api.google.endpoints.GooglePlusApiEndpoints;
 import com.ubiquity.social.domain.Contact;
@@ -33,6 +34,7 @@ public class GoogleAPI implements SocialAPI {
 	private static SocialAPI google = null;
 	OAuthService service = null;
 	
+	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private GooglePlusApiEndpoints googleApi;
@@ -56,7 +58,8 @@ public class GoogleAPI implements SocialAPI {
 		ClientResponse<String> response = null;
 		try {
 			response = googleApi.getMe(identity.getAccessToken());
-			log.debug("response code: {}", response.getResponseStatus().getStatusCode());
+			checkError(response);
+			
 			GooglePersonDto result = jsonConverter.parse(response.getEntity(), GooglePersonDto.class);
 			Contact contact = GooglePlusApiDtoAssembler.assembleContact(identity, result);
 			return contact;
@@ -72,6 +75,8 @@ public class GoogleAPI implements SocialAPI {
 		ClientResponse<String> response = null;
 		try {
 			response = googleApi.getFriends(identity.getAccessToken());
+			checkError(response);
+
 			GoogleItemsDto result = jsonConverter.parse(response.getEntity(), GoogleItemsDto.class);
 			
 			List<GooglePersonDto> peopleDtoList = jsonConverter.convertToListFromList(result.getItems(), GooglePersonDto.class);
@@ -97,5 +102,22 @@ public class GoogleAPI implements SocialAPI {
 	public Boolean postToWall(ExternalIdentity fromIdentity,
 			ExternalIdentity toIdentity, String message) {
 		throw new UnsupportedOperationException();
+	}
+	
+	private String getErrorMessage(ClientResponse<String> response) {
+		String errorMessage = null;
+		String errorBody = response.getEntity();
+		if(errorBody != null) {
+			GoogleRequestFailureDto failure = jsonConverter.parse(errorBody, GoogleRequestFailureDto.class);
+			errorMessage = failure.getError().getMessage();
+		} else {
+			errorMessage = "Unable to authenticate with provided credentials";
+		}
+		return errorMessage;
+	}
+	private void checkError(ClientResponse<String> response) {
+		if(response.getResponseStatus().getStatusCode() != 200) {
+			throw new RuntimeException(getErrorMessage(response));
+		}
 	}
 }

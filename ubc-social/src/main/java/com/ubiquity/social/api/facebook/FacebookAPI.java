@@ -14,6 +14,7 @@ import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.facebook.dto.FacebookGraphApiDtoAssembler;
 import com.ubiquity.social.api.facebook.dto.container.FacebookDataDto;
+import com.ubiquity.social.api.facebook.dto.container.FacebookRequestFailureDto;
 import com.ubiquity.social.api.facebook.dto.model.FacebookContactDto;
 import com.ubiquity.social.api.facebook.dto.model.FacebookEventDto;
 import com.ubiquity.social.api.facebook.endpoints.FacebookGraphApiEndpoints;
@@ -55,8 +56,7 @@ public class FacebookAPI implements SocialAPI {
 		ClientResponse<String> response = null;
 		try {
 			response = graphApi.getMe(identity.getAccessToken());
-			if(response.getResponseStatus().getStatusCode() != 200)
-				throw new RuntimeException("Unable to authenticate with the provided credentials");
+			checkError(response);
 				
 			FacebookContactDto contactDto = jsonConverter.parse(response.getEntity(), FacebookContactDto.class);
 			return FacebookGraphApiDtoAssembler.assembleContact(identity, contactDto);
@@ -74,6 +74,8 @@ public class FacebookAPI implements SocialAPI {
 		ClientResponse<String> response = null;
 		try {
 			response = graphApi.getFriends(identity.getAccessToken(), "id,name,first_name,last_name,username,link,picture");
+			checkError(response);
+
 			// convert the raw json into a container
 			FacebookDataDto result = jsonConverter.parse(response.getEntity(), FacebookDataDto.class);
 			// create a strongly typed list from the generic data container
@@ -126,6 +128,25 @@ public class FacebookAPI implements SocialAPI {
 	public Boolean postToWall(ExternalIdentity fromIdentity,
 			ExternalIdentity toIdentity, String message) {
 		throw new UnsupportedOperationException();
+	}
+	
+	
+	private String getErrorMessage(ClientResponse<String> response) { 
+		String errorMessage = null;
+		String errorBody = response.getEntity();
+		if(errorBody != null) {
+			FacebookRequestFailureDto failure = jsonConverter.parse(errorBody, FacebookRequestFailureDto.class);
+			errorMessage = failure.getError().getMessage();
+		} else {
+			errorMessage = "Unable to authenticate with provided credentials";
+		}
+		return errorMessage;
+	}
+	
+	private void checkError(ClientResponse<String> response) {
+		if(response.getResponseStatus().getStatusCode() != 200) {
+			throw new RuntimeException(getErrorMessage(response));
+		}
 	}
 
 
