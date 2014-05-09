@@ -8,7 +8,7 @@
         <dependent-module archiveName="sprocket-core-0.1.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/sprocket-core/sprocket-core">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="ubc-social-0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ubc-social/ubc-social">
+        <dependent-module archiveName="ubc-social-0.1.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ubc-social/ubc-social">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="niobium-data-access-0.2.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/niobium-data-access/niobium-data-access">
