@@ -14,7 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
+import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 
@@ -25,6 +27,42 @@ public class SocialEndpoint {
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
+	
+	
+	@GET
+	@Path("users/{userId}/activities")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response activities(@PathParam("userId") Long userId, InputStream payload) throws IOException {
+		ActivitiesDto activities = new ActivitiesDto();
+		
+		activities.getActivities().add(new ActivityDto.Builder()
+			.body("Activity 1 body")
+			.date(System.currentTimeMillis())
+			.title("Activity title 1 lorem ipsum lorem ipsume lorem ipsum lorem ipsum lorem ipsume lorem ipsume lorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsume")
+			.imageUrl(null)
+			.postedBy(new ContactDto.Builder().contactId(2l).displayName("Contact 1").firstName("Contact").lastName("One").imageUrl("https://graph.facebook.com/754592628/picture").build())
+			.build());
+		activities.getActivities().add(new ActivityDto.Builder()
+		.body("Activity 2 body lorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsume")
+		.date(System.currentTimeMillis())
+		.title("Activity title 2")
+		.imageUrl(null)
+		.postedBy(new ContactDto.Builder().contactId(2l).displayName("Contact 1").firstName("Contact").lastName("One").imageUrl("https://graph.facebook.com/754592628/picture").build())
+		.build());
+		
+		activities.getActivities().add(new ActivityDto.Builder()
+		.body("Activity 3 body lorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsume")
+		.date(System.currentTimeMillis())
+		.title("Activity title 3")
+		.imageUrl(null)
+		.postedBy(new ContactDto.Builder().contactId(2l).displayName("Contact 1").firstName("Contact").lastName("One").imageUrl("https://graph.facebook.com/754592628/picture").build())
+		.build());
+		return Response.ok()
+				.entity(jsonConverter.convertToPayload(activities))
+				.build();
+		
+	}
+	
 	
 	@GET
 	@Path("users/{userId}/messages")
