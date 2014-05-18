@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.social.domain.ContentProvider;
+import com.ubiquity.social.domain.SocialProvider;
 import com.ubiquity.sprocket.api.dto.containers.DocumentsDto;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
@@ -73,6 +74,7 @@ public class DocumentsEndpoint {
 		.data(new MessageDto.Builder()
 		.subject("Message subject 1")
 		.date(System.currentTimeMillis())
+		.socialProviderId(SocialProvider.Facebook.getValue())
 		.body("Body of message 1, lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsum")
 		.sender(new ContactDto.Builder().contactId(1l).displayName("Contact 1").firstName("Contact").lastName("One").imageUrl("https://graph.facebook.com/754592629/picture").build())
 		.build())
@@ -82,9 +84,11 @@ public class DocumentsEndpoint {
 		documentDto = new DocumentDto.Builder()
 		.rank(5)
 		.dataType("Activity")
+		
 		.data(new ActivityDto.Builder()
 		.body("Activity 3 body lorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsume")
 		.date(System.currentTimeMillis())
+		.socialProviderId(SocialProvider.LinkedIn.getValue())
 		.title("Activity title 3")
 		.imageUrl(null)
 		.postedBy(new ContactDto.Builder().contactId(2l).displayName("Contact 1").firstName("Contact").lastName("One").imageUrl("https://graph.facebook.com/754592628/picture").build())
