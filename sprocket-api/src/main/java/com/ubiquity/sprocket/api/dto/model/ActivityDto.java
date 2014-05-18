@@ -7,6 +7,7 @@ public class ActivityDto {
 	private Long date;
 	private ContactDto postedBy;
 	private String imageUrl;
+	private Integer socialProviderId;
 
 	public String getTitle() {
 		return title;
@@ -28,12 +29,17 @@ public class ActivityDto {
 		return imageUrl;
 	}
 
+	public Integer getSocialProviderId() {
+		return socialProviderId;
+	}
+
 	public static class Builder {
 		private String title;
 		private String body;
 		private Long date;
 		private ContactDto postedBy;
 		private String imageUrl;
+		private Integer socialProviderId;
 
 		public Builder title(String title) {
 			this.title = title;
@@ -60,6 +66,11 @@ public class ActivityDto {
 			return this;
 		}
 
+		public Builder socialProviderId(Integer socialProviderId) {
+			this.socialProviderId = socialProviderId;
+			return this;
+		}
+
 		public ActivityDto build() {
 			return new ActivityDto(this);
 		}
@@ -71,5 +82,6 @@ public class ActivityDto {
 		this.date = builder.date;
 		this.postedBy = builder.postedBy;
 		this.imageUrl = builder.imageUrl;
+		this.socialProviderId = builder.socialProviderId;
 	}
 }

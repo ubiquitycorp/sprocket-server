@@ -6,6 +6,11 @@ public class MessageDto {
 	private String body;
 	private Long date;
 	private ContactDto sender;
+	private Integer socialProviderId;
+
+	public Integer getSocialProviderId() {
+		return socialProviderId;
+	}
 
 	public String getSubject() {
 		return subject;
@@ -28,6 +33,7 @@ public class MessageDto {
 		private String body;
 		private Long date;
 		private ContactDto sender;
+		private Integer socialProviderId;
 
 		public Builder subject(String subject) {
 			this.subject = subject;
@@ -49,6 +55,11 @@ public class MessageDto {
 			return this;
 		}
 
+		public Builder socialProviderId(Integer socialProviderId) {
+			this.socialProviderId = socialProviderId;
+			return this;
+		}
+
 		public MessageDto build() {
 			return new MessageDto(this);
 		}
@@ -59,5 +70,6 @@ public class MessageDto {
 		this.body = builder.body;
 		this.date = builder.date;
 		this.sender = builder.sender;
+		this.socialProviderId = builder.socialProviderId;
 	}
 }

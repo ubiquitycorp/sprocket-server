@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.social.domain.SocialProvider;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
@@ -38,6 +39,7 @@ public class SocialEndpoint {
 		activities.getActivities().add(new ActivityDto.Builder()
 			.body("Activity 1 body")
 			.date(System.currentTimeMillis())
+			.socialProviderId(SocialProvider.Facebook.getValue())
 			.title("Activity title 1 lorem ipsum lorem ipsume lorem ipsum lorem ipsum lorem ipsume lorem ipsume lorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsume")
 			.imageUrl(null)
 			.postedBy(new ContactDto.Builder().contactId(2l).displayName("Contact 1").firstName("Contact").lastName("One").imageUrl("https://graph.facebook.com/754592628/picture").build())
@@ -45,6 +47,7 @@ public class SocialEndpoint {
 		activities.getActivities().add(new ActivityDto.Builder()
 		.body("Activity 2 body lorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsume")
 		.date(System.currentTimeMillis())
+		.socialProviderId(SocialProvider.Google.getValue())
 		.title("Activity title 2")
 		.imageUrl(null)
 		.postedBy(new ContactDto.Builder().contactId(2l).displayName("Contact 1").firstName("Contact").lastName("One").imageUrl("https://graph.facebook.com/754592628/picture").build())
@@ -54,6 +57,7 @@ public class SocialEndpoint {
 		.body("Activity 3 body lorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsume")
 		.date(System.currentTimeMillis())
 		.title("Activity title 3")
+		.socialProviderId(SocialProvider.LinkedIn.getValue())
 		.imageUrl(null)
 		.postedBy(new ContactDto.Builder().contactId(2l).displayName("Contact 1").firstName("Contact").lastName("One").imageUrl("https://graph.facebook.com/754592628/picture").build())
 		.build());
@@ -74,17 +78,20 @@ public class SocialEndpoint {
 		messagesDto.getMessages().add(new MessageDto.Builder()
 		.subject("Message subject 1")
 		.date(System.currentTimeMillis())
+		.socialProviderId(SocialProvider.Facebook.getValue())
 		.body("Body of message 1, lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsum")
 		.sender(new ContactDto.Builder().contactId(1l).displayName("Contact 1").firstName("Contact").lastName("One").imageUrl("https://graph.facebook.com/754592629/picture").build())
 		.build());
 		messagesDto.getMessages().add(new MessageDto.Builder()
 		.subject("Message subject 2")
+		.socialProviderId(SocialProvider.Google.getValue())
 		.date(System.currentTimeMillis())
 		.body("Body of message 2, lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsum")
 		.sender(new ContactDto.Builder().contactId(2l).displayName("Contact 1").firstName("Contact").lastName("One").imageUrl("https://graph.facebook.com/754592628/picture").build())
 		.build());
 		messagesDto.getMessages().add(new MessageDto.Builder()
 		.subject("Message subject 3")
+		.socialProviderId(SocialProvider.LinkedIn.getValue())
 		.date(System.currentTimeMillis())
 		.body("Body of message 3, lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsum")
 		.sender(new ContactDto.Builder().contactId(2l).displayName("Contact 2").firstName("Contact").lastName("Two").imageUrl("https://graph.facebook.com/754592628/picture").build())
