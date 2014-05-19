@@ -13,6 +13,8 @@
 		<class>com.ubiquity.identity.domain.Identity</class>
 		<class>com.ubiquity.identity.domain.NativeIdentity</class>
 		<class>com.ubiquity.social.domain.Contact</class>
+		<class>com.ubiquity.social.domain.Message</class>
+	
 		<class>com.ubiquity.social.domain.Event</class>
 		<class>com.ubiquity.social.domain.ExternalIdentity</class>
 
