@@ -2,6 +2,7 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -14,12 +15,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.identity.domain.Identity;
+import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.service.UserService;
+import com.ubiquity.social.api.gmail.GmailAPI;
+import com.ubiquity.social.domain.ExternalIdentity;
+import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialProvider;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
+import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/social")
 public class SocialEndpoint {
@@ -69,9 +77,54 @@ public class SocialEndpoint {
 	
 	
 	@GET
+	@Path("users/{userId}/providers/{socialProviderId}/messages")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response messages(@PathParam("userId") Long userId, @PathParam("socialProviderId") Integer socialProviderId) {
+		
+		MessagesDto result = new MessagesDto();
+		
+		SocialProvider socialProvider = SocialProvider.getEnum(socialProviderId);
+		
+		if(socialProvider == SocialProvider.Google) {
+			// G+ does not support messaging, so it's gmail; get the identity for gmail
+			UserService userService = ServiceFactory.getUserService();
+			User user = userService.getUserById(userId);
+			
+			for(Identity identity : user.getIdentities()) {
+				if(identity instanceof ExternalIdentity) {
+					ExternalIdentity external = (ExternalIdentity)identity;
+					if(external.getSocialProvider().getValue() == socialProviderId.intValue()) {
+						GmailAPI gmailApi = new GmailAPI();
+						List<Message> messages = gmailApi.findMessages(external);
+						for(Message message : messages) {
+							result.getMessages().add(new MessageDto.Builder()
+								.subject(message.getTitle())
+								.date(System.currentTimeMillis())
+								.socialProviderId(SocialProvider.Google.getValue())
+								.body(message.getBody())
+								//.sender(new ContactDto.Builder().contactId(1l).displayName().firstName().lastName("One").imageUrl("https://graph.facebook.com/754592629/picture").build())
+							.build());
+						}
+					}
+				}
+			}
+			
+		}
+		
+		
+		
+
+		return Response.ok()
+				.entity(jsonConverter.convertToPayload(result))
+				.build();
+	}
+	
+	@GET
 	@Path("users/{userId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response messages(@PathParam("userId") Long userId, InputStream payload) throws IOException {
+	public Response messages(@PathParam("userId") Long userId) throws IOException {
+		
+		
 		
 		// convert payload
 		MessagesDto messagesDto = new MessagesDto();
