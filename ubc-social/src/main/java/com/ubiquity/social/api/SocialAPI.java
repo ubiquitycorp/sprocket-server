@@ -62,4 +62,6 @@ public interface SocialAPI {
 	 * @throws UnsupportedOperationException if the underlying social network does not support this action
 	 */
 	Boolean postToWall(ExternalIdentity fromIdentity, ExternalIdentity toIdentity, String message);
+	
+	
 }

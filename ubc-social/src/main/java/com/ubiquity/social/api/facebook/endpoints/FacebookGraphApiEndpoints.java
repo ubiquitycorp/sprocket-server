@@ -18,6 +18,13 @@ public interface FacebookGraphApiEndpoints {
     ClientResponse<String> getEvents(@PathParam("userId") Long userId, @QueryParam("access_token") String accessToken);
 
     @GET
+    @Path("me/activities")
+    @Consumes("application/json")
+    @Produces("application/json")
+    ClientResponse<String> getActivities(@QueryParam("access_token") String accessToken);
+
+    
+    @GET
     @Path("me")
     @Consumes("application/json")
     @Produces("application/json")
