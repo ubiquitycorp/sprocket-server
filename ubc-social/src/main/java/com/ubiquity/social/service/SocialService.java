@@ -26,6 +26,8 @@ public class SocialService {
 		return identity;
 	}
 	
+	
+	
 	/***
 	 * Utility method for retrieving social identity already associated with this user
 	 * 
@@ -48,7 +50,7 @@ public class SocialService {
 			}
 		}
 		if(external == null)
-			throw new IllegalArgumentException("User has no identity for this provider");
+			throw new IllegalArgumentException("User has no identity for this provider: " + socialProvider.toString());
 		
 		return external;
 	}

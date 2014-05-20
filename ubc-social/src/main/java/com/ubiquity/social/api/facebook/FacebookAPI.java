@@ -17,8 +17,8 @@ import com.ubiquity.social.api.facebook.dto.container.FacebookDataDto;
 import com.ubiquity.social.api.facebook.dto.container.FacebookRequestFailureDto;
 import com.ubiquity.social.api.facebook.dto.model.FacebookActivityDto;
 import com.ubiquity.social.api.facebook.dto.model.FacebookContactDto;
-import com.ubiquity.social.api.facebook.dto.model.FacebookEventDto;
 import com.ubiquity.social.api.facebook.dto.model.FacebookConversationDto;
+import com.ubiquity.social.api.facebook.dto.model.FacebookEventDto;
 import com.ubiquity.social.api.facebook.endpoints.FacebookGraphApiEndpoints;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
@@ -43,8 +43,8 @@ public class FacebookAPI implements SocialAPI {
 	private FacebookAPI() {
 		// this initialization only needs to be done once per VM
 		RegisterBuiltin.register(ResteasyProviderFactory.getInstance());
-		graphApi = ProxyFactory.create(FacebookGraphApiEndpoints.class, "https://graph.facebook.com");
-
+		graphApi = ProxyFactory.create(FacebookGraphApiEndpoints.class,
+				"https://graph.facebook.com");
 	}
 
 	public static SocialAPI getProviderAPI() {
@@ -53,7 +53,6 @@ public class FacebookAPI implements SocialAPI {
 		return facebook;
 	}
 
-	
 	@Override
 	public Contact authenticateUser(ExternalIdentity identity) {
 
@@ -61,12 +60,14 @@ public class FacebookAPI implements SocialAPI {
 		try {
 			response = graphApi.getMe(identity.getAccessToken());
 			checkError(response);
-				
-			FacebookContactDto contactDto = jsonConverter.parse(response.getEntity(), FacebookContactDto.class);
-			return FacebookGraphApiDtoAssembler.assembleContact(identity, contactDto);
-			
+
+			FacebookContactDto contactDto = jsonConverter.parse(
+					response.getEntity(), FacebookContactDto.class);
+			return FacebookGraphApiDtoAssembler.assembleContact(identity,
+					contactDto);
+
 		} finally {
-			if(response != null)
+			if (response != null)
 				response.releaseConnection();
 		}
 	}
@@ -74,25 +75,30 @@ public class FacebookAPI implements SocialAPI {
 	@Override
 	public List<Contact> findContactsByOwnerIdentity(ExternalIdentity identity) {
 		List<Contact> contacts = new LinkedList<Contact>();
-		
+
 		ClientResponse<String> response = null;
 		try {
-			response = graphApi.getFriends(identity.getAccessToken(), "id,name,first_name,last_name,username,link,picture");
+			response = graphApi.getFriends(identity.getAccessToken(),
+					"id,name,first_name,last_name,username,link,picture");
 			checkError(response);
 
 			// convert the raw json into a container
-			FacebookDataDto result = jsonConverter.parse(response.getEntity(), FacebookDataDto.class);
+			FacebookDataDto result = jsonConverter.parse(response.getEntity(),
+					FacebookDataDto.class);
 			// create a strongly typed list from the generic data container
-			List<FacebookContactDto> contactsDtoList = jsonConverter.convertToListFromList(result.getData(), FacebookContactDto.class);
-			
+			List<FacebookContactDto> contactsDtoList = jsonConverter
+					.convertToListFromList(result.getData(),
+							FacebookContactDto.class);
+
 			// assemble from dto to entity
-			for(FacebookContactDto contactDto : contactsDtoList) {
+			for (FacebookContactDto contactDto : contactsDtoList) {
 				log.debug("Assembling contact {}", contactDto);
-				contacts.add(FacebookGraphApiDtoAssembler.assembleContact(identity.getUser(), contactDto));
+				contacts.add(FacebookGraphApiDtoAssembler.assembleContact(
+						identity.getUser(), contactDto));
 			}
 			return contacts;
 		} finally {
-			if(response != null)
+			if (response != null)
 				response.releaseConnection();
 		}
 	}
@@ -102,26 +108,37 @@ public class FacebookAPI implements SocialAPI {
 			List<Contact> contacts) {
 		List<Event> events = new LinkedList<Event>();
 
-		for(Contact contact : contacts) {
+		for (Contact contact : contacts) {
 			ClientResponse<String> response = null;
 			try {
-				response = graphApi.getEvents(Long.parseLong(contact.getSocialIdentity().getIdentifier()), identity.getAccessToken());
-				if(response.getResponseStatus().getStatusCode() != 200) {
-					// in this case, for now let's not kill the whole loop when it's possible only 1 request is failing (perhaps FB removed a pointer)
-					log.warn("Retrieving events for identity {} failed, reason: {}", contact.getSocialIdentity().getIdentifier(), response.getEntity());
+				response = graphApi.getEvents(Long.parseLong(contact
+						.getSocialIdentity().getIdentifier()), identity
+						.getAccessToken());
+				if (response.getResponseStatus().getStatusCode() != 200) {
+					// in this case, for now let's not kill the whole loop when
+					// it's possible only 1 request is failing (perhaps FB
+					// removed a pointer)
+					log.warn(
+							"Retrieving events for identity {} failed, reason: {}",
+							contact.getSocialIdentity().getIdentifier(),
+							response.getEntity());
 					continue;
 				}
-					
+
 				// convert the raw json into a container
-				FacebookDataDto result = jsonConverter.parse(response.getEntity(), FacebookDataDto.class);
+				FacebookDataDto result = jsonConverter.parse(
+						response.getEntity(), FacebookDataDto.class);
 
 				// create a strongly typed list from the generic data container
-				List<FacebookEventDto> eventsDtoList = jsonConverter.convertToListFromList(result.getData(), FacebookEventDto.class);
-				for(FacebookEventDto eventDto : eventsDtoList) {
-					events.add(FacebookGraphApiDtoAssembler.assembleEvent(contact, eventDto));
+				List<FacebookEventDto> eventsDtoList = jsonConverter
+						.convertToListFromList(result.getData(),
+								FacebookEventDto.class);
+				for (FacebookEventDto eventDto : eventsDtoList) {
+					events.add(FacebookGraphApiDtoAssembler.assembleEvent(
+							contact, eventDto));
 				}
 			} finally {
-				if(response != null)
+				if (response != null)
 					response.releaseConnection();
 			}
 		}
@@ -133,13 +150,10 @@ public class FacebookAPI implements SocialAPI {
 			ExternalIdentity toIdentity, String message) {
 		throw new UnsupportedOperationException();
 	}
-	
-	
-	
 
 	@Override
 	public List<Message> listMessages(ExternalIdentity externalIdentity) {
-		
+
 		List<Message> messages = new LinkedList<Message>();
 		ClientResponse<String> response = null;
 		try {
@@ -147,35 +161,40 @@ public class FacebookAPI implements SocialAPI {
 			checkError(response);
 
 			// convert the raw json into a container
-			FacebookDataDto result = jsonConverter.parse(response.getEntity(), FacebookDataDto.class);
+			FacebookDataDto result = jsonConverter.parse(response.getEntity(),
+					FacebookDataDto.class);
 			// create a strongly typed list from the generic data container
-			List<FacebookConversationDto> conversationDtoList = jsonConverter.convertToListFromList(result.getData(), FacebookConversationDto.class);
-			
+			List<FacebookConversationDto> conversationDtoList = jsonConverter
+					.convertToListFromList(result.getData(),
+							FacebookConversationDto.class);
+
 			// assemble from dto to entity
-			for(FacebookConversationDto conversationDto : conversationDtoList) {				
-		    	messages.add(FacebookGraphApiDtoAssembler.assemble(externalIdentity, conversationDto));
+			for (FacebookConversationDto conversationDto : conversationDtoList) {
+				messages.add(FacebookGraphApiDtoAssembler.assemble(
+						externalIdentity, conversationDto));
 			}
 		} finally {
-			if(response != null)
+			if (response != null)
 				response.releaseConnection();
 		}
 		return messages;
 	}
-	
-	private String getErrorMessage(ClientResponse<String> response) { 
+
+	private String getErrorMessage(ClientResponse<String> response) {
 		String errorMessage = null;
 		String errorBody = response.getEntity();
-		if(errorBody != null) {
-			FacebookRequestFailureDto failure = jsonConverter.parse(errorBody, FacebookRequestFailureDto.class);
+		if (errorBody != null) {
+			FacebookRequestFailureDto failure = jsonConverter.parse(errorBody,
+					FacebookRequestFailureDto.class);
 			errorMessage = failure.getError().getMessage();
 		} else {
 			errorMessage = "Unable to authenticate with provided credentials";
 		}
 		return errorMessage;
 	}
-	
+
 	private void checkError(ClientResponse<String> response) {
-		if(response.getResponseStatus().getStatusCode() != 200) {
+		if (response.getResponseStatus().getStatusCode() != 200) {
 			throw new RuntimeException(getErrorMessage(response));
 		}
 	}
@@ -189,22 +208,33 @@ public class FacebookAPI implements SocialAPI {
 			checkError(response);
 
 			// convert the raw json into a container
-			FacebookDataDto result = jsonConverter.parse(response.getEntity(), FacebookDataDto.class);
+			FacebookDataDto result = jsonConverter.parse(response.getEntity(),
+					FacebookDataDto.class);
 			// create a strongly typed list from the generic data container
-			List<FacebookActivityDto> activitiesDtoList = jsonConverter.convertToListFromList(result.getData(), FacebookActivityDto.class);
-			
+			List<FacebookActivityDto> activitiesDtoList = jsonConverter
+					.convertToListFromList(result.getData(),
+							FacebookActivityDto.class);
+
 			// assemble from dto to entity
-			for(FacebookActivityDto activityDto : activitiesDtoList) {
-				log.debug("Assembling message {}", activityDto.getId());
-				Activity activity = new Activity.Builder().title("").title("").build();
-		    	activities.add(activity);
+			for (FacebookActivityDto activityDto : activitiesDtoList) {
+				
+				// build contact 
+				Contact contact = FacebookGraphApiDtoAssembler.assembleContact(external, activityDto.getFrom());
+				Activity activity = new Activity.Builder()
+					.title(activityDto.getName())
+					.body(activityDto.getDescription())
+					.lastUpdated(System.currentTimeMillis())
+					.creationDate(System.currentTimeMillis())
+					.postedBy(contact)
+					.build();
+				
+				activities.add(activity);
 			}
 		} finally {
-			if(response != null)
+			if (response != null)
 				response.releaseConnection();
 		}
 		return activities;
 	}
-
 
 }

@@ -42,6 +42,10 @@ public class Activity {
 	@JoinColumn(name = "owner_id", nullable = false)
 	private User owner;
 
+	@ManyToOne
+	@JoinColumn(name = "posted_by_contact_id", nullable = false)
+	private Contact postedBy;
+
 	@Embedded
 	private Image image;
 
@@ -83,6 +87,10 @@ public class Activity {
 		return image;
 	}
 
+	public Contact getPostedBy() {
+		return postedBy;
+	}
+
 	public static class Builder {
 		private Long activityId;
 		private String title;
@@ -91,6 +99,7 @@ public class Activity {
 		private Long creationDate;
 		private Long lastUpdated;
 		private User owner;
+		private Contact postedBy;
 		private Image image;
 
 		public Builder activityId(Long activityId) {
@@ -128,6 +137,11 @@ public class Activity {
 			return this;
 		}
 
+		public Builder postedBy(Contact postedBy) {
+			this.postedBy = postedBy;
+			return this;
+		}
+
 		public Builder image(Image image) {
 			this.image = image;
 			return this;
@@ -146,6 +160,7 @@ public class Activity {
 		this.creationDate = builder.creationDate;
 		this.lastUpdated = builder.lastUpdated;
 		this.owner = builder.owner;
+		this.postedBy = builder.postedBy;
 		this.image = builder.image;
 	}
 }

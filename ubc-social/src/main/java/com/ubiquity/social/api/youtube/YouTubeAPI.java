@@ -10,6 +10,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.social.api.ContentAPI;
+import com.ubiquity.social.api.google.dto.container.GoogleRequestFailureDto;
 import com.ubiquity.social.api.youtube.dto.YouTubeApiDtoAssembler;
 import com.ubiquity.social.api.youtube.dto.container.YouTubeItemsDto;
 import com.ubiquity.social.api.youtube.dto.model.YouTubeVideoDto;
@@ -23,6 +24,11 @@ public class YouTubeAPI implements ContentAPI {
 	
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 
+	public YouTubeAPI() {
+		// this initialization only needs to be done once per VM
+		RegisterBuiltin.register(ResteasyProviderFactory.getInstance());
+		youTubeApi = ProxyFactory.create(YouTubeApiEndpoints.class, "https://www.googleapis.com/youtube");
+	}
 	
 	@Override
 	public List<VideoContent> findVideosByExternalIdentity(
@@ -31,6 +37,7 @@ public class YouTubeAPI implements ContentAPI {
 		ClientResponse<String> response = null;
 		try {
 			response = youTubeApi.getVideos("snippet", "mostPopular", "AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I", "  Bearer " + externalIdentity.getAccessToken());
+			checkError(response);
 			
 			YouTubeItemsDto result = jsonConverter.parse(response.getEntity(), YouTubeItemsDto.class);
 			
@@ -46,11 +53,25 @@ public class YouTubeAPI implements ContentAPI {
 		
 		return videos;
 	}
-
-	public YouTubeAPI() {
-		// this initialization only needs to be done once per VM
-		RegisterBuiltin.register(ResteasyProviderFactory.getInstance());
-		youTubeApi = ProxyFactory.create(YouTubeApiEndpoints.class, "https://www.googleapis.com/youtube");
+	
+	private String getErrorMessage(ClientResponse<String> response) {
+		String errorMessage = null;
+		String errorBody = response.getEntity();
+		if(errorBody != null) {
+			GoogleRequestFailureDto failure = jsonConverter.parse(errorBody, GoogleRequestFailureDto.class);
+			errorMessage = failure.getError().getMessage();
+		} else {
+			errorMessage = "Unable to authenticate with provided credentials";
+		}
+		return errorMessage;
 	}
+	
+	private void checkError(ClientResponse<String> response) {
+		if(response.getResponseStatus().getStatusCode() != 200) {
+			throw new RuntimeException(getErrorMessage(response));
+		}
+	}
+
+	
 
 }
