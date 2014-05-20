@@ -15,12 +15,16 @@ import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.facebook.dto.FacebookGraphApiDtoAssembler;
 import com.ubiquity.social.api.facebook.dto.container.FacebookDataDto;
 import com.ubiquity.social.api.facebook.dto.container.FacebookRequestFailureDto;
+import com.ubiquity.social.api.facebook.dto.model.FacebookActivityDto;
 import com.ubiquity.social.api.facebook.dto.model.FacebookContactDto;
 import com.ubiquity.social.api.facebook.dto.model.FacebookEventDto;
+import com.ubiquity.social.api.facebook.dto.model.FacebookMessageDto;
 import com.ubiquity.social.api.facebook.endpoints.FacebookGraphApiEndpoints;
+import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
 import com.ubiquity.social.domain.ExternalIdentity;
+import com.ubiquity.social.domain.Message;
 
 /***
  * Facebook API class
@@ -131,6 +135,35 @@ public class FacebookAPI implements SocialAPI {
 	}
 	
 	
+	
+
+	@Override
+	public List<Message> listMessages(ExternalIdentity externalIdentity) {
+		
+		List<Message> messages = new LinkedList<Message>();
+		ClientResponse<String> response = null;
+		try {
+			response = graphApi.getInbox(externalIdentity.getAccessToken());
+			checkError(response);
+
+			// convert the raw json into a container
+			FacebookDataDto result = jsonConverter.parse(response.getEntity(), FacebookDataDto.class);
+			// create a strongly typed list from the generic data container
+			List<FacebookMessageDto> messagesDtoList = jsonConverter.convertToListFromList(result.getData(), FacebookMessageDto.class);
+			
+			// assemble from dto to entity
+			for(FacebookMessageDto messageDto : messagesDtoList) {
+				log.debug("Assembling message {}", messageDto.getId());
+				Message message = new Message.Builder().title("").title("").build();
+		    	messages.add(message);
+			}
+		} finally {
+			if(response != null)
+				response.releaseConnection();
+		}
+		return messages;
+	}
+	
 	private String getErrorMessage(ClientResponse<String> response) { 
 		String errorMessage = null;
 		String errorBody = response.getEntity();
@@ -147,6 +180,32 @@ public class FacebookAPI implements SocialAPI {
 		if(response.getResponseStatus().getStatusCode() != 200) {
 			throw new RuntimeException(getErrorMessage(response));
 		}
+	}
+
+	@Override
+	public List<Activity> listActivities(ExternalIdentity external) {
+		List<Activity> activities = new LinkedList<Activity>();
+		ClientResponse<String> response = null;
+		try {
+			response = graphApi.getFeed(external.getAccessToken());
+			checkError(response);
+
+			// convert the raw json into a container
+			FacebookDataDto result = jsonConverter.parse(response.getEntity(), FacebookDataDto.class);
+			// create a strongly typed list from the generic data container
+			List<FacebookActivityDto> activitiesDtoList = jsonConverter.convertToListFromList(result.getData(), FacebookActivityDto.class);
+			
+			// assemble from dto to entity
+			for(FacebookActivityDto activityDto : activitiesDtoList) {
+				log.debug("Assembling message {}", activityDto.getId());
+				Activity activity = new Activity.Builder().title("").title("").build();
+		    	activities.add(activity);
+			}
+		} finally {
+			if(response != null)
+				response.releaseConnection();
+		}
+		return activities;
 	}
 
 

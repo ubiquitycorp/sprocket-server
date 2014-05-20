@@ -2,9 +2,11 @@ package com.ubiquity.social.api;
 
 import java.util.List;
 
+import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
 import com.ubiquity.social.domain.ExternalIdentity;
+import com.ubiquity.social.domain.Message;
 
 /***
  * Social interface for all social providers
@@ -62,6 +64,11 @@ public interface SocialAPI {
 	 * @throws UnsupportedOperationException if the underlying social network does not support this action
 	 */
 	Boolean postToWall(ExternalIdentity fromIdentity, ExternalIdentity toIdentity, String message);
+	
+	
+	List<Message> listMessages(ExternalIdentity externalIdentity);
+
+	List<Activity> listActivities(ExternalIdentity external);
 	
 	
 }

@@ -18,9 +18,11 @@ import com.ubiquity.social.api.google.dto.container.GoogleItemsDto;
 import com.ubiquity.social.api.google.dto.container.GoogleRequestFailureDto;
 import com.ubiquity.social.api.google.dto.model.GooglePersonDto;
 import com.ubiquity.social.api.google.endpoints.GooglePlusApiEndpoints;
+import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
 import com.ubiquity.social.domain.ExternalIdentity;
+import com.ubiquity.social.domain.Message;
 
 /***
  * Google API class
@@ -115,9 +117,21 @@ public class GoogleAPI implements SocialAPI {
 		}
 		return errorMessage;
 	}
+	
 	private void checkError(ClientResponse<String> response) {
 		if(response.getResponseStatus().getStatusCode() != 200) {
 			throw new RuntimeException(getErrorMessage(response));
 		}
+	}
+
+	@Override
+	public List<Message> listMessages(ExternalIdentity externalIdentity) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public List<Activity> listActivities(ExternalIdentity external) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

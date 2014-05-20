@@ -23,9 +23,11 @@ import com.ubiquity.social.api.linkedin.dto.LinkedInApiDtoAssembler;
 import com.ubiquity.social.api.linkedin.dto.container.LinkedInValuesDto;
 import com.ubiquity.social.api.linkedin.dto.model.LinkedInConnectionDto;
 import com.ubiquity.social.api.linkedin.dto.model.LinkedInMessageDto;
+import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
 import com.ubiquity.social.domain.ExternalIdentity;
+import com.ubiquity.social.domain.Message;
 
 public class LinkedInAPIOAuth1Strategy implements SocialAPI {
 
@@ -126,6 +128,17 @@ public class LinkedInAPIOAuth1Strategy implements SocialAPI {
 		oAuthService.signRequest(accessToken, request);
 		Response response = request.send();
 		return response.getCode() == 201;
+	}
+
+	@Override
+	public List<Message> listMessages(ExternalIdentity externalIdentity) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public List<Activity> listActivities(ExternalIdentity external) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
