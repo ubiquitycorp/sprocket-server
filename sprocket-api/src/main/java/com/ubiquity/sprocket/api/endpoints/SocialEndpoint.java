@@ -125,7 +125,6 @@ public class SocialEndpoint {
 
 		MessagesDto result = new MessagesDto();
 
-
 		UserService userService = ServiceFactory.getUserService();
 		User user = userService.getUserById(userId);
 
@@ -136,54 +135,12 @@ public class SocialEndpoint {
 		
 		List<Message> messages = socialApi.listMessages(identity);
 		for(Message message : messages) {
+			// note that a message can be null here...because Facebook allows conversations without "comments"
+			if(message == null)
+				continue;
 			result.getMessages().add(DtoAssembler.assemble(message));
-		}
-		// Now convert to DTO
+		}	
 		
-		
-//		
-//		if(socialProvider == SocialProvider.Google) {
-//			// G+ does not support messaging, so it's gmail
-//			GmailAPI gmailApi = new GmailAPI();
-//						List<Message> messages = gmailApi.findMessages(external);
-//						for(Message message : messages) {
-//							result.getMessages().add(new MessageDto.Builder()
-//							.subject(message.getTitle())
-//							.date(System.currentTimeMillis())
-//							.socialProviderId(SocialProvider.Google.getValue())
-//							.body(message.getBody())
-//							//.sender(new ContactDto.Builder().contactId(1l).displayName().firstName().lastName("One").imageUrl("https://graph.facebook.com/754592629/picture").build())
-//							.build());
-//						}
-//					}
-//				}
-//			}
-//
-//		} else if(socialProvider == SocialProvider.Facebook) {
-//
-//			for(Identity identity : user.getIdentities()) {
-//				if(identity instanceof ExternalIdentity) {
-//					ExternalIdentity external = (ExternalIdentity)identity;
-//					if(external.getSocialProvider() == SocialProvider.Facebook) {
-//						List<Message> messages = socialApi.listMessages(external);
-//						for(Message message : messages) {
-//							result.getMessages().add(new MessageDto.Builder()
-//							.subject(message.getTitle())
-//							.date(System.currentTimeMillis())
-//							.socialProviderId(SocialProvider.Facebook.getValue())
-//							.body(message.getBody())
-//							//.sender(new ContactDto.Builder().contactId(1l).displayName().firstName().lastName("One").imageUrl("https://graph.facebook.com/754592629/picture").build())
-//							.build());
-//						}
-//					}
-//				}
-//			}
-//
-//		}
-
-
-
-
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(result))
 				.build();
