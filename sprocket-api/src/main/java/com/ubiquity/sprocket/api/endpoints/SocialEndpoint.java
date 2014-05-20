@@ -1,7 +1,6 @@
 package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -18,7 +17,10 @@ import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.UserService;
+import com.ubiquity.social.api.SocialAPI;
+import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.api.gmail.GmailAPI;
+import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialProvider;
@@ -31,27 +33,27 @@ import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/social")
 public class SocialEndpoint {
-	
+
 	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
-	
-	
+
+
 	@GET
 	@Path("users/{userId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response activities(@PathParam("userId") Long userId, InputStream payload) throws IOException {
+	public Response activities(@PathParam("userId") Long userId) throws IOException {
 		ActivitiesDto activities = new ActivitiesDto();
-		
+
 		activities.getActivities().add(new ActivityDto.Builder()
-			.body("Activity 1 body")
-			.date(System.currentTimeMillis())
-			.socialProviderId(SocialProvider.Facebook.getValue())
-			.title("Activity title 1 lorem ipsum lorem ipsume lorem ipsum lorem ipsum lorem ipsume lorem ipsume lorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsume")
-			.imageUrl(null)
-			.postedBy(new ContactDto.Builder().contactId(2l).displayName("Contact 1").firstName("Contact").lastName("One").imageUrl("https://graph.facebook.com/754592628/picture").build())
-			.build());
+		.body("Activity 1 body")
+		.date(System.currentTimeMillis())
+		.socialProviderId(SocialProvider.Facebook.getValue())
+		.title("Activity title 1 lorem ipsum lorem ipsume lorem ipsum lorem ipsum lorem ipsume lorem ipsume lorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsume")
+		.imageUrl(null)
+		.postedBy(new ContactDto.Builder().contactId(2l).displayName("Contact 1").firstName("Contact").lastName("One").imageUrl("https://graph.facebook.com/754592628/picture").build())
+		.build());
 		activities.getActivities().add(new ActivityDto.Builder()
 		.body("Activity 2 body lorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsume")
 		.date(System.currentTimeMillis())
@@ -60,7 +62,7 @@ public class SocialEndpoint {
 		.imageUrl(null)
 		.postedBy(new ContactDto.Builder().contactId(2l).displayName("Contact 1").firstName("Contact").lastName("One").imageUrl("https://graph.facebook.com/754592628/picture").build())
 		.build());
-		
+
 		activities.getActivities().add(new ActivityDto.Builder()
 		.body("Activity 3 body lorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsumelorem ipsum lorem ipsume lorem ipsume")
 		.date(System.currentTimeMillis())
@@ -72,24 +74,65 @@ public class SocialEndpoint {
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(activities))
 				.build();
-		
+
 	}
-	
-	
+
+
+	@GET
+	@Path("users/{userId}/providers/{socialProviderId}/activities")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response activities(@PathParam("userId") Long userId, @PathParam("socialProviderId") Integer socialProviderId) {
+		ActivitiesDto results = new ActivitiesDto();
+
+
+		SocialProvider socialProvider = SocialProvider.getEnum(socialProviderId);
+
+		UserService userService = ServiceFactory.getUserService();
+		User user = userService.getUserById(userId);
+
+		SocialAPI socialApi = SocialAPIFactory.createProvider(socialProvider, user.getClientPlatform());
+		for(Identity identity : user.getIdentities()) {
+			if(identity instanceof ExternalIdentity) {
+				ExternalIdentity external = (ExternalIdentity)identity;
+				if(external.getSocialProvider() == SocialProvider.Facebook) {
+					List<Activity> activities = socialApi.listActivities(external);
+					for(Activity activity : activities) {
+						results.getActivities().add(
+						new ActivityDto.Builder()
+						.body(activity.getBody())
+						.date(System.currentTimeMillis())
+						.socialProviderId(SocialProvider.Facebook.getValue())
+						.title(activity.getTitle())
+						.imageUrl(null)
+						.postedBy(new ContactDto.Builder().contactId(2l).displayName("Contact 1").firstName("Contact").lastName("One").imageUrl("https://graph.facebook.com/754592628/picture").build())
+						.build());
+					}
+				}
+			}
+		}
+
+
+		return Response.ok()
+				.entity(jsonConverter.convertToPayload(results))
+				.build();
+	}
+
 	@GET
 	@Path("users/{userId}/providers/{socialProviderId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response messages(@PathParam("userId") Long userId, @PathParam("socialProviderId") Integer socialProviderId) {
-		
+
 		MessagesDto result = new MessagesDto();
-		
+
 		SocialProvider socialProvider = SocialProvider.getEnum(socialProviderId);
-		
+
+		UserService userService = ServiceFactory.getUserService();
+		User user = userService.getUserById(userId);
+
 		if(socialProvider == SocialProvider.Google) {
 			// G+ does not support messaging, so it's gmail; get the identity for gmail
-			UserService userService = ServiceFactory.getUserService();
-			User user = userService.getUserById(userId);
-			
+
+
 			for(Identity identity : user.getIdentities()) {
 				if(identity instanceof ExternalIdentity) {
 					ExternalIdentity external = (ExternalIdentity)identity;
@@ -98,34 +141,56 @@ public class SocialEndpoint {
 						List<Message> messages = gmailApi.findMessages(external);
 						for(Message message : messages) {
 							result.getMessages().add(new MessageDto.Builder()
-								.subject(message.getTitle())
-								.date(System.currentTimeMillis())
-								.socialProviderId(SocialProvider.Google.getValue())
-								.body(message.getBody())
-								//.sender(new ContactDto.Builder().contactId(1l).displayName().firstName().lastName("One").imageUrl("https://graph.facebook.com/754592629/picture").build())
+							.subject(message.getTitle())
+							.date(System.currentTimeMillis())
+							.socialProviderId(SocialProvider.Google.getValue())
+							.body(message.getBody())
+							//.sender(new ContactDto.Builder().contactId(1l).displayName().firstName().lastName("One").imageUrl("https://graph.facebook.com/754592629/picture").build())
 							.build());
 						}
 					}
 				}
 			}
-			
+
+		} else if(socialProvider == SocialProvider.Facebook) {
+
+			SocialAPI socialApi = SocialAPIFactory.createProvider(socialProvider, user.getClientPlatform());
+			for(Identity identity : user.getIdentities()) {
+				if(identity instanceof ExternalIdentity) {
+					ExternalIdentity external = (ExternalIdentity)identity;
+					if(external.getSocialProvider() == SocialProvider.Facebook) {
+						List<Message> messages = socialApi.listMessages(external);
+						for(Message message : messages) {
+							result.getMessages().add(new MessageDto.Builder()
+							.subject(message.getTitle())
+							.date(System.currentTimeMillis())
+							.socialProviderId(SocialProvider.Facebook.getValue())
+							.body(message.getBody())
+							//.sender(new ContactDto.Builder().contactId(1l).displayName().firstName().lastName("One").imageUrl("https://graph.facebook.com/754592629/picture").build())
+							.build());
+						}
+					}
+				}
+			}
+
 		}
-		
-		
-		
+
+
+
 
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(result))
 				.build();
 	}
-	
+
+
 	@GET
 	@Path("users/{userId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response messages(@PathParam("userId") Long userId) throws IOException {
-		
-		
-		
+
+
+
 		// convert payload
 		MessagesDto messagesDto = new MessagesDto();
 		messagesDto.getMessages().add(new MessageDto.Builder()
@@ -149,8 +214,8 @@ public class SocialEndpoint {
 		.body("Body of message 3, lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsum lorem ipsum")
 		.sender(new ContactDto.Builder().contactId(2l).displayName("Contact 2").firstName("Contact").lastName("Two").imageUrl("https://graph.facebook.com/754592628/picture").build())
 		.build());
-		
-		
+
+
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(messagesDto))
 				.build();
