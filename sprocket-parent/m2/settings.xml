@@ -14,7 +14,7 @@
 				<db.pool.maxWait>10000</db.pool.maxWait>
 				<db.pool.idleConnectionTestPeriod>60
 				</db.pool.idleConnectionTestPeriod>
-				<db.username>netappusr</db.username>
+				<db.username>sprocketusr</db.username>
 				<db.password>sprocket9801</db.password>
 				<db.host>localhost</db.host>
 				<hibernate.schema.auto>update</hibernate.schema.auto>
@@ -46,7 +46,7 @@
 				<db.pool.maxWait>10000</db.pool.maxWait>
 				<db.pool.idleConnectionTestPeriod>60
 				</db.pool.idleConnectionTestPeriod>
-				<db.username>netappusr</db.username>
+				<db.username>sprocketusr</db.username>
 				<db.password>sprocket9801</db.password>
 				<db.host>localhost</db.host>
 				<hibernate.schema.auto>update</hibernate.schema.auto>
