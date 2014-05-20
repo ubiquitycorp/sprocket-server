@@ -85,33 +85,29 @@ public class SocialEndpoint {
 	public Response activities(@PathParam("userId") Long userId, @PathParam("socialProviderId") Integer socialProviderId) {
 		ActivitiesDto results = new ActivitiesDto();
 
-
 		SocialProvider socialProvider = SocialProvider.getEnum(socialProviderId);
 
 		UserService userService = ServiceFactory.getUserService();
 		User user = userService.getUserById(userId);
 
 		SocialAPI socialApi = SocialAPIFactory.createProvider(socialProvider, user.getClientPlatform());
-		for(Identity identity : user.getIdentities()) {
-			if(identity instanceof ExternalIdentity) {
-				ExternalIdentity external = (ExternalIdentity)identity;
-				if(external.getSocialProvider() == SocialProvider.Facebook) {
-					List<Activity> activities = socialApi.listActivities(external);
+		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, socialProvider);
+		
+		
+		List<Activity> activities = socialApi.listActivities(identity);
 					for(Activity activity : activities) {
 						results.getActivities().add(
 						new ActivityDto.Builder()
 						.body(activity.getBody())
 						.date(System.currentTimeMillis())
-						.socialProviderId(SocialProvider.Facebook.getValue())
+						.socialProviderId(socialProvider.getValue())
 						.title(activity.getTitle())
 						.imageUrl(null)
-						.postedBy(new ContactDto.Builder().contactId(2l).displayName("Contact 1").firstName("Contact").lastName("One").imageUrl("https://graph.facebook.com/754592628/picture").build())
+						.postedBy(DtoAssembler.assemble(activity.getPostedBy()))
 						.build());
 					}
-				}
-			}
-		}
-
+			
+		
 
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(results))

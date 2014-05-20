@@ -11,13 +11,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.niobium.common.serialize.JsonConverter;
-import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.api.ContentAPI;
 import com.ubiquity.social.api.ContentAPIFactory;
 import com.ubiquity.social.domain.ContentProvider;
 import com.ubiquity.social.domain.ExternalIdentity;
+import com.ubiquity.social.domain.SocialProvider;
 import com.ubiquity.social.domain.VideoContent;
+import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.api.dto.model.ImageDto;
 import com.ubiquity.sprocket.api.dto.model.VideoDto;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -34,67 +35,28 @@ public class ContentEndpoint {
 		
 		List<VideoDto> results = new LinkedList<VideoDto>();
 		
+		// Only supporting YouTube now...
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		ContentAPI contentApi = ContentAPIFactory.createProvider(ContentProvider.YouTube);
-		//List<Video> videos = contentApi.findVideosByExternalIdentity(externalIdentity)
-		// Go through google
+
+		// Get a google identity; if we don't have one, an illegal argument exception will be thrown
+		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, SocialProvider.Google);
 		
-		List<VideoContent> videos = null;
-		for(Identity identity : user.getIdentities()) {
-			if(identity instanceof ExternalIdentity) {
-				ExternalIdentity external = (ExternalIdentity)identity;
-				if(external.getContentProvider() != null) { // for now this is good enough to find youtube, because 
-					videos = contentApi.findVideosByExternalIdentity(external);
-					break;
-				}
-			}
-		}
-		
+		List<VideoContent> videos = contentApi.findVideosByExternalIdentity(identity);		
 		if(videos != null) {
 			for(VideoContent videoContent : videos) {
 				results.add(new VideoDto.Builder()
 				.contentProviderId(ContentProvider.YouTube.ordinal())
-				.itemKey("UC_x5XG1OV2P6uZZ5FSM9Ttw")
-				.thumb(new ImageDto("https://yt3.ggpht.com/-Fgp8KFpgQqE/AAAAAAAAAAI/AAAAAAAAAAA/Wyh1vV5Up0I/s88-c-k-no/photo.jpg"))
-				.title("Google Developers")
-				.description("Talks, screencasts, interviews, and more relevant to Google's developer products.")
+				.itemKey(videoContent.getVideo().getItemKey())
+				.thumb(new ImageDto(videoContent.getThumb().getUrl()))
+				.title(videoContent.getTitle())
+				.description(videoContent.getDescription())
 				.build());
 			}
-		}
-		
-					
-		
+		}				
+	
 
-//		videos.add(new VideoDto.Builder()
-//		.contentProviderId(ContentProvider.YouTube.ordinal())
-//		.itemKey("UC_x5XG1OV2P6uZZ5FSM9Ttw")
-//		.thumb(new ImageDto("https://yt3.ggpht.com/-Fgp8KFpgQqE/AAAAAAAAAAI/AAAAAAAAAAA/Wyh1vV5Up0I/s88-c-k-no/photo.jpg"))
-//		.title("Google Developers")
-//		.description("Talks, screencasts, interviews, and more relevant to Google's developer products.")
-//		.build());
-//		videos.add(new VideoDto.Builder()
-//		.contentProviderId(ContentProvider.YouTube.ordinal())
-//		.itemKey("UC_x5XG1OV2P6uZZ5FSM9Ttw")
-//		.thumb(new ImageDto("https://yt3.ggpht.com/-Fgp8KFpgQqE/AAAAAAAAAAI/AAAAAAAAAAA/Wyh1vV5Up0I/s88-c-k-no/photo.jpg"))
-//		.title("Google Developers")
-//		.description("Talks, screencasts, interviews, and more relevant to Google's developer products.")
-//		.build());
-//		videos.add(new VideoDto.Builder()
-//		.contentProviderId(ContentProvider.YouTube.ordinal())
-//		.itemKey("UC_x5XG1OV2P6uZZ5FSM9Ttw")
-//		.thumb(new ImageDto("https://yt3.ggpht.com/-Fgp8KFpgQqE/AAAAAAAAAAI/AAAAAAAAAAA/Wyh1vV5Up0I/s88-c-k-no/photo.jpg"))
-//		.title("Google Developers")
-//		.description("Talks, screencasts, interviews, and more relevant to Google's developer products.")
-//		.build());
-//		videos.add(new VideoDto.Builder()
-//		.contentProviderId(ContentProvider.YouTube.ordinal())
-//		.itemKey("UC_x5XG1OV2P6uZZ5FSM9Ttw")
-//		.thumb(new ImageDto("https://yt3.ggpht.com/-Fgp8KFpgQqE/AAAAAAAAAAI/AAAAAAAAAAA/Wyh1vV5Up0I/s88-c-k-no/photo.jpg"))
-//		.title("Google Developers")
-//		.description("Talks, screencasts, interviews, and more relevant to Google's developer products.")
-//		.build());
-
-		return Response.ok().entity(jsonConverter.convertToPayload(videos)).build();
+		return Response.ok().entity(jsonConverter.convertToPayload(results)).build();
 	}
 
 }
