@@ -18,7 +18,7 @@ import com.ubiquity.social.api.facebook.dto.container.FacebookRequestFailureDto;
 import com.ubiquity.social.api.facebook.dto.model.FacebookActivityDto;
 import com.ubiquity.social.api.facebook.dto.model.FacebookContactDto;
 import com.ubiquity.social.api.facebook.dto.model.FacebookEventDto;
-import com.ubiquity.social.api.facebook.dto.model.FacebookMessageDto;
+import com.ubiquity.social.api.facebook.dto.model.FacebookConversationDto;
 import com.ubiquity.social.api.facebook.endpoints.FacebookGraphApiEndpoints;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
@@ -149,13 +149,11 @@ public class FacebookAPI implements SocialAPI {
 			// convert the raw json into a container
 			FacebookDataDto result = jsonConverter.parse(response.getEntity(), FacebookDataDto.class);
 			// create a strongly typed list from the generic data container
-			List<FacebookMessageDto> messagesDtoList = jsonConverter.convertToListFromList(result.getData(), FacebookMessageDto.class);
+			List<FacebookConversationDto> conversationDtoList = jsonConverter.convertToListFromList(result.getData(), FacebookConversationDto.class);
 			
 			// assemble from dto to entity
-			for(FacebookMessageDto messageDto : messagesDtoList) {
-				log.debug("Assembling message {}", messageDto.getId());
-				Message message = new Message.Builder().title("").title("").build();
-		    	messages.add(message);
+			for(FacebookConversationDto conversationDto : conversationDtoList) {				
+		    	messages.add(FacebookGraphApiDtoAssembler.assemble(externalIdentity, conversationDto));
 			}
 		} finally {
 			if(response != null)

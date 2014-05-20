@@ -1,24 +1,28 @@
 package com.ubiquity.social.api.facebook.dto.model;
 
-import com.ubiquity.social.api.facebook.dto.container.FacebookDataDto;
+import java.util.Map;
+
+import com.google.gson.annotations.SerializedName;
 
 public class FacebookMessageDto {
 	
-	private String id;
-	private FacebookDataDto to;
-	private FacebookDataDto comments;
+	private String message;
+	private Map<String, Object> from;
 	
-	public String getId() {
-		return id;
+	@SerializedName("created_time")
+	private String createdTime;
+
+	public String getMessage() {
+		return message;
 	}
-	public FacebookDataDto getTo() {
-		return to;
+
+	public String getCreatedTime() {
+		return createdTime;
 	}
-	public FacebookDataDto getComments() {
-		return comments;
+
+	public Map<String, Object> getFrom() {
+		return from;
 	}
-	
-	
 	
 	
 

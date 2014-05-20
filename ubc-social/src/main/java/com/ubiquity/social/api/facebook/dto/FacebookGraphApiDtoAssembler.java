@@ -2,17 +2,22 @@ package com.ubiquity.social.api.facebook.dto;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.joda.time.DateTime;
 
+import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.social.api.facebook.dto.container.FacebookDataDto;
 import com.ubiquity.social.api.facebook.dto.model.FacebookContactDto;
+import com.ubiquity.social.api.facebook.dto.model.FacebookConversationDto;
 import com.ubiquity.social.api.facebook.dto.model.FacebookEventDto;
+import com.ubiquity.social.api.facebook.dto.model.FacebookMessageDto;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
 import com.ubiquity.social.domain.ExternalIdentity;
+import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialProvider;
 
 /***
@@ -24,6 +29,35 @@ import com.ubiquity.social.domain.SocialProvider;
 public class FacebookGraphApiDtoAssembler {
 		
 	
+	private static JsonConverter jsonConverter = JsonConverter.getInstance();
+
+	public static Message assemble(ExternalIdentity identity, FacebookConversationDto conversationDto) {
+		
+		// Grab the latest comment; some conversations have no comments; if this is the case, return null
+		FacebookDataDto comments = conversationDto.getComments();
+		if(comments == null)
+			return null;
+		
+		List<FacebookMessageDto> messageDtoList = jsonConverter.convertToListFromList(conversationDto.getComments().getData(), FacebookMessageDto.class);
+		FacebookMessageDto messageDto = messageDtoList.get(0);
+		
+		Map<String, Object> senderDto = messageDto.getFrom();
+		Message message = new Message.Builder()
+				.title("")
+				.body(messageDto.getMessage())
+				.sentDate(System.currentTimeMillis())
+				.sender(new Contact.Builder()
+					.socialIdentity(new ExternalIdentity.Builder()
+						.identifier((String)senderDto.get("id"))
+						.socialProvider(SocialProvider.Facebook)
+						.lastUpdated(System.currentTimeMillis())
+						.build())
+					.displayName((String)senderDto.get("name"))
+					.build())
+				.build();
+		
+		return message;
+	}
 	/***
 	 * Assembles a contact and sets the identity user property as the owner. It also sets the 
 	 * identitifer and social provider on the passed in identity reference.
