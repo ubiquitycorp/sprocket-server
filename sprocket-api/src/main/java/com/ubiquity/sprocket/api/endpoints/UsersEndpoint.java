@@ -170,7 +170,7 @@ public class UsersEndpoint {
 		// Convert entire list to DTO
 		ContactsDto result = new ContactsDto();
 		for (Contact contact : variant.getCollection()) {
-			ContactDto contactDto = DtoAssembler.assembleContactDto(contact);
+			ContactDto contactDto = DtoAssembler.assemble(contact);
 			result.getContacts().add(contactDto);
 		}
 

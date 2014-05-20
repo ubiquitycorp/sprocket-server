@@ -15,7 +15,7 @@
 				<db.pool.idleConnectionTestPeriod>60
 				</db.pool.idleConnectionTestPeriod>
 				<db.username>netappusr</db.username>
-				<db.password>giftsender9801</db.password>
+				<db.password>sprocket9801</db.password>
 				<db.host>localhost</db.host>
 				<hibernate.schema.auto>update</hibernate.schema.auto>
 				<stripe.api.client>pk_test_ujJiLWzAZymWRzD10MqT2tej</stripe.api.client>

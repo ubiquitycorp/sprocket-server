@@ -19,11 +19,12 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.UserService;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
-import com.ubiquity.social.api.gmail.GmailAPI;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialProvider;
+import com.ubiquity.social.service.SocialService;
+import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
@@ -124,56 +125,61 @@ public class SocialEndpoint {
 
 		MessagesDto result = new MessagesDto();
 
-		SocialProvider socialProvider = SocialProvider.getEnum(socialProviderId);
 
 		UserService userService = ServiceFactory.getUserService();
 		User user = userService.getUserById(userId);
 
-		if(socialProvider == SocialProvider.Google) {
-			// G+ does not support messaging, so it's gmail; get the identity for gmail
-
-
-			for(Identity identity : user.getIdentities()) {
-				if(identity instanceof ExternalIdentity) {
-					ExternalIdentity external = (ExternalIdentity)identity;
-					if(external.getSocialProvider().getValue() == socialProviderId.intValue()) {
-						GmailAPI gmailApi = new GmailAPI();
-						List<Message> messages = gmailApi.findMessages(external);
-						for(Message message : messages) {
-							result.getMessages().add(new MessageDto.Builder()
-							.subject(message.getTitle())
-							.date(System.currentTimeMillis())
-							.socialProviderId(SocialProvider.Google.getValue())
-							.body(message.getBody())
-							//.sender(new ContactDto.Builder().contactId(1l).displayName().firstName().lastName("One").imageUrl("https://graph.facebook.com/754592629/picture").build())
-							.build());
-						}
-					}
-				}
-			}
-
-		} else if(socialProvider == SocialProvider.Facebook) {
-
-			SocialAPI socialApi = SocialAPIFactory.createProvider(socialProvider, user.getClientPlatform());
-			for(Identity identity : user.getIdentities()) {
-				if(identity instanceof ExternalIdentity) {
-					ExternalIdentity external = (ExternalIdentity)identity;
-					if(external.getSocialProvider() == SocialProvider.Facebook) {
-						List<Message> messages = socialApi.listMessages(external);
-						for(Message message : messages) {
-							result.getMessages().add(new MessageDto.Builder()
-							.subject(message.getTitle())
-							.date(System.currentTimeMillis())
-							.socialProviderId(SocialProvider.Facebook.getValue())
-							.body(message.getBody())
-							//.sender(new ContactDto.Builder().contactId(1l).displayName().firstName().lastName("One").imageUrl("https://graph.facebook.com/754592629/picture").build())
-							.build());
-						}
-					}
-				}
-			}
-
+		SocialProvider socialProvider = SocialProvider.getEnum(socialProviderId);
+		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, socialProvider);
+		
+		SocialAPI socialApi = SocialAPIFactory.createProvider(socialProvider, user.getClientPlatform());
+		
+		List<Message> messages = socialApi.listMessages(identity);
+		for(Message message : messages) {
+			result.getMessages().add(DtoAssembler.assemble(message));
 		}
+		// Now convert to DTO
+		
+		
+//		
+//		if(socialProvider == SocialProvider.Google) {
+//			// G+ does not support messaging, so it's gmail
+//			GmailAPI gmailApi = new GmailAPI();
+//						List<Message> messages = gmailApi.findMessages(external);
+//						for(Message message : messages) {
+//							result.getMessages().add(new MessageDto.Builder()
+//							.subject(message.getTitle())
+//							.date(System.currentTimeMillis())
+//							.socialProviderId(SocialProvider.Google.getValue())
+//							.body(message.getBody())
+//							//.sender(new ContactDto.Builder().contactId(1l).displayName().firstName().lastName("One").imageUrl("https://graph.facebook.com/754592629/picture").build())
+//							.build());
+//						}
+//					}
+//				}
+//			}
+//
+//		} else if(socialProvider == SocialProvider.Facebook) {
+//
+//			for(Identity identity : user.getIdentities()) {
+//				if(identity instanceof ExternalIdentity) {
+//					ExternalIdentity external = (ExternalIdentity)identity;
+//					if(external.getSocialProvider() == SocialProvider.Facebook) {
+//						List<Message> messages = socialApi.listMessages(external);
+//						for(Message message : messages) {
+//							result.getMessages().add(new MessageDto.Builder()
+//							.subject(message.getTitle())
+//							.date(System.currentTimeMillis())
+//							.socialProviderId(SocialProvider.Facebook.getValue())
+//							.body(message.getBody())
+//							//.sender(new ContactDto.Builder().contactId(1l).displayName().firstName().lastName("One").imageUrl("https://graph.facebook.com/754592629/picture").build())
+//							.build());
+//						}
+//					}
+//				}
+//			}
+//
+//		}
 
 
 
