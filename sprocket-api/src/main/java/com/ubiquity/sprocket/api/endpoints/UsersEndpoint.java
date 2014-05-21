@@ -31,6 +31,7 @@ import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.ContentProvider;
 import com.ubiquity.social.domain.ExternalIdentity;
 import com.ubiquity.social.domain.SocialProvider;
+import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ContactsDto;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
@@ -192,45 +193,41 @@ public class UsersEndpoint {
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload, IdentityDto.class, ActivationValidation.class);
 
 
-		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto.getClientPlatformId());
-		Integer socialProviderTypeId = identityDto.getSocialIdentityProviderId();
-		Integer contentProviderTypeId = identityDto.getContentIdentityProviderId();
+		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto.getClientPlatformId());		
+		SocialProvider socialProvider = SocialProvider.getEnum(identityDto.getSocialIdentityProviderId());
 		
-		SocialProvider socialProvider = null;
-		ContentProvider contentProvider = null;
-		if(socialProviderTypeId != null)
-			socialProvider = SocialProvider.getEnum(identityDto.getSocialIdentityProviderId());
-		if(contentProviderTypeId != null)
-			contentProvider = ContentProvider.values()[contentProviderTypeId];
-		
-		// create the identity
+		// get user
 		UserService userService = ServiceFactory.getUserService();
 		User user = userService.getUserById(userId);
-		ExternalIdentity identity = new ExternalIdentity.Builder()
+		
+		// create the identity if it does not exist; or use the existing one
+		SocialService socialService = ServiceFactory.getSocialService();
+		ExternalIdentity identity = socialService.findSocialIdentity(userId, socialProvider);
+		if(identity == null) {
+			identity = new ExternalIdentity.Builder()
 			.accessToken(identityDto.getAccessToken())
 			.secretToken(identityDto.getSecretToken())
 			.socialProvider(socialProvider)
-			.contentProvider(contentProvider)
 			.user(user)
 			.build();
-		user.getIdentities().add(identity);
-
-		// get the correct provider based on the social network we are activating; if we have content provider
-		// and a social provider, we use the social to auth (int the case of Google and YouTube); If we have 
-		// a single content provider we use that...
-		if(socialProvider != null) {
+			user.getIdentities().add(identity);
+			
 			SocialAPI social = SocialAPIFactory.createProvider(socialProvider, clientPlatform);
 
 			// authenticate the user; this will give the user a contact record specific for to this network
-			Contact contact;
 			try {
-				contact = social.authenticateUser(identity);
+				Contact contact = social.authenticateUser(identity);
+				ServiceFactory.getContactService().create(contact);
 			} catch (Exception e) {
 				throw new HttpException("Could not authenticate with provider: " + e.getMessage(), 401);
 			}
 
-			ServiceFactory.getContactService().create(contact);
+		} else {
+			// update the identity tokens
+			identity.setAccessToken(identityDto.getAccessToken());
+			identity.setSecretToken(identityDto.getSecretToken());
 		}
+	
 
 		// now update the user's identity
 		userService.update(user);
