@@ -27,7 +27,7 @@ SocialIdentityRepository {
 
 		Query query = getEntityManager()
 				.createQuery(
-						"select c from SocialIdentity c where c.user.userId = :ownerId");
+						"select c from ExternalIdentity c where c.user.userId = :ownerId");
 		query.setParameter("userId", userId);
 		return (List<ExternalIdentity>) query.getResultList();
 	}
@@ -39,7 +39,7 @@ SocialIdentityRepository {
 		assert (providerType != null);
 		Query query = getEntityManager()
 				.createQuery(
-						"select c from SocialIdentity c where c.user.userId = :userId and c.socialProviderType = :providerType");
+						"select c from ExternalIdentity c where c.user.userId = :userId and c.socialProvider = :providerType");
 		query.setParameter("userId", userId);
 		query.setParameter("providerType", providerType);
 		List<ExternalIdentity> results = query.getResultList();
@@ -52,7 +52,7 @@ SocialIdentityRepository {
 		assert (providerIdentifier != null);
 		assert (providerType != null);
 		Query query = getEntityManager().createQuery(
-				"select c from SocialIdentity c where c.identifier = :providerIdentifier and c.socialProviderType = :providerType");
+				"select c from Externaldentity c where c.identifier = :providerIdentifier and c.socialProvider = :providerType");
 		query.setParameter("providerIdentifier", providerIdentifier);
 		query.setParameter("providerType", providerType);
 		List<ExternalIdentity> results = query.getResultList();

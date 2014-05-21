@@ -34,7 +34,7 @@ public class SocialService {
 	 * @param user
 	 * @param socialProvider
 	 * 
-	 * @throws IllegalArgumentException
+	 * @throws IllegalArgumentException if the user does not have an identity for this provider
 	 * 
 	 * @return
 	 */

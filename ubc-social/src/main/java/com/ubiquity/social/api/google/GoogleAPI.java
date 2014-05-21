@@ -25,6 +25,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.social.api.SocialAPI;
+import com.ubiquity.social.api.exception.AuthorizationException;
 import com.ubiquity.social.api.gmail.GmailApiDtoAssembler;
 import com.ubiquity.social.api.gmail.endpoints.GmailApiEndpoints;
 import com.ubiquity.social.api.google.dto.GooglePlusApiDtoAssembler;
@@ -51,6 +52,7 @@ public class GoogleAPI implements SocialAPI {
 	private static SocialAPI google = null;
 	OAuthService service = null;
 	
+	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private GooglePlusApiEndpoints googleApi;
@@ -143,8 +145,12 @@ public class GoogleAPI implements SocialAPI {
 	}
 	
 	private void checkError(ClientResponse<String> response) {
-		if(response.getResponseStatus().getStatusCode() != 200) {
-			throw new RuntimeException(getErrorMessage(response));
+		int statusCode = response.getResponseStatus().getStatusCode();
+		if (statusCode != 200) {
+			if(statusCode == 401 || statusCode == 403)
+				throw new AuthorizationException(getErrorMessage(response));
+			else
+				throw new RuntimeException(getErrorMessage(response));
 		}
 	}
 
@@ -192,7 +198,6 @@ public class GoogleAPI implements SocialAPI {
 
 	@Override
 	public List<Activity> listActivities(ExternalIdentity external) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 }
