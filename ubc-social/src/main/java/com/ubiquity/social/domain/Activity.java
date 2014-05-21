@@ -43,7 +43,7 @@ public class Activity {
 	private User owner;
 
 	@ManyToOne
-	@JoinColumn(name = "posted_by_contact_id", nullable = false)
+	@JoinColumn(name = "posted_by_contact_id", nullable = true)
 	private Contact postedBy;
 
 	@Embedded
