@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>sprocket-core</artifactId>
 	<name>Sprocket Core</name>
-    <version>0.1.1</version>
+	<version>0.1.1</version>
 	<build>
 
 		<finalName>giftsender-core</finalName>
@@ -51,6 +51,13 @@
 			<artifactId>niobium-amqp</artifactId>
 			<version>0.2</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-solrj</artifactId>
+			<version>4.8.0</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>mysql</groupId>
