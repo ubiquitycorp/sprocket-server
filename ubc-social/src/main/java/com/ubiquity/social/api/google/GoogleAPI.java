@@ -12,7 +12,6 @@ import javax.xml.transform.sax.SAXSource;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.plugins.providers.atom.Entry;
 import org.jboss.resteasy.plugins.providers.atom.Feed;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.scribe.oauth.OAuthService;

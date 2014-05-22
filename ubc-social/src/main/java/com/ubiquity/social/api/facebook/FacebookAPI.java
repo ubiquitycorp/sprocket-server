@@ -197,7 +197,7 @@ public class FacebookAPI implements SocialAPI {
 	private void checkError(ClientResponse<String> response) {
 		int statusCode = response.getResponseStatus().getStatusCode();
 		if (statusCode != 200) {
-			if(statusCode == 401 || statusCode == 403)
+			if(statusCode == 401 || statusCode == 403 || statusCode == 400) // FB throws a 400 on expired tokens..
 				throw new AuthorizationException(getErrorMessage(response));
 			else
 				throw new RuntimeException(getErrorMessage(response));
