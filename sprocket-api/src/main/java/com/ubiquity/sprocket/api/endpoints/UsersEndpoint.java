@@ -24,11 +24,9 @@ import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.identity.service.UserService;
-import com.ubiquity.messaging.format.Message;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.ContentProvider;
 import com.ubiquity.social.domain.ExternalIdentity;
 import com.ubiquity.social.domain.SocialProvider;
 import com.ubiquity.social.service.SocialService;
@@ -40,11 +38,7 @@ import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
-import com.ubiquity.sprocket.messaging.MessageConverterFactory;
-import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
-import com.ubiquity.sprocket.messaging.definition.UserAuthenticated;
-import com.ubiquity.sprocket.messaging.definition.UserRegistered;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 
@@ -103,8 +97,8 @@ public class UsersEndpoint {
 		log.debug("Authenticated user {}", user);
 
 		// send notification interested consumers
-		String message = MessageConverterFactory.getMessageConverter().serialize(new Message(new UserAuthenticated(user.getUserId())));
-		MessageQueueFactory.getCacheInvalidationQueueProducer().write(message.getBytes());
+		//String message = MessageConverterFactory.getMessageConverter().serialize(new Message(new UserAuthenticated(user.getUserId())));
+		//MessageQueueFactory.getCacheInvalidationQueueProducer().write(message.getBytes());
 
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(accountDto))
@@ -146,8 +140,8 @@ public class UsersEndpoint {
 		log.debug("Created user {}", user);
 
 		// send notification interested consumers
-		String message = MessageConverterFactory.getMessageConverter().serialize(new Message(new UserRegistered(user.getUserId())));
-		MessageQueueFactory.getCacheInvalidationQueueProducer().write(message.getBytes());
+		//String message = MessageConverterFactory.getMessageConverter().serialize(new Message(new UserRegistered(user.getUserId())));
+		//MessageQueueFactory.getCacheInvalidationQueueProducer().write(message.getBytes());
 
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(accountDto))
@@ -240,9 +234,9 @@ public class UsersEndpoint {
 		.build();
 
 		// serialize it
-		String message = MessageConverterFactory.getMessageConverter().serialize(new Message(content));
+		//String message = MessageConverterFactory.getMessageConverter().serialize(new Message(content));
 		// send it
-		MessageQueueFactory.getCacheInvalidationQueueProducer().write(message.getBytes());
+		//MessageQueueFactory.getCacheInvalidationQueueProducer().write(message.getBytes());
 
 		IdentityDto result = new IdentityDto.Builder().identifier(identity.getIdentifier()).build();
 		return Response.ok()
