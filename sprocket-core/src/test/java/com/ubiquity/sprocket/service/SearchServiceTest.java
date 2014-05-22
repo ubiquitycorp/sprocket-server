@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.Assert;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.ubiquity.sprocket.domain.Document;
@@ -26,6 +26,7 @@ public class SearchServiceTest {
 	}
 	
 	@Test
+	@Ignore
 	public void testAddDocumentReturnsInBasicSearch() {
 		Document document = new Document();
 		document.getFields().put("name", searchTerm);
