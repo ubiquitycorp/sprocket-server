@@ -8,6 +8,9 @@
 				<syslog.host>localhost</syslog.host>
 				<redis.host>localhost</redis.host>
 				<hibernate.debug>true</hibernate.debug>
+				<solr.api.host>localhost</solr.api.host>
+				<solr.api.port>8080</solr.api.port>
+				<social.google.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I</social.google.apikey>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
 				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
@@ -40,6 +43,9 @@
 				<syslog.host>localhost</syslog.host>
 				<redis.host>localhost</redis.host>
 				<hibernate.debug>true</hibernate.debug>
+				<solr.api.host>localhost</solr.api.host>
+				<solr.api.port>8080</solr.api.port>
+				<social.google.apikey>AIzaSyCY3woAWsatYnwhkYOeBqVjQ8V9hGa2vt8</social.google.apikey>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
 				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
