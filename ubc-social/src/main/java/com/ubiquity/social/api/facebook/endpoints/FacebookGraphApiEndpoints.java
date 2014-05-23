@@ -42,6 +42,7 @@ public interface FacebookGraphApiEndpoints {
 
     @GET
     @Path("me/feed")
+    @Consumes("application/json")
     @Produces("application/json")
 	ClientResponse<String> getFeed(@QueryParam("access_token") String accessToken);
 }
