@@ -155,12 +155,14 @@ public class GoogleAPI implements SocialAPI {
 
 	@Override
 	public List<Message> listMessages(ExternalIdentity externalIdentity) {
-		List<Message> messages = new LinkedList<Message>();
 		ClientResponse<String> response = null;
 		try {
 			response = gmailApiEndpoints.getFeed(" Bearer "+ externalIdentity.getAccessToken());
-			if(response.getResponseStatus().getStatusCode() != 200)
-				return messages;
+			if(response.getResponseStatus().getStatusCode() != 200) {
+				log.error("Error reading gmail: " + response.getEntity());
+				throw new RuntimeException("Unable to process gmail messages");
+			}
+				
 			 // create JAXB context and instantiate marshaller
 	
 				
