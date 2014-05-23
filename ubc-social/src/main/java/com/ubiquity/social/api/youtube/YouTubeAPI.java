@@ -68,8 +68,9 @@ public class YouTubeAPI implements ContentAPI {
 				videos.add(videoContent);
 			}
 		} finally {
-			if(response != null)
+			if(response != null) {
 				response.releaseConnection();
+			}
 		}
 		
 		return videos;

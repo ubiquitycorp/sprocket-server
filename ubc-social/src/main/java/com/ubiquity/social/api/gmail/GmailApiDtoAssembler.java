@@ -23,7 +23,9 @@ public class GmailApiDtoAssembler {
 	
 			
 			Person person = entry.getAuthors().get(0);
-			Message message = new Message.Builder().title(title).title(body)
+			Message message = new Message.Builder()
+					.title(title)
+					.body(body)
 					.sender(new Contact.Builder()
 						.email(person.getEmail())
 						.displayName(person.getName())
