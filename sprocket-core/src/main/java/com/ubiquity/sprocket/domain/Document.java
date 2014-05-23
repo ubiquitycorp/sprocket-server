@@ -11,4 +11,11 @@ public class Document {
 		return fields;
 	}
 
+	@Override
+	public String toString() {
+		return "Document [fields=" + fields + "]";
+	}
+	
+	
+
 }

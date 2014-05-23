@@ -2,6 +2,7 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -21,6 +22,7 @@ import com.ubiquity.social.domain.VideoContent;
 import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.api.dto.model.ImageDto;
 import com.ubiquity.sprocket.api.dto.model.VideoDto;
+import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/content")
@@ -42,7 +44,8 @@ public class ContentEndpoint {
 		// Get a google identity; if we don't have one, an illegal argument exception will be thrown
 		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, SocialProvider.Google);
 		
-		List<VideoContent> videos = contentApi.findVideosByExternalIdentity(identity);		
+		List<VideoContent> videos = contentApi.findVideosByExternalIdentity(identity);	
+		// Return transformed
 		if(videos != null) {
 			for(VideoContent videoContent : videos) {
 				results.add(new VideoDto.Builder()
@@ -53,8 +56,7 @@ public class ContentEndpoint {
 				.description(videoContent.getDescription())
 				.build());
 			}
-		}				
-	
+		}	
 
 		return Response.ok().entity(jsonConverter.convertToPayload(results)).build();
 	}

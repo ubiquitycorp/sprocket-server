@@ -24,6 +24,7 @@ public class ServiceFactory {
 	private static UserService userService;
 	private static EventService eventService;
 	private static SocialService socialService;
+	private static SearchService searchService;
 	
 	/***
 	 * Initializes all services with the specified configuration
@@ -34,6 +35,12 @@ public class ServiceFactory {
 		configuration = config;
 	}
 	
+	
+	public static SearchService getSearchService() {
+		if(searchService == null)
+			searchService = new SearchService(configuration);
+		return searchService;
+	}
 	/***
 	 * Creates or returns user manager
 	 * 

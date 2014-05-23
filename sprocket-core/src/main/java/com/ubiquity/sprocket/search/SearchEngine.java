@@ -8,6 +8,6 @@ public interface SearchEngine {
 	
 	public void addDocument(Document document);
 
-	public List<Document> searchDocuments(String searchTerm);
+	public List<Document> searchDocuments(String searchTerm, Long userId);
 
 }

@@ -45,13 +45,12 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 	}
 
 	@Override
-	public List<Document> searchDocuments(String searchTerm) {
+	public List<Document> searchDocuments(String searchTerm, Long userId) {
 		
 		List<Document> documents = new LinkedList<Document>();
 		
 		SolrQuery query = new SolrQuery();
-	    query.setQuery(searchTerm);
-	    query.setStart(0);    
+	    query.setQuery("general_content:"+searchTerm + " AND user_id:" + userId); 
 	    QueryResponse response;
 		try {
 			response = server.query(query);
