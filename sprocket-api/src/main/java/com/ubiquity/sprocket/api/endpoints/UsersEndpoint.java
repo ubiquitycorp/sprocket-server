@@ -38,7 +38,6 @@ import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
-import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 
@@ -193,7 +192,7 @@ public class UsersEndpoint {
 		// get user
 		UserService userService = ServiceFactory.getUserService();
 		User user = userService.getUserById(userId);
-		
+				
 		// create the identity if it does not exist; or use the existing one
 		SocialService socialService = ServiceFactory.getSocialService();
 		ExternalIdentity identity = socialService.findSocialIdentity(userId, socialProvider);
@@ -215,23 +214,30 @@ public class UsersEndpoint {
 			} catch (Exception e) {
 				throw new HttpException("Could not authenticate with provider: " + e.getMessage(), 401);
 			}
+			
+			// now update the user's identity
+			userService.update(user);
+			
 
 		} else {
 			// update the identity tokens
 			identity.setAccessToken(identityDto.getAccessToken());
 			identity.setSecretToken(identityDto.getSecretToken());
+			
+			socialService.update(identity);
+			
 		}
 	
+		
 
-		// now update the user's identity
-		userService.update(user);
+		
 
 		// send notification to the data sync that some stuff needs to be loaded for this user now....
-		ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
-		.clientPlatformId(identityDto.getClientPlatformId())
-		.userId(userId)
-		.identityId(identity.getIdentityId())
-		.build();
+//		ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
+//		.clientPlatformId(identityDto.getClientPlatformId())
+//		.userId(userId)
+//		.identityId(identity.getIdentityId())
+//		.build();
 
 		// serialize it
 		//String message = MessageConverterFactory.getMessageConverter().serialize(new Message(content));
