@@ -2,6 +2,7 @@ package com.ubiquity.social.service;
 
 import org.apache.commons.configuration.Configuration;
 
+import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.domain.ExternalIdentity;
@@ -17,6 +18,15 @@ public class SocialService {
 		this.socialIdentityRepository = new SocialIdentityRepositoryJpaImpl();
 	}
 	
+	public void update(ExternalIdentity identity) {
+		try {	
+			EntityManagerSupport.beginTransaction();
+			socialIdentityRepository.update(identity);
+			EntityManagerSupport.commit();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+	}
 	public ExternalIdentity findSocialIdentity(Long userId, SocialProvider providerType) {
 		return socialIdentityRepository.findOne(userId, providerType);
 	}
