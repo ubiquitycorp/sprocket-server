@@ -7,7 +7,6 @@ import java.util.UUID;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -28,7 +27,7 @@ public class SearchServiceTest {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
-	@BeforeClass
+//	@BeforeClass
 	public static void setUp() throws Exception {
 		Configuration config = new PropertiesConfiguration("test.properties");
 		searchService = new SearchService(config);
