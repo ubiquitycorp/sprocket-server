@@ -8,6 +8,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ public class SearchServiceTest {
 
 
 	@Test
+	@Ignore
 	public void testAddMessagesReturnsInBasicSearch() {
 		// build partial doc with the fields being indexed
 		Message message = new Message.Builder()
@@ -63,6 +65,7 @@ public class SearchServiceTest {
 	}
 
 	@Test
+	@Ignore
 	public void testDedupe() {
 		// build a video content with random strings so that it contains the same signature 
 		VideoContent videoContent = new VideoContent.Builder()
@@ -82,6 +85,7 @@ public class SearchServiceTest {
 	}
 
 	@Test
+	@Ignore
 	public void testAddActivitiesReturnsInBasicSearch() {
 		// build partial doc with the fields being indexed
 		Activity activity = new Activity.Builder()
@@ -108,6 +112,7 @@ public class SearchServiceTest {
 	}
 
 	@Test
+	@Ignore
 	public void testAddVideoReturnsInBasicSearch() {
 		// build partial doc with the fields being indexed
 		VideoContent videoContent = new VideoContent.Builder()
