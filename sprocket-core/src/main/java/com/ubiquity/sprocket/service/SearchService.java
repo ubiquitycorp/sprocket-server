@@ -14,35 +14,13 @@ import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.VideoContent;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchEngine;
-import com.ubiquity.sprocket.search.SearchEngineSolrjImpl;
+import com.ubiquity.sprocket.search.SearchKeys;
+import com.ubiquity.sprocket.search.solr.SearchEngineSolrjImpl;
 
 public class SearchService {
 	
 	private Logger log = LoggerFactory.getLogger(getClass());
-	
-	public static class Keys {
-		
-		public static class CommonFields {
-			public static final String FIELD_TITLE = "title";
-			public static final String FIELD_DESCRIPTION = "description";
-			public static final String FIELD_USER_ID = "user_id";
-			public static final String FIELD_ID = "id";
-			public static final String FIELD_DATA_TYPE = "data_type";
-			public static final String FIELD_BODY = "body";
-		}
-		
-		public static class VideoContentFields {
-			public static final String FIELD_CATEGORY = "category";
-		}
-		
-		public static class MessageContentFields {
-			public static final String FIELD_SENDER = "sender";
-		}
-		
-		public static class ActivityContentFields {
-			public static final String FIELD_POSTED_BY = "posted_by";
-		}
-	}
+
 	
 	private SearchEngine searchEngine;
 	
@@ -62,12 +40,12 @@ public class SearchService {
 			
 			Document document = new Document();
 			
-			document.getFields().put(Keys.MessageContentFields.FIELD_SENDER, message.getSender().getDisplayName());
-			document.getFields().put(Keys.CommonFields.FIELD_BODY, message.getBody());
+			document.getFields().put(SearchKeys.MessageContentFields.FIELD_SENDER, message.getSender().getDisplayName());
+			document.getFields().put(SearchKeys.CommonFields.FIELD_BODY, message.getBody());
 
-			document.getFields().put(Keys.CommonFields.FIELD_DATA_TYPE, Message.class.getSimpleName());
-			document.getFields().put(Keys.CommonFields.FIELD_USER_ID, message.getOwner().getUserId());
-			document.getFields().put(Keys.CommonFields.FIELD_ID, message.getMessageId());
+			document.getFields().put(SearchKeys.CommonFields.FIELD_DATA_TYPE, Message.class.getSimpleName());
+			document.getFields().put(SearchKeys.CommonFields.FIELD_USER_ID, message.getOwner().getUserId());
+			document.getFields().put(SearchKeys.CommonFields.FIELD_ID, message.getMessageId());
 			
 			documents.add(document);
 		}
@@ -86,12 +64,12 @@ public class SearchService {
 			
 			Document document = new Document();
 			
-			document.getFields().put(Keys.ActivityContentFields.FIELD_POSTED_BY, activity.getPostedBy().getDisplayName());
-			document.getFields().put(Keys.CommonFields.FIELD_BODY, activity.getBody());
+			document.getFields().put(SearchKeys.ActivityContentFields.FIELD_POSTED_BY, activity.getPostedBy().getDisplayName());
+			document.getFields().put(SearchKeys.CommonFields.FIELD_BODY, activity.getBody());
 
-			document.getFields().put(Keys.CommonFields.FIELD_DATA_TYPE, Activity.class.getSimpleName());
-			document.getFields().put(Keys.CommonFields.FIELD_USER_ID, activity.getOwner().getUserId());
-			document.getFields().put(Keys.CommonFields.FIELD_ID, activity.getActivityId());
+			document.getFields().put(SearchKeys.CommonFields.FIELD_DATA_TYPE, Activity.class.getSimpleName());
+			document.getFields().put(SearchKeys.CommonFields.FIELD_USER_ID, activity.getOwner().getUserId());
+			document.getFields().put(SearchKeys.CommonFields.FIELD_ID, activity.getActivityId());
 			
 			documents.add(document);
 		}
@@ -112,13 +90,18 @@ public class SearchService {
 			
 			Document document = new Document();
 			
-			document.getFields().put(Keys.CommonFields.FIELD_TITLE, videoContent.getTitle());
-			document.getFields().put(Keys.CommonFields.FIELD_DESCRIPTION, videoContent.getDescription());
-			document.getFields().put(Keys.VideoContentFields.FIELD_CATEGORY, videoContent.getCategory());
+			document.getFields().put(SearchKeys.CommonFields.FIELD_TITLE, videoContent.getTitle());
+			document.getFields().put(SearchKeys.CommonFields.FIELD_DESCRIPTION, videoContent.getDescription());
+			
+			if(videoContent.getThumb() != null)
+				document.getFields().put(SearchKeys.CommonFields.FIELD_THUMBNAIL, videoContent.getThumb().getUrl());
 
-			document.getFields().put(Keys.CommonFields.FIELD_DATA_TYPE, VideoContent.class.getSimpleName());
-			document.getFields().put(Keys.CommonFields.FIELD_USER_ID, userId);
-			document.getFields().put(Keys.CommonFields.FIELD_ID, videoContent.getVideoContentId());
+			document.getFields().put(SearchKeys.VideoContentFields.FIELD_CATEGORY, videoContent.getCategory());
+			document.getFields().put(SearchKeys.VideoContentFields.FIELD_ITEM_KEY, videoContent.getVideo().getItemKey());
+			
+			document.getFields().put(SearchKeys.CommonFields.FIELD_DATA_TYPE, VideoContent.class.getSimpleName());
+			document.getFields().put(SearchKeys.CommonFields.FIELD_USER_ID, userId);
+			document.getFields().put(SearchKeys.CommonFields.FIELD_ID, videoContent.getVideoContentId());
 			
 			documents.add(document);
 		}
@@ -138,29 +121,29 @@ public class SearchService {
 		Map<String, Object> fields = new HashMap<String, Object>();
 		
 		// common keys
-		fields.put(Keys.CommonFields.FIELD_TITLE, searchTerm);
-		fields.put(Keys.CommonFields.FIELD_DESCRIPTION, searchTerm);
-		fields.put(Keys.CommonFields.FIELD_BODY, searchTerm);
+		fields.put(SearchKeys.CommonFields.FIELD_TITLE, searchTerm);
+		fields.put(SearchKeys.CommonFields.FIELD_DESCRIPTION, searchTerm);
+		fields.put(SearchKeys.CommonFields.FIELD_BODY, searchTerm);
 
 		// video keys
-		fields.put(Keys.VideoContentFields.FIELD_CATEGORY, searchTerm);
+		fields.put(SearchKeys.VideoContentFields.FIELD_CATEGORY, searchTerm);
 
 		// message keys
-		fields.put(Keys.MessageContentFields.FIELD_SENDER, searchTerm);
+		fields.put(SearchKeys.MessageContentFields.FIELD_SENDER, searchTerm);
 
 		// activity keys
-		fields.put(Keys.ActivityContentFields.FIELD_POSTED_BY, searchTerm);
+		fields.put(SearchKeys.ActivityContentFields.FIELD_POSTED_BY, searchTerm);
 
 		// filters
 		Map<String, Object> filters = new HashMap<String, Object>();
-		filters.put(Keys.CommonFields.FIELD_USER_ID, userId);
+		filters.put(SearchKeys.CommonFields.FIELD_USER_ID, userId);
 		return searchEngine.searchDocuments(searchTerm, new String[] {
-				Keys.CommonFields.FIELD_TITLE,
-				Keys.CommonFields.FIELD_DESCRIPTION,
-				Keys.CommonFields.FIELD_BODY,
-				Keys.VideoContentFields.FIELD_CATEGORY,
-				Keys.MessageContentFields.FIELD_SENDER,
-				Keys.ActivityContentFields.FIELD_POSTED_BY
+				SearchKeys.CommonFields.FIELD_TITLE,
+				SearchKeys.CommonFields.FIELD_DESCRIPTION,
+				SearchKeys.CommonFields.FIELD_BODY,
+				SearchKeys.VideoContentFields.FIELD_CATEGORY,
+				SearchKeys.MessageContentFields.FIELD_SENDER,
+				SearchKeys.ActivityContentFields.FIELD_POSTED_BY
 		}, filters);
 	}
 

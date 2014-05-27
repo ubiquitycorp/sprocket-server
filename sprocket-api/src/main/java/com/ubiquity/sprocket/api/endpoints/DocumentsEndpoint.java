@@ -2,6 +2,7 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -24,10 +25,15 @@ public class DocumentsEndpoint {
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 
 	@GET
-	@Path("/")
+	@Path("users/{userId}/indexed")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response search(@QueryParam("q") String q) {
+	public Response search(@PathParam("userId") Long userId, @QueryParam("q") String q) {
 
+//		DocumentsDto result = new DocumentsDto();
+//		List<Document> documents = ServiceFactory.getSearchService().searchDocuments(q, userId);
+//		for(Document document : documents)
+//			result.getDocuments().add(DtoAssembler.assemble(document));
+//
 		DocumentsDto documents = new DocumentsDto();
 		DocumentDto documentDto = new DocumentDto.Builder()
 		.rank(1)

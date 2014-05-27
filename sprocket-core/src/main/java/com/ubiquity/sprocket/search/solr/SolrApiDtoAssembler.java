@@ -1,4 +1,4 @@
-package com.ubiquity.sprocket.search;
+package com.ubiquity.sprocket.search.solr;
 
 import java.util.Collection;
 import java.util.Map;

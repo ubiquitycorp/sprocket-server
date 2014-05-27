@@ -18,7 +18,7 @@ import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.VideoContent;
 import com.ubiquity.sprocket.domain.Document;
-import com.ubiquity.sprocket.service.SearchService.Keys;
+import com.ubiquity.sprocket.search.SearchKeys;
 
 
 public class SearchServiceTest {
@@ -54,7 +54,7 @@ public class SearchServiceTest {
 
 		Assert.assertTrue(documents.size() == 1);
 		Document result = documents.get(0);
-		Assert.assertEquals(Message.class.getSimpleName(), result.getFields().get(Keys.CommonFields.FIELD_DATA_TYPE));
+		Assert.assertEquals(Message.class.getSimpleName(), result.getFields().get(SearchKeys.CommonFields.FIELD_DATA_TYPE));
 
 		// test the user filter
 		documents = searchService.searchDocuments(message.getSender().getDisplayName(), 2l);
@@ -99,7 +99,7 @@ public class SearchServiceTest {
 		log.debug("documents: {}", documents);
 		Assert.assertTrue(documents.size() == 1);
 		Document result = documents.get(0);
-		Assert.assertEquals(Activity.class.getSimpleName(), result.getFields().get(Keys.CommonFields.FIELD_DATA_TYPE));
+		Assert.assertEquals(Activity.class.getSimpleName(), result.getFields().get(SearchKeys.CommonFields.FIELD_DATA_TYPE));
 
 		// test the user filter
 		documents = searchService.searchDocuments(activity.getPostedBy().getDisplayName(), 2l);
@@ -124,7 +124,7 @@ public class SearchServiceTest {
 
 		Assert.assertTrue(documents.size() == 1);
 		Document result = documents.get(0);
-		Assert.assertEquals(VideoContent.class.getSimpleName(), result.getFields().get(Keys.CommonFields.FIELD_DATA_TYPE));
+		Assert.assertEquals(VideoContent.class.getSimpleName(), result.getFields().get(SearchKeys.CommonFields.FIELD_DATA_TYPE));
 
 		// test the user filter
 		documents = searchService.searchDocuments(videoContent.getTitle(), 2l);

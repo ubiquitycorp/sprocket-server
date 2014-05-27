@@ -1,4 +1,4 @@
-package com.ubiquity.sprocket.search;
+package com.ubiquity.sprocket.search.solr;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ubiquity.sprocket.domain.Document;
+import com.ubiquity.sprocket.search.SearchEngine;
 
 public class SearchEngineSolrjImpl implements SearchEngine {
 
