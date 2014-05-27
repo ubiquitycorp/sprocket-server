@@ -55,7 +55,7 @@ public class FacebookAPI implements SocialAPI {
 	}
 
 	@Override
-	public Contact authenticateUser(ExternalIdentity identity) {
+	public synchronized Contact authenticateUser(ExternalIdentity identity) {
 
 		ClientResponse<String> response = null;
 		try {
@@ -74,7 +74,7 @@ public class FacebookAPI implements SocialAPI {
 	}
 
 	@Override
-	public List<Contact> findContactsByOwnerIdentity(ExternalIdentity identity) {
+	public synchronized List<Contact> findContactsByOwnerIdentity(ExternalIdentity identity) {
 		List<Contact> contacts = new LinkedList<Contact>();
 
 		ClientResponse<String> response = null;
@@ -105,7 +105,7 @@ public class FacebookAPI implements SocialAPI {
 	}
 
 	@Override
-	public List<Event> findEventsCreatedByContacts(ExternalIdentity identity,
+	public synchronized List<Event> findEventsCreatedByContacts(ExternalIdentity identity,
 			List<Contact> contacts) {
 		List<Event> events = new LinkedList<Event>();
 
@@ -153,7 +153,7 @@ public class FacebookAPI implements SocialAPI {
 	}
 
 	@Override
-	public List<Message> listMessages(ExternalIdentity externalIdentity) {
+	public synchronized List<Message> listMessages(ExternalIdentity externalIdentity) {
 
 		List<Message> messages = new LinkedList<Message>();
 		ClientResponse<String> response = null;
@@ -204,8 +204,11 @@ public class FacebookAPI implements SocialAPI {
 		}
 	}
 
+	/**
+	 * Note method is synchronized to void bug with multi-threaded requests temporarily
+	 */
 	@Override
-	public List<Activity> listActivities(ExternalIdentity external) {
+	public synchronized List<Activity> listActivities(ExternalIdentity external) {
 		List<Activity> activities = new LinkedList<Activity>();
 		ClientResponse<String> response = null;
 		try {
