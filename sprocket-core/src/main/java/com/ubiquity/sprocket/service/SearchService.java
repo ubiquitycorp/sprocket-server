@@ -163,4 +163,9 @@ public class SearchService {
 				Keys.ActivityContentFields.FIELD_POSTED_BY
 		}, filters);
 	}
+
+	public void deleteAll() {
+		searchEngine.deleteAllDocuments();
+		
+	}
 }

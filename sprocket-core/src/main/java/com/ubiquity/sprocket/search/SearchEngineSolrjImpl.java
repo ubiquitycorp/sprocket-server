@@ -123,4 +123,16 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 		return results;
 	}
 
+	@Override
+	public void deleteAllDocuments() {
+		try {
+			server.deleteByQuery("*:*");
+		} catch (SolrServerException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		
+	}
+
 }
