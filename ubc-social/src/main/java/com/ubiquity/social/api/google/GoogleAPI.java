@@ -81,7 +81,7 @@ public class GoogleAPI implements SocialAPI {
 	}
 
 	@Override
-	public Contact authenticateUser(ExternalIdentity identity) {
+	public synchronized Contact authenticateUser(ExternalIdentity identity) {
 		ClientResponse<String> response = null;
 		try {
 			response = googleApi.getMe(identity.getAccessToken());
@@ -97,7 +97,7 @@ public class GoogleAPI implements SocialAPI {
 	}
 
 	@Override
-	public List<Contact> findContactsByOwnerIdentity(ExternalIdentity identity) {
+	public synchronized List<Contact> findContactsByOwnerIdentity(ExternalIdentity identity) {
 		List<Contact> contacts = new LinkedList<Contact>();
 		ClientResponse<String> response = null;
 		try {
@@ -154,7 +154,7 @@ public class GoogleAPI implements SocialAPI {
 	}
 
 	@Override
-	public List<Message> listMessages(ExternalIdentity externalIdentity) {
+	public synchronized List<Message> listMessages(ExternalIdentity externalIdentity) {
 		ClientResponse<String> response = null;
 		try {
 			response = gmailApiEndpoints.getFeed(" Bearer "+ externalIdentity.getAccessToken());
