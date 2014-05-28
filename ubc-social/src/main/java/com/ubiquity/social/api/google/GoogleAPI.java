@@ -11,9 +11,7 @@ import javax.xml.transform.sax.SAXSource;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.plugins.providers.atom.Feed;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.scribe.oauth.OAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +21,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.social.api.ClientExecutorFactory;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.exception.AuthorizationException;
 import com.ubiquity.social.api.gmail.GmailApiDtoAssembler;
@@ -51,7 +50,7 @@ public class GoogleAPI implements SocialAPI {
 	private static SocialAPI google = null;
 	OAuthService service = null;
 	
-	@SuppressWarnings("unused")
+
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private GooglePlusApiEndpoints googleApi;
@@ -68,10 +67,8 @@ public class GoogleAPI implements SocialAPI {
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 	
 	private GoogleAPI() {
-		// this initialization only needs to be done once per VM
-		RegisterBuiltin.register(ResteasyProviderFactory.getInstance());
-		googleApi = ProxyFactory.create(GooglePlusApiEndpoints.class, "https://www.googleapis.com/plus/v1");
-		gmailApiEndpoints = ProxyFactory.create(GmailApiEndpoints.class, "https://mail.google.com/");
+		googleApi = ProxyFactory.create(GooglePlusApiEndpoints.class, "https://www.googleapis.com/plus/v1", ClientExecutorFactory.createClientExecutor());
+		gmailApiEndpoints = ProxyFactory.create(GmailApiEndpoints.class, "https://mail.google.com/", ClientExecutorFactory.createClientExecutor());
 	}
 
 	public static SocialAPI getProviderAPI() {
@@ -81,7 +78,7 @@ public class GoogleAPI implements SocialAPI {
 	}
 
 	@Override
-	public synchronized Contact authenticateUser(ExternalIdentity identity) {
+	public Contact authenticateUser(ExternalIdentity identity) {
 		ClientResponse<String> response = null;
 		try {
 			response = googleApi.getMe(identity.getAccessToken());
@@ -97,7 +94,7 @@ public class GoogleAPI implements SocialAPI {
 	}
 
 	@Override
-	public synchronized List<Contact> findContactsByOwnerIdentity(ExternalIdentity identity) {
+	public List<Contact> findContactsByOwnerIdentity(ExternalIdentity identity) {
 		List<Contact> contacts = new LinkedList<Contact>();
 		ClientResponse<String> response = null;
 		try {
@@ -154,7 +151,7 @@ public class GoogleAPI implements SocialAPI {
 	}
 
 	@Override
-	public synchronized List<Message> listMessages(ExternalIdentity externalIdentity) {
+	public List<Message> listMessages(ExternalIdentity externalIdentity) {
 		ClientResponse<String> response = null;
 		try {
 			response = gmailApiEndpoints.getFeed(" Bearer "+ externalIdentity.getAccessToken());

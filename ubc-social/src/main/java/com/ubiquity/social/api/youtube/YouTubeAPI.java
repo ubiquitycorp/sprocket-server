@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.social.api.ClientExecutorFactory;
 import com.ubiquity.social.api.ContentAPI;
 import com.ubiquity.social.api.google.dto.container.GoogleRequestFailureDto;
 import com.ubiquity.social.api.youtube.dto.YouTubeApiDtoAssembler;
@@ -45,9 +46,7 @@ public class YouTubeAPI implements ContentAPI {
 		
 		log.info("Using api key: {}", apiKey);
 
-		// this initialization only needs to be done once per VM
-		RegisterBuiltin.register(ResteasyProviderFactory.getInstance());
-		youTubeApi = ProxyFactory.create(YouTubeApiEndpoints.class, "https://www.googleapis.com/youtube");
+		youTubeApi = ProxyFactory.create(YouTubeApiEndpoints.class, "https://www.googleapis.com/youtube", ClientExecutorFactory.createClientExecutor());
 	}
 	
 	@Override

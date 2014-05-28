@@ -1,5 +1,8 @@
 package com.ubiquity.social.api;
 
+import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
+
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.social.api.facebook.FacebookAPI;
 import com.ubiquity.social.api.google.GoogleAPI;

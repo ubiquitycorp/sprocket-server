@@ -5,13 +5,12 @@ import java.util.List;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.social.api.ClientExecutorFactory;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.exception.AuthorizationException;
 import com.ubiquity.social.api.facebook.dto.FacebookGraphApiDtoAssembler;
@@ -43,10 +42,9 @@ public class FacebookAPI implements SocialAPI {
 	private FacebookGraphApiEndpoints graphApi;
 
 	private FacebookAPI() {
-		// this initialization only needs to be done once per VM
-		RegisterBuiltin.register(ResteasyProviderFactory.getInstance());
+	
 		graphApi = ProxyFactory.create(FacebookGraphApiEndpoints.class,
-				"https://graph.facebook.com");
+				"https://graph.facebook.com", ClientExecutorFactory.createClientExecutor());
 	}
 
 	public static SocialAPI getProviderAPI() {
@@ -56,7 +54,7 @@ public class FacebookAPI implements SocialAPI {
 	}
 
 	@Override
-	public synchronized Contact authenticateUser(ExternalIdentity identity) {
+	public Contact authenticateUser(ExternalIdentity identity) {
 
 		ClientResponse<String> response = null;
 		try {
@@ -75,7 +73,7 @@ public class FacebookAPI implements SocialAPI {
 	}
 
 	@Override
-	public synchronized List<Contact> findContactsByOwnerIdentity(ExternalIdentity identity) {
+	public List<Contact> findContactsByOwnerIdentity(ExternalIdentity identity) {
 		List<Contact> contacts = new LinkedList<Contact>();
 
 		ClientResponse<String> response = null;
@@ -106,7 +104,7 @@ public class FacebookAPI implements SocialAPI {
 	}
 
 	@Override
-	public synchronized List<Event> findEventsCreatedByContacts(ExternalIdentity identity,
+	public List<Event> findEventsCreatedByContacts(ExternalIdentity identity,
 			List<Contact> contacts) {
 		List<Event> events = new LinkedList<Event>();
 
@@ -154,7 +152,7 @@ public class FacebookAPI implements SocialAPI {
 	}
 
 	@Override
-	public synchronized List<Message> listMessages(ExternalIdentity externalIdentity) {
+	public List<Message> listMessages(ExternalIdentity externalIdentity) {
 
 		List<Message> messages = new LinkedList<Message>();
 		ClientResponse<String> response = null;
@@ -209,7 +207,7 @@ public class FacebookAPI implements SocialAPI {
 	 * Note method is synchronized to void bug with multi-threaded requests temporarily
 	 */
 	@Override
-	public synchronized List<Activity> listActivities(ExternalIdentity external) {
+	public List<Activity> listActivities(ExternalIdentity external) {
 		List<Activity> activities = new LinkedList<Activity>();
 		ClientResponse<String> response = null;
 		try {
