@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.exception.AuthorizationException;
 import com.ubiquity.social.api.facebook.dto.FacebookGraphApiDtoAssembler;
@@ -226,11 +227,14 @@ public class FacebookAPI implements SocialAPI {
 			// assemble from dto to entity
 			for (FacebookActivityDto activityDto : activitiesDtoList) {
 				
+			
 				// build contact 
 				Contact contact = FacebookGraphApiDtoAssembler.assembleContact(external, activityDto.getFrom());
 				Activity activity = new Activity.Builder()
-					.title(activityDto.getName())
-					.body(activityDto.getDescription())
+					.title(activityDto.getStory())
+					.activityId((long)activityDto.getCreatedTime().hashCode()) // TODO: use FB until we start persisting, then remove
+					.owner(new User.Builder().userId(external.getUser().getUserId()).build())
+					.body(activityDto.getMessage())
 					.lastUpdated(System.currentTimeMillis())
 					.creationDate(System.currentTimeMillis())
 					.postedBy(contact)

@@ -43,9 +43,10 @@ public class FacebookGraphApiDtoAssembler {
 		
 		Map<String, Object> senderDto = messageDto.getFrom();
 		Message message = new Message.Builder()
-				.title("")
 				.body(messageDto.getMessage())
 				.sentDate(System.currentTimeMillis())
+				.owner(new User.Builder().userId(identity.getUser().getUserId()).build())
+				.messageId((long)messageDto.getCreatedTime().hashCode())
 				.sender(new Contact.Builder()
 					.socialIdentity(new ExternalIdentity.Builder()
 						.identifier((String)senderDto.get("id"))

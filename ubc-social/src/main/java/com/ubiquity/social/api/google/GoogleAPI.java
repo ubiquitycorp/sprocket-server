@@ -184,7 +184,7 @@ public class GoogleAPI implements SocialAPI {
 			    //Do unmarshalling
 			    Object inflated = unmarshaller.unmarshal(source);
 			    
-			    return GmailApiDtoAssembler.assemble((Feed)inflated);
+			    return GmailApiDtoAssembler.assemble((Feed)inflated, externalIdentity.getUser());
 			   
 			
 		} catch (SAXException e) {

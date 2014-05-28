@@ -15,6 +15,7 @@ public class YouTubeApiDtoAssembler {
 		Video video = new Video.Builder().itemKey(videoDto.getId()).build();
 		YouTubeVideoSnippetDto snippet = videoDto.getSnippet();
 		VideoContent videoContent = new VideoContent.Builder()
+			.videoContentId(1l)
 			.title(snippet.getTitle())
 			.video(video)
 			.thumb(new Image(snippet.getThumbnails().get("default").get("url")))

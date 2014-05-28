@@ -7,6 +7,7 @@ import com.google.gson.annotations.SerializedName;
 public class FacebookMessageDto {
 	
 	private String message;
+	
 	private Map<String, Object> from;
 	
 	@SerializedName("created_time")
@@ -15,6 +16,7 @@ public class FacebookMessageDto {
 	public String getMessage() {
 		return message;
 	}
+
 
 	public String getCreatedTime() {
 		return createdTime;
