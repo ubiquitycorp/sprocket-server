@@ -103,7 +103,7 @@ public class DocumentsEndpoint {
 
 
 
-		return Response.ok().entity(jsonConverter.convertToPayload(documents)).build();
+		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
 	}
 
 }
