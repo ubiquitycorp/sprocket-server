@@ -10,6 +10,7 @@ public class SearchKeys {
 		public static final String FIELD_DATA_TYPE = "data_type";
 		public static final String FIELD_BODY = "body";
 		public static final String FIELD_THUMBNAIL = "thumbnail";
+		public static final String FIELD_SOCIAL_NETWORK_ID = "social_network_id";
 	}
 	
 	public static class VideoContentFields {

@@ -46,9 +46,17 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 	@Override
 	public void addDocuments(List<Document> documents) {
 
+		if(documents.isEmpty()) {
+			log.debug("Documents empty, nothing to add to search index");
+			return;
+		}
+		
 		List<SolrInputDocument> solrDocs = new LinkedList<SolrInputDocument>();
-		for(Document document : documents)
-			solrDocs.add(SolrApiDtoAssembler.assemble(document));
+		for(Document document : documents) {
+			SolrInputDocument solrDoc = SolrApiDtoAssembler.assemble(document);
+			solrDocs.add(solrDoc);
+			log.debug("indexing {}", solrDoc);
+		}
 
 		try {
 			server.add(solrDocs);

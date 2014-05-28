@@ -7,12 +7,14 @@ import java.util.UUID;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.media.domain.Image;
+import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
@@ -27,7 +29,7 @@ public class SearchServiceTest {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
-//	@BeforeClass
+	@BeforeClass
 	public static void setUp() throws Exception {
 		Configuration config = new PropertiesConfiguration("test.properties");
 		searchService = new SearchService(config);
@@ -37,7 +39,6 @@ public class SearchServiceTest {
 
 
 	@Test
-	@Ignore
 	public void testAddMessagesReturnsInBasicSearch() {
 		// build partial doc with the fields being indexed
 		Message message = new Message.Builder()
@@ -64,13 +65,14 @@ public class SearchServiceTest {
 	}
 
 	@Test
-	@Ignore
 	public void testDedupe() {
 		// build a video content with random strings so that it contains the same signature 
 		VideoContent videoContent = new VideoContent.Builder()
 			.videoContentId(new java.util.Random().nextLong())
 			.category(UUID.randomUUID().toString())
 			.title(UUID.randomUUID().toString())
+			.video(new Video.Builder().itemKey(UUID.randomUUID().toString()).build())
+			.thumb(new Image("http://"+UUID.randomUUID().toString()+".com"))
 			.description(UUID.randomUUID().toString()).build();
 		// add 2
 		searchService.indexVideos(
@@ -84,7 +86,6 @@ public class SearchServiceTest {
 	}
 
 	@Test
-	@Ignore
 	public void testAddActivitiesReturnsInBasicSearch() {
 		// build partial doc with the fields being indexed
 		Activity activity = new Activity.Builder()
@@ -111,15 +112,16 @@ public class SearchServiceTest {
 	}
 
 	@Test
-	@Ignore
 	public void testAddVideoReturnsInBasicSearch() {
 		// build partial doc with the fields being indexed
 		VideoContent videoContent = new VideoContent.Builder()
-			.videoContentId(new java.util.Random().nextLong())
-			.category(UUID.randomUUID().toString())
-			.title("video")
-			.description(UUID.randomUUID().toString())
-			.build();
+		.videoContentId(new java.util.Random().nextLong())
+		.category(UUID.randomUUID().toString())
+		.title("video")
+		.video(new Video.Builder().itemKey(UUID.randomUUID().toString()).build())
+		.thumb(new Image("http://"+UUID.randomUUID().toString()+".com"))
+		.description(UUID.randomUUID().toString()).build();
+		
 		searchService.indexVideos(
 				Arrays.asList(new VideoContent[] { videoContent }), 1l);
 

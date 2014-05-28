@@ -106,7 +106,8 @@ public class SocialEndpoint {
 						.build());
 					}
 			
-		
+	ServiceFactory.getSearchService().indexActivities(activities);
+
 
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(results))
@@ -129,12 +130,22 @@ public class SocialEndpoint {
 		SocialAPI socialApi = SocialAPIFactory.createProvider(socialProvider, user.getClientPlatform());
 		
 		List<Message> messages = socialApi.listMessages(identity);
+		// prune this before sending to search index
 		for(Message message : messages) {
+			
 			// note that a message can be null here...because Facebook allows conversations without "comments"
-			if(message == null)
+			if(message == null) {
 				continue;
+			}
+			
+			
 			result.getMessages().add(DtoAssembler.assemble(message));
 		}	
+		
+	
+		
+		// Add to search index
+		ServiceFactory.getSearchService().indexMessages(messages);
 		
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(result))

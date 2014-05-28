@@ -3,12 +3,14 @@ package com.ubiquity.sprocket.api;
 import java.util.Map;
 import java.util.UUID;
 
+import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.ContentProvider;
 import com.ubiquity.social.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialProvider;
 import com.ubiquity.social.domain.VideoContent;
+import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
@@ -26,6 +28,7 @@ public class DtoAssembler {
 		String dataType = (String)fields.get(SearchKeys.CommonFields.FIELD_DATA_TYPE);
 		
 		Object data = null;
+		String apiModelDataType = null; // TODO: would use the class name but the API is set already and so close to demo...
 		if(dataType.equals(VideoContent.class.getSimpleName())) {
 			data = new VideoDto.Builder()
 			.contentProviderId(ContentProvider.YouTube.ordinal())
@@ -34,15 +37,34 @@ public class DtoAssembler {
 			.title((String)fields.get(SearchKeys.CommonFields.FIELD_TITLE))
 			.description((String)fields.get(SearchKeys.CommonFields.FIELD_DESCRIPTION))
 			.build();
+			apiModelDataType = "Video";
 		} else if(dataType.equals(Message.class.getSimpleName())) {
-			data = new MessageDto.Builder();
-				// TODO: finish this
+			
+			data = new MessageDto.Builder()
+			.subject((String)fields.get(SearchKeys.CommonFields.FIELD_TITLE))
+			.date(System.currentTimeMillis())
+			.socialProviderId((Integer)fields.get(SearchKeys.CommonFields.FIELD_SOCIAL_NETWORK_ID))
+			.body((String)fields.get(SearchKeys.CommonFields.FIELD_BODY))
+			.sender(new ContactDto.Builder().contactId(1l).displayName((String)fields.get(SearchKeys.MessageContentFields.FIELD_SENDER)).imageUrl(SearchKeys.CommonFields.FIELD_THUMBNAIL).build())
+			.build();
+			apiModelDataType = "Message";
+
+		} else if(dataType.equals(Activity.class.getSimpleName())) {
+			data = new ActivityDto.Builder()
+			.title((String)fields.get(SearchKeys.CommonFields.FIELD_TITLE))
+			.date(System.currentTimeMillis())
+			.socialProviderId((Integer)fields.get(SearchKeys.CommonFields.FIELD_SOCIAL_NETWORK_ID))
+			.body((String)fields.get(SearchKeys.CommonFields.FIELD_BODY))
+			.postedBy(new ContactDto.Builder().contactId(1l).displayName((String)fields.get(SearchKeys.ActivityContentFields.FIELD_POSTED_BY)).imageUrl(SearchKeys.CommonFields.FIELD_THUMBNAIL).build())
+			.build();
+			apiModelDataType = "Activity";
+		} else {
 			throw new IllegalArgumentException("Unknown data type: " + dataType);
 		}
 		
 		DocumentDto documentDto = new DocumentDto.Builder()
 		.rank(1)
-		.dataType(data.getClass().getSimpleName())
+		.dataType(apiModelDataType)
 		.data(data)
 		.build();
 		

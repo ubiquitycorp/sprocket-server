@@ -57,7 +57,7 @@ public class ContentEndpoint {
 		}	
 		
 		// now add to the search index for this user
-		//ServiceFactory.getSearchService().indexVideos(videos, userId);
+		ServiceFactory.getSearchService().indexVideos(videos, userId);
 
 		return Response.ok().entity(jsonConverter.convertToPayload(results)).build();
 	}

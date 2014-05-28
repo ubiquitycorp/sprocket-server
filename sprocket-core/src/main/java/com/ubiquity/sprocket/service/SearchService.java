@@ -38,14 +38,21 @@ public class SearchService {
 		List<Document> documents = new LinkedList<Document>();
 		for(Message message : messages) {
 			
+			if(message == null)
+				continue; // TODO: remove this once the core issue is resolved
+			
 			Document document = new Document();
 			
 			document.getFields().put(SearchKeys.MessageContentFields.FIELD_SENDER, message.getSender().getDisplayName());
 			document.getFields().put(SearchKeys.CommonFields.FIELD_BODY, message.getBody());
+			document.getFields().put(SearchKeys.CommonFields.FIELD_TITLE, message.getTitle());
 
 			document.getFields().put(SearchKeys.CommonFields.FIELD_DATA_TYPE, Message.class.getSimpleName());
 			document.getFields().put(SearchKeys.CommonFields.FIELD_USER_ID, message.getOwner().getUserId());
+			
+		
 			document.getFields().put(SearchKeys.CommonFields.FIELD_ID, message.getMessageId());
+
 			
 			documents.add(document);
 		}
@@ -66,10 +73,11 @@ public class SearchService {
 			
 			document.getFields().put(SearchKeys.ActivityContentFields.FIELD_POSTED_BY, activity.getPostedBy().getDisplayName());
 			document.getFields().put(SearchKeys.CommonFields.FIELD_BODY, activity.getBody());
-
+			document.getFields().put(SearchKeys.CommonFields.FIELD_TITLE, activity.getTitle());
 			document.getFields().put(SearchKeys.CommonFields.FIELD_DATA_TYPE, Activity.class.getSimpleName());
 			document.getFields().put(SearchKeys.CommonFields.FIELD_USER_ID, activity.getOwner().getUserId());
-			document.getFields().put(SearchKeys.CommonFields.FIELD_ID, activity.getActivityId());
+			
+			document.getFields().put(SearchKeys.CommonFields.FIELD_ID, activity.getActivityId()); 
 			
 			documents.add(document);
 		}
@@ -101,7 +109,7 @@ public class SearchService {
 			
 			document.getFields().put(SearchKeys.CommonFields.FIELD_DATA_TYPE, VideoContent.class.getSimpleName());
 			document.getFields().put(SearchKeys.CommonFields.FIELD_USER_ID, userId);
-			document.getFields().put(SearchKeys.CommonFields.FIELD_ID, videoContent.getVideoContentId());
+			document.getFields().put(SearchKeys.CommonFields.FIELD_ID, videoContent.getTitle().hashCode());
 			
 			documents.add(document);
 		}
