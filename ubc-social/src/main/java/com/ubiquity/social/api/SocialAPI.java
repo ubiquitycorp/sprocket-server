@@ -2,10 +2,10 @@ package com.ubiquity.social.api;
 
 import java.util.List;
 
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
-import com.ubiquity.social.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Message;
 
 /***
@@ -65,10 +65,21 @@ public interface SocialAPI {
 	 */
 	Boolean postToWall(ExternalIdentity fromIdentity, ExternalIdentity toIdentity, String message);
 	
-	
+	/***
+	 * Lists messages sent or received by this identity
+	 * 
+	 * @param externalIdentity
+	 * @return
+	 */
 	List<Message> listMessages(ExternalIdentity externalIdentity);
 
-	List<Activity> listActivities(ExternalIdentity external);
+	/***
+	 * Lists activities sent to or posted by this identity
+	 * 
+	 * @param externalIdentity
+	 * @return
+	 */
+	List<Activity> listActivities(ExternalIdentity externalIdentity);
 	
 	
 }

@@ -3,10 +3,13 @@ package com.ubiquity.social.domain;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
 
@@ -14,9 +17,14 @@ import com.ubiquity.media.domain.Video;
 @Table(name = "video_content")
 public class VideoContent {
 
+	@Id
+	@GeneratedValue
+	@Column(name = "video_content_id")
+	private Long videoContentId;
+
 	@ManyToOne
 	@JoinColumn(name = "identity_id")
-	private ExternalIdentity identity;
+	private ExternalIdentity externalIdentity;
 
 	@Embedded
 	private Video video;
@@ -36,15 +44,19 @@ public class VideoContent {
 	@Column(name = "category", nullable = false)
 	private String category;
 
-	public VideoContent(ExternalIdentity identity, Video video, Long lastUpdated) {
+	public VideoContent(ExternalIdentity externalIdentity, Video video, Long lastUpdated) {
 		super();
-		this.identity = identity;
+		this.externalIdentity = externalIdentity;
 		this.video = video;
 		this.lastUpdated = lastUpdated;
 	}
 
-	public ExternalIdentity getIdentity() {
-		return identity;
+	public Long getVideoContentId() {
+		return videoContentId;
+	}
+
+	public ExternalIdentity getExternalIdentity() {
+		return externalIdentity;
 	}
 
 	public Video getVideo() {
@@ -72,6 +84,7 @@ public class VideoContent {
 	}
 
 	public static class Builder {
+		private Long videoContentId;
 		private ExternalIdentity identity;
 		private Video video;
 		private Image thumb;
@@ -79,6 +92,11 @@ public class VideoContent {
 		private String title;
 		private String description;
 		private String category;
+
+		public Builder videoContentId(Long videoContentId) {
+			this.videoContentId = videoContentId;
+			return this;
+		}
 
 		public Builder identity(ExternalIdentity identity) {
 			this.identity = identity;
@@ -121,7 +139,8 @@ public class VideoContent {
 	}
 
 	private VideoContent(Builder builder) {
-		this.identity = builder.identity;
+		this.videoContentId = builder.videoContentId;
+		this.externalIdentity = builder.identity;
 		this.video = builder.video;
 		this.thumb = builder.thumb;
 		this.lastUpdated = builder.lastUpdated;

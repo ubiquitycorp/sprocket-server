@@ -7,7 +7,7 @@ import javax.persistence.Query;
 
 import com.niobium.repository.BaseRepositoryJpaImpl;
 import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.SocialProvider;
+import com.ubiquity.social.domain.SocialNetwork;
 
 public class ContactRepositoryJpaImpl extends BaseRepositoryJpaImpl <Long, Contact> implements ContactRepository {
 
@@ -21,7 +21,7 @@ public class ContactRepositoryJpaImpl extends BaseRepositoryJpaImpl <Long, Conta
 
 	@Override
 	public int countAllContactsByOwnerIdAndSocialIdentityProvider(Long ownerId,
-			SocialProvider socialProviderType) {
+			SocialNetwork socialProviderType) {
 		Query query = getEntityManager().createQuery("select count(c.contactId) from Contact c where c.owner.userId = :ownerId and c.socialIdentity.socialProviderType = :socialProviderType");
 		query.setParameter("ownerId", ownerId);
 		query.setParameter("socialProviderType", socialProviderType);
@@ -32,7 +32,7 @@ public class ContactRepositoryJpaImpl extends BaseRepositoryJpaImpl <Long, Conta
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Contact> findByOwnerIdAndSocialIdentityProvider(Long ownerId,
-			SocialProvider type) {
+			SocialNetwork type) {
 		Query query = getEntityManager().createQuery("select c from Contact c where c.owner.userId = :ownerId and c.socialIdentity.socialProviderType = :socialProviderType");
 		query.setParameter("ownerId", ownerId);
 		query.setParameter("socialProviderType", type);

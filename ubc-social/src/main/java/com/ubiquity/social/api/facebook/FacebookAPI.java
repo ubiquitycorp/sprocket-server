@@ -5,12 +5,13 @@ import java.util.List;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.User;
+import com.ubiquity.social.api.ClientExecutorFactory;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.exception.AuthorizationException;
 import com.ubiquity.social.api.facebook.dto.FacebookGraphApiDtoAssembler;
@@ -24,7 +25,6 @@ import com.ubiquity.social.api.facebook.endpoints.FacebookGraphApiEndpoints;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
-import com.ubiquity.social.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Message;
 
 /***
@@ -41,11 +41,12 @@ public class FacebookAPI implements SocialAPI {
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 	private FacebookGraphApiEndpoints graphApi;
 
+	/***
+	 * Constructor creates a threadsafe API proxy for the Facebook Graph
+	 */
 	private FacebookAPI() {
-		// this initialization only needs to be done once per VM
-		RegisterBuiltin.register(ResteasyProviderFactory.getInstance());
 		graphApi = ProxyFactory.create(FacebookGraphApiEndpoints.class,
-				"https://graph.facebook.com");
+				"https://graph.facebook.com", ClientExecutorFactory.createClientExecutor());
 	}
 
 	public static SocialAPI getProviderAPI() {
@@ -54,6 +55,9 @@ public class FacebookAPI implements SocialAPI {
 		return facebook;
 	}
 
+	/***
+	 * Authenticates a user by executing the "me" endpoint
+	 */
 	@Override
 	public Contact authenticateUser(ExternalIdentity identity) {
 
@@ -113,7 +117,7 @@ public class FacebookAPI implements SocialAPI {
 			ClientResponse<String> response = null;
 			try {
 				response = graphApi.getEvents(Long.parseLong(contact
-						.getSocialIdentity().getIdentifier()), identity
+						.getExternalIdentity().getIdentifier()), identity
 						.getAccessToken());
 				if (response.getResponseStatus().getStatusCode() != 200) {
 					// in this case, for now let's not kill the whole loop when
@@ -121,7 +125,7 @@ public class FacebookAPI implements SocialAPI {
 					// removed a pointer)
 					log.warn(
 							"Retrieving events for identity {} failed, reason: {}",
-							contact.getSocialIdentity().getIdentifier(),
+							contact.getExternalIdentity().getIdentifier(),
 							response.getEntity());
 					continue;
 				}
@@ -204,6 +208,9 @@ public class FacebookAPI implements SocialAPI {
 		}
 	}
 
+	/**
+	 * Note method is synchronized to void bug with multi-threaded requests temporarily
+	 */
 	@Override
 	public List<Activity> listActivities(ExternalIdentity external) {
 		List<Activity> activities = new LinkedList<Activity>();
@@ -223,11 +230,14 @@ public class FacebookAPI implements SocialAPI {
 			// assemble from dto to entity
 			for (FacebookActivityDto activityDto : activitiesDtoList) {
 				
+			
 				// build contact 
 				Contact contact = FacebookGraphApiDtoAssembler.assembleContact(external, activityDto.getFrom());
 				Activity activity = new Activity.Builder()
-					.title(activityDto.getName())
-					.body(activityDto.getDescription())
+					.title(activityDto.getStory())
+					.activityId((long)activityDto.getCreatedTime().hashCode()) // TODO: use FB until we start persisting, then remove
+					.owner(new User.Builder().userId(external.getUser().getUserId()).build())
+					.body(activityDto.getMessage())
 					.lastUpdated(System.currentTimeMillis())
 					.creationDate(System.currentTimeMillis())
 					.postedBy(contact)

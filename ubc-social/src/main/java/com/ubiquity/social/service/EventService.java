@@ -13,6 +13,7 @@ import com.niobium.repository.cache.DataCacheKeys;
 import com.niobium.repository.cache.UserDataModificationCache;
 import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
@@ -20,8 +21,7 @@ import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
-import com.ubiquity.social.domain.ExternalIdentity;
-import com.ubiquity.social.domain.SocialProvider;
+import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.social.repository.ContactRepository;
 import com.ubiquity.social.repository.ContactRepositoryJpaImpl;
 import com.ubiquity.social.repository.EventRepository;
@@ -114,13 +114,13 @@ public class EventService {
 	
 	public int refreshEventsForSocialIdentity(ExternalIdentity identity) {
 		
-		if(identity.getSocialProvider() != SocialProvider.Facebook)
+		if(identity.getIdentityProvider() != SocialNetwork.Facebook.getValue())
 			throw new UnsupportedOperationException();
 		
-		SocialAPI social = SocialAPIFactory.createProvider(SocialProvider.Facebook, identity.getUser().getClientPlatform());
+		SocialAPI social = SocialAPIFactory.createProvider(SocialNetwork.Facebook, identity.getUser().getClientPlatform());
 
 		// get the list of local contacts for this user
-		List<Contact> contacts = contactRepository.findByOwnerIdAndSocialIdentityProvider(identity.getUser().getUserId(), SocialProvider.Facebook);
+		List<Contact> contacts = contactRepository.findByOwnerIdAndSocialIdentityProvider(identity.getUser().getUserId(), SocialNetwork.Facebook);
 		// the returned list will be events will be events with no identifiers, but with contacts set
 		List<Event> events = social.findEventsCreatedByContacts(identity, contacts);
 

@@ -11,9 +11,7 @@ import javax.xml.transform.sax.SAXSource;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.plugins.providers.atom.Feed;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.scribe.oauth.OAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +21,8 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.social.api.ClientExecutorFactory;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.exception.AuthorizationException;
 import com.ubiquity.social.api.gmail.GmailApiDtoAssembler;
@@ -36,11 +36,10 @@ import com.ubiquity.social.api.util.NamespaceFilter;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
-import com.ubiquity.social.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Message;
 
 /***
- * Google API class
+ * Google API implementation of the SocialAPI
  * 
  * @author Peter
  * 
@@ -51,7 +50,7 @@ public class GoogleAPI implements SocialAPI {
 	private static SocialAPI google = null;
 	OAuthService service = null;
 	
-	@SuppressWarnings("unused")
+
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private GooglePlusApiEndpoints googleApi;
@@ -68,10 +67,8 @@ public class GoogleAPI implements SocialAPI {
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 	
 	private GoogleAPI() {
-		// this initialization only needs to be done once per VM
-		RegisterBuiltin.register(ResteasyProviderFactory.getInstance());
-		googleApi = ProxyFactory.create(GooglePlusApiEndpoints.class, "https://www.googleapis.com/plus/v1");
-		gmailApiEndpoints = ProxyFactory.create(GmailApiEndpoints.class, "https://mail.google.com/");
+		googleApi = ProxyFactory.create(GooglePlusApiEndpoints.class, "https://www.googleapis.com/plus/v1", ClientExecutorFactory.createClientExecutor());
+		gmailApiEndpoints = ProxyFactory.create(GmailApiEndpoints.class, "https://mail.google.com/", ClientExecutorFactory.createClientExecutor());
 	}
 
 	public static SocialAPI getProviderAPI() {
@@ -184,7 +181,7 @@ public class GoogleAPI implements SocialAPI {
 			    //Do unmarshalling
 			    Object inflated = unmarshaller.unmarshal(source);
 			    
-			    return GmailApiDtoAssembler.assemble((Feed)inflated);
+			    return GmailApiDtoAssembler.assemble((Feed)inflated, externalIdentity.getUser());
 			   
 			
 		} catch (SAXException e) {

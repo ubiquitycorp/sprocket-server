@@ -8,19 +8,18 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.social.api.ClientExecutorFactory;
 import com.ubiquity.social.api.ContentAPI;
 import com.ubiquity.social.api.google.dto.container.GoogleRequestFailureDto;
 import com.ubiquity.social.api.youtube.dto.YouTubeApiDtoAssembler;
 import com.ubiquity.social.api.youtube.dto.container.YouTubeItemsDto;
 import com.ubiquity.social.api.youtube.dto.model.YouTubeVideoDto;
 import com.ubiquity.social.api.youtube.endpoints.YouTubeApiEndpoints;
-import com.ubiquity.social.domain.ExternalIdentity;
 import com.ubiquity.social.domain.VideoContent;
 
 public class YouTubeAPI implements ContentAPI {
@@ -42,12 +41,7 @@ public class YouTubeAPI implements ContentAPI {
 		} catch (ConfigurationException e) {
 			throw new RuntimeException("Unable to configure access to YouTube");
 		}
-		
-		log.info("Using api key: {}", apiKey);
-
-		// this initialization only needs to be done once per VM
-		RegisterBuiltin.register(ResteasyProviderFactory.getInstance());
-		youTubeApi = ProxyFactory.create(YouTubeApiEndpoints.class, "https://www.googleapis.com/youtube");
+		youTubeApi = ProxyFactory.create(YouTubeApiEndpoints.class, "https://www.googleapis.com/youtube", ClientExecutorFactory.createClientExecutor());
 	}
 	
 	@Override
@@ -56,7 +50,6 @@ public class YouTubeAPI implements ContentAPI {
 		List<VideoContent> videos = new LinkedList<VideoContent>();
 		ClientResponse<String> response = null;
 		try {
-			log.info("Access ing YouTube with api key: {} and token: {}", apiKey, externalIdentity.getAccessToken());
 			response = youTubeApi.getVideos("snippet", "mostPopular", apiKey, "  Bearer " + externalIdentity.getAccessToken());
 			checkError(response);
 			
