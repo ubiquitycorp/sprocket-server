@@ -11,12 +11,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.api.ContentAPI;
 import com.ubiquity.social.api.ContentAPIFactory;
-import com.ubiquity.social.domain.ContentProvider;
-import com.ubiquity.social.domain.ExternalIdentity;
-import com.ubiquity.social.domain.SocialProvider;
+import com.ubiquity.social.domain.ContentNetwork;
+import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.social.domain.VideoContent;
 import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.api.dto.model.ImageDto;
@@ -37,17 +37,17 @@ public class ContentEndpoint {
 		
 		// Only supporting YouTube now...
 		User user = ServiceFactory.getUserService().getUserById(userId);
-		ContentAPI contentApi = ContentAPIFactory.createProvider(ContentProvider.YouTube);
+		ContentAPI contentApi = ContentAPIFactory.createProvider(ContentNetwork.YouTube);
 
 		// Get a google identity; if we don't have one, an illegal argument exception will be thrown
-		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, SocialProvider.Google);
+		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, SocialNetwork.Google);
 		
 		List<VideoContent> videos = contentApi.findVideosByExternalIdentity(identity);	
 		// Return transformed
 		if(videos != null) {
 			for(VideoContent videoContent : videos) {
 				results.add(new VideoDto.Builder()
-				.contentProviderId(ContentProvider.YouTube.ordinal())
+				.contentProviderId(ContentNetwork.YouTube.ordinal())
 				.itemKey(videoContent.getVideo().getItemKey())
 				.thumb(new ImageDto(videoContent.getThumb().getUrl()))
 				.title(videoContent.getTitle())

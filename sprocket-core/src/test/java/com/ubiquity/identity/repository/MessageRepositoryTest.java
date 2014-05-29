@@ -10,13 +10,13 @@ import org.junit.Test;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.NativeIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Message;
-import com.ubiquity.social.domain.SocialProvider;
+import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.social.repository.ContactRepository;
 import com.ubiquity.social.repository.ContactRepositoryJpaImpl;
 import com.ubiquity.social.repository.MessageRepository;
@@ -74,11 +74,11 @@ public class MessageRepositoryTest {
 						.displayName("Jill").firstName("Jill").lastName("Jackson")
 						.email("jill@mail.com").profileUrl("http://jills.profile.link")
 						.image(new Image("http://jills.image.url"))
-						.socialIdentity(new ExternalIdentity.Builder()
+						.externalIdentity(new ExternalIdentity.Builder()
 							.identifier(UUID.randomUUID().toString())
 							.isActive(Boolean.TRUE)
 							.lastUpdated(System.currentTimeMillis())
-							.socialProvider(SocialProvider.Facebook)
+							.identityProvider(SocialNetwork.Facebook.getValue())
 							.build())
 						.owner(owner)
 						

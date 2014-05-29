@@ -20,6 +20,7 @@ import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
 import com.ubiquity.api.exception.HttpException;
 import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
@@ -27,8 +28,7 @@ import com.ubiquity.identity.service.UserService;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.ExternalIdentity;
-import com.ubiquity.social.domain.SocialProvider;
+import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ContactsDto;
@@ -85,7 +85,7 @@ public class UsersEndpoint {
 		for(Identity identity : user.getIdentities()) {
 			if(identity instanceof ExternalIdentity) {
 				ExternalIdentity socialIdentity = (ExternalIdentity)identity;
-				IdentityDto associatedIdentityDto = new IdentityDto.Builder().identifier(socialIdentity.getIdentifier()).identityProviderId(socialIdentity.getSocialProvider().getValue()).build();
+				IdentityDto associatedIdentityDto = new IdentityDto.Builder().identifier(socialIdentity.getIdentifier()).identityProviderId(socialIdentity.getIdentityProvider()).build();
 				accountDto.getIdentities().add(associatedIdentityDto);
 			}
 		}
@@ -187,7 +187,7 @@ public class UsersEndpoint {
 
 
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto.getClientPlatformId());		
-		SocialProvider socialProvider = SocialProvider.getEnum(identityDto.getSocialIdentityProviderId());
+		SocialNetwork socialNetwork = SocialNetwork.getEnum(identityDto.getSocialIdentityProviderId());
 		
 		// get user
 		UserService userService = ServiceFactory.getUserService();
@@ -195,17 +195,17 @@ public class UsersEndpoint {
 				
 		// create the identity if it does not exist; or use the existing one
 		SocialService socialService = ServiceFactory.getSocialService();
-		ExternalIdentity identity = socialService.findSocialIdentity(userId, socialProvider);
+		ExternalIdentity identity = socialService.findSocialIdentity(userId, socialNetwork);
 		if(identity == null) {
 			identity = new ExternalIdentity.Builder()
 			.accessToken(identityDto.getAccessToken())
 			.secretToken(identityDto.getSecretToken())
-			.socialProvider(socialProvider)
+			.identityProvider(socialNetwork.getValue())
 			.user(user)
 			.build();
 			user.getIdentities().add(identity);
 			
-			SocialAPI social = SocialAPIFactory.createProvider(socialProvider, clientPlatform);
+			SocialAPI social = SocialAPIFactory.createProvider(socialNetwork, clientPlatform);
 
 			// authenticate the user; this will give the user a contact record specific for to this network
 			try {

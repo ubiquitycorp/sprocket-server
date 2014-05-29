@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.social.domain.ExternalIdentity;
-import com.ubiquity.social.domain.SocialProvider;
+import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.social.repository.SocialIdentityRepository;
 import com.ubiquity.social.repository.SocialIdentityRepositoryJpaImpl;
 
@@ -60,7 +60,7 @@ public class SocialRepositoryTest {
 			.user(user)
 			.identifier(UUID.randomUUID().toString())
 			.accessToken(UUID.randomUUID().toString())
-			.socialProvider(SocialProvider.Facebook)
+			.identityProvider(SocialNetwork.Facebook.getValue())
 			.build();
 		
 		user.getIdentities().add(identity);
@@ -75,7 +75,7 @@ public class SocialRepositoryTest {
 
 	@Test
 	public void testFindSocialIdentityByUserIdAndProvider() throws Exception {
-		ExternalIdentity persisted = socialRepository.findOne(user.getUserId(), SocialProvider.Facebook);
+		ExternalIdentity persisted = socialRepository.findOne(user.getUserId(), SocialNetwork.Facebook);
 		Assert.assertNotNull(persisted);
 		Assert.assertEquals(persisted.getIdentityId(), identity.getIdentityId());
 	
@@ -83,7 +83,7 @@ public class SocialRepositoryTest {
 	
 	@Test
 	public void testUpdateSocialIdentity() throws Exception {
-		ExternalIdentity persisted = socialRepository.findOne(user.getUserId(), SocialProvider.Facebook);
+		ExternalIdentity persisted = socialRepository.findOne(user.getUserId(), SocialNetwork.Facebook);
 		String newToken = UUID.randomUUID().toString();
 		persisted.setAccessToken(newToken);
 		
@@ -91,7 +91,7 @@ public class SocialRepositoryTest {
 		userRepository.update(user);
 		EntityManagerSupport.commit();
 		
-		persisted = socialRepository.findOne(user.getUserId(), SocialProvider.Facebook);
+		persisted = socialRepository.findOne(user.getUserId(), SocialNetwork.Facebook);
 		Assert.assertEquals(persisted.getAccessToken(), newToken);
 
 		

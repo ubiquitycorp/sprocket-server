@@ -3,12 +3,12 @@ package com.ubiquity.sprocket.api;
 import java.util.Map;
 import java.util.UUID;
 
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.ContentProvider;
-import com.ubiquity.social.domain.ExternalIdentity;
+import com.ubiquity.social.domain.ContentNetwork;
 import com.ubiquity.social.domain.Message;
-import com.ubiquity.social.domain.SocialProvider;
+import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.social.domain.VideoContent;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
@@ -31,7 +31,7 @@ public class DtoAssembler {
 		String apiModelDataType = null; // TODO: would use the class name but the API is set already and so close to demo...
 		if(dataType.equals(VideoContent.class.getSimpleName())) {
 			data = new VideoDto.Builder()
-			.contentProviderId(ContentProvider.YouTube.ordinal())
+			.contentProviderId(ContentNetwork.YouTube.ordinal())
 			.itemKey((String)fields.get(SearchKeys.VideoContentFields.FIELD_ITEM_KEY))
 			.thumb(new ImageDto((String)fields.get(SearchKeys.CommonFields.FIELD_THUMBNAIL)))
 			.title((String)fields.get(SearchKeys.CommonFields.FIELD_TITLE))
@@ -82,12 +82,12 @@ public class DtoAssembler {
 			.profileUrl(contact.getProfileUrl())
 			.etag(UUID.randomUUID().toString());
 		
-		ExternalIdentity identity = contact.getSocialIdentity();
+		ExternalIdentity identity = contact.getExternalIdentity();
 		if(identity != null)
 			contactDtoBuilder.identity(
 					new IdentityDto.Builder()
 						.identifier(identity.getIdentifier())
-						.identityProviderId(identity.getSocialProvider().getValue())
+						.identityProviderId(identity.getIdentityProvider())
 						.build());
 		// Image is optional
 		if (contact.getImage() != null)
@@ -100,7 +100,7 @@ public class DtoAssembler {
 		return new MessageDto.Builder()
 			.subject(message.getTitle())
 			.date(System.currentTimeMillis())
-			.socialProviderId(SocialProvider.Google.getValue())
+			.socialProviderId(SocialNetwork.Google.getValue())
 			.body(message.getBody())
 			.sender(
 					assemble(message.getSender())).build();
