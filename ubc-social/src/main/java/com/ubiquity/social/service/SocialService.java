@@ -2,10 +2,12 @@ package com.ubiquity.social.service;
 
 import org.apache.commons.configuration.Configuration;
 
+import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.social.repository.SocialIdentityRepository;
 import com.ubiquity.social.repository.SocialIdentityRepositoryJpaImpl;
@@ -66,4 +68,7 @@ public class SocialService {
 		return external;
 	}
 
+	public static CollectionVariant<Message> listMessages(Long userId, SocialNetwork sociaNetwork){
+		return null;		
+	}
 }
