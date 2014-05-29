@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.media.domain.Image;
 
@@ -51,16 +52,14 @@ public class Contact {
 	private User owner;
 
 	@OneToOne(cascade = CascadeType.ALL)
-	private ExternalIdentity socialIdentity;
+	private ExternalIdentity externalIdentity;
 
-	
 	/***
 	 * Default constructor required by JPA
 	 */
 	public Contact() {
 	}
 
-	
 	public Long getContactId() {
 		return contactId;
 	}
@@ -133,8 +132,12 @@ public class Contact {
 		this.profileUrl = profileUrl;
 	}
 
-	public ExternalIdentity getSocialIdentity() {
-		return socialIdentity;
+	public ExternalIdentity getExternalIdentity() {
+		return externalIdentity;
+	}
+
+	public void setExternalIdentity(ExternalIdentity externalIdentity) {
+		this.externalIdentity = externalIdentity;
 	}
 
 	public static class Builder {
@@ -147,7 +150,7 @@ public class Contact {
 		private String profileUrl;
 		private Long lastUpdated;
 		private User owner;
-		private ExternalIdentity socialIdentity;
+		private ExternalIdentity externalIdentity;
 
 		public Builder contactId(Long contactId) {
 			this.contactId = contactId;
@@ -194,8 +197,8 @@ public class Contact {
 			return this;
 		}
 
-		public Builder socialIdentity(ExternalIdentity socialIdentity) {
-			this.socialIdentity = socialIdentity;
+		public Builder externalIdentity(ExternalIdentity externalIdentity) {
+			this.externalIdentity = externalIdentity;
 			return this;
 		}
 
@@ -214,6 +217,6 @@ public class Contact {
 		this.profileUrl = builder.profileUrl;
 		this.lastUpdated = builder.lastUpdated;
 		this.owner = builder.owner;
-		this.socialIdentity = builder.socialIdentity;
+		this.externalIdentity = builder.externalIdentity;
 	}
 }

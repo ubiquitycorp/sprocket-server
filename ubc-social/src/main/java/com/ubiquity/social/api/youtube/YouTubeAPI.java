@@ -8,12 +8,11 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.api.ClientExecutorFactory;
 import com.ubiquity.social.api.ContentAPI;
 import com.ubiquity.social.api.google.dto.container.GoogleRequestFailureDto;
@@ -21,7 +20,6 @@ import com.ubiquity.social.api.youtube.dto.YouTubeApiDtoAssembler;
 import com.ubiquity.social.api.youtube.dto.container.YouTubeItemsDto;
 import com.ubiquity.social.api.youtube.dto.model.YouTubeVideoDto;
 import com.ubiquity.social.api.youtube.endpoints.YouTubeApiEndpoints;
-import com.ubiquity.social.domain.ExternalIdentity;
 import com.ubiquity.social.domain.VideoContent;
 
 public class YouTubeAPI implements ContentAPI {

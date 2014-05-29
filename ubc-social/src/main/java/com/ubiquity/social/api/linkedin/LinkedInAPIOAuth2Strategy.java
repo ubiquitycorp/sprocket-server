@@ -6,12 +6,12 @@ import java.util.List;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.social.api.ClientExecutorFactory;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.linkedin.dto.LinkedInApiDtoAssembler;
 import com.ubiquity.social.api.linkedin.dto.container.LinkedInValuesDto;
@@ -21,7 +21,6 @@ import com.ubiquity.social.api.linkedin.endpoints.LinkedInApiEndpoints;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
-import com.ubiquity.social.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Message;
 
 public class LinkedInAPIOAuth2Strategy implements SocialAPI {
@@ -40,8 +39,7 @@ public class LinkedInAPIOAuth2Strategy implements SocialAPI {
 
 	private LinkedInAPIOAuth2Strategy() {
 		// this initialization only needs to be done once per VM
-		RegisterBuiltin.register(ResteasyProviderFactory.getInstance());
-		linkedInApi = ProxyFactory.create(LinkedInApiEndpoints.class, "https://api.linkedin.com/v1");
+		linkedInApi = ProxyFactory.create(LinkedInApiEndpoints.class, "https://api.linkedin.com/v1", ClientExecutorFactory.createClientExecutor());
 	}
 
 	public static SocialAPI getProviderAPI() {

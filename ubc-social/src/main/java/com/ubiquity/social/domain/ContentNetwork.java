@@ -1,6 +1,6 @@
 package com.ubiquity.social.domain;
 
-public enum ContentProvider {
+public enum ContentNetwork {
 	YouTube,
 	Netflix;
 

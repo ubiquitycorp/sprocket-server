@@ -1,14 +1,11 @@
-package com.ubiquity.social.domain;
+package com.ubiquity.identity.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import com.ubiquity.identity.domain.Identity;
-import com.ubiquity.identity.domain.User;
-
 /***
- * Class encapsulating identifying information provided by an external network
+ * Class encapsulating identifying oauth identity
  * 
  * @author chris
  *
@@ -17,15 +14,21 @@ import com.ubiquity.identity.domain.User;
 @Table(name = "external_identity")
 public class ExternalIdentity extends Identity {
 
+	/***
+	 * External identifier provided
+	 */
 	@Column(name = "identifier", nullable = false)
 	private String identifier;
 
-	@Column(name = "social_provider_type", nullable = true)
-	private SocialProvider socialProvider;
+	/**
+	 * Provider, such as Facebook, Google
+	 */
+	@Column(name = "identity_provider", nullable = true)
+	private Integer identityProvider;
 
-	@Column(name = "content_provider_type", nullable = true)
-	private ContentProvider contentProvider;
-
+	/**
+	 * OAuth access / refresh tokens
+	 */
 	@Column(name = "access_token", nullable = true)
 	private String accessToken;
 
@@ -35,23 +38,14 @@ public class ExternalIdentity extends Identity {
 	@Column(name = "refresh_token", nullable = true)
 	private String refreshToken;
 
+	/***
+	 * Optional email field, used for lookup, merging
+	 */
 	@Column(name = "email", nullable = true)
 	private String email;
 
-	protected ExternalIdentity() {
-		super();
-	}
-
-	public ContentProvider getContentProvider() {
-		return contentProvider;
-	}
-
 	public String getIdentifier() {
 		return identifier;
-	}
-
-	public SocialProvider getSocialProvider() {
-		return socialProvider;
 	}
 
 	public String getAccessToken() {
@@ -74,6 +68,14 @@ public class ExternalIdentity extends Identity {
 		return refreshToken;
 	}
 
+	public Integer getIdentityProvider() {
+		return identityProvider;
+	}
+
+	public void setIdentityProvider(Integer identityProviderType) {
+		this.identityProvider = identityProviderType;
+	}
+
 	public void setRefreshToken(String refreshToken) {
 		this.refreshToken = refreshToken;
 	}
@@ -90,24 +92,15 @@ public class ExternalIdentity extends Identity {
 		this.identifier = identifier;
 	}
 
-	public void setSocialProviderType(SocialProvider socialProviderType) {
-		this.socialProvider = socialProviderType;
-	}
-
-	public void setContentProviderType(ContentProvider contentProviderType) {
-		this.contentProvider = contentProviderType;
-	}
-
 	public static class Builder {
 		private String identifier;
-		private SocialProvider socialProviderType;
-		private ContentProvider contentProviderType;
+		private Integer identityProvider;
 		private String accessToken;
 		private String secretToken;
 		private String refreshToken;
 		private String email;
-		private Boolean isActive;
 		private Long lastUpdated;
+		private Boolean isActive;
 		private User user;
 
 		public Builder identifier(String identifier) {
@@ -115,21 +108,16 @@ public class ExternalIdentity extends Identity {
 			return this;
 		}
 
-		public Builder socialProvider(SocialProvider socialProviderType) {
-			this.socialProviderType = socialProviderType;
-			return this;
-		}
-
-		public Builder contentProvider(
-				ContentProvider contentProviderType) {
-			this.contentProviderType = contentProviderType;
-			return this;
-		}
-
 		public Builder user(User user) {
 			this.user = user;
 			return this;
 		}
+		
+		public Builder identityProvider(Integer identityProvider) {
+			this.identityProvider = identityProvider;
+			return this;
+		}
+
 		public Builder accessToken(String accessToken) {
 			this.accessToken = accessToken;
 			return this;
@@ -149,14 +137,14 @@ public class ExternalIdentity extends Identity {
 			this.refreshToken = refreshToken;
 			return this;
 		}
-
-		public Builder email(String email) {
-			this.email = email;
-			return this;
-		}
 		
 		public Builder lastUpdated(Long lastUpdated) {
 			this.lastUpdated = lastUpdated;
+			return this;
+		}
+
+		public Builder email(String email) {
+			this.email = email;
 			return this;
 		}
 
@@ -167,14 +155,13 @@ public class ExternalIdentity extends Identity {
 
 	private ExternalIdentity(Builder builder) {
 		this.identifier = builder.identifier;
-		this.socialProvider = builder.socialProviderType;
-		this.contentProvider = builder.contentProviderType;
+		this.identityProvider = builder.identityProvider;
 		this.accessToken = builder.accessToken;
 		this.secretToken = builder.secretToken;
 		this.refreshToken = builder.refreshToken;
 		this.email = builder.email;
-		super.isActive = builder.isActive;
-		super.lastUpdated = builder.lastUpdated;
-		super.user = builder.user;
+		this.lastUpdated = builder.lastUpdated;
+		this.isActive = builder.isActive;
+		this.user = builder.user;
 	}
 }

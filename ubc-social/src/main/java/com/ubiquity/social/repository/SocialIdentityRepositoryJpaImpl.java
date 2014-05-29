@@ -6,8 +6,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import com.niobium.repository.BaseRepositoryJpaImpl;
-import com.ubiquity.social.domain.ExternalIdentity;
-import com.ubiquity.social.domain.SocialProvider;
+import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.social.domain.SocialNetwork;
 
 public class SocialIdentityRepositoryJpaImpl extends BaseRepositoryJpaImpl<Long, ExternalIdentity> implements
 SocialIdentityRepository {
@@ -34,27 +34,27 @@ SocialIdentityRepository {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ExternalIdentity findOne(Long userId, SocialProvider providerType) {
+	public ExternalIdentity findOne(Long userId, SocialNetwork socialNetwork) {
 		assert (userId != null);
-		assert (providerType != null);
+		assert (socialNetwork != null);
 		Query query = getEntityManager()
 				.createQuery(
-						"select c from ExternalIdentity c where c.user.userId = :userId and c.socialProvider = :providerType");
+						"select c from ExternalIdentity c where c.user.userId = :userId and c.identityProvider = :provider");
 		query.setParameter("userId", userId);
-		query.setParameter("providerType", providerType);
+		query.setParameter("provider", socialNetwork.getValue());
 		List<ExternalIdentity> results = query.getResultList();
 		return results.size() > 0 ? (ExternalIdentity)results.get(0) : null;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ExternalIdentity findOneByProviderIdentifier(String providerIdentifier, SocialProvider providerType) {
+	public ExternalIdentity findOneByProviderIdentifier(String providerIdentifier, SocialNetwork socialNetwork) {
 		assert (providerIdentifier != null);
-		assert (providerType != null);
+		assert (socialNetwork != null);
 		Query query = getEntityManager().createQuery(
-				"select c from Externaldentity c where c.identifier = :providerIdentifier and c.socialProvider = :providerType");
+				"select c from Externaldentity c where c.identifier = :providerIdentifier and c.identityProvider = :provider");
 		query.setParameter("providerIdentifier", providerIdentifier);
-		query.setParameter("providerType", providerType);
+		query.setParameter("provider", socialNetwork.getValue());
 		List<ExternalIdentity> results = query.getResultList();
 		return results.size() > 0 ? (ExternalIdentity)results.get(0) : null;
 	}

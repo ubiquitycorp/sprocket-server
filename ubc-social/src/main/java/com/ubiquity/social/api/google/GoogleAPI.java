@@ -21,6 +21,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.api.ClientExecutorFactory;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.exception.AuthorizationException;
@@ -35,11 +36,10 @@ import com.ubiquity.social.api.util.NamespaceFilter;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
-import com.ubiquity.social.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Message;
 
 /***
- * Google API class
+ * Google API implementation of the SocialAPI
  * 
  * @author Peter
  * 

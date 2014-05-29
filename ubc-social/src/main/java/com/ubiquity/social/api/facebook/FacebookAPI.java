@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.api.ClientExecutorFactory;
 import com.ubiquity.social.api.SocialAPI;
@@ -24,7 +25,6 @@ import com.ubiquity.social.api.facebook.endpoints.FacebookGraphApiEndpoints;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Event;
-import com.ubiquity.social.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Message;
 
 /***
@@ -41,8 +41,10 @@ public class FacebookAPI implements SocialAPI {
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 	private FacebookGraphApiEndpoints graphApi;
 
+	/***
+	 * Constructor creates a threadsafe API proxy for the Facebook Graph
+	 */
 	private FacebookAPI() {
-	
 		graphApi = ProxyFactory.create(FacebookGraphApiEndpoints.class,
 				"https://graph.facebook.com", ClientExecutorFactory.createClientExecutor());
 	}
@@ -53,6 +55,9 @@ public class FacebookAPI implements SocialAPI {
 		return facebook;
 	}
 
+	/***
+	 * Authenticates a user by executing the "me" endpoint
+	 */
 	@Override
 	public Contact authenticateUser(ExternalIdentity identity) {
 
@@ -112,7 +117,7 @@ public class FacebookAPI implements SocialAPI {
 			ClientResponse<String> response = null;
 			try {
 				response = graphApi.getEvents(Long.parseLong(contact
-						.getSocialIdentity().getIdentifier()), identity
+						.getExternalIdentity().getIdentifier()), identity
 						.getAccessToken());
 				if (response.getResponseStatus().getStatusCode() != 200) {
 					// in this case, for now let's not kill the whole loop when
@@ -120,7 +125,7 @@ public class FacebookAPI implements SocialAPI {
 					// removed a pointer)
 					log.warn(
 							"Retrieving events for identity {} failed, reason: {}",
-							contact.getSocialIdentity().getIdentifier(),
+							contact.getExternalIdentity().getIdentifier(),
 							response.getEntity());
 					continue;
 				}

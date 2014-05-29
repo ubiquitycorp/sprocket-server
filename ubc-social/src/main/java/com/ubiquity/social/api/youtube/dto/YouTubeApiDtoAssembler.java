@@ -1,10 +1,10 @@
 package com.ubiquity.social.api.youtube.dto;
 
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.api.youtube.dto.model.YouTubeVideoDto;
 import com.ubiquity.social.api.youtube.dto.model.YouTubeVideoSnippetDto;
-import com.ubiquity.social.domain.ExternalIdentity;
 import com.ubiquity.social.domain.VideoContent;
 
 public class YouTubeApiDtoAssembler {

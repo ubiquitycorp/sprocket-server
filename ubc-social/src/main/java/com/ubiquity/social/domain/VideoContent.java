@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
 
@@ -23,7 +24,7 @@ public class VideoContent {
 
 	@ManyToOne
 	@JoinColumn(name = "identity_id")
-	private ExternalIdentity identity;
+	private ExternalIdentity externalIdentity;
 
 	@Embedded
 	private Video video;
@@ -43,9 +44,9 @@ public class VideoContent {
 	@Column(name = "category", nullable = false)
 	private String category;
 
-	public VideoContent(ExternalIdentity identity, Video video, Long lastUpdated) {
+	public VideoContent(ExternalIdentity externalIdentity, Video video, Long lastUpdated) {
 		super();
-		this.identity = identity;
+		this.externalIdentity = externalIdentity;
 		this.video = video;
 		this.lastUpdated = lastUpdated;
 	}
@@ -54,8 +55,8 @@ public class VideoContent {
 		return videoContentId;
 	}
 
-	public ExternalIdentity getIdentity() {
-		return identity;
+	public ExternalIdentity getExternalIdentity() {
+		return externalIdentity;
 	}
 
 	public Video getVideo() {
@@ -139,7 +140,7 @@ public class VideoContent {
 
 	private VideoContent(Builder builder) {
 		this.videoContentId = builder.videoContentId;
-		this.identity = builder.identity;
+		this.externalIdentity = builder.identity;
 		this.video = builder.video;
 		this.thumb = builder.thumb;
 		this.lastUpdated = builder.lastUpdated;

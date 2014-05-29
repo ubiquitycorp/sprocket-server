@@ -1,14 +1,11 @@
 package com.ubiquity.social.api;
 
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.social.api.facebook.FacebookAPI;
 import com.ubiquity.social.api.google.GoogleAPI;
 import com.ubiquity.social.api.linkedin.LinkedInAPIOAuth1Strategy;
 import com.ubiquity.social.api.linkedin.LinkedInAPIOAuth2Strategy;
-import com.ubiquity.social.domain.SocialProvider;
+import com.ubiquity.social.domain.SocialNetwork;
 
 
 /***
@@ -28,7 +25,7 @@ public class SocialAPIFactory {
 	 * 
 	 * @throws IllegalArgumentException if the provider type is unknown
 	 */
-	public static SocialAPI createProvider(SocialProvider providerType, ClientPlatform client) {
+	public static SocialAPI createProvider(SocialNetwork providerType, ClientPlatform client) {
 		SocialAPI provider = null;
 		switch (providerType) {
 		case Facebook:
