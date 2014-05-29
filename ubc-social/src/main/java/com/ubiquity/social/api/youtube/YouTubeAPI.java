@@ -41,9 +41,6 @@ public class YouTubeAPI implements ContentAPI {
 		} catch (ConfigurationException e) {
 			throw new RuntimeException("Unable to configure access to YouTube");
 		}
-		
-		log.info("Using api key: {}", apiKey);
-
 		youTubeApi = ProxyFactory.create(YouTubeApiEndpoints.class, "https://www.googleapis.com/youtube", ClientExecutorFactory.createClientExecutor());
 	}
 	
@@ -53,7 +50,6 @@ public class YouTubeAPI implements ContentAPI {
 		List<VideoContent> videos = new LinkedList<VideoContent>();
 		ClientResponse<String> response = null;
 		try {
-			log.info("Access ing YouTube with api key: {} and token: {}", apiKey, externalIdentity.getAccessToken());
 			response = youTubeApi.getVideos("snippet", "mostPopular", apiKey, "  Bearer " + externalIdentity.getAccessToken());
 			checkError(response);
 			

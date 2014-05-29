@@ -10,7 +10,7 @@ public enum SocialNetwork {
     Facebook (1),
     Yahoo (2),
     LinkedIn (3),
-    Google (4);
+    Google(4);
     
     private final int value;
 
