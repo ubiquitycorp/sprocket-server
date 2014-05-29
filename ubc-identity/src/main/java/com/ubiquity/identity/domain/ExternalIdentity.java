@@ -44,6 +44,11 @@ public class ExternalIdentity extends Identity {
 	@Column(name = "email", nullable = true)
 	private String email;
 
+	/***
+	 * Required by JPA
+	 */
+	protected ExternalIdentity() {}
+	
 	public String getIdentifier() {
 		return identifier;
 	}
