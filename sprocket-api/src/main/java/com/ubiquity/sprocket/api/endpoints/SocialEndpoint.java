@@ -95,18 +95,8 @@ public class SocialEndpoint {
 		
 		List<Activity> activities = socialApi.listActivities(identity);
 					for(Activity activity : activities) {
-						results.getActivities().add(
-						new ActivityDto.Builder()
-						.body(activity.getBody())
-						.date(System.currentTimeMillis())
-						.socialProviderId(socialProvider.getValue())
-						.title(activity.getTitle())
-						.imageUrl(null)
-						.postedBy(DtoAssembler.assemble(activity.getPostedBy()))
-						.build());
+						results.getActivities().add(DtoAssembler.assemble(activity, socialProvider));
 					}
-			
-		
 
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(results))

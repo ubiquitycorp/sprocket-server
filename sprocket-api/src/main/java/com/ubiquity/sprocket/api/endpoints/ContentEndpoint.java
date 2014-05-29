@@ -2,7 +2,6 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -22,7 +21,6 @@ import com.ubiquity.social.domain.VideoContent;
 import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.api.dto.model.ImageDto;
 import com.ubiquity.sprocket.api.dto.model.VideoDto;
-import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/content")
