@@ -87,12 +87,21 @@
 		</dependency>
 
 
-
+	<!--  testing -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.6</version>
 			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.ubiquity</groupId>
+			<artifactId>ubc-identity-test</artifactId>
+			<version>0.1.1</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+			<optional>false</optional>
 		</dependency>
 
 	</dependencies>

@@ -171,15 +171,15 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>sprocket-core</artifactId>
-			<version>0.1</version>
+			<version>0.1.2</version>
 		</dependency>
 
-		<dependency>
+	<!-- 	<dependency>
 			<groupId>com.niobium</groupId>
 			<artifactId>niobium-amqp</artifactId>
 			<version>0.1</version>
 		</dependency>
-
+ -->
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>

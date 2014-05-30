@@ -18,6 +18,11 @@
 		<class>com.ubiquity.social.domain.Activity</class>
 		<class>com.ubiquity.social.domain.Contact</class>
 		<class>com.ubiquity.social.domain.Event</class>
+		<class>com.ubiquity.social.domain.VideoContent</class>
+		<!-- <class>com.ubiquity.media.domain.Video</class>
+		<class>com.ubiquity.media.domain.Media</class> -->
+		
+		
 		
 		<properties>
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />

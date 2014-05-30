@@ -1,4 +1,4 @@
-package com.ubiquity.sprocket.worker.cache;
+package com.ubiquity.sprocket.datasync.worker;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -14,9 +14,9 @@ import org.slf4j.LoggerFactory;
 import com.niobium.common.thread.ThreadPool;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.sprocket.datasync.worker.mq.consumer.CacheInvalidateConsumer;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
-import com.ubiquity.sprocket.worker.cache.mq.consumer.CacheInvalidateConsumer;
 
 public class DataSyncWorker {
 

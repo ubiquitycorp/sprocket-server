@@ -23,7 +23,6 @@ public class ExternalIdentityActivated {
 		return clientPlatformId;
 	}
 
-	
 	@Override
 	public String toString() {
 		return "SocialIdentityActivated [identityId=" + identityId

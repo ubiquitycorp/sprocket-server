@@ -54,7 +54,6 @@ public class MessageRepositoryTest {
 				.clientPlatform(ClientPlatform.Android)
 				.displayName(UUID.randomUUID().toString())
 				.build();
-		userRepository.create(owner);
 		
 		NativeIdentity identity = new NativeIdentity.Builder()
 			.isActive(Boolean.TRUE)
