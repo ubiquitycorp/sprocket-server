@@ -14,9 +14,10 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.UserFactory;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
-import com.ubiquity.social.domain.VideoContent;
-import com.ubiquity.social.repository.VideoContentRepository;
-import com.ubiquity.social.repository.VideoContentRepositoryJpaImpl;
+import com.ubiquity.sprocket.domain.ContentNetwork;
+import com.ubiquity.sprocket.domain.VideoContent;
+import com.ubiquity.sprocket.repository.VideoContentRepository;
+import com.ubiquity.sprocket.repository.VideoContentRepositoryJpaImpl;
 
 /***
  * Tests testing basic CRUD operations for a user repository
@@ -76,6 +77,17 @@ public class VideoContentRepositoryTest {
 		VideoContent persisted = allVideos.get(0);
 		Assert.assertTrue(persisted.getVideoContentId().longValue() == videoContent.getVideoContentId().longValue());
 	}
+	
+	@Test
+	public void testFindByOwnerAndContentNetwork() throws Exception {
+		List<VideoContent> videos = videoContentRepository.findByOwnerIdAndContentNetwork(owner.getUserId(), ContentNetwork.YouTube);
+		Assert.assertFalse(videos.isEmpty());
+		
+		// same user, different network
+		videos = videoContentRepository.findByOwnerIdAndContentNetwork(owner.getUserId(), ContentNetwork.Netflix);
+		Assert.assertTrue(videos.isEmpty());
+		
+	}
 
 	@Test
 	public void testDeleteWhereIdsNotEqualToList() throws Exception {
@@ -123,6 +135,7 @@ public class VideoContentRepositoryTest {
 		.thumb(new Image(UUID.randomUUID().toString()))
 		.description(UUID.randomUUID().toString())
 		.owner(user)
+		.contentNetwork(ContentNetwork.YouTube)
 		.lastUpdated(System.currentTimeMillis())
 		.build();
 		

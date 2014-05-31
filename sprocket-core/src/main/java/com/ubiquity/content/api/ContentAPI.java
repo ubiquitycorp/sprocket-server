@@ -3,7 +3,7 @@ package com.ubiquity.content.api;
 import java.util.List;
 
 import com.ubiquity.identity.domain.ExternalIdentity;
-import com.ubiquity.social.domain.VideoContent;
+import com.ubiquity.sprocket.domain.VideoContent;
 
 /***
  * Interface defining common operations for content networks

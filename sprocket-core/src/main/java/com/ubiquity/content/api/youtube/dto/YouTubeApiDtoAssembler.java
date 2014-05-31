@@ -5,7 +5,7 @@ import com.ubiquity.content.api.youtube.dto.model.YouTubeVideoSnippetDto;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
-import com.ubiquity.social.domain.VideoContent;
+import com.ubiquity.sprocket.domain.VideoContent;
 
 public class YouTubeApiDtoAssembler {
 

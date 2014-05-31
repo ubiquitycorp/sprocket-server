@@ -8,8 +8,8 @@
 # Provides: sprocket-datasync-worker
 # Required-Start: $network $syslog
 # Required-Stop: $network $syslog
-# Description: Gift Sender Cron Service 
-# Short-Description: Gift Sender Cron Service
+# Description: Sprocket Datasync Worker 
+# Short-Description: Sprocket Datasync Worker
 ### END INIT INFO
 
 . /etc/rc.d/init.d/functions

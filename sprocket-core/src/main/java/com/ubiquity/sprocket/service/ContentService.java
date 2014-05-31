@@ -12,10 +12,10 @@ import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.content.api.ContentAPIFactory;
 import com.ubiquity.identity.domain.ExternalIdentity;
-import com.ubiquity.social.domain.ContentNetwork;
-import com.ubiquity.social.domain.VideoContent;
-import com.ubiquity.social.repository.VideoContentRepository;
-import com.ubiquity.social.repository.VideoContentRepositoryJpaImpl;
+import com.ubiquity.sprocket.domain.ContentNetwork;
+import com.ubiquity.sprocket.domain.VideoContent;
+import com.ubiquity.sprocket.repository.VideoContentRepository;
+import com.ubiquity.sprocket.repository.VideoContentRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.cache.SprocketCacheKeys;
 
 
@@ -96,11 +96,11 @@ public class ContentService {
 	 * @param ifModifiedSince
 	 * @return
 	 */
-	public CollectionVariant<VideoContent> findAllVideosByOwnerId(Long ownerId, Long ifModifiedSince) {
+	public CollectionVariant<VideoContent> findAllVideosByOwnerIdAndContentNetwork(Long ownerId, ContentNetwork contentNetwork, Long ifModifiedSince) {
 
 		Long lastModified = dataModificationCache.getLastModified(ownerId, SprocketCacheKeys.UserProperties.VIDEOS, ifModifiedSince);
 
-		// If there is no cache entry, there are no contacts; add a zero value so it returns an empty collection with a zero value
+		// If there is no cache entry, there is no data
 		if(lastModified == null) {
 			return null;
 		}

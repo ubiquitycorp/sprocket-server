@@ -6,10 +6,8 @@ import java.util.UUID;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.ContentNetwork;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialNetwork;
-import com.ubiquity.social.domain.VideoContent;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
@@ -17,7 +15,9 @@ import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.dto.model.ImageDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 import com.ubiquity.sprocket.api.dto.model.VideoDto;
+import com.ubiquity.sprocket.domain.ContentNetwork;
 import com.ubiquity.sprocket.domain.Document;
+import com.ubiquity.sprocket.domain.VideoContent;
 import com.ubiquity.sprocket.search.SearchKeys;
 
 public class DtoAssembler {
@@ -31,7 +31,7 @@ public class DtoAssembler {
 		String apiModelDataType = null; // TODO: would use the class name but the API is set already and so close to demo...
 		if(dataType.equals(VideoContent.class.getSimpleName())) {
 			data = new VideoDto.Builder()
-			.contentProviderId(ContentNetwork.YouTube.ordinal())
+			.contentNetworkId(ContentNetwork.YouTube.ordinal())
 			.itemKey((String)fields.get(SearchKeys.VideoContentFields.FIELD_ITEM_KEY))
 			.thumb(new ImageDto((String)fields.get(SearchKeys.CommonFields.FIELD_THUMBNAIL)))
 			.title((String)fields.get(SearchKeys.CommonFields.FIELD_TITLE))
@@ -94,6 +94,17 @@ public class DtoAssembler {
 			contactDtoBuilder.imageUrl(contact.getImage().getUrl());
 
 		return contactDtoBuilder.build();
+	}
+	
+	public static VideoDto assemble(VideoContent videoContent) {
+		return new VideoDto.Builder()
+			.contentNetworkId(ContentNetwork.YouTube.ordinal())
+			.itemKey(videoContent.getVideo().getItemKey())
+			.thumb(new ImageDto(videoContent.getThumb().getUrl()))
+			.title(videoContent.getTitle())
+			.description(videoContent.getDescription())
+			.build();
+		
 	}
 	
 	public static MessageDto assemble(Message message) {

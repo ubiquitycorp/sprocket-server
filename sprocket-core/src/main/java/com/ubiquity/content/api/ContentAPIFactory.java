@@ -3,7 +3,7 @@ package com.ubiquity.content.api;
 import org.apache.commons.configuration.Configuration;
 
 import com.ubiquity.content.api.youtube.YouTubeAPI;
-import com.ubiquity.social.domain.ContentNetwork;
+import com.ubiquity.sprocket.domain.ContentNetwork;
 
 /***
  * Creates implementations of the ContentAPI interface

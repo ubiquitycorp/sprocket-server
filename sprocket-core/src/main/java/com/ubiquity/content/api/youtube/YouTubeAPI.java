@@ -17,7 +17,7 @@ import com.ubiquity.content.api.youtube.endpoints.YouTubeApiEndpoints;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.api.ClientExecutorFactory;
 import com.ubiquity.social.api.google.dto.container.GoogleRequestFailureDto;
-import com.ubiquity.social.domain.VideoContent;
+import com.ubiquity.sprocket.domain.VideoContent;
 
 public class YouTubeAPI implements ContentAPI {
 

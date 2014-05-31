@@ -18,8 +18,8 @@ import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
-import com.ubiquity.social.domain.VideoContent;
 import com.ubiquity.sprocket.domain.Document;
+import com.ubiquity.sprocket.domain.VideoContent;
 import com.ubiquity.sprocket.search.SearchKeys;
 
 
