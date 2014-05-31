@@ -12,7 +12,6 @@ import com.ubiquity.social.domain.ContentNetwork;
 import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
-import com.ubiquity.sprocket.service.AbstractContentService;
 import com.ubiquity.sprocket.service.ContentService;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
@@ -36,7 +35,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			log.debug("message received: {}", message);
 			if(message.getType().equals(ExternalIdentityActivated.class.getSimpleName()))
 				process((ExternalIdentityActivated)message.getContent());
-
+			
 
 		} catch (Exception e) {
 			// For now, log an error and exit until we know all the circumstances under which this can happen
@@ -56,9 +55,10 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		// get identity from message
 		ExternalIdentity identity = ServiceFactory.getSocialService().getSocialIdentityById(activated.getIdentityId());
 		if(identity.getIdentityProvider() == SocialNetwork.Google.getValue()) {
-			processVideos(identity, ContentNetwork.YouTube);
-			processMessages(identity, SocialNetwork.Google);
+			if(activated.getContentNetworkId() != null)
+				processVideos(identity, ContentNetwork.YouTube);
 			
+			processMessages(identity, SocialNetwork.Google);
 		}
 	}
 

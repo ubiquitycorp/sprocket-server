@@ -11,10 +11,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.content.api.ContentAPI;
+import com.ubiquity.content.api.ContentAPIFactory;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.social.api.ContentAPI;
-import com.ubiquity.social.api.ContentAPIFactory;
 import com.ubiquity.social.domain.ContentNetwork;
 import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.social.domain.VideoContent;

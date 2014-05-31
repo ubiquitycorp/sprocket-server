@@ -39,7 +39,7 @@ public class ServiceFactory {
 	 */
 	public static ContentService getContentService() {
 		if(contentService == null)
-			contentService = new ContentServiceMqSyncImpl(configuration);
+			contentService = new ContentService(configuration);
 		return contentService;
 	}
 	

@@ -22,13 +22,16 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
-import com.ubiquity.social.domain.ContentNetwork;
+import com.ubiquity.messaging.format.Message;
 import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
+import com.ubiquity.sprocket.messaging.MessageConverterFactory;
+import com.ubiquity.sprocket.messaging.MessageQueueFactory;
+import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 
@@ -155,19 +158,27 @@ public class UsersEndpoint {
 		// create the identity if it does not exist; or use the existing one
 		ExternalIdentity identity = ServiceFactory.getSocialService().createOrUpdateSocialIdentity(user, identityDto.getAccessToken(), identityDto.getSecretToken(), clientPlatform, socialNetwork);
 
-		// if this is for a content network, sync it
-		if(identityDto.getContentIdentityProviderId() != null) {
-			ContentNetwork contentNetwork = ContentNetwork.values()[identityDto.getContentIdentityProviderId()];
-			ServiceFactory.getContentService().sync(identity, contentNetwork);
-		}
-		
-		// ServiceFactory.getSocialService().sync(identity, socialNetwork)
+		// now send the message
+		sendActivatedMessage(user, identity, identityDto);
 		
 		IdentityDto result = new IdentityDto.Builder().identifier(identity.getIdentifier()).build();
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(result))
 				.build();
 
+	}
+	
+	private void sendActivatedMessage(User user, ExternalIdentity identity, IdentityDto identityDto) throws IOException {
+		ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
+		.clientPlatformId(identityDto.getClientPlatformId())
+		.userId(user.getUserId())
+		.identityId(identity.getIdentityId())
+		.contentNetworkId(identityDto.getContentIdentityProviderId())
+		.build();
+
+		// serialize and send itit
+		String message = MessageConverterFactory.getMessageConverter().serialize(new Message(content));
+		MessageQueueFactory.getCacheInvalidationQueueProducer().write(message.getBytes());
 	}
 
 }

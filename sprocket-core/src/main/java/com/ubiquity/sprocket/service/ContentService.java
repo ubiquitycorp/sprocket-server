@@ -1,17 +1,128 @@
 package com.ubiquity.sprocket.service;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.apache.commons.configuration.Configuration;
+
+import com.niobium.repository.CollectionVariant;
+import com.niobium.repository.cache.DataCacheKeys;
+import com.niobium.repository.cache.UserDataModificationCache;
+import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
+import com.niobium.repository.jpa.EntityManagerSupport;
+import com.ubiquity.content.api.ContentAPIFactory;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.domain.ContentNetwork;
 import com.ubiquity.social.domain.VideoContent;
+import com.ubiquity.social.repository.VideoContentRepository;
+import com.ubiquity.social.repository.VideoContentRepositoryJpaImpl;
+import com.ubiquity.social.repository.cache.SocialCacheKeys;
 
-public interface ContentService {
-	
-	VideoContent getVideoByItemKeyAndOwner(Long ownerId, String itemKey);
-	
-	void create(VideoContent videoContent);
-	
-	void update(VideoContent videoContent);
 
-	void sync(ExternalIdentity identity, ContentNetwork network);
+public class ContentService {
+	
+	private VideoContentRepository videoContentRepository;
+	private UserDataModificationCache dataModificationCache;
+		
+	public ContentService(Configuration configuration) {
+		videoContentRepository = new VideoContentRepositoryJpaImpl();
+		dataModificationCache = new UserDataModificationCacheRedisImpl(configuration.getInt(
+				DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_USER));
+		
+		ContentAPIFactory.initialize(configuration);
+	}
+	
+	
+	/**
+	 * Service will synchronize videos with external content network.
+	 * 
+	 * @param identity
+	 * @param network
+	 */
+	public void sync(ExternalIdentity identity, ContentNetwork network) {
+		
+		// For YouTube, use the item key as the external identifier;
+		List<VideoContent> videoContentList = ContentAPIFactory.createProvider(network).findVideosByExternalIdentity(identity);
+		
+		// the owner is this identitie's user
+		Long ownerId = identity.getUser().getUserId();
+		
+		// Keep track of processed ids
+		List<Long> processedIds = new LinkedList<Long>();
+		
+		// currently we are not supporting eTag until we know which feeds we'll be processing for YouTube; right now
+		// most popular will likely be changing daily, so we simply remove / update entries by the item key of the video
+		for(VideoContent videoContent : videoContentList) {
+			// find video by this id
+			VideoContent persisted = getVideoByItemKeyAndOwner(ownerId, videoContent.getVideo().getItemKey());
+			if(persisted == null) {
+				// save the video we got from from the content network
+				create(videoContent);
+			} else {
+				update(videoContent);
+			}
+			
+			processedIds.add(videoContent.getVideoContentId());
+		}
+		
+		if(!processedIds.isEmpty()) {
+			// now remove old videos
+			EntityManagerSupport.beginTransaction();
+			videoContentRepository.deleteWithoutIds(ownerId, processedIds);
+			EntityManagerSupport.commit();
+			
+			// update data modification cache
+			dataModificationCache.put(ownerId, SocialCacheKeys.UserProperties.VIDEOS, System.currentTimeMillis());
+		}
+
+	}
+	
+	/***
+	 * Returns a video entity by this properties or null if one does not exist
+	 * 
+	 * @param ownerId
+	 * @param itemKey
+	 * @return
+	 */
+	protected VideoContent getVideoByItemKeyAndOwner(Long ownerId, String itemKey) {
+		List<VideoContent> content = videoContentRepository.findByOwnerIdAndItemKey(ownerId, itemKey);
+		return content.isEmpty() ? null : content.get(0);
+	}
+	
+
+	public CollectionVariant<VideoContent> findAllVideosByOwnerId(Long ownerId) {
+		return null;
+	}
+	
+	/***
+	 * Persists a video
+	 * 
+	 * @param videoContent
+	 */
+	protected void create(VideoContent videoContent) {
+		try {	
+			EntityManagerSupport.beginTransaction();
+			videoContentRepository.create(videoContent);
+			EntityManagerSupport.commit();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+	}
+	
+	/***
+	 * Updates video, setting the last update date to the current date/time
+	 * 
+	 * @param videoContent
+	 */
+	protected void update(VideoContent videoContent) {
+		try {	
+			videoContent.setLastUpdated(System.currentTimeMillis());
+			EntityManagerSupport.beginTransaction();
+			videoContentRepository.update(videoContent);
+			EntityManagerSupport.commit();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+	}
 
 }
