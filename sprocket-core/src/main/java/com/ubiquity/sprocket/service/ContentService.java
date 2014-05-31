@@ -16,7 +16,7 @@ import com.ubiquity.social.domain.ContentNetwork;
 import com.ubiquity.social.domain.VideoContent;
 import com.ubiquity.social.repository.VideoContentRepository;
 import com.ubiquity.social.repository.VideoContentRepositoryJpaImpl;
-import com.ubiquity.social.repository.cache.SocialCacheKeys;
+import com.ubiquity.sprocket.repository.cache.SprocketCacheKeys;
 
 
 public class ContentService {
@@ -72,7 +72,7 @@ public class ContentService {
 			EntityManagerSupport.commit();
 			
 			// update data modification cache
-			dataModificationCache.put(ownerId, SocialCacheKeys.UserProperties.VIDEOS, System.currentTimeMillis());
+			dataModificationCache.put(ownerId, SprocketCacheKeys.UserProperties.VIDEOS, System.currentTimeMillis());
 		}
 
 	}
@@ -84,14 +84,29 @@ public class ContentService {
 	 * @param itemKey
 	 * @return
 	 */
-	protected VideoContent getVideoByItemKeyAndOwner(Long ownerId, String itemKey) {
+	private VideoContent getVideoByItemKeyAndOwner(Long ownerId, String itemKey) {
 		List<VideoContent> content = videoContentRepository.findByOwnerIdAndItemKey(ownerId, itemKey);
 		return content.isEmpty() ? null : content.get(0);
 	}
 	
+	/***
+	 * Returns video content or null if there is no entry for this user in the cache
+	 * 
+	 * @param ownerId
+	 * @param ifModifiedSince
+	 * @return
+	 */
+	public CollectionVariant<VideoContent> findAllVideosByOwnerId(Long ownerId, Long ifModifiedSince) {
 
-	public CollectionVariant<VideoContent> findAllVideosByOwnerId(Long ownerId) {
-		return null;
+		Long lastModified = dataModificationCache.getLastModified(ownerId, SprocketCacheKeys.UserProperties.VIDEOS, ifModifiedSince);
+
+		// If there is no cache entry, there are no contacts; add a zero value so it returns an empty collection with a zero value
+		if(lastModified == null) {
+			return null;
+		}
+
+		List<VideoContent> videos = videoContentRepository.findByOwnerId(ownerId);
+		return new CollectionVariant<VideoContent>(videos, lastModified);
 	}
 	
 	/***
@@ -99,7 +114,7 @@ public class ContentService {
 	 * 
 	 * @param videoContent
 	 */
-	protected void create(VideoContent videoContent) {
+	private void create(VideoContent videoContent) {
 		try {	
 			EntityManagerSupport.beginTransaction();
 			videoContentRepository.create(videoContent);
@@ -114,7 +129,7 @@ public class ContentService {
 	 * 
 	 * @param videoContent
 	 */
-	protected void update(VideoContent videoContent) {
+	private void update(VideoContent videoContent) {
 		try {	
 			videoContent.setLastUpdated(System.currentTimeMillis());
 			EntityManagerSupport.beginTransaction();
