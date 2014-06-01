@@ -39,7 +39,7 @@ public class ContentService {
 	 * @param identity
 	 * @param network
 	 */
-	public void sync(ExternalIdentity identity, ContentNetwork network) {
+	public List<VideoContent> sync(ExternalIdentity identity, ContentNetwork network) {
 		
 		// For YouTube, use the item key as the external identifier;
 		List<VideoContent> videoContentList = ContentAPIFactory.createProvider(network).findVideosByExternalIdentity(identity);
@@ -59,6 +59,8 @@ public class ContentService {
 				// save the video we got from from the content network
 				create(videoContent);
 			} else {
+				// the only thing we want to retain from the persisted record is the pk value
+				videoContent.setVideoContentId(persisted.getVideoContentId());
 				update(videoContent);
 			}
 			
@@ -74,6 +76,8 @@ public class ContentService {
 			// update data modification cache
 			dataModificationCache.put(ownerId, SprocketCacheKeys.UserProperties.VIDEOS, System.currentTimeMillis());
 		}
+		
+		return videoContentList;
 
 	}
 	

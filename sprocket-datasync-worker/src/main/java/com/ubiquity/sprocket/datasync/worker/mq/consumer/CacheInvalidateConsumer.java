@@ -1,5 +1,7 @@
 package com.ubiquity.sprocket.datasync.worker.mq.consumer;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +12,7 @@ import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.sprocket.domain.ContentNetwork;
+import com.ubiquity.sprocket.domain.VideoContent;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.service.ContentService;
@@ -71,7 +74,11 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 	private void processVideos(ExternalIdentity identity, ContentNetwork contentNetwork) {
 
 		ContentService contentService = ServiceFactory.getContentService();
-		contentService.sync(identity, contentNetwork);
+		List<VideoContent> synced = contentService.sync(identity, contentNetwork);
+		
+		// add videos to search results
+		ServiceFactory.getSearchService().indexVideos(synced, identity.getUser().getUserId());
+		
 		
 	}
 	

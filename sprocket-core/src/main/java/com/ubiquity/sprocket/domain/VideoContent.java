@@ -60,6 +60,7 @@ public class VideoContent {
 	@Column(name = "category", nullable = false)
 	private String category;
 
+	
 	/**
 	 * Default constuctor required by JPA
 	 */
@@ -70,6 +71,11 @@ public class VideoContent {
 		this.owner = owner;
 		this.video = video;
 		this.lastUpdated = lastUpdated;
+	}
+
+	
+	public void setVideoContentId(Long videoContentId) {
+		this.videoContentId = videoContentId;
 	}
 
 	public ContentNetwork getContentNetwork() {
