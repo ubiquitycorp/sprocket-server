@@ -14,23 +14,23 @@ import com.ubiquity.social.domain.Message;
 public class GmailApiDtoAssembler {
 
 
-	public static List<Message> assemble(javax.mail.Message[] messages) {
+	public static List<Message> assemble(javax.mail.Message[] messages, User owne) {
 		List<Message> messagesresult = new LinkedList<Message>();
 		//map messages to DB messages
 		for(int i =0;i<messages.length;i++)
 		{
-/*			Message message = new Message.Builder()
+/*		Message message = new Message.Builder()
 			.title(messages[0].getSubject())
 			.body(messages[0].)
 			.messageId(messages[0].get)
 			.owner(owner)
 			.sender(new Contact.Builder()
-				.email(person.getEmail())
+				.email((messages[0].getFrom()[0].toString())
 				.displayName(person.getName())
 				.build())
 			.build();
-				messages.add(message);
-			*/
+				messages.add(message);*/
+			
 		}
 		
 		
