@@ -1,8 +1,10 @@
 package com.ubiquity.social.api.google;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.mail.MessagingException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
@@ -17,6 +19,7 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.api.ClientExecutorFactory;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.exception.AuthorizationException;
+import com.ubiquity.social.api.gmail.GmailApiDtoAssembler;
 import com.ubiquity.social.api.gmail.endpoints.GmailApiEndpoints;
 import com.ubiquity.social.api.gmail.endpoints.OAuth2Authenticator;
 import com.ubiquity.social.api.google.dto.GooglePlusApiDtoAssembler;
@@ -160,17 +163,21 @@ public class GoogleAPI implements SocialAPI {
 					.getInboxMessagesUsingIMap(externalIdentity.getEmail(),
 							externalIdentity.getAccessToken());
 
-			/*
-			 * if(response.getResponseStatus().getStatusCode() != 200) {
-			 * log.error("Error reading gmail: " + response.getEntity()); throw
-			 * new RuntimeException("Unable to process gmail messages"); }
-			 */
-			// return GmailApiDtoAssembler.assemble(,
-			// externalIdentity.getUser());
+			return GmailApiDtoAssembler.assemble(messages,
+					externalIdentity.getUser());
+		} catch (MessagingException e) {
+			throw new RuntimeException(
+					"Unable to get Gmail message content Type", e);
+			// e.printStackTrace();
+		}
+
+		catch (IOException e) {
+			throw new RuntimeException("Unable to get Gmail message content", e);
+			// e.printStackTrace();
 		} catch (Exception e) {
 			throw new RuntimeException("Unable to parse response from Gmail", e);
 		}
-		return null;
+
 	}
 
 	/*
