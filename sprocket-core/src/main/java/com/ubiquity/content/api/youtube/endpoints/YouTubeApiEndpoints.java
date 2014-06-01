@@ -13,7 +13,7 @@ public interface YouTubeApiEndpoints {
 
     @GET
     @Path("v3/videos")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     ClientResponse<String> getVideos(@QueryParam("part") String part, @QueryParam("chart") String chart, @QueryParam("key") String apiKey, @HeaderParam("Authorization") String accessToken);
     
  
