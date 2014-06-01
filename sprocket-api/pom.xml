@@ -4,7 +4,7 @@
 	<artifactId>sprocket-api</artifactId>
 	<name>Sprocket API</name>
 	<packaging>war</packaging>
-	<version>0.8.13</version>
+	<version>1.0.6</version>
 	<!-- Note, parameterize this -->
 	<properties>
 		<app.home>/var/lib/tomcat7/webapps/sprocket-api</app.home>
@@ -94,15 +94,6 @@
 
 				</executions>
 			</plugin>
-
-			<plugin>
-				<groupId>commons-codec</groupId>
-				<artifactId>commons-codec</artifactId>
-				<configuration>
-					<source>1.9</source>
-					<target>1.9</target>
-				</configuration>
-			</plugin>
 		</plugins>
 
 	</build>
@@ -116,6 +107,16 @@
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jaxrs</artifactId>
 			<version>2.3.4.Final</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-httpclient</artifactId>
+					<groupId>commons-httpclient</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>httpclient</artifactId>
+					<groupId>org.apache.httpcomponents</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -136,6 +137,12 @@
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-api</artifactId>
 			<version>0.3.1</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-codec</artifactId>
+					<groupId>commons-codec</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 

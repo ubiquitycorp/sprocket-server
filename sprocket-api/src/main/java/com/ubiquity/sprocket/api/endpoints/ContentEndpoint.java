@@ -1,9 +1,7 @@
 package com.ubiquity.sprocket.api.endpoints;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -11,16 +9,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.niobium.common.serialize.JsonConverter;
-import com.ubiquity.identity.domain.User;
-import com.ubiquity.social.api.ContentAPI;
-import com.ubiquity.social.api.ContentAPIFactory;
-import com.ubiquity.social.domain.ContentProvider;
-import com.ubiquity.social.domain.ExternalIdentity;
-import com.ubiquity.social.domain.SocialProvider;
-import com.ubiquity.social.domain.VideoContent;
-import com.ubiquity.social.service.SocialService;
-import com.ubiquity.sprocket.api.dto.model.ImageDto;
-import com.ubiquity.sprocket.api.dto.model.VideoDto;
+import com.niobium.repository.CollectionVariant;
+import com.ubiquity.sprocket.api.DtoAssembler;
+import com.ubiquity.sprocket.api.dto.containers.VideosDto;
+import com.ubiquity.sprocket.domain.ContentNetwork;
+import com.ubiquity.sprocket.domain.VideoContent;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/content")
@@ -29,34 +22,23 @@ public class ContentEndpoint {
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 
 	@GET
-	@Path("/users/{userId}/providers/{contentProviderId}/videos")
+	@Path("/users/{userId}/providers/{contentNetworkId}/videos")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response videos(@PathParam("userId") Long userId) {
+	public Response videos(@PathParam("userId") Long userId, @PathParam("contentNetworkId") Integer contentNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		
-		List<VideoDto> results = new LinkedList<VideoDto>();
+		VideosDto results = new VideosDto();
 		
-		// Only supporting YouTube now...
-		User user = ServiceFactory.getUserService().getUserById(userId);
-		ContentAPI contentApi = ContentAPIFactory.createProvider(ContentProvider.YouTube);
+		ContentNetwork contentNetwork = ContentNetwork.getContentNetworkFromId(contentNetworkId);
+		CollectionVariant<VideoContent> variant = ServiceFactory.getContentService().findAllVideosByOwnerIdAndContentNetwork(userId, contentNetwork, ifModifiedSince);
 
-		// Get a google identity; if we don't have one, an illegal argument exception will be thrown
-		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, SocialProvider.Google);
+		// Throw a 304 if if there is no variant (no change)
+		if (variant == null)
+			return Response.notModified().build();
 		
-		List<VideoContent> videos = contentApi.findVideosByExternalIdentity(identity);	
-		// Return transformed
-		if(videos != null) {
-			for(VideoContent videoContent : videos) {
-				results.add(new VideoDto.Builder()
-				.contentProviderId(ContentProvider.YouTube.ordinal())
-				.itemKey(videoContent.getVideo().getItemKey())
-				.thumb(new ImageDto(videoContent.getThumb().getUrl()))
-				.title(videoContent.getTitle())
-				.description(videoContent.getDescription())
-				.build());
-			}
-		}	
+		for(VideoContent videoContent : variant.getCollection())
+			results.getVideos().add(DtoAssembler.assemble(videoContent));
 
-		return Response.ok().entity(jsonConverter.convertToPayload(results)).build();
+		return Response.ok().header("Last-Modified", variant.getLastModified()).entity(jsonConverter.convertToPayload(results)).build();
 	}
 
 }

@@ -14,12 +14,16 @@ import com.ubiquity.sprocket.api.validation.RegistrationValidation;
  */
 public class IdentityDto {
 
-	@NotNull(groups = {RegistrationValidation.class, AuthenticationValidation.class})
-	@Size(min = 3, max = 80, groups = {RegistrationValidation.class, AuthenticationValidation.class})
+	@NotNull(groups = { RegistrationValidation.class,
+			AuthenticationValidation.class })
+	@Size(min = 3, max = 80, groups = { RegistrationValidation.class,
+			AuthenticationValidation.class })
 	private String username;
 
-	@NotNull(groups = {RegistrationValidation.class, AuthenticationValidation.class})
-	@Size(min = 6, max = 20, groups = {RegistrationValidation.class, AuthenticationValidation.class})
+	@NotNull(groups = { RegistrationValidation.class,
+			AuthenticationValidation.class })
+	@Size(min = 6, max = 20, groups = { RegistrationValidation.class,
+			AuthenticationValidation.class })
 	private String password;
 
 	@NotNull(groups = RegistrationValidation.class)
@@ -35,15 +39,14 @@ public class IdentityDto {
 	private String accessToken;
 
 	@NotNull(groups = ActivationValidation.class)
-	private Integer socialIdentityProviderId;
-	
-	private Integer contentIdentityProviderId;
+	private Integer socialNetworkId;
+
+	private Integer contentNetworkId;
 
 	@Size(min = 10, max = 255, groups = ActivationValidation.class)
 	private String secretToken;
-	
-	private String identifier;
 
+	private String identifier;
 
 	public String getUsername() {
 		return username;
@@ -65,10 +68,6 @@ public class IdentityDto {
 		return accessToken;
 	}
 
-	public Integer getSocialIdentityProviderId() {
-		return socialIdentityProviderId;
-	}
-
 	public String getSecretToken() {
 		return secretToken;
 	}
@@ -77,11 +76,13 @@ public class IdentityDto {
 		return identifier;
 	}
 
-	
-	public Integer getContentIdentityProviderId() {
-		return contentIdentityProviderId;
+	public Integer getSocialNetworkId() {
+		return socialNetworkId;
 	}
 
+	public Integer getContentNetworkId() {
+		return contentNetworkId;
+	}
 
 	public static class Builder {
 		private String username;
@@ -89,9 +90,10 @@ public class IdentityDto {
 		private String displayName;
 		private Integer clientPlatformId;
 		private String accessToken;
-		private Integer identityProviderId;
-		private String identifier;
+		private Integer socialNetworkId;
+		private Integer contentNetworkId;
 		private String secretToken;
+		private String identifier;
 
 		public Builder username(String username) {
 			this.username = username;
@@ -118,18 +120,23 @@ public class IdentityDto {
 			return this;
 		}
 
-		public Builder identityProviderId(Integer identityProviderId) {
-			this.identityProviderId = identityProviderId;
+		public Builder socialNetworkId(Integer socialNetworkId) {
+			this.socialNetworkId = socialNetworkId;
 			return this;
 		}
 
-		public Builder identifier(String identifier) {
-			this.identifier = identifier;
+		public Builder contentNetworkId(Integer contentNetworkId) {
+			this.contentNetworkId = contentNetworkId;
 			return this;
 		}
 
 		public Builder secretToken(String secretToken) {
 			this.secretToken = secretToken;
+			return this;
+		}
+
+		public Builder identifier(String identifier) {
+			this.identifier = identifier;
 			return this;
 		}
 
@@ -144,8 +151,9 @@ public class IdentityDto {
 		this.displayName = builder.displayName;
 		this.clientPlatformId = builder.clientPlatformId;
 		this.accessToken = builder.accessToken;
-		this.socialIdentityProviderId = builder.identityProviderId;
-		this.identifier = builder.identifier;
+		this.socialNetworkId = builder.socialNetworkId;
+		this.contentNetworkId = builder.contentNetworkId;
 		this.secretToken = builder.secretToken;
+		this.identifier = builder.identifier;
 	}
 }

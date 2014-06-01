@@ -5,7 +5,6 @@ import java.io.InputStream;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -17,27 +16,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
-import com.niobium.repository.CollectionVariant;
 import com.ubiquity.api.exception.HttpException;
 import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
-import com.ubiquity.identity.service.UserService;
-import com.ubiquity.social.api.SocialAPI;
-import com.ubiquity.social.api.SocialAPIFactory;
-import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.ExternalIdentity;
-import com.ubiquity.social.domain.SocialProvider;
-import com.ubiquity.social.service.SocialService;
-import com.ubiquity.sprocket.api.DtoAssembler;
-import com.ubiquity.sprocket.api.dto.containers.ContactsDto;
+import com.ubiquity.messaging.format.Message;
+import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
-import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
+import com.ubiquity.sprocket.messaging.MessageConverterFactory;
+import com.ubiquity.sprocket.messaging.MessageQueueFactory;
+import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 
@@ -85,7 +79,7 @@ public class UsersEndpoint {
 		for(Identity identity : user.getIdentities()) {
 			if(identity instanceof ExternalIdentity) {
 				ExternalIdentity socialIdentity = (ExternalIdentity)identity;
-				IdentityDto associatedIdentityDto = new IdentityDto.Builder().identifier(socialIdentity.getIdentifier()).identityProviderId(socialIdentity.getSocialProvider().getValue()).build();
+				IdentityDto associatedIdentityDto = new IdentityDto.Builder().identifier(socialIdentity.getIdentifier()).socialNetworkId(socialIdentity.getIdentityProvider()).build();
 				accountDto.getIdentities().add(associatedIdentityDto);
 			}
 		}
@@ -138,41 +132,11 @@ public class UsersEndpoint {
 
 		log.debug("Created user {}", user);
 
-		// send notification interested consumers
-		//String message = MessageConverterFactory.getMessageConverter().serialize(new Message(new UserRegistered(user.getUserId())));
-		//MessageQueueFactory.getCacheInvalidationQueueProducer().write(message.getBytes());
-
+	
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(accountDto))
 				.build();
 	}
-
-	@GET
-	@Path("/{userId}/contacts")
-	public Response contacts(@PathParam("userId") Long userId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
-
-		CollectionVariant<Contact> variant = ServiceFactory.getContactService().findAllContactsByOwnerId(userId, ifModifiedSince);
-
-		// Throw a 304 if there is no variant (no change)
-		if (variant == null)
-			return Response.notModified().build();
-
-		// Throw a 204 if the cache has been reset to indicate a long, background load
-		if(variant.getLastModified() == 1l)
-			return Response.noContent().build();
-
-		// Convert entire list to DTO
-		ContactsDto result = new ContactsDto();
-		for (Contact contact : variant.getCollection()) {
-			ContactDto contactDto = DtoAssembler.assemble(contact);
-			result.getContacts().add(contactDto);
-		}
-
-		return Response.ok().header("Last-Modified", variant.getLastModified())
-				.entity(jsonConverter.convertToPayload(result)).build();
-
-	}
-	
 
 	
 	@POST
@@ -181,74 +145,40 @@ public class UsersEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response activate(@PathParam("userId") Long userId, InputStream payload) throws IOException {
 
-
 		// convert payload
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload, IdentityDto.class, ActivationValidation.class);
 
 
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto.getClientPlatformId());		
-		SocialProvider socialProvider = SocialProvider.getEnum(identityDto.getSocialIdentityProviderId());
+		SocialNetwork socialNetwork = SocialNetwork.getEnum(identityDto.getSocialNetworkId());
 		
-		// get user
-		UserService userService = ServiceFactory.getUserService();
-		User user = userService.getUserById(userId);
+		// load user
+		User user = ServiceFactory.getUserService().getUserById(userId);
 				
 		// create the identity if it does not exist; or use the existing one
-		SocialService socialService = ServiceFactory.getSocialService();
-		ExternalIdentity identity = socialService.findSocialIdentity(userId, socialProvider);
-		if(identity == null) {
-			identity = new ExternalIdentity.Builder()
-			.accessToken(identityDto.getAccessToken())
-			.secretToken(identityDto.getSecretToken())
-			.socialProvider(socialProvider)
-			.user(user)
-			.build();
-			user.getIdentities().add(identity);
-			
-			SocialAPI social = SocialAPIFactory.createProvider(socialProvider, clientPlatform);
+		ExternalIdentity identity = ServiceFactory.getSocialService().createOrUpdateSocialIdentity(user, identityDto.getAccessToken(), identityDto.getSecretToken(), clientPlatform, socialNetwork);
 
-			// authenticate the user; this will give the user a contact record specific for to this network
-			try {
-				Contact contact = social.authenticateUser(identity);
-				ServiceFactory.getContactService().create(contact);
-			} catch (Exception e) {
-				throw new HttpException("Could not authenticate with provider: " + e.getMessage(), 401);
-			}
-			
-			// now update the user's identity
-			userService.update(user);
-			
-
-		} else {
-			// update the identity tokens
-			identity.setAccessToken(identityDto.getAccessToken());
-			identity.setSecretToken(identityDto.getSecretToken());
-			
-			socialService.update(identity);
-			
-		}
-	
+		// now send the message
+		sendActivatedMessage(user, identity, identityDto);
 		
-
-		
-
-		// send notification to the data sync that some stuff needs to be loaded for this user now....
-//		ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
-//		.clientPlatformId(identityDto.getClientPlatformId())
-//		.userId(userId)
-//		.identityId(identity.getIdentityId())
-//		.build();
-
-		// serialize it
-		//String message = MessageConverterFactory.getMessageConverter().serialize(new Message(content));
-		// send it
-		//MessageQueueFactory.getCacheInvalidationQueueProducer().write(message.getBytes());
-
 		IdentityDto result = new IdentityDto.Builder().identifier(identity.getIdentifier()).build();
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(result))
 				.build();
 
+	}
+	
+	private void sendActivatedMessage(User user, ExternalIdentity identity, IdentityDto identityDto) throws IOException {
+		ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
+		.clientPlatformId(identityDto.getClientPlatformId())
+		.userId(user.getUserId())
+		.identityId(identity.getIdentityId())
+		.contentNetworkId(identityDto.getContentNetworkId())
+		.build();
+
+		// serialize and send itit
+		String message = MessageConverterFactory.getMessageConverter().serialize(new Message(content));
+		MessageQueueFactory.getCacheInvalidationQueueProducer().write(message.getBytes());
 	}
 
 }

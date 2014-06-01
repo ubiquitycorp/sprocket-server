@@ -48,6 +48,8 @@ public class ServicesInitializer implements ServletContextListener {
 			// start cache services
 			JedisConnectionFactory.initialize(configuration);
 			
+			
+			
 			// start MQ services
 			MessageQueueFactory.initialize(configuration);
 			
