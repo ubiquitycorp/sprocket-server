@@ -81,9 +81,9 @@ public class DataSyncWorker {
 	}
 
 	private void startServices(Configuration configuration) throws IOException {
+		ServiceFactory.initialize(configuration);
 		JedisConnectionFactory.initialize(configuration);
 		MessageQueueFactory.initialize(configuration);
-		ServiceFactory.initialize(configuration);
 	}
 
 	private void stopServices() {

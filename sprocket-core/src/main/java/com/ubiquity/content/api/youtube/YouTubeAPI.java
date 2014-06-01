@@ -25,12 +25,12 @@ public class YouTubeAPI implements ContentAPI {
 	private String apiKey;
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 
-	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	public YouTubeAPI(String apiKey) {
 		this.apiKey = apiKey;
 		youTubeApi = ProxyFactory.create(YouTubeApiEndpoints.class, "https://www.googleapis.com/youtube", ClientExecutorFactory.createClientExecutor());
+		log.debug("using api key: " + apiKey);
 	}
 	
 	@Override
