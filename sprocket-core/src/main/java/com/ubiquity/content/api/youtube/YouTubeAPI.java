@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
+import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +30,7 @@ public class YouTubeAPI implements ContentAPI {
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	public YouTubeAPI(String apiKey) {
+		
 		this.apiKey = apiKey;
 		youTubeApi = ProxyFactory.create(YouTubeApiEndpoints.class, "https://www.googleapis.com/youtube", ClientExecutorFactory.createClientExecutor());
 		log.debug("using api key: " + apiKey);
@@ -43,7 +46,7 @@ public class YouTubeAPI implements ContentAPI {
 			log.debug("response code {} ", response.getResponseStatus().getStatusCode());
 			checkError(response);
 			
-			YouTubeItemsDto result = jsonConverter.parse(response.getEntity(), YouTubeItemsDto.class);
+			YouTubeItemsDto result = jsonConverter.parse(response.getEntity(String.class), YouTubeItemsDto.class);
 			
 			List<YouTubeVideoDto> videoDtoList = jsonConverter.convertToListFromList(result.getItems(), YouTubeVideoDto.class);
 			for(YouTubeVideoDto videoDto : videoDtoList) {
