@@ -30,7 +30,7 @@ public class ExternalIdentityActivated {
 
 	@Override
 	public String toString() {
-		return "SocialIdentityActivated [identityId=" + identityId
+		return "ExternalIdentityActivated [identityId=" + identityId
 				+ ", userId=" + userId + ", clientPlatformId="
 				+ clientPlatformId + "]";
 	}

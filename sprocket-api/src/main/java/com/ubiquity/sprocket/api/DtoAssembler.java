@@ -87,7 +87,7 @@ public class DtoAssembler {
 			contactDtoBuilder.identity(
 					new IdentityDto.Builder()
 						.identifier(identity.getIdentifier())
-						.identityProviderId(identity.getIdentityProvider())
+						.socialNetworkId(identity.getIdentityProvider())
 						.build());
 		// Image is optional
 		if (contact.getImage() != null)

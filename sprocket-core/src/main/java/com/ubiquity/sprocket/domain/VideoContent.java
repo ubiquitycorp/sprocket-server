@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -52,12 +53,18 @@ public class VideoContent {
 	@Column(name = "title", nullable = false)
 	private String title;
 
+	@Lob
 	@Column(name = "description", nullable = false)
 	private String description;
 
 	@Column(name = "category", nullable = false)
 	private String category;
 
+	/**
+	 * Default constuctor required by JPA
+	 */
+	protected VideoContent() {}
+	
 	public VideoContent(User owner, Video video, Long lastUpdated) {
 		super();
 		this.owner = owner;

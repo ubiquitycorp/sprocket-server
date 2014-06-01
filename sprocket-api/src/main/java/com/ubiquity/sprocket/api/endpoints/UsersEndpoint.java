@@ -79,7 +79,7 @@ public class UsersEndpoint {
 		for(Identity identity : user.getIdentities()) {
 			if(identity instanceof ExternalIdentity) {
 				ExternalIdentity socialIdentity = (ExternalIdentity)identity;
-				IdentityDto associatedIdentityDto = new IdentityDto.Builder().identifier(socialIdentity.getIdentifier()).identityProviderId(socialIdentity.getIdentityProvider()).build();
+				IdentityDto associatedIdentityDto = new IdentityDto.Builder().identifier(socialIdentity.getIdentifier()).socialNetworkId(socialIdentity.getIdentityProvider()).build();
 				accountDto.getIdentities().add(associatedIdentityDto);
 			}
 		}
@@ -150,7 +150,7 @@ public class UsersEndpoint {
 
 
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto.getClientPlatformId());		
-		SocialNetwork socialNetwork = SocialNetwork.getEnum(identityDto.getSocialIdentityProviderId());
+		SocialNetwork socialNetwork = SocialNetwork.getEnum(identityDto.getSocialNetworkId());
 		
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
@@ -173,7 +173,7 @@ public class UsersEndpoint {
 		.clientPlatformId(identityDto.getClientPlatformId())
 		.userId(user.getUserId())
 		.identityId(identity.getIdentityId())
-		.contentNetworkId(identityDto.getContentIdentityProviderId())
+		.contentNetworkId(identityDto.getContentNetworkId())
 		.build();
 
 		// serialize and send itit
