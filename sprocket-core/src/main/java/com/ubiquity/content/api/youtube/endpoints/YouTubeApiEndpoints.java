@@ -1,6 +1,5 @@
 package com.ubiquity.content.api.youtube.endpoints;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
@@ -14,8 +13,7 @@ public interface YouTubeApiEndpoints {
 
     @GET
     @Path("v3/videos")
-    @Produces(MediaType.TEXT_PLAIN)
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     ClientResponse<String> getVideos(@QueryParam("part") String part, @QueryParam("chart") String chart, @QueryParam("key") String apiKey, @HeaderParam("Authorization") String accessToken);
     
  
