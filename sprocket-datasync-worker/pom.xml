@@ -21,7 +21,7 @@
 
 	<!-- turns on resource filtering -->
 	<build>
-		<finalName>giftsender-datasync-worker</finalName>
+		<finalName>sprocket-datasync-worker</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -94,7 +94,7 @@
 					<packager>Ubiquity</packager>
 					<!-- <prefix>/var/lib/tomcat7</prefix> -->
 					<defineStatements>
-						<defineStatement>Giftsender Cron Service</defineStatement>
+						<defineStatement>Sprocket Datasync Worker</defineStatement>
 					</defineStatements>
 					<mappings>
 						<mapping>

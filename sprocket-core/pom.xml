@@ -12,7 +12,7 @@
 	<version>0.1.2</version>
 	<build>
 
-		<finalName>giftsender-core</finalName>
+		<finalName>sprocket-core</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
