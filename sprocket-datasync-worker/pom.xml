@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>sprocket-datasync-worker</artifactId>
 	<name>Sprocket Data Sync Worker</name>
-	<version>0.1.5</version>
+	<version>0.1.6</version>
 	<parent>
 		<groupId>com.ubiquity</groupId>
 		<artifactId>sprocket-parent</artifactId>
@@ -191,6 +191,13 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.6</version>
 		</dependency>
+		
+		<!-- currently to fix message body reader error -->
+		<dependency>
+    <groupId>org.jboss.resteasy</groupId>
+    <artifactId>resteasy-jackson-provider</artifactId>
+    <version>2.3.4.Final</version>
+   </dependency>
 
 
 	</dependencies>
