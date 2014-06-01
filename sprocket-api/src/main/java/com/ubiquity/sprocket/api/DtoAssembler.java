@@ -9,7 +9,6 @@ import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
-import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
@@ -119,7 +118,7 @@ public class DtoAssembler {
 	}
 
 	public static ActivityDto assemble(Activity activity,
-			SocialProvider socialProvider) {
+			SocialNetwork socialProvider) {
 		return new ActivityDto.Builder().body(activity.getBody())
 				.date(System.currentTimeMillis())
 				.socialProviderId(socialProvider.getValue())
