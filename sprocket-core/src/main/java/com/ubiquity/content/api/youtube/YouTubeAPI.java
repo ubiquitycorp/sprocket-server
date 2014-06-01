@@ -46,7 +46,7 @@ public class YouTubeAPI implements ContentAPI {
 			log.debug("response code {} ", response.getResponseStatus().getStatusCode());
 			checkError(response);
 			
-			YouTubeItemsDto result = jsonConverter.parse(response.getEntity(String.class), YouTubeItemsDto.class);
+			YouTubeItemsDto result = jsonConverter.parse(response.getEntity(), YouTubeItemsDto.class);
 			
 			List<YouTubeVideoDto> videoDtoList = jsonConverter.convertToListFromList(result.getItems(), YouTubeVideoDto.class);
 			for(YouTubeVideoDto videoDto : videoDtoList) {
