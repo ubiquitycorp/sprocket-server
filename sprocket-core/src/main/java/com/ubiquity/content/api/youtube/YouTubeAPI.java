@@ -40,15 +40,10 @@ public class YouTubeAPI implements ContentAPI {
 		ClientResponse<String> response = null;
 		try {
 			response = youTubeApi.getVideos("snippet", "mostPopular", apiKey, "  Bearer " + externalIdentity.getAccessToken());
-			
-//			ClientResponse cr = r.accept(MediaType.APPLICATION_XML_TYPE).get(ClientResponse.class);
-
-			//And now, you can get entity (for example like string):
-
-			
+			log.debug("response code {} ", response.getResponseStatus().getStatusCode());
 			checkError(response);
 			
-			YouTubeItemsDto result = jsonConverter.parse(response.getEntity(String.class), YouTubeItemsDto.class);
+			YouTubeItemsDto result = jsonConverter.parse(response.getEntity(), YouTubeItemsDto.class);
 			
 			List<YouTubeVideoDto> videoDtoList = jsonConverter.convertToListFromList(result.getItems(), YouTubeVideoDto.class);
 			for(YouTubeVideoDto videoDto : videoDtoList) {
