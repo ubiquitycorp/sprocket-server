@@ -27,7 +27,8 @@ public class MessageRepositoryJpaImpl extends BaseRepositoryJpaImpl <Long, Messa
 		query.setParameter("ownerId", ownerId);
 		return (List<Message>)query.getResultList();
 	}
-	@SuppressWarnings("unchecked")
+	
+	
 	public List<Message> findByOwnerIdAndSocialNetwork(Long ownerId,SocialNetwork socialNetwork) 
 	{
 		assert(ownerId != null);
