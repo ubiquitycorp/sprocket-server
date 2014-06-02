@@ -13,11 +13,14 @@ import com.niobium.repository.jpa.EntityManagerSupport;
 import com.sun.mail.handlers.message_rfc822;
 import com.ubiquity.content.api.ContentAPIFactory;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialNetwork;
+import com.ubiquity.social.repository.MessageRepository;
+import com.ubiquity.social.repository.MessageRepositoryJpaImpl;
 import com.ubiquity.sprocket.domain.ContentNetwork;
 import com.ubiquity.sprocket.domain.VideoContent;
 import com.ubiquity.sprocket.repository.VideoContentRepository;
@@ -30,10 +33,15 @@ import com.ubiquity.sprocket.repository.cache.SprocketCacheKeys;
  */
 public class SocialService {
 	private UserDataModificationCache dataModificationCache;
-		
+	private MessageRepository messageContentRepository;	
 	public SocialService(Configuration configuration) {
+		messageContentRepository = new MessageRepositoryJpaImpl();	
 		dataModificationCache = new UserDataModificationCacheRedisImpl(configuration.getInt(
 				DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_USER));
+		
+		
+		ContentAPIFactory.initialize(configuration);
+		
 	}
 	
 	
@@ -44,18 +52,14 @@ public class SocialService {
 	 * @param ifModifiedSince
 	 * @return
 	 */
-	public CollectionVariant<Message> findAllMessagesByOwnerIdAndSocialNetwork(Long ownerId, SocialNetwork socialNetwork, Long ifModifiedSince) {
+	public CollectionVariant<Message> findAllMessagesByOwnerIdAndSocialNetwork(Long ownerId, SocialNetwork socialNetwork) {
 
-		Long lastModified = dataModificationCache.getLastModified(ownerId, SprocketCacheKeys.UserProperties.MESSAGES, ifModifiedSince);
-
-		// If there is no cache entry, there is no data
-		if(lastModified == null) {
-			return null;
-		}
-		return null;
-
+		
+		List<Message> messages =  messageContentRepository.findByOwnerIdAndSocialNetwork(ownerId,socialNetwork);
 		//List<VideoContent> videos = videoContentRepository.findByOwnerId(ownerId);
 		//return new CollectionVariant<VideoContent>(videos, lastModified);
+		
+		return new CollectionVariant<Message>(messages, null);
 	}
 	/**
 	 * Service will synchronize videos with external content network.
@@ -78,18 +82,21 @@ public class SocialService {
 		// currently we are not supporting eTag until we know which feeds we'll be processing for YouTube; right now
 		// most popular will likely be changing daily, so we simply remove / update entries by the item key of the video
 		for(Message messages : messagesList) {
-			/*// find video by this id
-			VideoContent persisted = getVideoByItemKeyAndOwner(ownerId, videoContent.getVideo().getItemKey());
+			// find video by this id
+			Message persisted = getMessageByOwnerIdAndSocialNetwork(ownerId, network);
 			if(persisted == null) {
 				// save the video we got from from the content network
-				create(videoContent);
+				create(messages);
 			} else {
 				// the only thing we want to retain from the persisted record is the pk value
-				videoContent.setVideoContentId(persisted.getVideoContentId());
-				update(videoContent);
+				
+				messages.setMessageId(persisted.getMessageId());
+				update(messages);
 			}
 			
-			processedIds.add(videoContent.getVideoContentId());*/
+			processedIds.add(messages.getMessageId());
+			
+			
 		}
 		
 		if(!processedIds.isEmpty()) {
@@ -105,4 +112,52 @@ public class SocialService {
 		//return videoContentList;
 
 	}
+	
+	
+	
+	/***
+	 * Returns a video entity by this properties or null if one does not exist
+	 * 
+	 * @param ownerId
+	 * @param itemKey
+	 * @return
+	 */
+	private Message getMessageByOwnerIdAndSocialNetwork(Long ownerId, SocialNetwork socialNetwork) {
+		List<Message> messages =  messageContentRepository.findByOwnerIdAndSocialNetwork(ownerId, socialNetwork);
+		return messages.isEmpty() ? null : messages.get(0);
+	}
+	
+	/***
+	 * Persists a  message
+	 * 
+	 * @param Message
+	 */
+	private void create(Message message) {
+		try {	
+			EntityManagerSupport.beginTransaction();
+			messageContentRepository.create(message);
+			EntityManagerSupport.commit();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+	}
+	
+	/***
+	 * Updates message, setting the last update date to the current date/time
+	 * 
+	 * @param Message
+	 */
+	private void update(Message message) {
+		try {	
+			//message.setLastUpdated(System.currentTimeMillis());
+			EntityManagerSupport.beginTransaction();
+			messageContentRepository.update(message);
+			EntityManagerSupport.commit();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+	}
+	
+	
+	
 }
