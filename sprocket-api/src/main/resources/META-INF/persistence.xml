@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="1.0"
+	xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+    http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
+
+	<persistence-unit name="manager" transaction-type="RESOURCE_LOCAL">
+
+
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+
+		<class>com.ubiquity.sprocket.domain.VideoContent</class>
+
+
+		<class>com.ubiquity.identity.domain.User</class>
+		<class>com.ubiquity.identity.domain.Identity</class>
+		<class>com.ubiquity.identity.domain.NativeIdentity</class>
+		<class>com.ubiquity.identity.domain.ExternalIdentity</class>
+		<class>com.ubiquity.social.domain.Contact</class>
+		<class>com.ubiquity.social.domain.Message</class>
+		<class>com.ubiquity.social.domain.Activity</class>
+		<class>com.ubiquity.social.domain.Event</class>
+
+
+
+		<properties>
+
+			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
+			<property name="hibernate.connection.url" value="jdbc:mysql://${db.host}:3306/sprocket" />
+			<property name="hibernate.connection.username" value="${db.username}" />
+			<property name="hibernate.connection.password" value="${db.password}" />
+			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
+			<property name="hibernate.show_sql" value="${hibernate.debug}" />
+			<property name="hibernate.format_sql" value="${hibernate.debug}" />
+			<property name="hibernate.transaction.flush_before_completion"
+				value="true" />
+
+
+			<!-- Connection Pooling settings -->
+			<property name="hibernate.connection.provider_class"
+				value="com.jolbox.bonecp.provider.BoneCPConnectionProvider" />
+			<property name="bonecp.idleConnectionTestPeriodInMinutes"
+				value="2" />
+			<property name="bonecp.idleMaxAgeInMinutes" value="1" />
+
+			<property name="bonecp.partitionCount" value="2" />
+			<property name="bonecp.maxConnectionsPerPartition" value="10" />
+			<property name="bonecp.minConnectionsPerPartition" value="5" />
+			<property name="bonecp.disableConnectionTracking" value="true" />
+			<property name="bonecp.releaseHelperThreads" value="0" />
+			<property name="bonecp.statementsCacheSize" value="100" />
+			<property name="bonecp.releaseHelperThreads" value="2" />
+			<property name="bonecp.statementCachePerConnection" value="10" />
+			<property name="acquireRetryAttempts" value="5" />
+
+			<property name="hibernate.hbm2ddl.auto" value="${hibernate.schema.auto}" />
+
+
+		</properties>
+	</persistence-unit>
+
+
+</persistence>

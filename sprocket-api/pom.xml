@@ -1,0 +1,157 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>sprocket-api</artifactId>
+	<name>Sprocket API</name>
+	<packaging>war</packaging>
+	<version>1.0.7</version>
+	<!-- Note, parameterize this -->
+	<properties>
+		<app.home>/var/lib/tomcat7/webapps/sprocket-api</app.home>
+	</properties>
+
+	<!-- turns on resource filtering -->
+	<build>
+
+		<finalName>sprocket-api</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<excludes>
+					<exclude>**/*.xlsx</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
+		<plugins>
+
+			<!-- RPM Packaging -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>rpm-maven-plugin</artifactId>
+				<version>2.1-alpha-3</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>rpm</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<copyright>2013, Ubiquity</copyright>
+					<distribution>Gift Sender API</distribution>
+					<group>Application/Mobile</group>
+					<packager>Ubiquity</packager>
+					<prefix>/var/lib/tomcat7</prefix>
+					<defineStatements>
+						<defineStatement>stop and start gift sender api</defineStatement>
+					</defineStatements>
+					<mappings>
+						<mapping>
+							<directory>${app.home}</directory>
+							<sources>
+								<source>
+									<location>target/sprocket-api</location>
+								</source>
+							</sources>
+						</mapping>
+					</mappings>
+					<preinstallScriptlet>
+						<scriptFile>rpm/undeploy.sh</scriptFile>
+					</preinstallScriptlet>
+					<postinstallScriptlet>
+						<scriptFile>rpm/deploy.sh</scriptFile>
+					</postinstallScriptlet>
+
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-rpm</id>
+						<phase>package</phase>
+						<configuration>
+							<tasks>
+								<copy todir="/var/www/html/repository/${repo.env}" flatten="true"
+									overwrite="true" verbose="true" failonerror="true">
+									<fileset dir="target/rpm/${build.finalName}/RPMS/noarch/"
+										includes="**.rpm" />
+								</copy>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+
+				</executions>
+			</plugin>
+		</plugins>
+
+	</build>
+
+
+	<dependencies>
+
+
+
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxrs</artifactId>
+			<version>2.3.4.Final</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-httpclient</artifactId>
+					<groupId>commons-httpclient</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>httpclient</artifactId>
+					<groupId>org.apache.httpcomponents</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.4</version>
+			<scope>provided</scope>
+		</dependency>
+
+        
+		<dependency>
+		  <groupId>com.ubiquity</groupId>
+		  <artifactId>sprocket-core</artifactId>
+		  <version>0.1.2</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.ubiquity</groupId>
+			<artifactId>ubc-api</artifactId>
+			<version>0.3.1</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-codec</artifactId>
+					<groupId>commons-codec</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+
+
+	</dependencies>
+	<parent>
+		<groupId>com.ubiquity</groupId>
+		<artifactId>sprocket-parent</artifactId>
+		<version>0.1</version>
+		<relativePath>../sprocket-parent/pom.xml</relativePath>
+	</parent>
+</project>

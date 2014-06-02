@@ -1,0 +1,197 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>sprocket-datasync-worker</artifactId>
+	<name>Sprocket Data Sync Worker</name>
+	<version>0.1.1</version>
+	<parent>
+		<groupId>com.ubiquity</groupId>
+		<artifactId>sprocket-parent</artifactId>
+		<version>0.1</version>
+		<relativePath>../sprocket-parent/pom.xml</relativePath>
+	</parent>
+
+	<!-- Note, parameterize this -->
+	<properties>
+		<app.home>/var/lib/java-services</app.home>
+		<bin.home>/usr/local/bin</bin.home>
+		<init.home>/etc/init.d</init.home>
+	</properties>
+
+
+	<!-- turns on resource filtering -->
+	<build>
+		<finalName>sprocket-datasync-worker</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.2</version>
+				<!-- nothing here -->
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2-beta-4</version>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>com.ubiquity.sprocket.worker.cache.DataSyncWorker</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<appendAssemblyId>false</appendAssemblyId>
+							<finalName>sprocket-datasync-worker</finalName>
+							<attach>true</attach>
+							<outputDirectory>target/jar</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+
+
+			<!-- RPM Packaging -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>rpm-maven-plugin</artifactId>
+				<version>2.1-alpha-3</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>rpm</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<copyright>2014, Ubiquity</copyright>
+					<distribution>Sprocket Datasync Woker</distribution>
+					<group>Application/Mobile</group>
+					<packager>Ubiquity</packager>
+					<!-- <prefix>/var/lib/tomcat7</prefix> -->
+					<defineStatements>
+						<defineStatement>Sprocket Datasync Worker</defineStatement>
+					</defineStatements>
+					<mappings>
+						<mapping>
+							<directory>${app.home}</directory>
+							<username>jserviceusr</username>
+							<groupname>jserviceusr</groupname>
+							<sources>
+								<source>
+									<location>target/jar</location>
+								</source>
+							</sources>
+						</mapping>
+						<mapping>
+							<directory>${bin.home}</directory>
+							<username>jserviceusr</username>
+							<groupname>jserviceusr</groupname>
+							<filemode>755</filemode>
+							<sources>
+								<source>
+									<location>rpm/bin</location>
+								</source>
+							</sources>
+						</mapping>
+						<mapping>
+							<directory>${init.home}</directory>
+							<username>root</username>
+							<groupname>root</groupname>
+							<filemode>755</filemode>
+							<directoryIncluded>false</directoryIncluded>
+							<sources>
+								<source>
+									<location>rpm/init.d</location>
+								</source>
+							</sources>
+						</mapping>
+					</mappings>
+
+					<postinstallScriptlet>
+						<scriptFile>rpm/deploy.sh</scriptFile>
+					</postinstallScriptlet>
+
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-rpm</id>
+						<phase>package</phase>
+						<configuration>
+							<tasks>
+								<copy todir="/var/www/html/repository/${repo.env}" flatten="true"
+									overwrite="true" verbose="true" failonerror="true">
+									<fileset dir="target/rpm/${build.finalName}/RPMS/noarch/"
+										includes="**.rpm" />
+								</copy>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+
+				</executions>
+			</plugin>
+
+		</plugins>
+
+	</build>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>com.ubiquity</groupId>
+			<artifactId>sprocket-core</artifactId>
+			<version>0.1.2</version>
+		</dependency>
+
+	<!-- 	<dependency>
+			<groupId>com.niobium</groupId>
+			<artifactId>niobium-amqp</artifactId>
+			<version>0.1</version>
+		</dependency>
+ -->
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>2.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.6</version>
+		</dependency>
+
+
+	</dependencies>
+</project>
