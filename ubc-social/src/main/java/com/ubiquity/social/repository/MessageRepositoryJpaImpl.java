@@ -7,6 +7,7 @@ import javax.persistence.Query;
 
 import com.niobium.repository.BaseRepositoryJpaImpl;
 import com.ubiquity.social.domain.Message;
+import com.ubiquity.social.domain.SocialNetwork;
 
 public class MessageRepositoryJpaImpl extends BaseRepositoryJpaImpl <Long, Message> implements MessageRepository {
 
@@ -26,5 +27,16 @@ public class MessageRepositoryJpaImpl extends BaseRepositoryJpaImpl <Long, Messa
 		query.setParameter("ownerId", ownerId);
 		return (List<Message>)query.getResultList();
 	}
+	@SuppressWarnings("unchecked")
+	public List<Message> findByOwnerIdAndSocialNetwork(Long ownerId,SocialNetwork socialNetwork) 
+	{
+		assert(ownerId != null);
+		assert(socialNetwork != null);
+		Query query = getEntityManager().createQuery("select m from Message m where m.owner.userId = :ownerId and m.socialNetwork = :socialNetwork");
+		query.setParameter("ownerId", ownerId);
+		query.setParameter("socialNetwork", socialNetwork);
+		return (List<Message>)query.getResultList();
+	}
+	
 	
 }

@@ -38,6 +38,8 @@ public class Message {
 	@JoinColumn(name = "owner_id", nullable = false)
 	private User owner;
 
+	@Column(name = "social_network")
+	private SocialNetwork socialNetwork;
 	/**
 	 * Default constructor required by JPA
 	 */
@@ -47,6 +49,9 @@ public class Message {
 		return messageId;
 	}
 
+	public void setMessageId(Long messageId) {
+		this.messageId = messageId;
+	}
 	public String getTitle() {
 		return title;
 	}
@@ -66,6 +71,10 @@ public class Message {
 	public User getOwner() {
 		return owner;
 	}
+	
+	public SocialNetwork getSocialNetwork() {
+		return socialNetwork;
+	}
 
 	public static class Builder {
 		private Long messageId;
@@ -74,7 +83,8 @@ public class Message {
 		private Long sentDate;
 		private Contact sender;
 		private User owner;
-
+		private SocialNetwork socialNetwork;
+		
 		public Builder messageId(Long messageId) {
 			this.messageId = messageId;
 			return this;
@@ -104,6 +114,11 @@ public class Message {
 			this.owner = owner;
 			return this;
 		}
+		
+		public Builder socialNetwork(SocialNetwork socialNetwork) {
+			this.socialNetwork = socialNetwork;
+			return this;
+		}
 
 		public Message build() {
 			return new Message(this);
@@ -117,5 +132,6 @@ public class Message {
 		this.sentDate = builder.sentDate;
 		this.sender = builder.sender;
 		this.owner = builder.owner;
+		this.socialNetwork=builder.socialNetwork;
 	}
 }
