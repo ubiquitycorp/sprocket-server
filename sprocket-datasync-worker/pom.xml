@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>sprocket-datasync-worker</artifactId>
 	<name>Sprocket Data Sync Worker</name>
-	<version>0.1.1</version>
+	<version>0.1.17</version>
 	<parent>
 		<groupId>com.ubiquity</groupId>
 		<artifactId>sprocket-parent</artifactId>
@@ -45,7 +45,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>com.ubiquity.sprocket.worker.cache.DataSyncWorker</mainClass>
+							<mainClass>com.ubiquity.sprocket.datasync.worker.DataSyncWorker</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -171,27 +171,25 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>sprocket-core</artifactId>
-			<version>0.1.2</version>
+			<version>0.1.8</version>
 		</dependency>
 
-	<!-- 	<dependency>
-			<groupId>com.niobium</groupId>
-			<artifactId>niobium-amqp</artifactId>
-			<version>0.1</version>
-		</dependency>
- -->
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
 			<version>2.1.1</version>
 		</dependency>
+		
+		
 
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.6</version>
 		</dependency>
+		
 
+	 
 
 	</dependencies>
 </project>
