@@ -5,7 +5,7 @@
 		<profile>
 			<id>env-vm</id>
 			<properties>
-				<syslog.host>localhost</syslog.host>
+				<syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
 				<redis.host>localhost</redis.host>
 				<hibernate.debug>true</hibernate.debug>
 				<solr.api.host>localhost</solr.api.host>
@@ -40,7 +40,7 @@
 		<profile>
 			<id>env-qa</id>
 			<properties>
-				<syslog.host>localhost</syslog.host>
+				<syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
 				<redis.host>localhost</redis.host>
 				<hibernate.debug>true</hibernate.debug>
 				<solr.api.host>localhost</solr.api.host>
