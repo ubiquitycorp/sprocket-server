@@ -3,7 +3,6 @@ package com.ubiquity.sprocket.api.endpoints;
 import java.util.List;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -28,7 +27,6 @@ import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
-import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/social")
@@ -81,6 +79,9 @@ public class SocialEndpoint {
 		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialProviderId);
 		CollectionVariant<Message> variant = ServiceFactory.getSocialService().findMessagesByOwnerIdAndSocialNetwork(user.getUserId(), socialNetwork, ifModifiedSince);
 		
+		//test temporarily
+		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, socialNetwork);
+		 ServiceFactory.getSocialService().sync(identity, socialNetwork);
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
 			return Response.notModified().build();

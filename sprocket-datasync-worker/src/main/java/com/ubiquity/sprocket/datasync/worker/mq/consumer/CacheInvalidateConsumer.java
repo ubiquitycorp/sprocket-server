@@ -11,6 +11,7 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.social.domain.SocialNetwork;
+import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.domain.ContentNetwork;
 import com.ubiquity.sprocket.domain.VideoContent;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
@@ -82,8 +83,17 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		
 	}
 	
+	/***
+	 * Process messages for this social network
+	 * @param identity
+	 * @param socialNetwork
+	 */
 	private void processMessages(ExternalIdentity identity, SocialNetwork socialNetwork) {
+		SocialService socialService = ServiceFactory.getSocialService();
+		List<com.ubiquity.social.domain.Message> messages = socialService.sync(identity, socialNetwork);
 		
+		//add messages to search results
+		ServiceFactory.getSearchService().indexMessages(messages);
 	}
 	
 	
