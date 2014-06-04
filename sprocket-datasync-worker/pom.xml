@@ -70,28 +70,85 @@
 
 
 			<!-- RPM Packaging -->
-			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>rpm-maven-plugin</artifactId> 
-				<version>2.1-alpha-3</version> <executions> <execution> <goals> <goal>rpm</goal> 
-				</goals> </execution> </executions> <configuration> <copyright>2014, Ubiquity</copyright> 
-				<distribution>Sprocket Datasync Woker</distribution> <group>Application/Mobile</group> 
-				<packager>Ubiquity</packager> <prefix>/var/lib/tomcat7</prefix> <defineStatements> 
-				<defineStatement>Sprocket Datasync Worker</defineStatement> </defineStatements> 
-				<mappings> <mapping> <directory>${app.home}</directory> <username>jserviceusr</username> 
-				<groupname>jserviceusr</groupname> <sources> <source> <location>target/jar</location> 
-				</source> </sources> </mapping> <mapping> <directory>${bin.home}</directory> 
-				<username>jserviceusr</username> <groupname>jserviceusr</groupname> <filemode>755</filemode> 
-				<sources> <source> <location>rpm/bin</location> </source> </sources> </mapping> 
-				<mapping> <directory>${init.home}</directory> <username>root</username> <groupname>root</groupname> 
-				<filemode>755</filemode> <directoryIncluded>false</directoryIncluded> <sources> 
-				<source> <location>rpm/init.d</location> </source> </sources> </mapping> 
-				</mappings> </configuration> </plugin> -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>rpm-maven-plugin</artifactId>
+				<version>2.1-alpha-3</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>rpm</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<copyright>2014, Ubiquity</copyright>
+					<distribution>Sprocket Datasync Woker</distribution>
+					<group>Application/Mobile</group>
+					<packager>Ubiquity</packager>
+					<prefix>/var/lib/tomcat7</prefix>
+					<defineStatements>
+						<defineStatement>Sprocket Datasync Worker</defineStatement>
+					</defineStatements>
+					<mappings>
+						<mapping>
+							<directory>${app.home}</directory>
+							<username>jserviceusr</username>
+							<groupname>jserviceusr</groupname>
+							<sources>
+								<source>
+									<location>target/jar</location>
+								</source>
+							</sources>
+						</mapping>
+						<mapping>
+							<directory>${bin.home}</directory>
+							<username>jserviceusr</username>
+							<groupname>jserviceusr</groupname>
+							<filemode>755</filemode>
+							<sources>
+								<source>
+									<location>rpm/bin</location>
+								</source>
+							</sources>
+						</mapping>
+						<mapping>
+							<directory>${init.home}</directory>
+							<username>root</username>
+							<groupname>root</groupname>
+							<filemode>755</filemode>
+							<directoryIncluded>false</directoryIncluded>
+							<sources>
+								<source>
+									<location>rpm/init.d</location>
+								</source>
+							</sources>
+						</mapping>
+					</mappings>
+				</configuration>
+			</plugin>
 
-			<!-- <plugin> <artifactId>maven-antrun-plugin</artifactId> <executions> 
-				<execution> <id>copy-rpm</id> <phase>package</phase> <configuration> <tasks> 
-				<copy todir="/var/www/html/repository/${repo.env}" flatten="true" overwrite="true" 
-				verbose="true" failonerror="true"> <fileset dir="target/rpm/${build.finalName}/RPMS/noarch/" 
-				includes="**.rpm" /> </copy> </tasks> </configuration> <goals> <goal>run</goal> 
-				</goals> </execution> </executions> </plugin> -->
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-rpm</id>
+						<phase>package</phase>
+						<configuration>
+							<tasks>
+								<copy todir="/var/www/html/repository/${repo.env}" flatten="true"
+									overwrite="true" verbose="true" failonerror="true">
+									<fileset dir="target/rpm/${build.finalName}/RPMS/noarch/"
+										includes="**.rpm" />
+								</copy>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
 		</plugins>
 
@@ -104,10 +161,10 @@
 			<artifactId>sprocket-core</artifactId>
 			<version>0.1.8</version>
 			<exclusions>
-			  <exclusion>
-			     <groupId>org.jboss.resteasy</groupId>
-				<artifactId>resteasy-atom-provider</artifactId>
-			  </exclusion>
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-atom-provider</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -126,7 +183,7 @@
 		</dependency>
 
 
-		
+
 
 
 
