@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>sprocket-datasync-worker</artifactId>
 	<name>Sprocket Data Sync Worker</name>
-	<version>0.1.20</version>
+	<version>0.1.21</version>
 	<parent>
 		<groupId>com.ubiquity</groupId>
 		<artifactId>sprocket-parent</artifactId>
@@ -131,10 +131,6 @@
 							</sources>
 						</mapping>
 					</mappings>
-
-					<postinstallScriptlet>
-						<scriptFile>rpm/deploy.sh</scriptFile>
-					</postinstallScriptlet>
 
 				</configuration>
 			</plugin>
