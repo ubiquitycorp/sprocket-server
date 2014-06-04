@@ -3,10 +3,12 @@ package com.ubiquity.content.api.youtube;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
+
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +19,6 @@ import com.ubiquity.content.api.youtube.dto.container.YouTubeItemsDto;
 import com.ubiquity.content.api.youtube.dto.model.YouTubeVideoDto;
 import com.ubiquity.content.api.youtube.endpoints.YouTubeApiEndpoints;
 import com.ubiquity.identity.domain.ExternalIdentity;
-import com.ubiquity.social.api.ClientExecutorFactory;
 import com.ubiquity.social.api.google.dto.container.GoogleRequestFailureDto;
 import com.ubiquity.sprocket.domain.VideoContent;
 
@@ -32,20 +33,31 @@ public class YouTubeAPI implements ContentAPI {
 	public YouTubeAPI(String apiKey) {
 		
 		this.apiKey = apiKey;
-		youTubeApi = ProxyFactory.create(YouTubeApiEndpoints.class, "https://www.googleapis.com/youtube", ClientExecutorFactory.createClientExecutor());
-		log.debug("using api key: " + apiKey);
+        
+		Client client = ClientBuilder.newBuilder().build();		
+        WebTarget target = client.target("https://www.googleapis.com/youtube");
+		
+        ResteasyWebTarget rtarget = (ResteasyWebTarget)target;
+        youTubeApi = rtarget.proxy(YouTubeApiEndpoints.class);
+        
+//        ClientConnectionManager cm = new ThreadSafeClientConnManager();
+//        HttpClient httpClient = new DefaultHttpClient(cm);
+//        ApacheHttpClient4Engine engine = new ApacheHttpClient4Engine(httpClient);
+        
+//		youTubeApi = ProxyFactory.create(YouTubeApiEndpoints.class, "https://www.googleapis.com/youtube", ClientExecutorFactory.createClientExecutor());
+		log.debug("Using api key for YoutTube: " + apiKey);
 	}
 	
 	@Override
 	public List<VideoContent> findVideosByExternalIdentity(
 			ExternalIdentity externalIdentity) {
 		List<VideoContent> videos = new LinkedList<VideoContent>();
-		ClientResponse<String> response = null;
+		Response response = null;
 		try {
 			response = youTubeApi.getVideos("snippet", "mostPopular", apiKey, "  Bearer " + externalIdentity.getAccessToken());
 			checkError(response);
 			
-			YouTubeItemsDto result = jsonConverter.parse(response.getEntity(), YouTubeItemsDto.class);
+			YouTubeItemsDto result = jsonConverter.parse(response.readEntity(String.class), YouTubeItemsDto.class);
 			
 			List<YouTubeVideoDto> videoDtoList = jsonConverter.convertToListFromList(result.getItems(), YouTubeVideoDto.class);
 			for(YouTubeVideoDto videoDto : videoDtoList) {
@@ -54,16 +66,16 @@ public class YouTubeAPI implements ContentAPI {
 			}
 		} finally {
 			if(response != null) {
-				response.releaseConnection();
+				response.close();
 			}
 		}
 		
 		return videos;
 	}
 	
-	private String getErrorMessage(ClientResponse<String> response) {
+	private String getErrorMessage(Response response) {
 		String errorMessage = null;
-		String errorBody = response.getEntity();
+		String errorBody = response.readEntity(String.class);
 		if(errorBody != null) {
 			GoogleRequestFailureDto failure = jsonConverter.parse(errorBody, GoogleRequestFailureDto.class);
 			errorMessage = failure.getError().getMessage();
@@ -73,8 +85,8 @@ public class YouTubeAPI implements ContentAPI {
 		return errorMessage;
 	}
 	
-	private void checkError(ClientResponse<String> response) {
-		if(response.getResponseStatus().getStatusCode() != 200) {
+	private void checkError(Response response) {
+		if(response.getStatus() != 200) {
 			throw new RuntimeException(getErrorMessage(response));
 		}
 	}
