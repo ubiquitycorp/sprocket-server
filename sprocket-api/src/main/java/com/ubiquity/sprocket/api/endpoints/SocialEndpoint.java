@@ -72,7 +72,12 @@ public class SocialEndpoint {
 				.entity(jsonConverter.convertToPayload(results))
 				.build();
 	}
-
+	/***
+	 * This method returns messages of specific social network
+	 * @param userId
+	 * @param socialProviderId
+	 * @return
+	 */
 	@GET
 	@Path("users/{userId}/providers/{socialProviderId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
