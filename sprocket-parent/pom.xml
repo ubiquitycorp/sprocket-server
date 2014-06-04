@@ -49,7 +49,7 @@
 	</dependencies>
 
 	<modules>
-	<!--	<module>../sprocket-api</module> -->
+        <module>../sprocket-api</module>
 		<module>../sprocket-core</module>
 		<module>../sprocket-datasync-worker</module>
 	</modules>
