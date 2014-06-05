@@ -95,6 +95,7 @@ public class MessageRepositoryTest {
 			.sentDate(System.currentTimeMillis())
 			.sender(sender)
 			.owner(owner)
+			.socialNetwork(SocialNetwork.Facebook)
 			.build();
 		
 		EntityManagerSupport.beginTransaction();

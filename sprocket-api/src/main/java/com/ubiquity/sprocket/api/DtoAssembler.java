@@ -75,13 +75,13 @@ public class DtoAssembler {
 	
 	public static ContactDto assemble(Contact contact) {
 		ContactDto.Builder contactDtoBuilder = new ContactDto.Builder()
-			.contactId(contact.getContactId())
-			.displayName(contact.getDisplayName())
-			.firstName(contact.getFirstName())
-			.lastName(contact.getLastName()).email(contact.getEmail())
-			.profileUrl(contact.getProfileUrl())
-			.etag(UUID.randomUUID().toString());
-		
+				.contactId(contact.getContactId())
+				.displayName(contact.getDisplayName())
+				.firstName(contact.getFirstName())
+				.lastName(contact.getLastName()).email(contact.getEmail())
+				.profileUrl(contact.getProfileUrl())
+				.etag(UUID.randomUUID().toString());
+
 		ExternalIdentity identity = contact.getExternalIdentity();
 		if(identity != null)
 			contactDtoBuilder.identity(
@@ -95,7 +95,7 @@ public class DtoAssembler {
 
 		return contactDtoBuilder.build();
 	}
-	
+
 	public static VideoDto assemble(VideoContent videoContent) {
 		return new VideoDto.Builder()
 			.contentNetworkId(ContentNetwork.YouTube.ordinal())
@@ -116,5 +116,15 @@ public class DtoAssembler {
 			.sender(
 					assemble(message.getSender())).build();
 	}
-	
+
+	public static ActivityDto assemble(Activity activity,
+			SocialNetwork socialProvider) {
+		return new ActivityDto.Builder().body(activity.getBody())
+				.date(System.currentTimeMillis())
+				.socialProviderId(socialProvider.getValue())
+				.title(activity.getTitle()).imageUrl(null)
+				.postedBy(DtoAssembler.assemble(activity.getPostedBy()))
+				.build();
+	}
+
 }
