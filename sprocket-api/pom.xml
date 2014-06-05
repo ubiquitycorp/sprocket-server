@@ -4,7 +4,7 @@
 	<artifactId>sprocket-api</artifactId>
 	<name>Sprocket API</name>
 	<packaging>war</packaging>
-	<version>1.0.7</version>
+	<version>1.0.8</version>
 	<!-- Note, parameterize this -->
 	<properties>
 		<app.home>/var/lib/tomcat7/webapps/sprocket-api</app.home>
@@ -13,14 +13,14 @@
 	<!-- turns on resource filtering -->
 	<build>
 
+
+
+
 		<finalName>sprocket-api</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
-				<excludes>
-					<exclude>**/*.xlsx</exclude>
-				</excludes>
 			</resource>
 		</resources>
 		<testResources>
@@ -31,7 +31,19 @@
 		</testResources>
 		<plugins>
 
+		<!--  This compiler plugin is included via parent but needed here for a bug in dynamic web module with Java 1.7 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+
 			<!-- RPM Packaging -->
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>rpm-maven-plugin</artifactId>
@@ -126,19 +138,19 @@
 			<scope>provided</scope>
 		</dependency>
 
-        
+
 		<dependency>
-		  <groupId>com.ubiquity</groupId>
-		  <artifactId>sprocket-core</artifactId>
-		  <version>0.1.8</version>
-		  <exclusions>
-		    <exclusion>
-		    <groupId>org.jboss.resteasy</groupId>
-			<artifactId>resteasy-jaxrs</artifactId>
-		    </exclusion>
-		  </exclusions>
+			<groupId>com.ubiquity</groupId>
+			<artifactId>sprocket-core</artifactId>
+			<version>0.1.8</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-jaxrs</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-api</artifactId>

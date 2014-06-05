@@ -20,7 +20,6 @@ public class VideoContentRepositoryJpaImpl extends BaseRepositoryJpaImpl <Long, 
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public List<VideoContent> findByOwnerId(Long ownerId) {
 		assert(ownerId != null);
 		Query query = getEntityManager().createQuery("select vc from VideoContent vc where vc.owner.userId = :ownerId");
@@ -29,7 +28,6 @@ public class VideoContentRepositoryJpaImpl extends BaseRepositoryJpaImpl <Long, 
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public List<VideoContent> findByOwnerIdAndItemKey(Long ownerId,
 			String itemKey) {
 		assert(ownerId != null);
@@ -40,7 +38,6 @@ public class VideoContentRepositoryJpaImpl extends BaseRepositoryJpaImpl <Long, 
 		return (List<VideoContent>)query.getResultList();
 	}
 
-	@Override
 	public int deleteWithoutIds(Long ownerId, List<Long> videoContentIds) {
 		assert(ownerId != null);
 		assert(videoContentIds != null);
@@ -52,7 +49,6 @@ public class VideoContentRepositoryJpaImpl extends BaseRepositoryJpaImpl <Long, 
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public List<VideoContent> findByOwnerIdAndContentNetwork(Long ownerId,
 			ContentNetwork contentNetwork) {
 		assert(ownerId != null);

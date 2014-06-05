@@ -29,7 +29,6 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 		server = new HttpSolrServer(config.getString("solr.api.path"));
 	}
 
-	@Override
 	public void addDocument(Document document) {
 		SolrInputDocument solrDoc = SolrApiDtoAssembler.assemble(document);
 		try {
@@ -43,7 +42,7 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 
 	}
 
-	@Override
+
 	public void addDocuments(List<Document> documents) {
 
 		if(documents.isEmpty()) {
@@ -69,7 +68,6 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 
 	}
 
-	@Override
 	public List<Document> searchDocuments(String searchTerm, String[] fields, Map<String, Object> filters) {
 		List<Document> documents = new LinkedList<Document>();
 
@@ -132,7 +130,6 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 		return results;
 	}
 
-	@Override
 	public void deleteAllDocuments() {
 		try {
 			server.deleteByQuery("*:*");

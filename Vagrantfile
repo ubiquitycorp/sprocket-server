@@ -11,6 +11,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.box = "vagrant-centos-6.4-x86_64-puppet"
+  config.vm.hostname = "vm-#{ENV['WORKSTATION']}-sprocket.ubiquitybc.net"
 
   config.vm.provision "puppet_server" do |puppet|
     puppet.puppet_server = "ubiquity-provision.ubiquitybc.net"
