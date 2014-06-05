@@ -37,11 +37,11 @@ public class SocialEndpoint {
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 
-
 	@GET
 	@Path("users/{userId}/providers/{socialProviderId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response activities(@PathParam("userId") Long userId, @PathParam("socialProviderId") Integer socialProviderId) {
+	public Response activities(@PathParam("userId") Long userId,@PathParam("socialProviderId") Integer socialProviderId,
+			@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		ActivitiesDto results = new ActivitiesDto();
 
 		SocialNetwork socialProvider = SocialNetwork.getEnum(socialProviderId);
@@ -49,24 +49,38 @@ public class SocialEndpoint {
 		UserService userService = ServiceFactory.getUserService();
 		User user = userService.getUserById(userId);
 
-		SocialAPI socialApi = SocialAPIFactory.createProvider(socialProvider, user.getClientPlatform());
-		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, socialProvider);
-		
-		
-		List<Activity> activities = socialApi.listActivities(identity);
-					for(Activity activity : activities) {
-						results.getActivities().add(DtoAssembler.assemble(activity, socialProvider));
-					}
-			
-	ServiceFactory.getSearchService().indexActivities(activities);
+		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialProviderId);
+		CollectionVariant<Activity> variant = ServiceFactory.getSocialService()
+				.findActivityByOwnerIdAndSocialNetwork(user.getUserId(),
+						socialNetwork, ifModifiedSince);
 
 
-		return Response.ok()
-				.entity(jsonConverter.convertToPayload(results))
+		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(
+				user, socialProvider);
+		ServiceFactory.getSocialService().syncActivities(identity, socialNetwork);
+		// Throw a 304 if if there is no variant (no change)
+		if (variant == null)
+			return Response.notModified().build();
+		// prune this before sending to search index
+
+		//List<Activity> activities = socialApi.listActivities(identity);
+		for (Activity activity :  variant.getCollection()) {
+			if (activity == null) {
+				continue;
+			}
+			results.getActivities().add(DtoAssembler.assemble(activity, socialProvider));
+		}
+		/*this need to be moved to the background worker method 
+		 * */
+		//ServiceFactory.getSearchService().indexActivities(activities);
+
+		return Response.ok().entity(jsonConverter.convertToPayload(results))
 				.build();
 	}
+
 	/***
 	 * This method returns messages of specific social network
+	 * 
 	 * @param userId
 	 * @param socialProviderId
 	 * @return
@@ -74,7 +88,9 @@ public class SocialEndpoint {
 	@GET
 	@Path("users/{userId}/providers/{socialProviderId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response messages(@PathParam("userId") Long userId, @PathParam("socialProviderId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+	public Response messages(@PathParam("userId") Long userId,
+			@PathParam("socialProviderId") Integer socialProviderId,
+			@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		MessagesDto result = new MessagesDto();
 
@@ -82,24 +98,29 @@ public class SocialEndpoint {
 		User user = userService.getUserById(userId);
 
 		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialProviderId);
-		CollectionVariant<Message> variant = ServiceFactory.getSocialService().findMessagesByOwnerIdAndSocialNetwork(user.getUserId(), socialNetwork, ifModifiedSince);
-		
-		//test temporarily
-		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, socialNetwork);
-		 ServiceFactory.getSocialService().sync(identity, socialNetwork);
+		CollectionVariant<Message> variant = ServiceFactory.getSocialService()
+				.findMessagesByOwnerIdAndSocialNetwork(user.getUserId(),
+						socialNetwork, ifModifiedSince);
+
+		// test temporarily
+		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(
+				user, socialNetwork);
+		ServiceFactory.getSocialService().sync(identity, socialNetwork);
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
 			return Response.notModified().build();
 		// prune this before sending to search index
-		for(Message message : variant.getCollection()) {
-			// note that a message can be null here...because Facebook allows conversations without "comments"
-			if(message == null) {
+		for (Message message : variant.getCollection()) {
+			// note that a message can be null here...because Facebook allows
+			// conversations without "comments"
+			if (message == null) {
 				continue;
 			}
 			result.getMessages().add(DtoAssembler.assemble(message));
-		}	
-		
-		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
+		}
+
+		return Response.ok().entity(jsonConverter.convertToPayload(result))
+				.build();
 	}
 
 }
