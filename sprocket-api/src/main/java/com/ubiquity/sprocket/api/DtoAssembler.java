@@ -7,7 +7,6 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
-import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
