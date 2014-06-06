@@ -9,10 +9,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.identity.domain.ClientPlatform;
-import com.ubiquity.identity.domain.NativeIdentity;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.factory.UserFactory;
 import com.ubiquity.social.domain.Activity;
+import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.social.repository.ActivityRepository;
 import com.ubiquity.social.repository.ActivityRepositoryJpaImpl;
 
@@ -25,6 +25,8 @@ import com.ubiquity.social.repository.ActivityRepositoryJpaImpl;
 public class ActivityRepositoryTest {
 
 	private ActivityRepository activityRepository;
+	private UserRepository userRepository;
+	
 	private Activity activity;
 	private User owner;
 
@@ -37,50 +39,13 @@ public class ActivityRepositoryTest {
 	public void setUp() throws Exception {
 
 		activityRepository = new ActivityRepositoryJpaImpl();
-
-		UserRepository userRepository = new UserRepositoryJpaImpl();
-		owner = new User.Builder()
-				.lastUpdated(System.currentTimeMillis())
-				.firstName(UUID.randomUUID().toString())
-				.lastName(UUID.randomUUID().toString())
-				.email(UUID.randomUUID().toString())
-				.clientPlatform(ClientPlatform.Android)
-				.displayName(UUID.randomUUID().toString())
-				.build();
-		userRepository.create(owner);
+		userRepository = new UserRepositoryJpaImpl();
 		
-		NativeIdentity identity = new NativeIdentity.Builder()
-			.isActive(Boolean.TRUE)
-			.lastUpdated(System.currentTimeMillis())
-			.user(owner)
-			.username(UUID.randomUUID().toString())
-			.password(UUID.randomUUID().toString())
-			.build();
-		owner.getIdentities().add(identity);
+		owner = UserFactory.createTestUserWithMinimumRequiredProperties();
 		
 		EntityManagerSupport.beginTransaction();
 		userRepository.create(owner);
 		EntityManagerSupport.commit();
-//		
-//		// now create a contact - who isn't necessarily a user
-//		sender = new Contact.Builder().lastUpdated(System.currentTimeMillis())
-//						.displayName("Jill").firstName("Jill").lastName("Jackson")
-//						.email("jill@mail.com").profileUrl("http://jills.profile.link")
-//						.image(new Image("http://jills.image.url"))
-//						.socialIdentity(new ExternalIdentity.Builder()
-//							.identifier(UUID.randomUUID().toString())
-//							.isActive(Boolean.TRUE)
-//							.lastUpdated(System.currentTimeMillis())
-//							.socialProvider(SocialProvider.Facebook)
-//							.build())
-//						.owner(owner)
-//						
-//						.build();
-			
-//		ContactRepository contactRepository = new ContactRepositoryJpaImpl();
-//		EntityManagerSupport.beginTransaction();
-//		contactRepository.create(sender);
-//		EntityManagerSupport.commit();
 		
 		// now create a message
 		activity  = new Activity.Builder()
@@ -89,16 +54,14 @@ public class ActivityRepositoryTest {
 			.type("post")
 			.creationDate(System.currentTimeMillis())
 			.lastUpdated(System.currentTimeMillis())
-//			.sender(sender)
+			.externalIdentifier(UUID.randomUUID().toString())
 			.owner(owner)
+			.socialNetwork(SocialNetwork.Facebook)
 			.build();
 		
 		EntityManagerSupport.beginTransaction();
 		activityRepository.create(activity);
 		EntityManagerSupport.commit();
-
-		
-		
 	}
 
 	@Test
@@ -116,6 +79,26 @@ public class ActivityRepositoryTest {
 		Activity persisted = allActivities.get(0);
 		Assert.assertTrue(persisted.getActivityId().longValue() == activity.getActivityId().longValue());
 	}
+	
+	@Test
+	public void testFindByExternalIdentifier() throws Exception {
+		Activity persisted = activityRepository.getByExternalIdentifierAndSocialNetwork(activity.getExternalIdentifier(), owner.getUserId(), SocialNetwork.Facebook);
+		Assert.assertNotNull(persisted);
+		Assert.assertTrue(persisted.getActivityId().longValue() == activity.getActivityId().longValue());
+		
+		// query by different id
+		persisted = activityRepository.getByExternalIdentifierAndSocialNetwork(activity.getExternalIdentifier(), owner.getUserId(), SocialNetwork.Facebook);		
+		Assert.assertNull(persisted);
+
+		// query by same id, different network
+		persisted = activityRepository.getByExternalIdentifierAndSocialNetwork(activity.getExternalIdentifier(), owner.getUserId(), SocialNetwork.Facebook);
+		Assert.assertNotNull(persisted);
+
+	}
+	
+	
+	
+	
 
 
 }

@@ -9,10 +9,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
-import com.ubiquity.identity.domain.NativeIdentity;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.factory.UserFactory;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
@@ -31,6 +30,9 @@ import com.ubiquity.social.repository.MessageRepositoryJpaImpl;
 public class MessageRepositoryTest {
 
 	private MessageRepository messageRepository;
+	private UserRepository userRepository;
+	private ContactRepository contactRepository;
+	
 	private Message message;
 	private Contact sender;
 	private User owner;
@@ -44,25 +46,11 @@ public class MessageRepositoryTest {
 	public void setUp() throws Exception {
 
 		messageRepository = new MessageRepositoryJpaImpl();
+		userRepository = new UserRepositoryJpaImpl();
+		contactRepository = new ContactRepositoryJpaImpl();
 
-		UserRepository userRepository = new UserRepositoryJpaImpl();
-		owner = new User.Builder()
-				.lastUpdated(System.currentTimeMillis())
-				.firstName(UUID.randomUUID().toString())
-				.lastName(UUID.randomUUID().toString())
-				.email(UUID.randomUUID().toString())
-				.clientPlatform(ClientPlatform.Android)
-				.displayName(UUID.randomUUID().toString())
-				.build();
 		
-		NativeIdentity identity = new NativeIdentity.Builder()
-			.isActive(Boolean.TRUE)
-			.lastUpdated(System.currentTimeMillis())
-			.user(owner)
-			.username(UUID.randomUUID().toString())
-			.password(UUID.randomUUID().toString())
-			.build();
-		owner.getIdentities().add(identity);
+		owner = UserFactory.createTestUserWithMinimumRequiredProperties();
 		
 		EntityManagerSupport.beginTransaction();
 		userRepository.create(owner);
@@ -83,7 +71,6 @@ public class MessageRepositoryTest {
 						
 						.build();
 			
-		ContactRepository contactRepository = new ContactRepositoryJpaImpl();
 		EntityManagerSupport.beginTransaction();
 		contactRepository.create(sender);
 		EntityManagerSupport.commit();
@@ -94,6 +81,8 @@ public class MessageRepositoryTest {
 			.body(UUID.randomUUID().toString())
 			.sentDate(System.currentTimeMillis())
 			.sender(sender)
+			.socialNetwork(SocialNetwork.Facebook)
+			.externalIdentifier(UUID.randomUUID().toString())
 			.owner(owner)
 			.build();
 		
@@ -120,6 +109,22 @@ public class MessageRepositoryTest {
 		Assert.assertFalse(allMessages.isEmpty());
 		Message persisted = allMessages.get(0);
 		Assert.assertTrue(persisted.getMessageId().longValue() == message.getMessageId().longValue());
+	}
+	
+	@Test
+	public void testFindByExternalIdentifier() throws Exception {
+		Message persisted = messageRepository.getByExternalIdentifierAndSocialNetwork(message.getExternalIdentifier(), owner.getUserId(), SocialNetwork.Facebook);;
+		Assert.assertNotNull(persisted);
+		Assert.assertTrue(persisted.getMessageId().longValue() == message.getMessageId().longValue());
+		
+		// query by different id
+		persisted = messageRepository.getByExternalIdentifierAndSocialNetwork(UUID.randomUUID().toString(), owner.getUserId(), SocialNetwork.Facebook);;
+		Assert.assertNull(persisted);
+		
+		// query by same id, different network
+		persisted = messageRepository.getByExternalIdentifierAndSocialNetwork(message.getExternalIdentifier(), owner.getUserId(), SocialNetwork.Facebook);;
+		Assert.assertNotNull(persisted);
+				
 	}
 
 

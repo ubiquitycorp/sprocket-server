@@ -111,10 +111,21 @@ public class DtoAssembler {
 		return new MessageDto.Builder()
 			.subject(message.getTitle())
 			.date(System.currentTimeMillis())
-			.socialProviderId(SocialNetwork.Google.getValue())
+			.socialProviderId(message.getSocialNetwork().getValue())
 			.body(message.getBody())
 			.sender(
 					assemble(message.getSender())).build();
+	}
+
+	public static ActivityDto assemble(Activity activity) {
+		return new ActivityDto.Builder()
+			.body(activity.getBody())
+			.date(System.currentTimeMillis())
+			.socialProviderId(activity.getSocialNetwork().getValue())
+			.title(activity.getTitle())
+			.imageUrl(null)
+			.postedBy(DtoAssembler.assemble(activity.getPostedBy()))
+			.build();
 	}
 	
 }
