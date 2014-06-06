@@ -50,7 +50,7 @@ public class YouTubeAPI implements ContentAPI {
 		List<VideoContent> videos = new LinkedList<VideoContent>();
 		Response response = null;
 		try {
-			response = youTubeApi.getVideos("snippet", "mostPopular", apiKey, "  Bearer " + externalIdentity.getAccessToken());
+			response = youTubeApi.getVideos("snippet", "mostPopular", 10, apiKey, "  Bearer " + externalIdentity.getAccessToken());
 			checkError(response);
 			
 			YouTubeItemsDto result = jsonConverter.parse(response.readEntity(String.class), YouTubeItemsDto.class);

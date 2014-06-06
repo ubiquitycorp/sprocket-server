@@ -10,6 +10,7 @@ import com.niobium.amqp.MessageQueueChannel;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
+import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.domain.ContentNetwork;
@@ -63,7 +64,19 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 				processVideos(identity, ContentNetwork.YouTube);
 			
 			processMessages(identity, SocialNetwork.Google);
+		} else if(identity.getIdentityProvider() == SocialNetwork.Facebook.getValue()) {
+			processMessages(identity, SocialNetwork.Facebook);
+			processActivities(identity, SocialNetwork.Facebook);
 		}
+	} 
+
+	
+	private void processActivities(ExternalIdentity identity, SocialNetwork socialNetwork) {
+		SocialService socialService = ServiceFactory.getSocialService();
+		List<Activity> synced = socialService.syncActivities(identity, socialNetwork);
+		
+		// index for searching
+		ServiceFactory.getSearchService().indexActivities(synced);
 	}
 
 	/***
@@ -95,6 +108,8 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		//add messages to search results
 		ServiceFactory.getSearchService().indexMessages(messages);
 	}
+	
+	
 	
 	
 }

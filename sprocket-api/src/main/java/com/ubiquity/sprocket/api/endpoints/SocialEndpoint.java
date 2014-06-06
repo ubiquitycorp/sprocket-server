@@ -1,7 +1,5 @@
 package com.ubiquity.sprocket.api.endpoints;
 
-import java.util.List;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
@@ -15,15 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
-import com.ubiquity.identity.domain.ExternalIdentity;
-import com.ubiquity.identity.domain.User;
-import com.ubiquity.identity.service.UserService;
-import com.ubiquity.social.api.SocialAPI;
-import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialNetwork;
-import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
@@ -39,32 +31,29 @@ public class SocialEndpoint {
 
 
 	@GET
-	@Path("users/{userId}/providers/{socialProviderId}/activities")
+	@Path("users/{userId}/providers/{socialNetworkId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response activities(@PathParam("userId") Long userId, @PathParam("socialProviderId") Integer socialProviderId) {
+	public Response activities(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		ActivitiesDto results = new ActivitiesDto();
 
-		SocialNetwork socialProvider = SocialNetwork.getEnum(socialProviderId);
+		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialProviderId);
 
-		UserService userService = ServiceFactory.getUserService();
-		User user = userService.getUserById(userId);
+		CollectionVariant<Activity> variant = ServiceFactory.getSocialService().findActivityByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince);
 
-		SocialAPI socialApi = SocialAPIFactory.createProvider(socialProvider, user.getClientPlatform());
-		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, socialProvider);
-		
-		
-		List<Activity> activities = socialApi.listActivities(identity);
-					for(Activity activity : activities) {
-						results.getActivities().add(DtoAssembler.assemble(activity, socialProvider));
-					}
-			
-	ServiceFactory.getSearchService().indexActivities(activities);
+		// Throw a 304 if if there is no variant (no change)
+		if (variant == null)
+			return Response.notModified().build();
 
+		for(Activity activity : variant.getCollection())
+			results.getActivities().add(DtoAssembler.assemble(activity));
 
 		return Response.ok()
+				.header("Last-Modified", variant.getLastModified())
 				.entity(jsonConverter.convertToPayload(results))
 				.build();
 	}
+
+
 	/***
 	 * This method returns messages of specific social network
 	 * @param userId
@@ -72,14 +61,13 @@ public class SocialEndpoint {
 	 * @return
 	 */
 	@GET
-	@Path("users/{userId}/providers/{socialProviderId}/messages")
+	@Path("users/{userId}/providers/{socialNetworkId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response messages(@PathParam("userId") Long userId, @PathParam("socialProviderId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		MessagesDto result = new MessagesDto();
 
-		UserService userService = ServiceFactory.getUserService();
-		User user = userService.getUserById(userId);
+		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialProviderId);
 
 		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialProviderId);
 		//test temporarily
@@ -94,15 +82,12 @@ public class SocialEndpoint {
 		if (variant == null)
 			return Response.notModified().build();
 		// prune this before sending to search index
-		for(Message message : variant.getCollection()) {
-			// note that a message can be null here...because Facebook allows conversations without "comments"
-			if(message == null) {
-				continue;
-			}
-			result.getMessages().add(DtoAssembler.assemble(message));
-		}	
-		
-		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
+		for(Message message : variant.getCollection())
+			result.getMessages().add(DtoAssembler.assemble(message));			
+
+		return Response.ok()
+				.entity(jsonConverter.convertToPayload(result))
+				.build();
 	}
 
 }
