@@ -103,7 +103,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 	 */
 	private void processMessages(ExternalIdentity identity, SocialNetwork socialNetwork) {
 		SocialService socialService = ServiceFactory.getSocialService();
-		List<com.ubiquity.social.domain.Message> messages = socialService.sync(identity, socialNetwork);
+		List<com.ubiquity.social.domain.Message> messages = socialService.syncMessages(identity, socialNetwork);
 		
 		//add messages to search results
 		ServiceFactory.getSearchService().indexMessages(messages);

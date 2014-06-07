@@ -63,11 +63,9 @@ public class SocialEndpoint {
 	@GET
 	@Path("users/{userId}/providers/{socialNetworkId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response messages(@PathParam("userId") Long userId, @PathParam("socialProviderId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+	public Response messages(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		MessagesDto result = new MessagesDto();
-
-		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialProviderId);
 
 		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialProviderId);
 		//test temporarily
@@ -75,7 +73,7 @@ public class SocialEndpoint {
 		ServiceFactory.getSocialService().sync(identity, socialNetwork);*/
 				 
 		
-		CollectionVariant<Message> variant = ServiceFactory.getSocialService().findMessagesByOwnerIdAndSocialNetwork(user.getUserId(), socialNetwork, ifModifiedSince);
+		CollectionVariant<Message> variant = ServiceFactory.getSocialService().findMessagesByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince);
 		
 		
 		// Throw a 304 if if there is no variant (no change)
