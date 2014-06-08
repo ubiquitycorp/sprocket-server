@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>sprocket-core</artifactId>
 	<name>Sprocket Core</name>
-	<version>0.1.11</version>
+	<version>0.1.12</version>
 	<build>
 
 		<finalName>sprocket-core</finalName>
@@ -61,7 +61,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-social</artifactId>
-			<version>0.1.10</version>
+			<version>0.1.11</version>
 		</dependency>
 
 		<dependency>
