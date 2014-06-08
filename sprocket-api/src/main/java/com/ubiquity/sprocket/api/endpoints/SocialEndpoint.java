@@ -68,13 +68,17 @@ public class SocialEndpoint {
 		MessagesDto result = new MessagesDto();
 
 		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialProviderId);
-
+		//test temporarily
+		/*ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, socialNetwork);
+		ServiceFactory.getSocialService().sync(identity, socialNetwork);*/
+				 
+		
 		CollectionVariant<Message> variant = ServiceFactory.getSocialService().findMessagesByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince);
-
+		
+		
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
 			return Response.notModified().build();
-
 		// prune this before sending to search index
 		for(Message message : variant.getCollection())
 			result.getMessages().add(DtoAssembler.assemble(message));			

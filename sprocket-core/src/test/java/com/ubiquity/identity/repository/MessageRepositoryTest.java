@@ -84,6 +84,7 @@ public class MessageRepositoryTest {
 			.socialNetwork(SocialNetwork.Facebook)
 			.externalIdentifier(UUID.randomUUID().toString())
 			.owner(owner)
+			.socialNetwork(SocialNetwork.Facebook)
 			.build();
 		
 		EntityManagerSupport.beginTransaction();

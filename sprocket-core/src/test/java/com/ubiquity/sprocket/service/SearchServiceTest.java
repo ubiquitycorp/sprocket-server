@@ -18,6 +18,7 @@ import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
+import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.domain.VideoContent;
 import com.ubiquity.sprocket.search.SearchKeys;
@@ -47,6 +48,7 @@ public class SearchServiceTest {
 		.body(UUID.randomUUID().toString())
 		.title(UUID.randomUUID().toString()).sender(
 				new Contact.Builder().displayName("Jack").build())
+				.socialNetwork(SocialNetwork.Facebook)
 				.build();
 		searchService.indexMessages(
 				Arrays.asList(new Message[] { message }));

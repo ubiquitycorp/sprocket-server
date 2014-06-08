@@ -1,0 +1,91 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>ubc-social</artifactId>
+	<name>UBC Social</name>
+	<version>0.1.4</version>
+	<parent>
+		<groupId>com.ubiquity</groupId>
+		<artifactId>ubc-parent</artifactId>
+		<version>0.1</version>
+		<relativePath>../ubc-parent/pom.xml</relativePath>
+	</parent>
+
+	<dependencies>
+
+		<dependency>
+			<artifactId>niobium-data-access</artifactId>
+			<groupId>com.niobium</groupId>
+			<version>0.2</version>
+		</dependency>
+
+		<dependency>
+			<artifactId>niobium-common</artifactId>
+			<groupId>com.niobium</groupId>
+			<version>0.2</version>
+		</dependency>
+
+		<dependency>
+			<artifactId>ubc-media</artifactId>
+			<groupId>com.ubiquity</groupId>
+			<version>0.1</version>
+		</dependency>
+
+		<dependency>
+			<artifactId>ubc-identity</artifactId>
+			<groupId>com.ubiquity</groupId>
+			<version>0.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.scribe</groupId>
+			<artifactId>scribe</artifactId>
+			<version>1.3.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.10-FINAL</version>
+		</dependency>
+
+
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.10-FINAL</version>
+		</dependency>
+
+
+
+
+		<!-- for atom parsing -->
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-atom-provider</artifactId>
+			<version>2.3.7.Final</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxrs</artifactId>
+			<version>2.3.7.Final</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+
+	</dependencies>
+</project>
