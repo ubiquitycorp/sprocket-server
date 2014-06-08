@@ -1,0 +1,1 @@
+service sprocket-tracker-worker stop
