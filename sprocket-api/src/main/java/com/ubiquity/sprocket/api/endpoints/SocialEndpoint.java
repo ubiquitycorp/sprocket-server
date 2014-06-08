@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialNetwork;
@@ -84,6 +85,7 @@ public class SocialEndpoint {
 			result.getMessages().add(DtoAssembler.assemble(message));			
 
 		return Response.ok()
+				.header("Last-Modified", variant.getLastModified())
 				.entity(jsonConverter.convertToPayload(result))
 				.build();
 	}
