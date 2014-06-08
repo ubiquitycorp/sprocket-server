@@ -39,8 +39,8 @@ public class SocialEndpoint {
 
 		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialProviderId);
 
-		ExternalIdentity identity = ServiceFactory.getSocialService().findSocialIdentity(userId, socialNetwork);
-		ServiceFactory.getSocialService().syncActivities(identity, socialNetwork);
+//		ExternalIdentity identity = ServiceFactory.getSocialService().findSocialIdentity(userId, socialNetwork);
+//		ServiceFactory.getSocialService().syncActivities(identity, socialNetwork);
 		CollectionVariant<Activity> variant = ServiceFactory.getSocialService().findActivityByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince);
 
 		// Throw a 304 if if there is no variant (no change)
