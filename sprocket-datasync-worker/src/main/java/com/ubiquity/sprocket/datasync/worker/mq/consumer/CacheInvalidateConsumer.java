@@ -45,7 +45,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		} catch (Exception e) {
 			// For now, log an error and exit until we know all the circumstances under which this can happen
 			log.error("Could not process message: {}", e);
-			System.exit(0);
+			//System.exit(0);
 		}
 	}
 
@@ -103,6 +103,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 	 */
 	private void processMessages(ExternalIdentity identity, SocialNetwork socialNetwork) {
 		SocialService socialService = ServiceFactory.getSocialService();
+		
 		List<com.ubiquity.social.domain.Message> messages = socialService.syncMessages(identity, socialNetwork);
 		
 		//add messages to search results
