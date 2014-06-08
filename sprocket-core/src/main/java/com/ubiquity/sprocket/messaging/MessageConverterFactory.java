@@ -1,6 +1,7 @@
 package com.ubiquity.sprocket.messaging;
 
 import com.ubiquity.messaging.MessageConverter;
+import com.ubiquity.sprocket.messaging.definition.EventTracked;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.messaging.definition.UserAuthenticated;
 import com.ubiquity.sprocket.messaging.definition.UserRegistered;
@@ -15,6 +16,7 @@ public class MessageConverterFactory {
 				.registerMessageType(ExternalIdentityActivated.class)
 				.registerMessageType(UserAuthenticated.class)
 				.registerMessageType(UserRegistered.class)
+				.registerMessageType(EventTracked.class)
 				.build();
 		}
 		return converter;

@@ -29,8 +29,10 @@ import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
+import com.ubiquity.sprocket.domain.EventType;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
+import com.ubiquity.sprocket.messaging.definition.EventTracked;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
@@ -158,8 +160,12 @@ public class UsersEndpoint {
 		// create the identity if it does not exist; or use the existing one
 		ExternalIdentity identity = ServiceFactory.getSocialService().createOrUpdateSocialIdentity(user, identityDto.getAccessToken(), identityDto.getSecretToken(), clientPlatform, socialNetwork);
 
-		// now send the message
+		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto);
+		
+		// send off to analytics tracker
+		sendEventTrackedMessage(user, identity);
+
 		
 		IdentityDto result = new IdentityDto.Builder().identifier(identity.getIdentifier()).build();
 		return Response.ok()
@@ -176,9 +182,20 @@ public class UsersEndpoint {
 		.contentNetworkId(identityDto.getContentNetworkId())
 		.build();
 
-		// serialize and send itit
+		// serialize and send it
 		String message = MessageConverterFactory.getMessageConverter().serialize(new Message(content));
 		MessageQueueFactory.getCacheInvalidationQueueProducer().write(message.getBytes());
+	}
+	
+	private void sendEventTrackedMessage(User user, ExternalIdentity identity) throws IOException {
+		EventTracked content = new EventTracked(EventType.UserAddedIdentity.ordinal());
+		content.getProperties().put("user", user.getUserId());
+		content.getProperties().put("social_network", SocialNetwork.getName(identity.getIdentityProvider()));
+		
+		// serialize and send it
+		String message = MessageConverterFactory.getMessageConverter().serialize(new Message(content));
+		MessageQueueFactory.getTrackQueueProducer().write(message.getBytes());
+		
 	}
 
 }

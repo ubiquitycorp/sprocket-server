@@ -22,6 +22,7 @@ public class ServiceFactory {
 	private static SearchService searchService;
 	private static ContentService contentService;
 	private static ContactService contactService;
+	private static AnalyticsService analyticsService;
 	
 	/***
 	 * Initializes all services with the specified configuration
@@ -30,6 +31,18 @@ public class ServiceFactory {
 	 */
 	public static void initialize(Configuration config) {
 		configuration = config;
+	}
+	
+	
+	/***
+	 * Returns analytics service
+	 * 
+	 * @return
+	 */
+	public static AnalyticsService getAnalyticsService() {
+		if(analyticsService == null)
+			analyticsService = new AnalyticsService(configuration);
+		return analyticsService;
 	}
 	
 	/***

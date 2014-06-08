@@ -19,7 +19,7 @@ public class SprocketCacheKeys {
 	public static final class UserProperties {
 		public static final String VIDEOS = "videos";
 	}
-	
+
 	
 	/**
 	 * Will generate a cache key for each content network

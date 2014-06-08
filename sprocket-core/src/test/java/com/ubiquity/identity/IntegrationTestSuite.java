@@ -10,6 +10,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.sprocket.service.AnalyticsServiceTest;
 import com.ubiquity.sprocket.service.AuthenticationServiceTest;
 
 /***
@@ -20,7 +21,7 @@ import com.ubiquity.sprocket.service.AuthenticationServiceTest;
  */
 @RunWith(Suite.class)
 @SuiteClasses({ 
-	AuthenticationServiceTest.class})
+	AuthenticationServiceTest.class, AnalyticsServiceTest.class })
 public class IntegrationTestSuite {
 	
 	@AfterClass
