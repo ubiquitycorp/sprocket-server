@@ -136,12 +136,6 @@
 							</sources>
 						</mapping>
 					</mappings>
-					<preinstallScriptlet>
-						<scriptFile>rpm/undeploy.sh</scriptFile>
-					</preinstallScriptlet>
-					<postinstallScriptlet>
-						<scriptFile>rpm/deploy.sh</scriptFile>
-					</postinstallScriptlet>
 				</configuration>
 			</plugin>
 

@@ -1,1 +1,0 @@
-service sprocket-tracker-worker start
