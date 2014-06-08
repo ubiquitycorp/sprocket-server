@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialNetwork;
@@ -38,6 +39,8 @@ public class SocialEndpoint {
 
 		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialProviderId);
 
+		ExternalIdentity identity = ServiceFactory.getSocialService().findSocialIdentity(userId, socialNetwork);
+		ServiceFactory.getSocialService().syncActivities(identity, socialNetwork);
 		CollectionVariant<Activity> variant = ServiceFactory.getSocialService().findActivityByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince);
 
 		// Throw a 304 if if there is no variant (no change)
