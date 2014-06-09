@@ -60,10 +60,11 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		// get identity from message
 		ExternalIdentity identity = ServiceFactory.getSocialService().getSocialIdentityById(activated.getIdentityId());
 		if(identity.getIdentityProvider() == SocialNetwork.Google.getValue()) {
+			processMessages(identity, SocialNetwork.Google);
+
 			if(activated.getContentNetworkId() != null)
 				processVideos(identity, ContentNetwork.YouTube);
 			
-			processMessages(identity, SocialNetwork.Google);
 		} else if(identity.getIdentityProvider() == SocialNetwork.Facebook.getValue()) {
 			processMessages(identity, SocialNetwork.Facebook);
 			processActivities(identity, SocialNetwork.Facebook);
