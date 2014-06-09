@@ -64,7 +64,7 @@ public class AnalyticsServiceTest {
 	public void testGetTopOccurances() {
 		
 		// add 3, and then add 2 random + 1 more than the max
-		String topTerm = "fuck";
+		String topTerm = UUID.randomUUID().toString();
 		event = new Event(EventType.Search);
 		event.getProperties().put("term", topTerm);
 		analyticsService.track(event);

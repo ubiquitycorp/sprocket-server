@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.cache.DataCacheKeys;
@@ -23,7 +25,8 @@ public class ContentService {
 	
 	private VideoContentRepository videoContentRepository;
 	private UserDataModificationCache dataModificationCache;
-		
+	private Logger log = LoggerFactory.getLogger(getClass());
+	
 	public ContentService(Configuration configuration) {
 		videoContentRepository = new VideoContentRepositoryJpaImpl();
 		dataModificationCache = new UserDataModificationCacheRedisImpl(configuration.getInt(
@@ -54,17 +57,25 @@ public class ContentService {
 		// most popular will likely be changing daily, so we simply remove / update entries by the item key of the video
 		for(VideoContent videoContent : videoContentList) {
 			// find video by this id
-			VideoContent persisted = getVideoByItemKeyAndOwner(ownerId, videoContent.getVideo().getItemKey());
-			if(persisted == null) {
-				// save the video we got from from the content network
-				create(videoContent);
-			} else {
-				// the only thing we want to retain from the persisted record is the pk value
-				videoContent.setVideoContentId(persisted.getVideoContentId());
-				update(videoContent);
-			}
+			try {
 			
-			processedIds.add(videoContent.getVideoContentId());
+				VideoContent persisted = getVideoByItemKeyAndOwner(ownerId, videoContent.getVideo().getItemKey());
+				if(persisted == null) {
+					// save the video we got from from the content network
+					
+					
+						create(videoContent);
+					
+				} else {
+					// the only thing we want to retain from the persisted record is the pk value
+					videoContent.setVideoContentId(persisted.getVideoContentId());
+					update(videoContent);
+				}
+			
+				processedIds.add(videoContent.getVideoContentId());
+			} catch (Exception e) {
+				log.warn("Could not process content, skipping record.", e);
+			}
 		}
 		
 		if(!processedIds.isEmpty()) {
