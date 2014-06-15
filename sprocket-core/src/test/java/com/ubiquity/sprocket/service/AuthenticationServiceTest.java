@@ -27,7 +27,7 @@ public class AuthenticationServiceTest {
 		authenticationService = new AuthenticationService(config);
 		userService = new UserService(config);
 
-		user = authenticationService.register(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), ClientPlatform.Android);
+		user = authenticationService.register(UUID.randomUUID().toString(), UUID.randomUUID().toString(),UUID.randomUUID().toString(),UUID.randomUUID().toString(), UUID.randomUUID().toString(), ClientPlatform.Android);
 	}
 	
 	@Test
