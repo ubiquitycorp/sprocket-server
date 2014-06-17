@@ -118,7 +118,7 @@ public class UsersEndpoint {
 
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto.getClientPlatformId());
 		User user = ServiceFactory.getAuthenticationService().register(identityDto.getUsername(), 
-				identityDto.getPassword(),"", "", identityDto.getDisplayName(), clientPlatform);
+				identityDto.getPassword(),"", "", identityDto.getDisplayName(), clientPlatform, Boolean.TRUE);
 
 		// user now has a single, native identity
 		String apiKey = authenticationService.generateApiKey();
