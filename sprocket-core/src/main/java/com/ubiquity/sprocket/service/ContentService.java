@@ -45,7 +45,7 @@ public class ContentService {
 	public List<VideoContent> sync(ExternalIdentity identity, ContentNetwork network) {
 		
 		// For YouTube, use the item key as the external identifier;
-		List<VideoContent> videoContentList = ContentAPIFactory.createProvider(network).findVideosByExternalIdentity(identity);
+		List<VideoContent> videoContentList = ContentAPIFactory.createProvider(network, identity.getClientPlatform()).findVideosByExternalIdentity(identity);
 		
 		// the owner is this identitie's user
 		Long ownerId = identity.getUser().getUserId();
