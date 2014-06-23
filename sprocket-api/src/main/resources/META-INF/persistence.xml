@@ -41,7 +41,7 @@
 				value="com.jolbox.bonecp.provider.BoneCPConnectionProvider" />
 			<property name="bonecp.idleConnectionTestPeriodInMinutes"
 				value="2" />
-			<property name="bonecp.idleMaxAgeInMinutes" value="1" />
+			<property name="bonecp.maxConnectionAgeInSeconds" value="25000" />
 
 			<property name="bonecp.partitionCount" value="2" />
 			<property name="bonecp.maxConnectionsPerPartition" value="10" />
