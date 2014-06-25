@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>sprocket-core</artifactId>
 	<name>Sprocket Core</name>
-	<version>0.1.15</version>
+	<version>0.1.16</version>
 	<build>
 
 		<finalName>sprocket-core</finalName>
