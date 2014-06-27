@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.api.utils.Page;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.DocumentsDto;
@@ -30,18 +31,26 @@ public class DocumentsEndpoint {
 	@GET
 	@Path("users/{userId}/indexed")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response search(@PathParam("userId") Long userId, @QueryParam("q") String q) throws IOException {
+	public Response search(@PathParam("userId") Long userId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
+
+
 
 		DocumentsDto result = new DocumentsDto();
 		List<Document> documents = ServiceFactory.getSearchService().searchDocuments(q, userId);
-		for(Document document : documents)
-			result.getDocuments().add(DtoAssembler.assemble(document));
 		
+		Page<Document> pager = new Page<Document>(documents, page, 3);
+		result.getPagination().setHasNextPage(pager.getHasNextPage());
+				
+		for(Document document : pager.getSubList())
+			result.getDocuments().add(DtoAssembler.assemble(document));
+
 		// now track this
 		sendEventTrackedMessage(q);
-		
+
 		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
 	}
+
+
 
 	private void sendEventTrackedMessage(String q) throws IOException {
 		EventTracked content = new EventTracked(EventType.Search.ordinal());
@@ -50,7 +59,7 @@ public class DocumentsEndpoint {
 		// serialize and send itit
 		String message = MessageConverterFactory.getMessageConverter().serialize(new Message(content));
 		MessageQueueFactory.getTrackQueueProducer().write(message.getBytes());
-		
+
 	}
 
 }
