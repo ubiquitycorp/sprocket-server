@@ -2,8 +2,10 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -12,6 +14,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +27,7 @@ import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.messaging.format.Message;
+import com.ubiquity.social.api.linkedin.ExchangeService;
 import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
@@ -36,6 +41,7 @@ import com.ubiquity.sprocket.messaging.definition.EventTracked;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 
 @Path("/1.0/users")
 public class UsersEndpoint {
@@ -51,6 +57,58 @@ public class UsersEndpoint {
 		return Response.ok().entity("{\"message\":\"pong\"}").build();
 	}
 
+	
+	
+	
+	
+	
+	/***
+	 * This method authenticates user's linkedin via native login. Thereafter users can authenticate
+	 * 
+	 * @param cookie file
+	 * @return
+	 * @throws IOException 
+	 */
+	//public Response authenticatedlinkedin(@CookieParam("linkedin_oauth_7747wv47q1ili9") String cookie) throws IOException {
+	//	public Response authenticatedlinkedin(@PathParam("userId") Long userId,@CookieParam("linkedin_oauth_7747wv47q1ili9") String cookie) throws IOException {
+	//@Path("/{userId}/authenticatedlinkedin")@Path("/authenticatedlinkedin")
+	@GET
+	@Path("/{userId}/authenticatedlinkedin")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response authenticatedlinkedin(@PathParam("userId") Long userId,@CookieParam("linkedin_oauth_7747wv47q1ili9") String cookie) throws IOException {
+		
+		// load user
+				User user = ServiceFactory.getUserService().getUserById(userId);
+				if(user == null)
+					throw new HttpException("Username / password incorrect", 401);
+//		StringWriter writer = new StringWriter();
+//		IOUtils.copy(payload, writer);
+//		String cookieString = writer.toString();
+		String cookieString =java.net.URLDecoder.decode(cookie, "UTF-8");
+		ExchangeService exchangservice = new ExchangeService();
+		String[] accesstokens=exchangservice.exchangeToken(cookieString);
+		//System.out.println(accesstoken);
+		
+
+		
+		
+		if(accesstokens[0]==null || accesstokens[0].equalsIgnoreCase(""))
+			throw new HttpException("Autontication Failed no oAuth_token_returned", 401);
+		
+		// create the identity if it does not exist; or use the existing one
+	  ExternalIdentity identity = ServiceFactory.getSocialService().createOrUpdateSocialIdentity(user, accesstokens[0], accesstokens[1], ClientPlatform.WEB, SocialNetwork.LinkedIn);
+
+				
+		return Response.ok()		
+				.build();
+		
+	}
+	
+	
+	
+	
+	
+	
 
 
 	/***
