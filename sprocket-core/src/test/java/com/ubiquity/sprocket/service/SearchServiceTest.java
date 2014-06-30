@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
@@ -20,7 +21,6 @@ import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.sprocket.domain.Document;
-import com.ubiquity.sprocket.domain.VideoContent;
 import com.ubiquity.sprocket.search.SearchKeys;
 
 

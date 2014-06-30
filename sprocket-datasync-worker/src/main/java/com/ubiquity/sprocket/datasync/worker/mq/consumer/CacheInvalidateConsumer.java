@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
+import com.ubiquity.content.domain.ContentNetwork;
+import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.content.service.ContentService;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.messaging.MessageConverter;
@@ -14,8 +16,6 @@ import com.ubiquity.messaging.format.Message;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.social.service.SocialService;
-import com.ubiquity.sprocket.domain.ContentNetwork;
-import com.ubiquity.sprocket.domain.VideoContent;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.service.ServiceFactory;

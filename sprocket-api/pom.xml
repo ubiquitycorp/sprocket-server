@@ -116,9 +116,9 @@
 
 
 		<dependency>
-			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>resteasy-jaxrs</artifactId>
-			<version>2.3.7.Final</version>
+	<groupId>org.jboss.resteasy</groupId>
+	<artifactId>resteasy-jaxrs</artifactId>
+	<version>3.0.8.Final</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>commons-httpclient</artifactId>

@@ -11,9 +11,20 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.api.utils.Page;
+import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.User;
 import com.ubiquity.messaging.format.Message;
+import com.ubiquity.social.api.SocialAPI;
+import com.ubiquity.social.api.SocialAPIFactory;
+import com.ubiquity.social.domain.Activity;
+import com.ubiquity.social.domain.SocialNetwork;
+import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.DocumentsDto;
 import com.ubiquity.sprocket.domain.Document;
@@ -26,6 +37,8 @@ import com.ubiquity.sprocket.service.ServiceFactory;
 @Path("/1.0/documents")
 public class DocumentsEndpoint {
 
+	private Logger log = LoggerFactory.getLogger(getClass());
+	
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 
 	/***
@@ -62,11 +75,25 @@ public class DocumentsEndpoint {
 	public Response search(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
 		DocumentsDto result = new DocumentsDto();
 
-		List<Document> documents = ServiceFactory.getSearchService().searchDocuments(q, userId);
-
+		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialNetworkId);
+		User user = ServiceFactory.getUserService().getUserById(userId);
+		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, socialNetwork);
+		//List<Document> documents = ServiceFactory.getSearchService().searchDocuments(q, userId);
+		
+		SocialAPI socialAPI = SocialAPIFactory.createProvider(SocialNetwork.getEnum(socialNetworkId), ClientPlatform.Android);
+		
+		// if limit is 25, th
+		// get the identity associated with this network
+		//ExternalIdentity identity = ServiceFactory.getSocialService().getAssociatedSocialIdentity(user, socialNetwork);
+		List<Activity> activities = socialAPI.searchActivities(identity, q, 5, 0);
+		log.debug("activities {}", activities.size());
 		
 		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
 	}
+	
+	
+	
+	
 	
 	
 	
