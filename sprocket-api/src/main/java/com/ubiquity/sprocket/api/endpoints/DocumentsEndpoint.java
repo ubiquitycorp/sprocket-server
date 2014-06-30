@@ -28,12 +28,18 @@ public class DocumentsEndpoint {
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 
+	/***
+	 * Searches over indexed content for all social networks and content providers
+	 * @param userId
+	 * @param q
+	 * @param page
+	 * @return
+	 * @throws IOException
+	 */
 	@GET
 	@Path("users/{userId}/indexed")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response search(@PathParam("userId") Long userId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
-
-
 
 		DocumentsDto result = new DocumentsDto();
 		List<Document> documents = ServiceFactory.getSearchService().searchDocuments(q, userId);
@@ -49,7 +55,21 @@ public class DocumentsEndpoint {
 
 		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
 	}
+	
+	@GET
+	@Path("users/{userId}/socialnetworks/{socialNetworkId}/indexed")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response search(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
+		DocumentsDto result = new DocumentsDto();
 
+		List<Document> documents = ServiceFactory.getSearchService().searchDocuments(q, userId);
+
+		
+		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
+	}
+	
+	
+	
 
 
 	private void sendEventTrackedMessage(String q) throws IOException {
