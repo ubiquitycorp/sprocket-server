@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.sprocket.domain.Document;
-import com.ubiquity.sprocket.domain.VideoContent;
+import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.sprocket.search.SearchEngine;
 import com.ubiquity.sprocket.search.SearchKeys;
 import com.ubiquity.sprocket.search.solr.SearchEngineSolrjImpl;
