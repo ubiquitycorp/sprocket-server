@@ -2,6 +2,7 @@ package com.ubiquity.sprocket.service;
 
 import org.apache.commons.configuration.Configuration;
 
+import com.ubiquity.content.service.ContentService;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.identity.service.UserService;
 import com.ubiquity.social.service.ContactService;

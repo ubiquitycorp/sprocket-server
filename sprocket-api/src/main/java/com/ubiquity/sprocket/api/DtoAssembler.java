@@ -3,6 +3,7 @@ package com.ubiquity.sprocket.api;
 import java.util.Map;
 import java.util.UUID;
 
+import com.ubiquity.content.domain.ContentNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
@@ -14,9 +15,8 @@ import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.dto.model.ImageDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 import com.ubiquity.sprocket.api.dto.model.VideoDto;
-import com.ubiquity.sprocket.domain.ContentNetwork;
 import com.ubiquity.sprocket.domain.Document;
-import com.ubiquity.sprocket.domain.VideoContent;
+import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.sprocket.search.SearchKeys;
 
 public class DtoAssembler {
