@@ -29,12 +29,12 @@ public class SearchServiceTest {
 	private static SearchService searchService;
 
 	private Logger log = LoggerFactory.getLogger(getClass());
-	
+
 	@BeforeClass
 	public static void setUp() throws Exception {
 		Configuration config = new PropertiesConfiguration("test.properties");
 		searchService = new SearchService(config);
-		
+
 		searchService.deleteAll();
 	}
 
@@ -46,23 +46,24 @@ public class SearchServiceTest {
 		.messageId(new java.util.Random().nextLong())
 		.owner(new User.Builder().userId(1l).build())
 		.body(UUID.randomUUID().toString())
+		.socialNetwork(SocialNetwork.Facebook)
 		.title(UUID.randomUUID().toString()).sender(
 				new Contact.Builder().displayName("Jack").build())
 				.socialNetwork(SocialNetwork.Facebook)
 				.build();
+
 		searchService.indexMessages(
 				Arrays.asList(new Message[] { message }));
 
 		// search by sender display name, making sure that only this entity shows up and it's of type "Message"
-		List<Document> documents = searchService.searchDocuments("Jack", 1l);
+		List<Document> documents = searchService.searchIndexedDocuments("Jack", 1l);
 
 		Assert.assertTrue(documents.size() == 1);
 		Document result = documents.get(0);
-		Assert.assertEquals(Message.class.getSimpleName(), result.getFields().get(SearchKeys.CommonFields.FIELD_DATA_TYPE));
+		Assert.assertEquals(Message.class.getSimpleName(), result.getFields().get(SearchKeys.Fields.FIELD_DATA_TYPE));
 
-		// test the user filter
-		documents = searchService.searchDocuments(message.getSender().getDisplayName(), 2l);
-		Assert.assertTrue(documents.isEmpty());
+		testUserAndSocialNetworkFilter(message.getSender().getDisplayName(), 1l, SocialNetwork.Facebook);
+
 
 	}
 
@@ -70,22 +71,24 @@ public class SearchServiceTest {
 	public void testDedupe() {
 		// build a video content with random strings so that it contains the same signature 
 		VideoContent videoContent = new VideoContent.Builder()
-			.videoContentId(new java.util.Random().nextLong())
-			.category(UUID.randomUUID().toString())
-			.title(UUID.randomUUID().toString())
-			.video(new Video.Builder().itemKey(UUID.randomUUID().toString()).build())
-			.thumb(new Image("http://"+UUID.randomUUID().toString()+".com"))
-			.description(UUID.randomUUID().toString()).build();
+		.videoContentId(new java.util.Random().nextLong())
+		.category(UUID.randomUUID().toString())
+		.title(UUID.randomUUID().toString())
+		.video(new Video.Builder().itemKey(UUID.randomUUID().toString()).build())
+		.thumb(new Image("http://"+UUID.randomUUID().toString()+".com"))
+		.description(UUID.randomUUID().toString()).build();
 		// add 2
 		searchService.indexVideos(
 				Arrays.asList(new VideoContent[] { videoContent, videoContent }), 1l);
 
 		// search, making sure that only this entity shows up and it's of type "VideoContent"
-		List<Document> documents = searchService.searchDocuments(videoContent.getTitle(), 1l);
+		List<Document> documents = searchService.searchIndexedDocuments(videoContent.getTitle(), 1l);
 		log.debug("documents {}", documents);
 		Assert.assertTrue(documents.size() == 1);
 
 	}
+
+
 
 	@Test
 	public void testAddActivitiesReturnsInBasicSearch() {
@@ -94,6 +97,7 @@ public class SearchServiceTest {
 		.activityId(new java.util.Random().nextLong())
 		.owner(new User.Builder().userId(1l).build())
 		.body(UUID.randomUUID().toString())
+		.socialNetwork(SocialNetwork.LinkedIn)
 		.title(UUID.randomUUID().toString()).postedBy(
 				new Contact.Builder().displayName("Bob").build())
 				.build();
@@ -101,15 +105,16 @@ public class SearchServiceTest {
 				Arrays.asList(new Activity[] { activity }));
 
 		// search by sender display name, making sure that only this entity shows up and it's of type "Message"
-		List<Document> documents = searchService.searchDocuments("Bob", 1l);
+		List<Document> documents = searchService.searchIndexedDocuments("Bob", 1l);
 		log.debug("documents: {}", documents);
 		Assert.assertTrue(documents.size() == 1);
 		Document result = documents.get(0);
-		Assert.assertEquals(Activity.class.getSimpleName(), result.getFields().get(SearchKeys.CommonFields.FIELD_DATA_TYPE));
+		Assert.assertEquals(Activity.class.getSimpleName(), result.getFields().get(SearchKeys.Fields.FIELD_DATA_TYPE));
 
-		// test the user filter
-		documents = searchService.searchDocuments(activity.getPostedBy().getDisplayName(), 2l);
-		Assert.assertTrue(documents.isEmpty());
+		
+		testUserAndSocialNetworkFilter(activity.getPostedBy().getDisplayName(), 1l, SocialNetwork.LinkedIn);
+
+
 
 	}
 
@@ -123,24 +128,48 @@ public class SearchServiceTest {
 		.video(new Video.Builder().itemKey(UUID.randomUUID().toString()).build())
 		.thumb(new Image("http://"+UUID.randomUUID().toString()+".com"))
 		.description(UUID.randomUUID().toString()).build();
-		
+
 		searchService.indexVideos(
 				Arrays.asList(new VideoContent[] { videoContent }), 1l);
 
 		// search, making sure that only this entity shows up and it's of type "VideoContent"
-		List<Document> documents = searchService.searchDocuments("video", 1l);
+		List<Document> documents = searchService.searchIndexedDocuments("video", 1l);
 
 		Assert.assertTrue(documents.size() == 1);
 		Document result = documents.get(0);
-		Assert.assertEquals(VideoContent.class.getSimpleName(), result.getFields().get(SearchKeys.CommonFields.FIELD_DATA_TYPE));
+		Assert.assertEquals(VideoContent.class.getSimpleName(), result.getFields().get(SearchKeys.Fields.FIELD_DATA_TYPE));
 
 		// test the user filter
-		documents = searchService.searchDocuments(videoContent.getTitle(), 2l);
+		documents = searchService.searchIndexedDocuments(videoContent.getTitle(), 2l);
 		Assert.assertTrue(documents.isEmpty());
 		
-		
+
+
 
 	}	
+
+	/***
+	 * Convenience method for testing if the social network and user id filters persisted
+	 * 
+	 * @param searchTerm
+	 * @param userId
+	 * @param socialNetwork
+	 */
+	private void testUserAndSocialNetworkFilter(String searchTerm, Long userId, SocialNetwork socialNetwork) {
+		// test the user filter
+		List<Document> documents = searchService.searchIndexedDocuments(searchTerm, userId + 1);
+		Assert.assertTrue(documents.isEmpty());
+
+		// test the social filter
+		documents = searchService.searchIndexedDocuments(searchTerm, userId, socialNetwork);
+		Assert.assertTrue(!documents.isEmpty());
+
+		SocialNetwork anotherNetwork = socialNetwork.ordinal() == 0 ? SocialNetwork.values()[1] : SocialNetwork.values()[0];
+		// pick a network that is not the passed in network
+		documents = searchService.searchIndexedDocuments(searchTerm, 1l, anotherNetwork);
+		Assert.assertTrue(documents.isEmpty());
+	}
+
 
 
 }

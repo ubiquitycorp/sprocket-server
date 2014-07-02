@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
-import com.ubiquity.api.utils.Page;
+import com.niobium.repository.utils.Page;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
@@ -55,7 +55,7 @@ public class DocumentsEndpoint {
 	public Response search(@PathParam("userId") Long userId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
 
 		DocumentsDto result = new DocumentsDto();
-		List<Document> documents = ServiceFactory.getSearchService().searchDocuments(q, userId);
+		List<Document> documents = ServiceFactory.getSearchService().searchIndexedDocuments(q, userId);
 		
 		Page<Document> pager = new Page<Document>(documents, page, 3);
 		result.getPagination().setHasNextPage(pager.getHasNextPage());
@@ -72,7 +72,7 @@ public class DocumentsEndpoint {
 	@GET
 	@Path("users/{userId}/socialnetworks/{socialNetworkId}/indexed")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response search(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
+	public Response searchIndexed(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
 		DocumentsDto result = new DocumentsDto();
 
 		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialNetworkId);
@@ -90,6 +90,32 @@ public class DocumentsEndpoint {
 		
 		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
 	}
+	
+	@GET
+	@Path("users/{userId}/socialnetworks/{socialNetworkId}/live")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response searchLive(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
+		DocumentsDto result = new DocumentsDto();
+		
+		// get user from db
+		User user = ServiceFactory.getUserService().getUserById(userId);
+		
+		
+		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialNetworkId);
+		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, socialNetwork);
+		
+		// search over public activities
+		List<Document> documents = ServiceFactory.getSearchService().searchPublicActivities(q, user, socialNetwork, identity.getClientPlatform(), page);
+		
+		// assemble into dtos
+		for(Document document : documents)
+			result.getDocuments().add(DtoAssembler.assemble(document));
+		
+		
+		
+		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
+	}
+	
 	
 	
 	

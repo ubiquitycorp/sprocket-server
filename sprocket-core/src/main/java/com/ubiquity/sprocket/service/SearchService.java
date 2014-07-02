@@ -9,25 +9,43 @@ import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.repository.utils.Page;
 import com.ubiquity.content.domain.ContentNetwork;
 import com.ubiquity.content.domain.VideoContent;
+import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.User;
+import com.ubiquity.social.api.SocialAPI;
+import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialNetwork;
+import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchEngine;
 import com.ubiquity.sprocket.search.SearchKeys;
 import com.ubiquity.sprocket.search.solr.SearchEngineSolrjImpl;
 
+/***
+ * Search service encapsulates all search functions for both indexed searches and live searches
+ * 
+ * @author chris
+ *
+ */
 public class SearchService {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
-
-
+	
 	private SearchEngine searchEngine;
-
+	
+	private Integer resultsLimit;
+	private Integer pageLimit;
+	
 	public SearchService(Configuration config) {
 		log.debug("Using solr api path: {}", config.getProperty("solr.api.path"));
+		resultsLimit = config.getInt("rules.search.results.limit");
+		pageLimit = config.getInt("rules.search.results.page.limit");
+				
 		searchEngine = new SearchEngineSolrjImpl(config);
 	}
 
@@ -45,15 +63,14 @@ public class SearchService {
 
 			Document document = new Document();
 
-			document.getFields().put(SearchKeys.MessageContentFields.FIELD_SENDER, message.getSender().getDisplayName());
-			document.getFields().put(SearchKeys.CommonFields.FIELD_BODY, message.getBody());
-			document.getFields().put(SearchKeys.CommonFields.FIELD_TITLE, message.getTitle());
+			document.getFields().put(SearchKeys.Fields.FIELD_SENDER, message.getSender().getDisplayName());
+			document.getFields().put(SearchKeys.Fields.FIELD_BODY, message.getBody());
+			document.getFields().put(SearchKeys.Fields.FIELD_TITLE, message.getTitle());
 
-			document.getFields().put(SearchKeys.CommonFields.FIELD_DATA_TYPE, Message.class.getSimpleName());
-			document.getFields().put(SearchKeys.CommonFields.FIELD_USER_ID, message.getOwner().getUserId());
-
-
-			document.getFields().put(SearchKeys.CommonFields.FIELD_ID, message.getMessageId());
+			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Message.class.getSimpleName());
+			document.getFields().put(SearchKeys.Fields.FIELD_USER_ID, message.getOwner().getUserId());
+			document.getFields().put(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID, message.getSocialNetwork().ordinal());
+			document.getFields().put(SearchKeys.Fields.FIELD_ID, message.getMessageId());
 
 
 			documents.add(document);
@@ -73,13 +90,13 @@ public class SearchService {
 
 			Document document = new Document();
 
-			document.getFields().put(SearchKeys.ActivityContentFields.FIELD_POSTED_BY, activity.getPostedBy().getDisplayName());
-			document.getFields().put(SearchKeys.CommonFields.FIELD_BODY, activity.getBody());
-			document.getFields().put(SearchKeys.CommonFields.FIELD_TITLE, activity.getTitle());
-			document.getFields().put(SearchKeys.CommonFields.FIELD_DATA_TYPE, Activity.class.getSimpleName());
-			document.getFields().put(SearchKeys.CommonFields.FIELD_USER_ID, activity.getOwner().getUserId());
-
-			document.getFields().put(SearchKeys.CommonFields.FIELD_ID, activity.getActivityId()); 
+			document.getFields().put(SearchKeys.Fields.FIELD_POSTED_BY, activity.getPostedBy().getDisplayName());
+			document.getFields().put(SearchKeys.Fields.FIELD_BODY, activity.getBody());
+			document.getFields().put(SearchKeys.Fields.FIELD_TITLE, activity.getTitle());
+			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Activity.class.getSimpleName());
+			document.getFields().put(SearchKeys.Fields.FIELD_USER_ID, activity.getOwner().getUserId());
+			document.getFields().put(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID, activity.getSocialNetwork().ordinal());
+			document.getFields().put(SearchKeys.Fields.FIELD_ID, activity.getActivityId()); 
 
 			documents.add(document);
 		}
@@ -100,18 +117,18 @@ public class SearchService {
 
 			Document document = new Document();
 
-			document.getFields().put(SearchKeys.CommonFields.FIELD_TITLE, videoContent.getTitle());
-			document.getFields().put(SearchKeys.CommonFields.FIELD_DESCRIPTION, videoContent.getDescription());
+			document.getFields().put(SearchKeys.Fields.FIELD_TITLE, videoContent.getTitle());
+			document.getFields().put(SearchKeys.Fields.FIELD_DESCRIPTION, videoContent.getDescription());
 
 			if(videoContent.getThumb() != null)
-				document.getFields().put(SearchKeys.CommonFields.FIELD_THUMBNAIL, videoContent.getThumb().getUrl());
+				document.getFields().put(SearchKeys.Fields.FIELD_THUMBNAIL, videoContent.getThumb().getUrl());
 
-			document.getFields().put(SearchKeys.VideoContentFields.FIELD_CATEGORY, videoContent.getCategory());
-			document.getFields().put(SearchKeys.VideoContentFields.FIELD_ITEM_KEY, videoContent.getVideo().getItemKey());
+			document.getFields().put(SearchKeys.Fields.FIELD_CATEGORY, videoContent.getCategory());
+			document.getFields().put(SearchKeys.Fields.FIELD_ITEM_KEY, videoContent.getVideo().getItemKey());
 
-			document.getFields().put(SearchKeys.CommonFields.FIELD_DATA_TYPE, VideoContent.class.getSimpleName());
-			document.getFields().put(SearchKeys.CommonFields.FIELD_USER_ID, userId);
-			document.getFields().put(SearchKeys.CommonFields.FIELD_ID, videoContent.getTitle().hashCode());
+			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, VideoContent.class.getSimpleName());
+			document.getFields().put(SearchKeys.Fields.FIELD_USER_ID, userId);
+			document.getFields().put(SearchKeys.Fields.FIELD_ID, videoContent.getTitle().hashCode());
 
 			documents.add(document);
 		}
@@ -119,15 +136,57 @@ public class SearchService {
 		addDocuments(documents);
 	}
 
+	/***
+	 * Indexes a document
+	 * 
+	 * @param document
+	 */
 	public void addDocument(Document document) {
 		searchEngine.addDocument(document);
 	}
 
+	/***
+	 * Indexes a batch of documents
+	 * 
+	 * @param documents
+	 */
 	public void addDocuments(List<Document> documents) {
 		searchEngine.addDocuments(documents);
 	}
 
 
+	/***
+	 * Searches public activities for a social network
+	 * 
+	 * @param searchTerm
+	 * @param userId
+	 * @param socialNetwork
+	 * @return
+	 */
+	public List<Document> searchPublicActivities(String searchTerm, User user, SocialNetwork socialNetwork, ClientPlatform clientPlatform, Integer page) {
+
+		List<Document> documents = new LinkedList<Document>();
+		
+		// get the identity and social network
+		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, socialNetwork);
+		SocialAPI socialAPI = SocialAPIFactory.createProvider(socialNetwork, clientPlatform);
+		
+		// calculate offset with page utility based on page limits
+		int offset = Page.calculateOffsetFromPage(page, resultsLimit, pageLimit);
+		List<Activity> activities = socialAPI.searchActivities(identity, searchTerm, resultsLimit, offset);
+		
+		// now wrap them in a search document
+		int rank = 0;
+		for(Activity activity : activities) {
+			Document document = new Document(activity, rank);
+			rank++;
+			documents.add(document);
+		}
+		
+		return documents;
+		
+	}
+	
 	/***
 	 * Searches documents for a social network
 	 * 
@@ -136,14 +195,14 @@ public class SearchService {
 	 * @param socialNetwork
 	 * @return
 	 */
-	public List<Document> searchDocuments(String searchTerm, Long userId, SocialNetwork socialNetwork) {
+	public List<Document> searchIndexedDocuments(String searchTerm, Long userId, SocialNetwork socialNetwork) {
 
 		// filters
 		Map<String, Object> filters = new HashMap<String, Object>();
-		filters.put(SearchKeys.CommonFields.FIELD_USER_ID, userId);
-		filters.put(SearchKeys.CommonFields.FIELD_SOCIAL_NETWORK_ID, socialNetwork.ordinal());
+		filters.put(SearchKeys.Fields.FIELD_USER_ID, userId);
+		filters.put(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID, socialNetwork.ordinal());
 		
-		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchForSocialNetwork(), filters);
+		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
 
 	}
 	
@@ -155,89 +214,50 @@ public class SearchService {
 	 * @param contentNetwork
 	 * @return
 	 */
-	public List<Document> searchDocuments(String searchTerm, Long userId, ContentNetwork socialNetwork) {
+	public List<Document> searchIndexedDocuments(String searchTerm, Long userId, ContentNetwork socialNetwork) {
 
 		// filters
 		Map<String, Object> filters = new HashMap<String, Object>();
-		filters.put(SearchKeys.CommonFields.FIELD_USER_ID, userId);
-		filters.put(SearchKeys.CommonFields.FIELD_SOCIAL_NETWORK_ID, socialNetwork.ordinal());
+		filters.put(SearchKeys.Fields.FIELD_USER_ID, userId);
+		filters.put(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID, socialNetwork.ordinal());
 		
-		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchForSocialNetwork(), filters);
+		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
 
 	}
 	
-	
-	
 
 	/***
-	 * Searches documents by a search term and user id across all social entworks and content providers
+	 * Searches documents by a search term and user id across all social networks and content providers
 	 * 
 	 * @param searchTerm
 	 * @param userId
 	 * @return
 	 */
-	public List<Document> searchDocuments(String searchTerm, Long userId) {
+	public List<Document> searchIndexedDocuments(String searchTerm, Long userId) {
 
 		// filters
 		Map<String, Object> filters = new HashMap<String, Object>();
-		filters.put(SearchKeys.CommonFields.FIELD_USER_ID, userId);
-		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchForAllNetworks(), filters);
+		filters.put(SearchKeys.Fields.FIELD_USER_ID, userId);
+		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
 	}
 
+	/***
+	 * Clears entire search index
+	 */
 	public void deleteAll() {
 		searchEngine.deleteAllDocuments();
 
 	}
 
-	/***
-	 * Creates a field map to search over for a social network
-	 * @param searchTerm
-	 * @param socialNetwork
-	 * @return
-	 */
-	private Map<String, Object> createSearchFieldsForSocialNetwork(String searchTerm) {
-
-		Map<String, Object> fields = new HashMap<String, Object>();
-
-
-		// common keys
-		fields.put(SearchKeys.CommonFields.FIELD_TITLE, searchTerm);
-		fields.put(SearchKeys.CommonFields.FIELD_DESCRIPTION, searchTerm);
-		fields.put(SearchKeys.CommonFields.FIELD_BODY, searchTerm);
-
-		// message keys
-		fields.put(SearchKeys.MessageContentFields.FIELD_SENDER, searchTerm);
-
-		// activity keys
-		fields.put(SearchKeys.ActivityContentFields.FIELD_POSTED_BY, searchTerm);
-
-		return fields;
-	}
-
-	private String[] createFieldsToSearchForSocialNetwork() {
+	private String[] createFieldsToSearchOver() {
 		return new String[] {
-				SearchKeys.CommonFields.FIELD_TITLE,
-				SearchKeys.CommonFields.FIELD_DESCRIPTION,
-				SearchKeys.CommonFields.FIELD_BODY,
-				SearchKeys.MessageContentFields.FIELD_SENDER,
-				SearchKeys.ActivityContentFields.FIELD_POSTED_BY
+				SearchKeys.Fields.FIELD_TITLE,
+				SearchKeys.Fields.FIELD_DESCRIPTION,
+				SearchKeys.Fields.FIELD_BODY,
+				SearchKeys.Fields.FIELD_SENDER,
+				SearchKeys.Fields.FIELD_POSTED_BY,
+				SearchKeys.Fields.FIELD_CATEGORY
 		};
-	}
-
-	private String[] createFieldsToSearchForContentNetwork() {
-		return new String[] {
-				SearchKeys.VideoContentFields.FIELD_CATEGORY
-		};
-	}
-
-	private String[] createFieldsToSearchForAllNetworks() {
-		List<String> list = new LinkedList<String>();
-		for(String field : createFieldsToSearchForSocialNetwork())
-			list.add(field);
-		for(String field : createFieldsToSearchForContentNetwork())
-			list.add(field);
-
-		return (String[])list.toArray();
 	}
 
 

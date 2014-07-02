@@ -2,7 +2,7 @@ package com.ubiquity.sprocket.search;
 
 public class SearchKeys {
 
-	public static class CommonFields {
+	public static class Fields {
 		public static final String FIELD_TITLE = "title";
 		public static final String FIELD_DESCRIPTION = "description";
 		public static final String FIELD_USER_ID = "user_id";
@@ -12,20 +12,13 @@ public class SearchKeys {
 		public static final String FIELD_THUMBNAIL = "thumbnail";
 		public static final String FIELD_SOCIAL_NETWORK_ID = "social_network_id";
 		public static final String FIELD_CONTENT_NETWORK_ID = "content_network_id";
-
-	}
-	
-	public static class VideoContentFields {
 		public static final String FIELD_CATEGORY = "category";
 		public static final String FIELD_ITEM_KEY = "item_key";
-	}
-	
-	public static class MessageContentFields {
 		public static final String FIELD_SENDER = "sender";
-	}
-	
-	public static class ActivityContentFields {
 		public static final String FIELD_POSTED_BY = "posted_by";
+
+
+
 	}
 	
 }
