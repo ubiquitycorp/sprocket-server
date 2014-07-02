@@ -192,11 +192,11 @@ public class UsersEndpoint {
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		ContentAPI contentApi = ContentAPIFactory.createProvider(contentNetwork, clientPlatform);
-		//String accessToken = contentApi.getAccessToken(identityDto.getCode(), identityDto.getRedirectUrl());
+		String accessToken = contentApi.getAccessToken(identityDto.getCode(), identityDto.getRedirectUrl());
 		
 		// create the identity if it does not exist; or use the existing one
-		//ExternalIdentity identity = ServiceFactory.getContentService().createOrUpdateContentIdentity(user, accessToken, identityDto.getSecretToken(), clientPlatform, contentNetwork);
-		ExternalIdentity identity = ServiceFactory.getContentService().getContentIdentityById(5L);
+		ExternalIdentity identity = ServiceFactory.getContentService().createOrUpdateContentIdentity(user, accessToken, identityDto.getSecretToken(), clientPlatform, contentNetwork);
+		//ExternalIdentity identity = ServiceFactory.getContentService().getContentIdentityById(5L);
 		
 		//List<VideoContent> synced = ServiceFactory.getContentService().sync(identity, contentNetwork);
 		sendActivatedMessage(user, identity, identityDto);
