@@ -20,8 +20,6 @@ public class VimeoAPITest {
 	
 	@BeforeClass
 	public static void setUp() throws Exception {
-		//Configuration config = new PropertiesConfiguration("test.properties");
-		//accessToken = 
 		identity = new ExternalIdentity.Builder().accessToken("a5f46897abbbd2b83501ea79b4916f44").build();
 		log.debug("authenticated Vimeo with identity {} ", identity);
 	}
