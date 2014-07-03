@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
@@ -22,6 +23,7 @@ import com.ubiquity.social.repository.ActivityRepositoryJpaImpl;
  * @author chris
  *
  */
+@Ignore
 public class ActivityRepositoryTest {
 
 	private ActivityRepository activityRepository;
