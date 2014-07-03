@@ -104,7 +104,8 @@ public class SearchService {
 			if(videoContent.getThumb() != null)
 				document.getFields().put(SearchKeys.CommonFields.FIELD_THUMBNAIL, videoContent.getThumb().getUrl());
 
-			document.getFields().put(SearchKeys.VideoContentFields.FIELD_CATEGORY, videoContent.getCategory());
+			if(videoContent.getCategory() != null)
+				document.getFields().put(SearchKeys.VideoContentFields.FIELD_CATEGORY, videoContent.getCategory());
 			document.getFields().put(SearchKeys.VideoContentFields.FIELD_ITEM_KEY, videoContent.getVideo().getItemKey());
 			
 			document.getFields().put(SearchKeys.CommonFields.FIELD_DATA_TYPE, VideoContent.class.getSimpleName());
