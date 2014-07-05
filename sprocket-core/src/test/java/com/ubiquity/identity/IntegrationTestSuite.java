@@ -34,7 +34,8 @@ import com.ubiquity.sprocket.service.SearchServiceTest;
 	UserRepositoryTest.class, 
 	ActivityRepositoryTest.class, 
 	MessageRepositoryTest.class,
-	VideoContentRepositoryTest.class })
+	VideoContentRepositoryTest.class
+	})
 public class IntegrationTestSuite {
 	
 	@AfterClass

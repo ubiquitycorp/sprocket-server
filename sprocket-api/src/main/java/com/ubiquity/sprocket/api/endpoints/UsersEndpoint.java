@@ -2,7 +2,6 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -21,7 +20,6 @@ import com.ubiquity.api.exception.HttpException;
 import com.ubiquity.content.api.ContentAPI;
 import com.ubiquity.content.api.ContentAPIFactory;
 import com.ubiquity.content.domain.ContentNetwork;
-import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;

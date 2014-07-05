@@ -126,7 +126,7 @@ public class DtoAssembler {
 			
 			MessageDto messageDto = assemble(message);
 			String conversationIdentifier = message.getConversationIdentifier();
-			if(topLevelMessageDto != null && lastConversationIdentifier.equals(conversationIdentifier)) {
+			if(topLevelMessageDto != null && conversationIdentifier != null && lastConversationIdentifier.equals(conversationIdentifier)) {
 				// we are adding to the conversation
 				topLevelMessageDto.getConversation().addLast(messageDto);
 			} else {

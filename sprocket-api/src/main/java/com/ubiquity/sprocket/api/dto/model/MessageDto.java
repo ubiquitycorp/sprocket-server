@@ -2,8 +2,6 @@ package com.ubiquity.sprocket.api.dto.model;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
 
 public class MessageDto {
 
