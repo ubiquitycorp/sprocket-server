@@ -4,15 +4,20 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.identity.repository.SocialRepositoryTest;
+import com.ubiquity.identity.repository.UserRepositoryTest;
+import com.ubiquity.identity.repository.VideoContentRepositoryTest;
+import com.ubiquity.social.repository.ActivityRepositoryTest;
+import com.ubiquity.social.repository.MessageRepositoryTest;
 import com.ubiquity.sprocket.service.AnalyticsServiceTest;
 import com.ubiquity.sprocket.service.AuthenticationServiceTest;
+import com.ubiquity.sprocket.service.SearchServiceTest;
 
 /***
  * Test suite will ensure that the integration tests have their dependencies met and cleaned up
@@ -20,10 +25,16 @@ import com.ubiquity.sprocket.service.AuthenticationServiceTest;
  * @author chris
  *
  */
-@Ignore
 @RunWith(Suite.class)
 @SuiteClasses({ 
-	AuthenticationServiceTest.class, AnalyticsServiceTest.class })
+	AuthenticationServiceTest.class, 
+	AnalyticsServiceTest.class, 
+	SocialRepositoryTest.class, 
+	SearchServiceTest.class,
+	UserRepositoryTest.class, 
+	ActivityRepositoryTest.class, 
+	MessageRepositoryTest.class,
+	VideoContentRepositoryTest.class })
 public class IntegrationTestSuite {
 	
 	@AfterClass

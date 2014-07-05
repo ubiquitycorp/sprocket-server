@@ -23,7 +23,6 @@ import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.sprocket.search.SearchKeys;
 
-
 public class SearchServiceTest {
 
 	private static SearchService searchService;

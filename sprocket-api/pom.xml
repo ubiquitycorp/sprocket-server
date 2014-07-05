@@ -162,6 +162,25 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		<!-- testing -->
+		<dependency>
+			<groupId>com.ubiquity</groupId>
+			<artifactId>ubc-integration-test</artifactId>
+			<version>0.1</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+			<optional>false</optional>
+		</dependency>
+		
+			<dependency>
+			<groupId>com.ubiquity</groupId>
+			<artifactId>ubc-identity-test</artifactId>
+			<version>0.1.1</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+			<optional>false</optional>
+		</dependency>
 
 
 

@@ -1,4 +1,4 @@
-package com.ubiquity.identity.repository;
+package com.ubiquity.social.repository;
 
 import java.util.List;
 import java.util.UUID;
@@ -6,16 +6,15 @@ import java.util.UUID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.UserFactory;
+import com.ubiquity.identity.repository.UserRepository;
+import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.SocialNetwork;
-import com.ubiquity.social.repository.ActivityRepository;
-import com.ubiquity.social.repository.ActivityRepositoryJpaImpl;
 
 /***
  * Tests testing basic CRUD operations for a user repository
@@ -23,7 +22,6 @@ import com.ubiquity.social.repository.ActivityRepositoryJpaImpl;
  * @author chris
  *
  */
-@Ignore
 public class ActivityRepositoryTest {
 
 	private ActivityRepository activityRepository;
@@ -88,8 +86,8 @@ public class ActivityRepositoryTest {
 		Assert.assertNotNull(persisted);
 		Assert.assertTrue(persisted.getActivityId().longValue() == activity.getActivityId().longValue());
 		
-		// query by different id
-		persisted = activityRepository.getByExternalIdentifierAndSocialNetwork(activity.getExternalIdentifier(), owner.getUserId(), SocialNetwork.Facebook);		
+		// query by different user id
+		persisted = activityRepository.getByExternalIdentifierAndSocialNetwork(activity.getExternalIdentifier(), new java.util.Random().nextLong(), SocialNetwork.Facebook);		
 		Assert.assertNull(persisted);
 
 		// query by same id, different network
@@ -97,10 +95,5 @@ public class ActivityRepositoryTest {
 		Assert.assertNotNull(persisted);
 
 	}
-	
-	
-	
-	
-
 
 }

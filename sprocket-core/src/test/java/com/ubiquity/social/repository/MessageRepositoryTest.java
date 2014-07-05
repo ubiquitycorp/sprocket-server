@@ -1,4 +1,4 @@
-package com.ubiquity.identity.repository;
+package com.ubiquity.social.repository;
 
 import java.util.List;
 import java.util.UUID;
@@ -6,21 +6,17 @@ import java.util.UUID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.UserFactory;
-import com.ubiquity.media.domain.Image;
+import com.ubiquity.identity.repository.UserRepository;
+import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
+import com.ubiquity.integration.factory.ContactFactory;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialNetwork;
-import com.ubiquity.social.repository.ContactRepository;
-import com.ubiquity.social.repository.ContactRepositoryJpaImpl;
-import com.ubiquity.social.repository.MessageRepository;
-import com.ubiquity.social.repository.MessageRepositoryJpaImpl;
 
 /***
  * Tests testing basic CRUD operations for a user repository
@@ -28,7 +24,6 @@ import com.ubiquity.social.repository.MessageRepositoryJpaImpl;
  * @author chris
  *
  */
-@Ignore
 public class MessageRepositoryTest {
 
 	private MessageRepository messageRepository;
@@ -57,22 +52,9 @@ public class MessageRepositoryTest {
 		EntityManagerSupport.beginTransaction();
 		userRepository.create(owner);
 		EntityManagerSupport.commit();
+					
+		sender = ContactFactory.createContactWithMininumRequiredFieldsAndSocialNetwork(owner, SocialNetwork.Facebook);
 		
-		// now create a contact - who isn't necessarily a user
-		sender = new Contact.Builder().lastUpdated(System.currentTimeMillis())
-						.displayName("Jill").firstName("Jill").lastName("Jackson")
-						.email("jill@mail.com").profileUrl("http://jills.profile.link")
-						.image(new Image("http://jills.image.url"))
-						.externalIdentity(new ExternalIdentity.Builder()
-							.identifier(UUID.randomUUID().toString())
-							.isActive(Boolean.TRUE)
-							.lastUpdated(System.currentTimeMillis())
-							.identityProvider(SocialNetwork.Facebook.getValue())
-							.build())
-						.owner(owner)
-						
-						.build();
-			
 		EntityManagerSupport.beginTransaction();
 		contactRepository.create(sender);
 		EntityManagerSupport.commit();
@@ -89,9 +71,7 @@ public class MessageRepositoryTest {
 			.socialNetwork(SocialNetwork.Facebook)
 			.build();
 		
-		EntityManagerSupport.beginTransaction();
-		messageRepository.create(message);
-		EntityManagerSupport.commit();
+		saveMessage(message);
 
 		
 		
@@ -112,6 +92,65 @@ public class MessageRepositoryTest {
 		Assert.assertFalse(allMessages.isEmpty());
 		Message persisted = allMessages.get(0);
 		Assert.assertTrue(persisted.getMessageId().longValue() == message.getMessageId().longValue());
+	}
+	
+	@Test
+	public void testConversationGroupingAndMessageOrdering() {
+		
+		String conversationIdentifier = UUID.randomUUID().toString();
+
+		// add 2 messages with a conversation identifier
+		Message first  = new Message.Builder()
+			.title(UUID.randomUUID().toString())
+			.body(UUID.randomUUID().toString())
+			.conversationIdentifier(conversationIdentifier)
+			.sentDate(System.currentTimeMillis())
+			.sender(sender)
+			.socialNetwork(SocialNetwork.Facebook)
+			.externalIdentifier(UUID.randomUUID().toString())
+			.owner(owner)
+			.socialNetwork(SocialNetwork.Facebook)
+			.build();
+		saveMessage(first);
+		
+		Message next  = new Message.Builder()
+			.title(UUID.randomUUID().toString())
+			.body(UUID.randomUUID().toString())
+			.conversationIdentifier(conversationIdentifier)
+			.sentDate(System.currentTimeMillis() + 1)
+			.sender(sender)
+			.socialNetwork(SocialNetwork.Facebook)
+			.externalIdentifier(UUID.randomUUID().toString())
+			.owner(owner)
+			.socialNetwork(SocialNetwork.Facebook)
+			.build();
+		saveMessage(next);
+
+		// now query, making sure messages are grouped properly
+		List<Message> messages = messageRepository.findByOwnerIdAndSocialNetwork(owner.getUserId(), SocialNetwork.Facebook);
+		Assert.assertTrue(messages.size() == 3);
+		
+		// let's make sure this one has no id
+		Message persisted = messages.get(0);
+		Assert.assertNull(persisted.getConversationIdentifier());
+		
+		// test sorting and that they have the same conversation
+		persisted = messages.get(1);
+		Assert.assertTrue(persisted.getMessageId().longValue() == first.getMessageId().longValue());
+		Assert.assertNotNull(persisted.getConversationIdentifier());
+		Assert.assertTrue(persisted.getConversationIdentifier().equals(first.getConversationIdentifier()));
+		
+		persisted = messages.get(2);
+		Assert.assertTrue(persisted.getMessageId().longValue() == next.getMessageId().longValue());
+		Assert.assertNotNull(persisted.getConversationIdentifier());
+		Assert.assertTrue(persisted.getConversationIdentifier().equals(first.getConversationIdentifier()));
+
+	}
+	
+	private void saveMessage(Message message) {
+		EntityManagerSupport.beginTransaction();
+		messageRepository.create(message);
+		EntityManagerSupport.commit();
 	}
 	
 	@Test

@@ -1,5 +1,10 @@
 package com.ubiquity.sprocket.api.dto.model;
 
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
+
 public class MessageDto {
 
 	private String subject;
@@ -7,6 +12,8 @@ public class MessageDto {
 	private Long date;
 	private ContactDto sender;
 	private Integer socialProviderId;
+	
+	private Deque<MessageDto> conversation = new LinkedList<MessageDto>();
 
 	public Integer getSocialProviderId() {
 		return socialProviderId;
@@ -27,6 +34,12 @@ public class MessageDto {
 	public ContactDto getSender() {
 		return sender;
 	}
+
+	
+	public Deque<MessageDto> getConversation() {
+		return conversation;
+	}
+
 
 	public static class Builder {
 		private String subject;
