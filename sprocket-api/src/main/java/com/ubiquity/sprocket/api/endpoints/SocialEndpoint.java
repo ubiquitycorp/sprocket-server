@@ -69,19 +69,6 @@ public class SocialEndpoint {
 	 * @param socialProviderId
 	 * @return
 	 */
-	@GET
-	@Path("users/{userId}/networks/{socialNetworkId}/messages")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getMessages(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
-		return messages(userId, socialNetworkId, ifModifiedSince);
-	}
-	
-	/***
-	 * This method returns messages of specific social network
-	 * @param userId
-	 * @param socialProviderId
-	 * @return
-	 */
 	@Deprecated
 	@GET
 	@Path("users/{userId}/providers/{socialNetworkId}/messages")

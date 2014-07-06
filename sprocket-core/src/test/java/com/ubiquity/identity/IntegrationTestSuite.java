@@ -30,7 +30,6 @@ import com.ubiquity.sprocket.service.SearchServiceTest;
 	AuthenticationServiceTest.class, 
 	AnalyticsServiceTest.class, 
 	SocialRepositoryTest.class, 
-	SearchServiceTest.class,
 	UserRepositoryTest.class, 
 	ActivityRepositoryTest.class, 
 	MessageRepositoryTest.class,
