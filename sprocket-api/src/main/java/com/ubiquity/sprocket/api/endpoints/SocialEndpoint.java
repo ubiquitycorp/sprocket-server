@@ -69,7 +69,6 @@ public class SocialEndpoint {
 	 * @param socialProviderId
 	 * @return
 	 */
-	@Deprecated
 	@GET
 	@Path("users/{userId}/providers/{socialNetworkId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
