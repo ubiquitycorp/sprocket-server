@@ -30,8 +30,6 @@ public class Document {
 	private Integer rank;
 	
 	
-	public Document() {}
-	
 	/***
 	 * Creates a document with required property data type
 	 * 
@@ -73,9 +71,10 @@ public class Document {
 
 	@Override
 	public String toString() {
-		return "Document [fields=" + fields + "]";
+		return "Document [dataType=" + dataType + ", fields=" + fields
+				+ ", data=" + data + ", rank=" + rank + "]";
 	}
-	
+
 	
 
 }

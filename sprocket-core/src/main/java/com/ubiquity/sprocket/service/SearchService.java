@@ -61,7 +61,7 @@ public class SearchService {
 			if(message == null)
 				continue; // TODO: remove this once the core issue is resolved
 
-			Document document = new Document();
+			Document document = new Document(Message.class.getName());
 
 			document.getFields().put(SearchKeys.Fields.FIELD_SENDER, message.getSender().getDisplayName());
 			document.getFields().put(SearchKeys.Fields.FIELD_BODY, message.getBody());
@@ -88,7 +88,7 @@ public class SearchService {
 		List<Document> documents = new LinkedList<Document>();
 		for(Activity activity : activities) {
 
-			Document document = new Document();
+			Document document = new Document(Activity.class.getName());
 
 			document.getFields().put(SearchKeys.Fields.FIELD_POSTED_BY, activity.getPostedBy().getDisplayName());
 			document.getFields().put(SearchKeys.Fields.FIELD_BODY, activity.getBody());
@@ -115,7 +115,7 @@ public class SearchService {
 		List<Document> documents = new LinkedList<Document>();
 		for(VideoContent videoContent : videos) {
 
-			Document document = new Document();
+			Document document = new Document(VideoContent.class.getSimpleName());
 
 			document.getFields().put(SearchKeys.Fields.FIELD_TITLE, videoContent.getTitle());
 			document.getFields().put(SearchKeys.Fields.FIELD_DESCRIPTION, videoContent.getDescription());
@@ -163,7 +163,7 @@ public class SearchService {
 	 * @param socialNetwork
 	 * @return
 	 */
-	public List<Document> searchPublicActivities(String searchTerm, User user, SocialNetwork socialNetwork, ClientPlatform clientPlatform, Integer page) {
+	public List<Document> searchLiveActivities(String searchTerm, User user, SocialNetwork socialNetwork, ClientPlatform clientPlatform, Integer page) {
 
 		List<Document> documents = new LinkedList<Document>();
 		
@@ -183,6 +183,8 @@ public class SearchService {
 			documents.add(document);
 		}
 		
+		log.debug("documents {}", documents);
+
 		return documents;
 		
 	}

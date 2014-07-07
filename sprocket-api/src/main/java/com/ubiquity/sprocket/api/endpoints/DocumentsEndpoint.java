@@ -76,17 +76,11 @@ public class DocumentsEndpoint {
 		DocumentsDto result = new DocumentsDto();
 
 		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialNetworkId);
-		User user = ServiceFactory.getUserService().getUserById(userId);
-		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, socialNetwork);
-		//List<Document> documents = ServiceFactory.getSearchService().searchDocuments(q, userId);
 		
-		SocialAPI socialAPI = SocialAPIFactory.createProvider(SocialNetwork.getEnum(socialNetworkId), ClientPlatform.Android);
-		
-		// if limit is 25, th
-		// get the identity associated with this network
-		//ExternalIdentity identity = ServiceFactory.getSocialService().getAssociatedSocialIdentity(user, socialNetwork);
-		List<Activity> activities = socialAPI.searchActivities(identity, q, 5, 0);
-		log.debug("activities {}", activities.size());
+		List<Document> documents = ServiceFactory.getSearchService().searchIndexedDocuments(q, userId, socialNetwork);
+		for(Document document : documents) {
+			result.getDocuments().add(DtoAssembler.assemble(document));
+		}
 		
 		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
 	}
@@ -96,24 +90,18 @@ public class DocumentsEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response searchLive(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
 		DocumentsDto result = new DocumentsDto();
-		
-		// get user from db
+
+		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialNetworkId);
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		
+		List<Document> documents = ServiceFactory.getSearchService().searchLiveActivities(q, user, socialNetwork, ClientPlatform.Android, page);
 		
-		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialNetworkId);
-		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, socialNetwork);
-		
-		// search over public activities
-		List<Document> documents = ServiceFactory.getSearchService().searchPublicActivities(q, user, socialNetwork, identity.getClientPlatform(), page);
-		
-		// assemble into dtos
-		for(Document document : documents)
+		for(Document document : documents) {
 			result.getDocuments().add(DtoAssembler.assemble(document));
-		
-		
+		}
 		
 		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
+		
 	}
 	
 	

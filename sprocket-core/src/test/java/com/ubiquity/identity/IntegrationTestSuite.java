@@ -17,7 +17,6 @@ import com.ubiquity.social.repository.ActivityRepositoryTest;
 import com.ubiquity.social.repository.MessageRepositoryTest;
 import com.ubiquity.sprocket.service.AnalyticsServiceTest;
 import com.ubiquity.sprocket.service.AuthenticationServiceTest;
-import com.ubiquity.sprocket.service.SearchServiceTest;
 
 /***
  * Test suite will ensure that the integration tests have their dependencies met and cleaned up

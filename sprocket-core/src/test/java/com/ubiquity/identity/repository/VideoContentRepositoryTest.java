@@ -2,7 +2,6 @@ package com.ubiquity.identity.repository;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -16,8 +15,7 @@ import com.ubiquity.content.repository.VideoContentRepository;
 import com.ubiquity.content.repository.VideoContentRepositoryJpaImpl;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.UserFactory;
-import com.ubiquity.media.domain.Image;
-import com.ubiquity.media.domain.Video;
+import com.ubiquity.integration.factory.VideoContentFactory;
 
 /***
  * Tests testing basic CRUD operations for a user repository
@@ -46,7 +44,7 @@ public class VideoContentRepositoryTest {
 		owner = UserFactory.createTestUserWithMinimumRequiredProperties();
 		persistUser(owner);
 		
-		videoContent = createTestVideoWithMinimumRequiredProperties(owner);
+		videoContent = VideoContentFactory.createVideoContentWithMininumRequiredFields(owner, ContentNetwork.YouTube);
 		persistVideoContent(videoContent);
 		
 	}
@@ -93,14 +91,14 @@ public class VideoContentRepositoryTest {
 	public void testDeleteWhereIdsNotEqualToList() throws Exception {
 		
 		// create another video for the main user
-		VideoContent anotherVideo = createTestVideoWithMinimumRequiredProperties(owner);
+		VideoContent anotherVideo = VideoContentFactory.createVideoContentWithMininumRequiredFields(owner, ContentNetwork.YouTube);
 		persistVideoContent(anotherVideo);
 		
 		
 		// create a video for another user
 		User anotherUser = UserFactory.createTestUserWithMinimumRequiredProperties();
 		persistUser(anotherUser);
-		VideoContent videoThatShouldRemain = createTestVideoWithMinimumRequiredProperties(anotherUser);
+		VideoContent videoThatShouldRemain = VideoContentFactory.createVideoContentWithMininumRequiredFields(anotherUser, ContentNetwork.YouTube);
 		persistVideoContent(videoThatShouldRemain);
 		
 		List<VideoContent> allVideos = videoContentRepository.findByOwnerId(owner.getUserId());
@@ -127,19 +125,7 @@ public class VideoContentRepositoryTest {
 	}
 	
 	
-	private VideoContent createTestVideoWithMinimumRequiredProperties(User user) {
-		return new VideoContent.Builder()
-		.title(UUID.randomUUID().toString())
-		.category(UUID.randomUUID().toString())
-		.video(new Video.Builder().itemKey(UUID.randomUUID().toString()).build())
-		.thumb(new Image(UUID.randomUUID().toString()))
-		.description(UUID.randomUUID().toString())
-		.owner(user)
-		.contentNetwork(ContentNetwork.YouTube)
-		.lastUpdated(System.currentTimeMillis())
-		.build();
-		
-	}
+	
 	
 	private void persistUser(User user) {
 		EntityManagerSupport.beginTransaction();

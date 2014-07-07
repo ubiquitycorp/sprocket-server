@@ -28,7 +28,7 @@ public class DtoAssembler {
 		Map<String, Object> fields = document.getFields();
 		
 		// determine data type from field;
-		String dataType = (String)fields.get(SearchKeys.Fields.FIELD_DATA_TYPE);
+		String dataType = document.getDataType();
 		
 		
 		Object data = null;
@@ -51,13 +51,22 @@ public class DtoAssembler {
 			.build();
 
 		} else if(dataType.equals(Activity.class.getSimpleName())) {
-			data = new ActivityDto.Builder()
-			.title((String)fields.get(SearchKeys.Fields.FIELD_TITLE))
-			.date(System.currentTimeMillis())
-			.socialProviderId((Integer)fields.get(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID))
-			.body((String)fields.get(SearchKeys.Fields.FIELD_BODY))
-			.postedBy(new ContactDto.Builder().contactId(1l).displayName((String)fields.get(SearchKeys.Fields.FIELD_POSTED_BY)).imageUrl(SearchKeys.Fields.FIELD_THUMBNAIL).build())
-			.build();
+			// if we have an object, build from the entity data
+			if(document.getData() != null) {
+				Activity activity = (Activity)document.getData();
+				data = assemble(activity);
+				
+			
+			} else {
+				data = new ActivityDto.Builder()
+				.title((String)fields.get(SearchKeys.Fields.FIELD_TITLE))
+				.date(System.currentTimeMillis())
+				.socialProviderId((Integer)fields.get(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID))
+				.body((String)fields.get(SearchKeys.Fields.FIELD_BODY))
+				.postedBy(new ContactDto.Builder().contactId(1l).displayName((String)fields.get(SearchKeys.Fields.FIELD_POSTED_BY)).imageUrl(SearchKeys.Fields.FIELD_THUMBNAIL).build())
+				.build();
+			}
+			
 		} else {
 			throw new IllegalArgumentException("Unknown data type: " + dataType);
 		}
@@ -153,14 +162,24 @@ public class DtoAssembler {
 	}
 
 	public static ActivityDto assemble(Activity activity) {
-		return new ActivityDto.Builder()
-			.body(activity.getBody())
+		 ActivityDto.Builder activityDtoBuilder = new ActivityDto.Builder();
+		
+		 activityDtoBuilder.body(activity.getBody())
+			.type(activity.getActivityType().toString().toLowerCase())
 			.date(System.currentTimeMillis())
 			.socialProviderId(activity.getSocialNetwork().getValue())
 			.title(activity.getTitle())
-			.imageUrl(null)
-			.postedBy(DtoAssembler.assemble(activity.getPostedBy()))
-			.build();
+			.link(activity.getLink())
+			.postedBy(DtoAssembler.assemble(activity.getPostedBy()));
+		 	
+		 if(activity.getImage() != null)
+			 activityDtoBuilder.photo(new ImageDto(activity.getImage().getUrl()));
+		 if(activity.getVideo() != null)
+			 activityDtoBuilder.video(new VideoDto.Builder().url(activity.getVideo().getUrl()).itemKey(activity.getVideo().getItemKey()).build());
+		 
+		 return activityDtoBuilder.build();
+		
+			
 	}
 	
 }

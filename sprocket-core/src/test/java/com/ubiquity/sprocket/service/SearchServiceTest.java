@@ -13,7 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ubiquity.content.domain.VideoContent;
+import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.factory.UserFactory;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.domain.Activity;
@@ -37,6 +40,16 @@ public class SearchServiceTest {
 		searchService.deleteAll();
 	}
 
+	
+	@Test
+	public void testLiveSearch() {
+		
+		User user = UserFactory.createTestUserWithMinimumRequiredProperties();
+		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("CAACEdEose0cBAJDovo29F6NOZCBZCFJUTGpCaOhJsCOzvLCGZA8aMWrZApIwvd5xNwkROgkabPFDgFoJhLVfrmTsiIRSTTtmmZCAtdlr7y776bC40Aj4tf5vcKWjyZCmbsgEd9bVtA9zcFMcqV8kaVZBhpYkBvxNLPz2V2mINqctf3V92odSyXPDcXQviaJqHYZD").identityProvider(SocialNetwork.Facebook.getValue()).build());
+		List<Document> documents = searchService.searchLiveActivities("Karate", user, SocialNetwork.Facebook, ClientPlatform.WEB, 1);
+		log.debug("documents: {}", documents);
+		
+	}
 
 	@Test
 	public void testAddMessagesReturnsInBasicSearch() {

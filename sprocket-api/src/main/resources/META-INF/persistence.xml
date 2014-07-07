@@ -19,8 +19,6 @@
 		<class>com.ubiquity.social.domain.Activity</class>
 		<class>com.ubiquity.social.domain.Event</class>
 
-
-
 		<properties>
 
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
