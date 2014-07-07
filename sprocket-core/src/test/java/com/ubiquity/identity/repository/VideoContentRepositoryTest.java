@@ -25,6 +25,7 @@ import com.ubiquity.media.domain.Video;
  * @author chris
  *
  */
+// tests need to be revisited because model methods have changed relative to ContentNetwork
 public class VideoContentRepositoryTest {
 
 	private VideoContentRepository videoContentRepository;
@@ -72,7 +73,7 @@ public class VideoContentRepositoryTest {
 	
 	@Test
 	public void testFindByOwnerAndItemKey() throws Exception {
-		List<VideoContent> allVideos = videoContentRepository.findByOwnerIdAndItemKey(owner.getUserId(), videoContent.getVideo().getItemKey());
+		List<VideoContent> allVideos = videoContentRepository.findByItemKeyAndContentNetwork(owner.getUserId(), videoContent.getVideo().getItemKey(), ContentNetwork.YouTube);
 		Assert.assertFalse(allVideos.isEmpty());
 		VideoContent persisted = allVideos.get(0);
 		Assert.assertTrue(persisted.getVideoContentId().longValue() == videoContent.getVideoContentId().longValue());
@@ -110,7 +111,7 @@ public class VideoContentRepositoryTest {
 		
 		// now delete any that dont match the video id we just created for the main user
 		EntityManagerSupport.beginTransaction();
-		videoContentRepository.deleteWithoutIds(owner.getUserId(), Arrays.asList(new Long[] { anotherVideo.getVideoContentId() }));
+		videoContentRepository.deleteWithoutIds(owner.getUserId(), Arrays.asList(new Long[] { anotherVideo.getVideoContentId() }), ContentNetwork.YouTube);
 		EntityManagerSupport.commit();
 
 		// we should have 1 now
