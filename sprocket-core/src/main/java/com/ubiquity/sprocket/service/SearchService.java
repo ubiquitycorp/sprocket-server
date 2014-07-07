@@ -178,7 +178,7 @@ public class SearchService {
 		// now wrap them in a search document
 		int rank = 0;
 		for(Activity activity : activities) {
-			Document document = new Document(activity, rank);
+			Document document = new Document(activity.getClass().getSimpleName(), activity, rank);
 			rank++;
 			documents.add(document);
 		}

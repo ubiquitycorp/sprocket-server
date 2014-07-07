@@ -1,5 +1,7 @@
 package com.ubiquity.sprocket.api;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -105,10 +107,45 @@ public class DtoAssembler {
 		
 	}
 	
+	
+	/***
+	 * Constructs a list of messages and conversations (if the message has a conversation identifier). This method assumes the messages
+	 * are sorted by latest first
+	 * 
+	 * @param messageDtoList
+	 * @return
+	 */
+	public static List<MessageDto> assemble(List<Message> messages) {
+		List<MessageDto> messageDtoList = new LinkedList<MessageDto>();
+		
+		// check to see if we have a new conversation
+		MessageDto topLevelMessageDto = null;
+		String lastConversationIdentifier = null; // we track these two values because the identifier is not stored in the dto
+		for(Message message : messages) {
+			
+			MessageDto messageDto = assemble(message);
+			String conversationIdentifier = message.getConversationIdentifier();
+			if(topLevelMessageDto != null && conversationIdentifier != null && lastConversationIdentifier.equals(conversationIdentifier)) {
+				// we are adding to the conversation
+				topLevelMessageDto.getConversation().addLast(messageDto);
+			} else {
+				// we have a top level message
+				topLevelMessageDto = messageDto;
+				lastConversationIdentifier = conversationIdentifier;
+				
+				// now add to the main list for a "roll up"
+				messageDtoList.add(topLevelMessageDto);
+			}
+		}
+				
+		return messageDtoList;
+	}
+	
+	
 	public static MessageDto assemble(Message message) {
 		return new MessageDto.Builder()
 			.subject(message.getTitle())
-			.date(System.currentTimeMillis())
+			.date(message.getSentDate())
 			.socialProviderId(message.getSocialNetwork().getValue())
 			.body(message.getBody())
 			.sender(

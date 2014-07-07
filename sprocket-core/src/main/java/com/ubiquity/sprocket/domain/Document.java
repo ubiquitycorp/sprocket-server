@@ -30,6 +30,8 @@ public class Document {
 	private Integer rank;
 	
 	
+	public Document() {}
+	
 	/***
 	 * Creates a document with required property data type
 	 * 

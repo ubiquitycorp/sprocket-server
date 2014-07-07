@@ -23,7 +23,6 @@ import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchKeys;
 
-
 public class SearchServiceTest {
 
 	private static SearchService searchService;

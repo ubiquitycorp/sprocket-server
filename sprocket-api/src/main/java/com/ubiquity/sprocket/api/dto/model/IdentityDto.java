@@ -5,6 +5,7 @@ import javax.validation.constraints.Size;
 
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
+import com.ubiquity.sprocket.api.validation.AuthorizationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
 
 /***
@@ -31,7 +32,7 @@ public class IdentityDto {
 	private String displayName;
 
 	@NotNull(groups = { RegistrationValidation.class,
-			ActivationValidation.class, AuthenticationValidation.class })
+			ActivationValidation.class, AuthenticationValidation.class, AuthorizationValidation.class })
 	private Integer clientPlatformId;
 
 	@NotNull(groups = ActivationValidation.class)
@@ -41,12 +42,19 @@ public class IdentityDto {
 	@NotNull(groups = ActivationValidation.class)
 	private Integer socialNetworkId;
 
+	@NotNull(groups = AuthorizationValidation.class)
 	private Integer contentNetworkId;
 
 	@Size(min = 10, max = 255, groups = ActivationValidation.class)
 	private String secretToken;
 
 	private String identifier;
+	
+	@NotNull(groups = AuthorizationValidation.class)
+	private String code;
+
+	@Size(min = 10, max = 255, groups = AuthorizationValidation.class)
+	private String redirectUrl;
 
 	public String getUsername() {
 		return username;
@@ -84,6 +92,14 @@ public class IdentityDto {
 		return contentNetworkId;
 	}
 
+	public String getCode() {
+		return code;
+	}
+
+	public String getRedirectUrl() {
+		return redirectUrl;
+	}
+
 	public static class Builder {
 		private String username;
 		private String password;
@@ -94,6 +110,8 @@ public class IdentityDto {
 		private Integer contentNetworkId;
 		private String secretToken;
 		private String identifier;
+		private String code;
+		public String redirectUrl;
 
 		public Builder username(String username) {
 			this.username = username;
@@ -139,6 +157,16 @@ public class IdentityDto {
 			this.identifier = identifier;
 			return this;
 		}
+		
+		public Builder code(String code) {
+			this.code = code;
+			return this;
+		}
+		
+		public Builder redirectUrl(String redirectUrl) {
+			this.redirectUrl = redirectUrl;
+			return this;
+		}
 
 		public IdentityDto build() {
 			return new IdentityDto(this);
@@ -155,5 +183,7 @@ public class IdentityDto {
 		this.contentNetworkId = builder.contentNetworkId;
 		this.secretToken = builder.secretToken;
 		this.identifier = builder.identifier;
+		this.code = builder.code;
+		this.redirectUrl = builder.redirectUrl;
 	}
 }
