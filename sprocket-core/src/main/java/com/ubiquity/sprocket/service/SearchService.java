@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.sprocket.domain.Document;
-import com.ubiquity.sprocket.domain.VideoContent;
+import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.sprocket.search.SearchEngine;
 import com.ubiquity.sprocket.search.SearchKeys;
 import com.ubiquity.sprocket.search.solr.SearchEngineSolrjImpl;
@@ -104,7 +104,8 @@ public class SearchService {
 			if(videoContent.getThumb() != null)
 				document.getFields().put(SearchKeys.CommonFields.FIELD_THUMBNAIL, videoContent.getThumb().getUrl());
 
-			document.getFields().put(SearchKeys.VideoContentFields.FIELD_CATEGORY, videoContent.getCategory());
+			if(videoContent.getCategory() != null)
+				document.getFields().put(SearchKeys.VideoContentFields.FIELD_CATEGORY, videoContent.getCategory());
 			document.getFields().put(SearchKeys.VideoContentFields.FIELD_ITEM_KEY, videoContent.getVideo().getItemKey());
 			
 			document.getFields().put(SearchKeys.CommonFields.FIELD_DATA_TYPE, VideoContent.class.getSimpleName());

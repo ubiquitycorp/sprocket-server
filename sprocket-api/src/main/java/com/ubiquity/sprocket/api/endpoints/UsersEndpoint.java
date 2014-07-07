@@ -17,6 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.api.exception.HttpException;
+import com.ubiquity.content.api.ContentAPI;
+import com.ubiquity.content.api.ContentAPIFactory;
+import com.ubiquity.content.domain.ContentNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
@@ -28,6 +31,7 @@ import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
+import com.ubiquity.sprocket.api.validation.AuthorizationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
 import com.ubiquity.sprocket.domain.EventType;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
@@ -50,8 +54,6 @@ public class UsersEndpoint {
 	public Response ping() {
 		return Response.ok().entity("{\"message\":\"pong\"}").build();
 	}
-
-
 
 	/***
 	 * This method authenticates user via native login. Thereafter users can authenticate
@@ -171,6 +173,33 @@ public class UsersEndpoint {
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(result))
 				.build();
+
+	}
+	
+	@POST
+	@Path("/{userId}/authorized")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response authorize(@PathParam("userId") Long userId, InputStream payload) throws IOException {
+	
+		// convert payload
+		IdentityDto identityDto = jsonConverter.convertFromPayload(payload, IdentityDto.class, AuthorizationValidation.class);
+		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto.getClientPlatformId());		
+		ContentNetwork contentNetwork = ContentNetwork.getContentNetworkFromId(identityDto.getContentNetworkId());
+		
+		// load user
+		User user = ServiceFactory.getUserService().getUserById(userId);
+		ContentAPI contentApi = ContentAPIFactory.createProvider(contentNetwork, clientPlatform);
+		String accessToken = contentApi.getAccessToken(identityDto.getCode(), identityDto.getRedirectUrl());
+		
+		// create the identity if it does not exist; or use the existing one
+		ExternalIdentity identity = ServiceFactory.getContentService().createOrUpdateContentIdentity(user, accessToken, identityDto.getSecretToken(), clientPlatform, contentNetwork);
+		//ExternalIdentity identity = ServiceFactory.getContentService().getContentIdentityById(5L);
+		
+		//List<VideoContent> synced = ServiceFactory.getContentService().sync(identity, contentNetwork);
+		sendActivatedMessage(user, identity, identityDto);
+		
+		return Response.ok().build();
 
 	}
 	

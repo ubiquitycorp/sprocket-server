@@ -66,6 +66,7 @@ public class SocialEndpoint {
 	}
 
 
+	
 	/***
 	 * This method returns messages of specific social network
 	 * @param userId
@@ -88,16 +89,13 @@ public class SocialEndpoint {
 		if (variant == null)
 			return Response.notModified().build();
 		
-		// limit 20 for demo
-		int limit = 20;
-		int count = 0;
-		for(Message message : variant.getCollection()) {
-			if(count < limit)
-				result.getMessages().add(DtoAssembler.assemble(message));
-			count++;
-		}
-
 		
+		List<Message> messages = new LinkedList<Message>();
+		messages.addAll(variant.getCollection());
+		
+		// Assemble into message dto, constructing conversations if they are inherent in the data
+		result.getMessages().addAll(DtoAssembler.assemble(messages));
+	
 		return Response.ok()
 				.header("Last-Modified", variant.getLastModified())
 				.entity(jsonConverter.convertToPayload(result))
