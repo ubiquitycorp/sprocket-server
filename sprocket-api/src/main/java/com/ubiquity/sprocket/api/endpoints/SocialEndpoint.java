@@ -1,6 +1,8 @@
 package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
