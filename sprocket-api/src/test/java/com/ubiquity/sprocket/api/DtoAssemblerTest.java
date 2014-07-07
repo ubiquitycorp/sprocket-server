@@ -6,7 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.integration.factory.MessageFactory;
+import com.ubiquity.integration.factory.TestMessageFactory;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialNetwork;
@@ -24,13 +24,13 @@ public class DtoAssemblerTest {
 	@Test
 	public void testAssembleMessageConversation() {
 		
-		List<Message> conversation = MessageFactory.createConversation(SocialNetwork.Facebook);
+		List<Message> conversation = TestMessageFactory.createConversation(SocialNetwork.Facebook);
 		// get the owner and create one orphan message
 		
 		Message aMessage = conversation.get(0);
 		User owner = aMessage.getOwner();
 		Contact sender = aMessage.getSender();
-		conversation.add(MessageFactory.createMessageWithMininumRequiredFields(owner, sender, SocialNetwork.Facebook, null));
+		conversation.add(TestMessageFactory.createMessageWithMininumRequiredFields(owner, sender, SocialNetwork.Facebook, null));
 		
 		List<MessageDto> messageDtoList = DtoAssembler.assemble(conversation);
 		

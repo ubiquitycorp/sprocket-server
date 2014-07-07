@@ -15,7 +15,7 @@ import com.ubiquity.content.repository.VideoContentRepository;
 import com.ubiquity.content.repository.VideoContentRepositoryJpaImpl;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.UserFactory;
-import com.ubiquity.integration.factory.VideoContentFactory;
+import com.ubiquity.integration.factory.TestVideoContentFactory;
 
 /***
  * Tests testing basic CRUD operations for a user repository
@@ -44,7 +44,7 @@ public class VideoContentRepositoryTest {
 		owner = UserFactory.createTestUserWithMinimumRequiredProperties();
 		persistUser(owner);
 		
-		videoContent = VideoContentFactory.createVideoContentWithMininumRequiredFields(owner, ContentNetwork.YouTube);
+		videoContent = TestVideoContentFactory.createVideoContentWithMininumRequiredFields(owner, ContentNetwork.YouTube);
 		persistVideoContent(videoContent);
 		
 	}
@@ -67,14 +67,7 @@ public class VideoContentRepositoryTest {
 		VideoContent persisted = allVideos.get(0);
 		Assert.assertTrue(persisted.getVideoContentId().longValue() == videoContent.getVideoContentId().longValue());
 	}
-	
-	@Test
-	public void testFindByOwnerAndItemKey() throws Exception {
-		List<VideoContent> allVideos = videoContentRepository.findByOwnerIdAndItemKey(owner.getUserId(), videoContent.getVideo().getItemKey());
-		Assert.assertFalse(allVideos.isEmpty());
-		VideoContent persisted = allVideos.get(0);
-		Assert.assertTrue(persisted.getVideoContentId().longValue() == videoContent.getVideoContentId().longValue());
-	}
+
 	
 	@Test
 	public void testFindByOwnerAndContentNetwork() throws Exception {
@@ -91,14 +84,14 @@ public class VideoContentRepositoryTest {
 	public void testDeleteWhereIdsNotEqualToList() throws Exception {
 		
 		// create another video for the main user
-		VideoContent anotherVideo = VideoContentFactory.createVideoContentWithMininumRequiredFields(owner, ContentNetwork.YouTube);
+		VideoContent anotherVideo = TestVideoContentFactory.createVideoContentWithMininumRequiredFields(owner, ContentNetwork.YouTube);
 		persistVideoContent(anotherVideo);
 		
 		
 		// create a video for another user
 		User anotherUser = UserFactory.createTestUserWithMinimumRequiredProperties();
 		persistUser(anotherUser);
-		VideoContent videoThatShouldRemain = VideoContentFactory.createVideoContentWithMininumRequiredFields(anotherUser, ContentNetwork.YouTube);
+		VideoContent videoThatShouldRemain = TestVideoContentFactory.createVideoContentWithMininumRequiredFields(anotherUser, ContentNetwork.YouTube);
 		persistVideoContent(videoThatShouldRemain);
 		
 		List<VideoContent> allVideos = videoContentRepository.findByOwnerId(owner.getUserId());
@@ -108,7 +101,7 @@ public class VideoContentRepositoryTest {
 		
 		// now delete any that dont match the video id we just created for the main user
 		EntityManagerSupport.beginTransaction();
-		videoContentRepository.deleteWithoutIds(owner.getUserId(), Arrays.asList(new Long[] { anotherVideo.getVideoContentId() }));
+		videoContentRepository.deleteWithoutIds(owner.getUserId(), Arrays.asList(new Long[] { anotherVideo.getVideoContentId() }), ContentNetwork.YouTube);
 		EntityManagerSupport.commit();
 
 		// we should have 1 now

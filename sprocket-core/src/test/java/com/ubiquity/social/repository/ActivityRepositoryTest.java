@@ -12,7 +12,7 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.UserFactory;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
-import com.ubiquity.integration.factory.ActivityFactory;
+import com.ubiquity.integration.factory.TestActivityFactory;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.domain.Activity;
@@ -51,10 +51,10 @@ public class ActivityRepositoryTest {
 		EntityManagerSupport.commit();
 		
 		// now create activities based on content
-		statusActivity = ActivityFactory.createActivityWithMininumRequirements(owner, SocialNetwork.Facebook);
-		videoActivity = ActivityFactory.createActivityWithMininumRequirements(owner, SocialNetwork.Facebook, new Video.Builder().url("http://my.video.url").build());
-		photoActivity = ActivityFactory.createActivityWithMininumRequirements(owner, SocialNetwork.Facebook, new Image("http://my.image.url"));
-		linkActivity = ActivityFactory.createActivityWithMininumRequirements(owner, SocialNetwork.Facebook, "http://my.link.url");
+		statusActivity = TestActivityFactory.createActivityWithMininumRequirements(owner, SocialNetwork.Facebook);
+		videoActivity = TestActivityFactory.createActivityWithMininumRequirements(owner, SocialNetwork.Facebook, new Video.Builder().url("http://my.video.url").build());
+		photoActivity = TestActivityFactory.createActivityWithMininumRequirements(owner, SocialNetwork.Facebook, new Image("http://my.image.url"));
+		linkActivity = TestActivityFactory.createActivityWithMininumRequirements(owner, SocialNetwork.Facebook, "http://my.link.url");
 
 		EntityManagerSupport.beginTransaction();
 		activityRepository.create(statusActivity);

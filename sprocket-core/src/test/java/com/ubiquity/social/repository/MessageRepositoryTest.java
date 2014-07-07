@@ -13,7 +13,7 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.UserFactory;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
-import com.ubiquity.integration.factory.ContactFactory;
+import com.ubiquity.integration.factory.TestContactFactory;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.SocialNetwork;
@@ -53,7 +53,7 @@ public class MessageRepositoryTest {
 		userRepository.create(owner);
 		EntityManagerSupport.commit();
 					
-		sender = ContactFactory.createContactWithMininumRequiredFieldsAndSocialNetwork(owner, SocialNetwork.Facebook);
+		sender = TestContactFactory.createContactWithMininumRequiredFieldsAndSocialNetwork(owner, SocialNetwork.Facebook);
 		
 		EntityManagerSupport.beginTransaction();
 		contactRepository.create(sender);
