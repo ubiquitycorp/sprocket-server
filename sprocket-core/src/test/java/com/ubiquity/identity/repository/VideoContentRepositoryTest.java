@@ -23,6 +23,7 @@ import com.ubiquity.integration.factory.TestVideoContentFactory;
  * @author chris
  *
  */
+// tests need to be revisited because model methods have changed relative to ContentNetwork
 public class VideoContentRepositoryTest {
 
 	private VideoContentRepository videoContentRepository;
@@ -68,6 +69,14 @@ public class VideoContentRepositoryTest {
 		Assert.assertTrue(persisted.getVideoContentId().longValue() == videoContent.getVideoContentId().longValue());
 	}
 
+	
+	@Test
+	public void testFindByOwnerAndItemKey() throws Exception {
+		List<VideoContent> allVideos = videoContentRepository.findByItemKeyAndContentNetwork(owner.getUserId(), videoContent.getVideo().getItemKey(), ContentNetwork.YouTube);
+		Assert.assertFalse(allVideos.isEmpty());
+		VideoContent persisted = allVideos.get(0);
+		Assert.assertTrue(persisted.getVideoContentId().longValue() == videoContent.getVideoContentId().longValue());
+	}
 	
 	@Test
 	public void testFindByOwnerAndContentNetwork() throws Exception {
