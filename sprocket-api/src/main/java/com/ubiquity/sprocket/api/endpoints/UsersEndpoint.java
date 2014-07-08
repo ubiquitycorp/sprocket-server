@@ -176,6 +176,14 @@ public class UsersEndpoint {
 
 	}
 	
+	/***
+	 * This end point authorizes user in the given content network and retrieves access token. 
+	 * Then it saves an external identity for this user in given content network
+	 * @param userId
+	 * @param payload
+	 * @return
+	 * @throws IOException
+	 */
 	@POST
 	@Path("/{userId}/authorized")
 	@Consumes(MediaType.APPLICATION_JSON)
