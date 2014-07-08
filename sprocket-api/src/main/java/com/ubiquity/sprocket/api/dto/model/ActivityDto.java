@@ -6,8 +6,27 @@ public class ActivityDto {
 	private String body;
 	private Long date;
 	private ContactDto postedBy;
-	private String imageUrl;
+	private ImageDto photo;
+	private VideoDto video;
 	private Integer socialProviderId;
+	private String type;
+	private String link;
+
+	public String getLink() {
+		return link;
+	}
+
+	public ImageDto getPhoto() {
+		return photo;
+	}
+
+	public VideoDto getVideo() {
+		return video;
+	}
+
+	public String getType() {
+		return type;
+	}
 
 	public String getTitle() {
 		return title;
@@ -25,10 +44,6 @@ public class ActivityDto {
 		return postedBy;
 	}
 
-	public String getImageUrl() {
-		return imageUrl;
-	}
-
 	public Integer getSocialProviderId() {
 		return socialProviderId;
 	}
@@ -38,8 +53,11 @@ public class ActivityDto {
 		private String body;
 		private Long date;
 		private ContactDto postedBy;
-		private String imageUrl;
+		private ImageDto photo;
+		private VideoDto video;
 		private Integer socialProviderId;
+		private String type;
+		private String link;
 
 		public Builder title(String title) {
 			this.title = title;
@@ -61,13 +79,28 @@ public class ActivityDto {
 			return this;
 		}
 
-		public Builder imageUrl(String imageUrl) {
-			this.imageUrl = imageUrl;
+		public Builder photo(ImageDto photo) {
+			this.photo = photo;
+			return this;
+		}
+
+		public Builder video(VideoDto video) {
+			this.video = video;
 			return this;
 		}
 
 		public Builder socialProviderId(Integer socialProviderId) {
 			this.socialProviderId = socialProviderId;
+			return this;
+		}
+
+		public Builder type(String type) {
+			this.type = type;
+			return this;
+		}
+
+		public Builder link(String link) {
+			this.link = link;
 			return this;
 		}
 
@@ -81,7 +114,10 @@ public class ActivityDto {
 		this.body = builder.body;
 		this.date = builder.date;
 		this.postedBy = builder.postedBy;
-		this.imageUrl = builder.imageUrl;
+		this.photo = builder.photo;
+		this.video = builder.video;
 		this.socialProviderId = builder.socialProviderId;
+		this.type = builder.type;
+		this.link = builder.link;
 	}
 }

@@ -9,9 +9,7 @@
 
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 
-		<class>com.ubiquity.sprocket.domain.VideoContent</class>
-
-
+		<class>com.ubiquity.content.domain.VideoContent</class>
 		<class>com.ubiquity.identity.domain.User</class>
 		<class>com.ubiquity.identity.domain.Identity</class>
 		<class>com.ubiquity.identity.domain.NativeIdentity</class>
@@ -20,8 +18,6 @@
 		<class>com.ubiquity.social.domain.Message</class>
 		<class>com.ubiquity.social.domain.Activity</class>
 		<class>com.ubiquity.social.domain.Event</class>
-
-
 
 		<properties>
 

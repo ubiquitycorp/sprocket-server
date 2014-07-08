@@ -7,17 +7,17 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
+import com.ubiquity.content.domain.ContentNetwork;
+import com.ubiquity.content.domain.VideoContent;
+import com.ubiquity.content.service.ContentService;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.social.service.SocialService;
-import com.ubiquity.sprocket.domain.ContentNetwork;
-import com.ubiquity.sprocket.domain.VideoContent;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
-import com.ubiquity.sprocket.service.ContentService;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 public class CacheInvalidateConsumer extends AbstractConsumerThread {
@@ -59,12 +59,22 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		
 		// get identity from message
 		ExternalIdentity identity = ServiceFactory.getSocialService().getSocialIdentityById(activated.getIdentityId());
+		
+		
+		if(activated.getContentNetworkId() != null){
+			ContentNetwork contentNetwork = ContentNetwork.getContentNetworkFromId(activated.getContentNetworkId());
+			// Google has the same identity for both Youtube and Google+
+			if(contentNetwork.equals(ContentNetwork.YouTube))
+				processVideos(identity, contentNetwork);
+			else{
+				// get content identity
+				ExternalIdentity contentIdentity = ServiceFactory.getContentService().getContentIdentityById(activated.getIdentityId());
+				processVideos(contentIdentity, contentNetwork);
+			}
+		}
+		
 		if(identity.getIdentityProvider() == SocialNetwork.Google.getValue()) {
 			processMessages(identity, SocialNetwork.Google);
-
-			if(activated.getContentNetworkId() != null)
-				processVideos(identity, ContentNetwork.YouTube);
-			
 		} else if(identity.getIdentityProvider() == SocialNetwork.Facebook.getValue()) {
 			processMessages(identity, SocialNetwork.Facebook);
 			processActivities(identity, SocialNetwork.Facebook);

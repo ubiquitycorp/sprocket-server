@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>sprocket-core</artifactId>
 	<name>Sprocket Core</name>
-	<version>0.1.15</version>
+	<version>0.1.16</version>
 	<build>
 
 		<finalName>sprocket-core</finalName>
@@ -61,7 +61,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-integration</artifactId>
-			<version>0.1.18</version>
+			<version>0.1.20</version>
 		</dependency>
 
 	
@@ -111,11 +111,24 @@
 			<version>5.1.6</version>
 			<scope>test</scope>
 		</dependency>
+		
+
 
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-identity-test</artifactId>
 			<version>0.1.1</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+			<optional>false</optional>
+		</dependency>
+		
+		
+		
+		<dependency>
+			<groupId>com.ubiquity</groupId>
+			<artifactId>ubc-integration-test</artifactId>
+			<version>0.1</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 			<optional>false</optional>

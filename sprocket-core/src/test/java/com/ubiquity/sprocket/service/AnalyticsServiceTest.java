@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import com.ubiquity.sprocket.domain.Event;
 import com.ubiquity.sprocket.domain.EventType;
 
-
 public class AnalyticsServiceTest {
 
 	private static AnalyticsService analyticsService;

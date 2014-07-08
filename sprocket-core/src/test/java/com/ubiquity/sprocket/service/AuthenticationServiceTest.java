@@ -13,7 +13,6 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.identity.service.UserService;
 
-
 public class AuthenticationServiceTest {
 
 	private AuthenticationService authenticationService;
