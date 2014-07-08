@@ -11,9 +11,9 @@ import javax.ws.rs.core.Response;
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
 import com.ubiquity.content.domain.ContentNetwork;
+import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.VideosDto;
-import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/content")

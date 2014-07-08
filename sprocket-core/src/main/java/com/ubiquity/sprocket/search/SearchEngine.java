@@ -23,13 +23,14 @@ public interface SearchEngine {
 
 	/***
 	 * 
-	 * Search for documents matching the value for this map of field / value pairs
+	 * Search for indexed documents matching the value for this map of field / value pairs
      *
 	 * @param searchTerm
 	 * @param fields
 	 * @return
 	 */
 	public List<Document> searchDocuments(String searchTerm, String[] fields, Map<String, Object> filter);
+	
 
 	/***
 	 * Removes all documents 

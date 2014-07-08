@@ -53,12 +53,9 @@ public class SocialEndpoint {
 		if (variant == null)
 			return Response.notModified().build();
 
-		int limit = 20;
-		int count = 0;
+		
 		for(Activity activity : variant.getCollection()) {
-			if(count < limit)
-				results.getActivities().add(DtoAssembler.assemble(activity));
-			count++;
+			results.getActivities().add(DtoAssembler.assemble(activity));
 		}
 
 		return Response.ok()

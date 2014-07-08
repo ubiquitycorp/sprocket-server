@@ -7,6 +7,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 
 import com.ubiquity.sprocket.domain.Document;
+import com.ubiquity.sprocket.search.SearchKeys;
 
 public class SolrApiDtoAssembler {
 	
@@ -32,7 +33,7 @@ public class SolrApiDtoAssembler {
 	 * @return
 	 */
 	public static Document assemble(SolrDocument solrDocument) {
-		Document document = new Document();
+		Document document = new Document((String)solrDocument.get(SearchKeys.Fields.FIELD_DATA_TYPE));
 		Collection<String> fieldNames = solrDocument.getFieldNames();
 		for(String key : fieldNames) {
 			Object value = solrDocument.get(key);
