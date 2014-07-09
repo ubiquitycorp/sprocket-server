@@ -1,5 +1,8 @@
 package com.ubiquity.social.api;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Assert;
@@ -32,7 +35,24 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 	public void sendMessage() {
 		
 		SocialAPI twitterAPI = SocialAPIFactory.createProvider(SocialNetwork.Twitter, ClientPlatform.WEB);
-		Boolean sent = twitterAPI.sendMessage(identity, null, "engminashafik", "test");
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+		Date date = new Date();
+		String message = dateFormat.format(date);
+		message = message.replaceAll(" ", "%20");
+		Boolean sent = twitterAPI.sendMessage(identity, null, "engminashafik", message);
 		Assert.assertTrue(sent);
+	}
+	@Test
+	public void testGetMessages() {
+		
+		SocialAPI twitterAPI = SocialAPIFactory.createProvider(SocialNetwork.Twitter, ClientPlatform.WEB);
+		List<Message> messages = twitterAPI.listMessages(identity);
+		Assert.assertFalse(messages.isEmpty());
+		// all fb messages will have conversations
+		for(Message message : messages) {
+			log.debug("message {}", message);
+			Assert.assertNotNull(message.getConversationIdentifier());
+		}
+		
 	}
 }
