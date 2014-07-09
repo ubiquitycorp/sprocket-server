@@ -73,9 +73,10 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			}
 		}
 		
-		if(identity.getIdentityProvider() == SocialNetwork.Google.getValue()) {
-			processMessages(identity, SocialNetwork.Google);
-		} else if(identity.getIdentityProvider() == SocialNetwork.Facebook.getValue()) {
+		SocialNetwork socialNetwork = SocialNetwork.getEnum(identity.getIdentityProvider());
+		if(socialNetwork.equals(SocialNetwork.Google)||socialNetwork.equals(SocialNetwork.Twitter)) {
+			processMessages(identity, socialNetwork);
+		} else if(socialNetwork.equals(SocialNetwork.Facebook)) {
 			processMessages(identity, SocialNetwork.Facebook);
 			processActivities(identity, SocialNetwork.Facebook);
 		}

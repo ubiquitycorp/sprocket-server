@@ -19,10 +19,13 @@
         <dependent-module archiveName="niobium-amqp-0.2.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/niobium-amqp/niobium-amqp">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="niobium-data-access-0.5.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/niobium-data-access/niobium-data-access">
+        <dependent-module archiveName="ubc-api-0.3.2.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ubc-api/ubc-api">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="niobium-common-0.2.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/niobium-common/niobium-common">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="niobium-data-access-0.5.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/niobium-data-access/niobium-data-access">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="ubc-identity-0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ubc-identity/ubc-identity">
