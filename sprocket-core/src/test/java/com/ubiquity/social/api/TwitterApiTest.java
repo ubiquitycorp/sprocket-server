@@ -15,7 +15,6 @@ import com.ubiquity.content.api.VimeoAPITest;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Message;
-import com.ubiquity.social.domain.PostActivity;
 import com.ubiquity.social.domain.SocialNetwork;
 
 public class TwitterApiTest {
