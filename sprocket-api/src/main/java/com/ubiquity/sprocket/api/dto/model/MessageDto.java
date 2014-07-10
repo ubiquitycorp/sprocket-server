@@ -9,12 +9,12 @@ public class MessageDto {
 	private String body;
 	private Long date;
 	private ContactDto sender;
-	private Integer socialProviderId;
+	private Integer externalNetworkId;
 	
 	private Deque<MessageDto> conversation = new LinkedList<MessageDto>();
 
-	public Integer getSocialProviderId() {
-		return socialProviderId;
+	public Integer getExternalNetworkId() {
+		return externalNetworkId;
 	}
 
 	public String getSubject() {
@@ -44,7 +44,7 @@ public class MessageDto {
 		private String body;
 		private Long date;
 		private ContactDto sender;
-		private Integer socialProviderId;
+		private Integer externalNetworkId;
 
 		public Builder subject(String subject) {
 			this.subject = subject;
@@ -66,8 +66,8 @@ public class MessageDto {
 			return this;
 		}
 
-		public Builder socialProviderId(Integer socialProviderId) {
-			this.socialProviderId = socialProviderId;
+		public Builder externalNetworkId(Integer externalNetworkId) {
+			this.externalNetworkId = externalNetworkId;
 			return this;
 		}
 
@@ -81,6 +81,6 @@ public class MessageDto {
 		this.body = builder.body;
 		this.date = builder.date;
 		this.sender = builder.sender;
-		this.socialProviderId = builder.socialProviderId;
+		this.externalNetworkId = builder.externalNetworkId;
 	}
 }

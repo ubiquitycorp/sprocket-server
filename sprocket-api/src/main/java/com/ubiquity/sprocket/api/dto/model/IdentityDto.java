@@ -40,7 +40,7 @@ public class IdentityDto {
 	private String accessToken;
 
 	@NotNull(groups = {ActivationValidation.class, AuthorizationValidation.class})
-	private Integer socialNetworkId;
+	private Integer externalNetworkId;
 
 	@Size(min = 10, max = 255, groups = ActivationValidation.class)
 	private String secretToken;
@@ -81,8 +81,8 @@ public class IdentityDto {
 		return identifier;
 	}
 
-	public Integer getexternalNetworkId() {
-		return socialNetworkId;
+	public Integer getExternalNetworkId() {
+		return externalNetworkId;
 	}
 
 	public String getCode() {
@@ -166,7 +166,7 @@ public class IdentityDto {
 		this.displayName = builder.displayName;
 		this.clientPlatformId = builder.clientPlatformId;
 		this.accessToken = builder.accessToken;
-		this.socialNetworkId = builder.externalNetworkId;
+		this.externalNetworkId = builder.externalNetworkId;
 		this.secretToken = builder.secretToken;
 		this.identifier = builder.identifier;
 		this.code = builder.code;

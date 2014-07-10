@@ -152,13 +152,13 @@ public class UsersEndpoint {
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload, IdentityDto.class, ActivationValidation.class);
 
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto.getClientPlatformId());		
-		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(identityDto.getexternalNetworkId());
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(identityDto.getExternalNetworkId());
 		
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
 				
 		// create the identity if it does not exist; or use the existing one
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().createOrUpdateExternalIdentity(user, identityDto.getAccessToken(), identityDto.getSecretToken(), clientPlatform, socialNetwork);
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().createOrUpdateExternalIdentity(user, identityDto.getAccessToken(), identityDto.getSecretToken(), clientPlatform, externalNetwork);
 
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto);
@@ -191,7 +191,7 @@ public class UsersEndpoint {
 		// convert payload
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload, IdentityDto.class, AuthorizationValidation.class);
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto.getClientPlatformId());		
-		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(identityDto.getexternalNetworkId());
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(identityDto.getExternalNetworkId());
 		
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);

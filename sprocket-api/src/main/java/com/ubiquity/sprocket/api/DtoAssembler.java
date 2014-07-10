@@ -45,7 +45,7 @@ public class DtoAssembler {
 			data = new MessageDto.Builder()
 			.subject((String)fields.get(SearchKeys.Fields.FIELD_TITLE))
 			.date(System.currentTimeMillis())
-			.socialProviderId((Integer)fields.get(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID))
+			.externalNetworkId((Integer)fields.get(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID))
 			.body((String)fields.get(SearchKeys.Fields.FIELD_BODY))
 			.sender(new ContactDto.Builder().contactId(1l).displayName((String)fields.get(SearchKeys.Fields.FIELD_SENDER)).imageUrl(SearchKeys.Fields.FIELD_THUMBNAIL).build())
 			.build();
@@ -61,7 +61,7 @@ public class DtoAssembler {
 				data = new ActivityDto.Builder()
 				.title((String)fields.get(SearchKeys.Fields.FIELD_TITLE))
 				.date(System.currentTimeMillis())
-				.socialProviderId((Integer)fields.get(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID))
+				.externalNetworkId((Integer)fields.get(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID))
 				.body((String)fields.get(SearchKeys.Fields.FIELD_BODY))
 				.postedBy(new ContactDto.Builder().contactId(1l).displayName((String)fields.get(SearchKeys.Fields.FIELD_POSTED_BY)).imageUrl(SearchKeys.Fields.FIELD_THUMBNAIL).build())
 				.build();
@@ -155,7 +155,7 @@ public class DtoAssembler {
 		return new MessageDto.Builder()
 			.subject(message.getTitle())
 			.date(message.getSentDate())
-			.socialProviderId(message.getExternalNetwork().ordinal())
+			.externalNetworkId(message.getExternalNetwork().ordinal())
 			.body(message.getBody())
 			.sender(
 					assemble(message.getSender())).build();
@@ -167,7 +167,7 @@ public class DtoAssembler {
 		 activityDtoBuilder.body(activity.getBody())
 			.type(activity.getActivityType().toString().toLowerCase())
 			.date(System.currentTimeMillis())
-			.socialProviderId(activity.getExternalNetwork().ordinal())
+			.externalNetworkId(activity.getExternalNetwork().ordinal())
 			.title(activity.getTitle())
 			.link(activity.getLink())
 			.postedBy(DtoAssembler.assemble(activity.getPostedBy()));
