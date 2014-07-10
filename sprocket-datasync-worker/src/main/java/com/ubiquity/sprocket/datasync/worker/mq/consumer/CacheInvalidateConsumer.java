@@ -69,13 +69,13 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		else if (externalNetwork.equals(ExternalNetwork.Google))
 			processVideos(identity, ExternalNetwork.YouTube);
 		
-		if (externalNetwork.equals(ExternalNetwork.Google)) {
-			processMessages(identity, ExternalNetwork.Google);
-		} else if (externalNetwork.equals(ExternalNetwork.Facebook)) {
+		if(externalNetwork.equals(ExternalNetwork.Google)||externalNetwork.equals(ExternalNetwork.Twitter)) {
+			processMessages(identity, externalNetwork);
+		}  else if (externalNetwork.equals(ExternalNetwork.Facebook)) {
 			processMessages(identity, ExternalNetwork.Facebook);
 			processActivities(identity, ExternalNetwork.Facebook);
 		}
-	}
+	} 
 
 	private void processActivities(ExternalIdentity identity,
 			ExternalNetwork socialNetwork) {

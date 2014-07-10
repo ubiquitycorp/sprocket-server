@@ -13,6 +13,7 @@ import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.identity.repository.SocialRepositoryTest;
 import com.ubiquity.identity.repository.UserRepositoryTest;
 import com.ubiquity.identity.repository.VideoContentRepositoryTest;
+import com.ubiquity.social.api.TwitterApiTest;
 import com.ubiquity.social.repository.ActivityRepositoryTest;
 import com.ubiquity.social.repository.MessageRepositoryTest;
 import com.ubiquity.sprocket.service.AnalyticsServiceTest;
@@ -32,7 +33,8 @@ import com.ubiquity.sprocket.service.AuthenticationServiceTest;
 	UserRepositoryTest.class, 
 	ActivityRepositoryTest.class, 
 	MessageRepositoryTest.class,
-	VideoContentRepositoryTest.class
+	VideoContentRepositoryTest.class,
+	TwitterApiTest.class
 	})
 public class IntegrationTestSuite {
 	
