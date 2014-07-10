@@ -15,6 +15,7 @@ import com.ubiquity.content.api.VimeoAPITest;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Message;
+import com.ubiquity.social.domain.PostActivity;
 import com.ubiquity.social.domain.SocialNetwork;
 
 public class TwitterApiTest {
@@ -35,7 +36,7 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 	public void sendMessage() {
 		
 		SocialAPI twitterAPI = SocialAPIFactory.createProvider(SocialNetwork.Twitter, ClientPlatform.WEB);
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH-mm-ss");
 		Date date = new Date();
 		String message = dateFormat.format(date);
 		message = message.replaceAll(" ", "%20");

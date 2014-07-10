@@ -23,6 +23,7 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.api.exception.AuthorizationException;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Message;
+import com.ubiquity.social.domain.PostActivity;
 import com.ubiquity.social.domain.SocialNetwork;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
@@ -131,4 +132,37 @@ public class SocialEndpoint {
 		return Response.ok().build();
 			
 	}
+	
+	/***
+	 * This method send message to specific user in social network
+	 * @param userId
+	 * @param socialProviderId
+	 * @return
+	 */
+	@POST
+	@Path("users/{userId}/providers/{socialNetworkId}/postactivity")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response postactivity(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) {
+
+		// get social network 
+		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialProviderId);
+		// get the identity from DB
+		ExternalIdentity identity = ServiceFactory.getSocialService().findSocialIdentity(userId, socialNetwork);
+		//Cast the input into SendMessageObject
+		PostActivity postActivity = jsonConverter.convertFromPayload(payload, PostActivity.class);
+		try{
+			ServiceFactory.getSocialService().PostActivity(identity, socialNetwork, postActivity);
+		}
+		catch(AuthorizationException e)
+		{
+			throw new AuthorizationException(e.getMessage());
+		}
+		catch(RuntimeException e)
+		{
+			throw new HttpException(e.getMessage(), 503);
+		}
+		return Response.ok().build();
+			
+	}
+
 }
