@@ -10,8 +10,8 @@ import javax.ws.rs.core.Response;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
-import com.ubiquity.content.domain.ContentNetwork;
 import com.ubiquity.content.domain.VideoContent;
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.VideosDto;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -24,12 +24,12 @@ public class ContentEndpoint {
 	@GET
 	@Path("/users/{userId}/providers/{contentNetworkId}/videos")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response videos(@PathParam("userId") Long userId, @PathParam("contentNetworkId") Integer contentNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+	public Response videos(@PathParam("userId") Long userId, @PathParam("contentNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		
 		VideosDto results = new VideosDto();
 		
-		ContentNetwork contentNetwork = ContentNetwork.getContentNetworkFromId(contentNetworkId);
-		CollectionVariant<VideoContent> variant = ServiceFactory.getContentService().findAllVideosByOwnerIdAndContentNetwork(userId, contentNetwork, ifModifiedSince);
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
+		CollectionVariant<VideoContent> variant = ServiceFactory.getContentService().findAllVideosByOwnerIdAndContentNetwork(userId, externalNetwork, ifModifiedSince);
 
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)

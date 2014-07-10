@@ -22,7 +22,7 @@ import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
-import com.ubiquity.social.domain.SocialNetwork;
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchKeys;
 
@@ -45,8 +45,8 @@ public class SearchServiceTest {
 	public void testLiveSearch() {
 		
 		User user = UserFactory.createTestUserWithMinimumRequiredProperties();
-		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("CAACEdEose0cBAJDovo29F6NOZCBZCFJUTGpCaOhJsCOzvLCGZA8aMWrZApIwvd5xNwkROgkabPFDgFoJhLVfrmTsiIRSTTtmmZCAtdlr7y776bC40Aj4tf5vcKWjyZCmbsgEd9bVtA9zcFMcqV8kaVZBhpYkBvxNLPz2V2mINqctf3V92odSyXPDcXQviaJqHYZD").identityProvider(SocialNetwork.Facebook.getValue()).build());
-		List<Document> documents = searchService.searchLiveActivities("Karate", user, SocialNetwork.Facebook, ClientPlatform.WEB, 1);
+		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("CAACEdEose0cBAJDovo29F6NOZCBZCFJUTGpCaOhJsCOzvLCGZA8aMWrZApIwvd5xNwkROgkabPFDgFoJhLVfrmTsiIRSTTtmmZCAtdlr7y776bC40Aj4tf5vcKWjyZCmbsgEd9bVtA9zcFMcqV8kaVZBhpYkBvxNLPz2V2mINqctf3V92odSyXPDcXQviaJqHYZD").externalNetwork(ExternalNetwork.Facebook.ordinal()).build());
+		List<Document> documents = searchService.searchLiveActivities("Karate", user, ExternalNetwork.Facebook, ClientPlatform.WEB, 1);
 		log.debug("documents: {}", documents);
 		
 	}
@@ -58,10 +58,10 @@ public class SearchServiceTest {
 		.messageId(new java.util.Random().nextLong())
 		.owner(new User.Builder().userId(1l).build())
 		.body(UUID.randomUUID().toString())
-		.socialNetwork(SocialNetwork.Facebook)
+		.externalNetwork(ExternalNetwork.Facebook)
 		.title(UUID.randomUUID().toString()).sender(
 				new Contact.Builder().displayName("Jack").build())
-				.socialNetwork(SocialNetwork.Facebook)
+				.externalNetwork(ExternalNetwork.Facebook)
 				.build();
 
 		searchService.indexMessages(
@@ -74,7 +74,7 @@ public class SearchServiceTest {
 		Document result = documents.get(0);
 		Assert.assertEquals(Message.class.getSimpleName(), result.getFields().get(SearchKeys.Fields.FIELD_DATA_TYPE));
 
-		testUserAndSocialNetworkFilter(message.getSender().getDisplayName(), 1l, SocialNetwork.Facebook);
+		testUserAndSocialNetworkFilter(message.getSender().getDisplayName(), 1l, ExternalNetwork.Facebook);
 
 
 	}
@@ -109,7 +109,7 @@ public class SearchServiceTest {
 		.activityId(new java.util.Random().nextLong())
 		.owner(new User.Builder().userId(1l).build())
 		.body(UUID.randomUUID().toString())
-		.socialNetwork(SocialNetwork.LinkedIn)
+		.externalNetwork(ExternalNetwork.LinkedIn)
 		.title(UUID.randomUUID().toString()).postedBy(
 				new Contact.Builder().displayName("Bob").build())
 				.build();
@@ -124,7 +124,7 @@ public class SearchServiceTest {
 		Assert.assertEquals(Activity.class.getSimpleName(), result.getFields().get(SearchKeys.Fields.FIELD_DATA_TYPE));
 
 		
-		testUserAndSocialNetworkFilter(activity.getPostedBy().getDisplayName(), 1l, SocialNetwork.LinkedIn);
+		testUserAndSocialNetworkFilter(activity.getPostedBy().getDisplayName(), 1l, ExternalNetwork.LinkedIn);
 
 
 
@@ -167,7 +167,7 @@ public class SearchServiceTest {
 	 * @param userId
 	 * @param socialNetwork
 	 */
-	private void testUserAndSocialNetworkFilter(String searchTerm, Long userId, SocialNetwork socialNetwork) {
+	private void testUserAndSocialNetworkFilter(String searchTerm, Long userId, ExternalNetwork socialNetwork) {
 		// test the user filter
 		List<Document> documents = searchService.searchIndexedDocuments(searchTerm, userId + 1);
 		Assert.assertTrue(documents.isEmpty());
@@ -176,7 +176,7 @@ public class SearchServiceTest {
 		documents = searchService.searchIndexedDocuments(searchTerm, userId, socialNetwork);
 		Assert.assertTrue(!documents.isEmpty());
 
-		SocialNetwork anotherNetwork = socialNetwork.ordinal() == 0 ? SocialNetwork.values()[1] : SocialNetwork.values()[0];
+		ExternalNetwork anotherNetwork = socialNetwork.ordinal() == 0 ? ExternalNetwork.values()[1] : ExternalNetwork.values()[0];
 		// pick a network that is not the passed in network
 		documents = searchService.searchIndexedDocuments(searchTerm, 1l, anotherNetwork);
 		Assert.assertTrue(documents.isEmpty());

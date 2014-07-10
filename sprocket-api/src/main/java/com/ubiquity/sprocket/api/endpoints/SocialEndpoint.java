@@ -18,7 +18,7 @@ import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Message;
-import com.ubiquity.social.domain.SocialNetwork;
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
@@ -39,7 +39,7 @@ public class SocialEndpoint {
 	public Response activities(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		ActivitiesDto results = new ActivitiesDto();
 
-		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialProviderId);
+		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
 
 		CollectionVariant<Activity> variant = ServiceFactory.getSocialService().findActivityByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince);
 
@@ -73,7 +73,7 @@ public class SocialEndpoint {
 
 		MessagesDto result = new MessagesDto();
 
-		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialProviderId);
+		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
 					 
 		CollectionVariant<Message> variant = ServiceFactory.getSocialService().findMessagesByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince);
 		

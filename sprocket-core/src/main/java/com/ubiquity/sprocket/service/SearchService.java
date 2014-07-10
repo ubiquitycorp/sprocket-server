@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.utils.Page;
-import com.ubiquity.content.domain.ContentNetwork;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
@@ -19,8 +18,8 @@ import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Message;
-import com.ubiquity.social.domain.SocialNetwork;
-import com.ubiquity.social.service.SocialService;
+import com.ubiquity.external.service.ExternalIdentityService;
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchEngine;
 import com.ubiquity.sprocket.search.SearchKeys;
@@ -69,7 +68,7 @@ public class SearchService {
 
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Message.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_USER_ID, message.getOwner().getUserId());
-			document.getFields().put(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID, message.getSocialNetwork().ordinal());
+			document.getFields().put(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID, message.getExternalNetwork().ordinal());
 			document.getFields().put(SearchKeys.Fields.FIELD_ID, message.getMessageId());
 
 
@@ -95,7 +94,7 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_TITLE, activity.getTitle());
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Activity.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_USER_ID, activity.getOwner().getUserId());
-			document.getFields().put(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID, activity.getSocialNetwork().ordinal());
+			document.getFields().put(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID, activity.getExternalNetwork().ordinal());
 			document.getFields().put(SearchKeys.Fields.FIELD_ID, activity.getActivityId()); 
 
 			documents.add(document);
@@ -160,16 +159,16 @@ public class SearchService {
 	 * 
 	 * @param searchTerm
 	 * @param userId
-	 * @param socialNetwork
+	 * @param externalNetwork
 	 * @return
 	 */
-	public List<Document> searchLiveActivities(String searchTerm, User user, SocialNetwork socialNetwork, ClientPlatform clientPlatform, Integer page) {
+	public List<Document> searchLiveActivities(String searchTerm, User user, ExternalNetwork externalNetwork, ClientPlatform clientPlatform, Integer page) {
 
 		List<Document> documents = new LinkedList<Document>();
 		
 		// get the identity and social network
-		ExternalIdentity identity = SocialService.getAssociatedSocialIdentity(user, socialNetwork);
-		SocialAPI socialAPI = SocialAPIFactory.createProvider(socialNetwork, clientPlatform);
+		ExternalIdentity identity = ExternalIdentityService.getAssociatedExternalIdentity(user, externalNetwork);
+		SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
 		
 		// calculate offset with page utility based on page limits
 		int offset = Page.calculateOffsetFromPage(page, resultsLimit, pageLimit);
@@ -197,7 +196,7 @@ public class SearchService {
 	 * @param socialNetwork
 	 * @return
 	 */
-	public List<Document> searchIndexedDocuments(String searchTerm, Long userId, SocialNetwork socialNetwork) {
+	public List<Document> searchIndexedDocuments(String searchTerm, Long userId, ExternalNetwork socialNetwork) {
 
 		// filters
 		Map<String, Object> filters = new HashMap<String, Object>();
@@ -207,26 +206,6 @@ public class SearchService {
 		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
 
 	}
-	
-	/***
-	 * Searches documents for a content network
-	 * 
-	 * @param searchTerm
-	 * @param userId
-	 * @param contentNetwork
-	 * @return
-	 */
-	public List<Document> searchIndexedDocuments(String searchTerm, Long userId, ContentNetwork socialNetwork) {
-
-		// filters
-		Map<String, Object> filters = new HashMap<String, Object>();
-		filters.put(SearchKeys.Fields.FIELD_USER_ID, userId);
-		filters.put(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID, socialNetwork.ordinal());
-		
-		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
-
-	}
-	
 
 	/***
 	 * Searches documents by a search term and user id across all social networks and content providers

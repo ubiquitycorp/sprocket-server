@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.ubiquity.content.domain.ContentNetwork;
 import com.ubiquity.content.domain.VideoContent;
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
@@ -34,7 +34,7 @@ public class DtoAssembler {
 		Object data = null;
 		if(dataType.equals(VideoContent.class.getSimpleName())) {
 			data = new VideoDto.Builder()
-			.contentNetworkId(ContentNetwork.YouTube.ordinal())
+			.externalNetworkId(ExternalNetwork.YouTube.ordinal())
 			.itemKey((String)fields.get(SearchKeys.Fields.FIELD_ITEM_KEY))
 			.thumb(new ImageDto((String)fields.get(SearchKeys.Fields.FIELD_THUMBNAIL)))
 			.title((String)fields.get(SearchKeys.Fields.FIELD_TITLE))
@@ -96,7 +96,7 @@ public class DtoAssembler {
 			contactDtoBuilder.identity(
 					new IdentityDto.Builder()
 						.identifier(identity.getIdentifier())
-						.socialNetworkId(identity.getIdentityProvider())
+						.externalNetworkId(identity.getExternalNetwork())
 						.build());
 		// Image is optional
 		if (contact.getImage() != null)
@@ -107,7 +107,7 @@ public class DtoAssembler {
 	
 	public static VideoDto assemble(VideoContent videoContent) {
 		return new VideoDto.Builder()
-			.contentNetworkId(ContentNetwork.YouTube.ordinal())
+			.externalNetworkId(ExternalNetwork.YouTube.ordinal())
 			.itemKey(videoContent.getVideo().getItemKey())
 			.thumb(new ImageDto(videoContent.getThumb().getUrl()))
 			.title(videoContent.getTitle())
@@ -155,7 +155,7 @@ public class DtoAssembler {
 		return new MessageDto.Builder()
 			.subject(message.getTitle())
 			.date(message.getSentDate())
-			.socialProviderId(message.getSocialNetwork().getValue())
+			.socialProviderId(message.getExternalNetwork().ordinal())
 			.body(message.getBody())
 			.sender(
 					assemble(message.getSender())).build();
@@ -167,7 +167,7 @@ public class DtoAssembler {
 		 activityDtoBuilder.body(activity.getBody())
 			.type(activity.getActivityType().toString().toLowerCase())
 			.date(System.currentTimeMillis())
-			.socialProviderId(activity.getSocialNetwork().getValue())
+			.socialProviderId(activity.getExternalNetwork().ordinal())
 			.title(activity.getTitle())
 			.link(activity.getLink())
 			.postedBy(DtoAssembler.assemble(activity.getPostedBy()));

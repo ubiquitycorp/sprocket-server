@@ -19,14 +19,13 @@ import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.api.exception.HttpException;
 import com.ubiquity.content.api.ContentAPI;
 import com.ubiquity.content.api.ContentAPIFactory;
-import com.ubiquity.content.domain.ContentNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.messaging.format.Message;
-import com.ubiquity.social.domain.SocialNetwork;
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
@@ -83,7 +82,7 @@ public class UsersEndpoint {
 		for(Identity identity : user.getIdentities()) {
 			if(identity instanceof ExternalIdentity) {
 				ExternalIdentity socialIdentity = (ExternalIdentity)identity;
-				IdentityDto associatedIdentityDto = new IdentityDto.Builder().identifier(socialIdentity.getIdentifier()).socialNetworkId(socialIdentity.getIdentityProvider()).build();
+				IdentityDto associatedIdentityDto = new IdentityDto.Builder().identifier(socialIdentity.getIdentifier()).externalNetworkId(socialIdentity.getExternalNetwork()).build();
 				accountDto.getIdentities().add(associatedIdentityDto);
 			}
 		}
@@ -152,15 +151,14 @@ public class UsersEndpoint {
 		// convert payload
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload, IdentityDto.class, ActivationValidation.class);
 
-
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto.getClientPlatformId());		
-		SocialNetwork socialNetwork = SocialNetwork.getEnum(identityDto.getSocialNetworkId());
+		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(identityDto.getexternalNetworkId());
 		
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
 				
 		// create the identity if it does not exist; or use the existing one
-		ExternalIdentity identity = ServiceFactory.getSocialService().createOrUpdateSocialIdentity(user, identityDto.getAccessToken(), identityDto.getSecretToken(), clientPlatform, socialNetwork);
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().createOrUpdateExternalIdentity(user, identityDto.getAccessToken(), identityDto.getSecretToken(), clientPlatform, socialNetwork);
 
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto);
@@ -193,15 +191,15 @@ public class UsersEndpoint {
 		// convert payload
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload, IdentityDto.class, AuthorizationValidation.class);
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto.getClientPlatformId());		
-		ContentNetwork contentNetwork = ContentNetwork.getContentNetworkFromId(identityDto.getContentNetworkId());
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(identityDto.getexternalNetworkId());
 		
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
-		ContentAPI contentApi = ContentAPIFactory.createProvider(contentNetwork, clientPlatform);
+		ContentAPI contentApi = ContentAPIFactory.createProvider(externalNetwork, clientPlatform);
 		String accessToken = contentApi.getAccessToken(identityDto.getCode(), identityDto.getRedirectUrl());
 		
 		// create the identity if it does not exist; or use the existing one
-		ExternalIdentity identity = ServiceFactory.getContentService().createOrUpdateContentIdentity(user, accessToken, identityDto.getSecretToken(), clientPlatform, contentNetwork);
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().createOrUpdateExternalIdentity(user, accessToken, identityDto.getSecretToken(), clientPlatform, externalNetwork);
 		//ExternalIdentity identity = ServiceFactory.getContentService().getContentIdentityById(5L);
 		
 		//List<VideoContent> synced = ServiceFactory.getContentService().sync(identity, contentNetwork);
@@ -216,7 +214,6 @@ public class UsersEndpoint {
 		.clientPlatformId(identityDto.getClientPlatformId())
 		.userId(user.getUserId())
 		.identityId(identity.getIdentityId())
-		.contentNetworkId(identityDto.getContentNetworkId())
 		.build();
 
 		// serialize and send it
@@ -227,7 +224,7 @@ public class UsersEndpoint {
 	private void sendEventTrackedMessage(User user, ExternalIdentity identity) throws IOException {
 		EventTracked content = new EventTracked(EventType.UserAddedIdentity.ordinal());
 		content.getProperties().put("user", user.getUserId());
-		content.getProperties().put("social_network", SocialNetwork.getName(identity.getIdentityProvider()));
+		content.getProperties().put("social_network", ExternalNetwork.getName(identity.getExternalNetwork()));
 		
 		// serialize and send it
 		String message = MessageConverterFactory.getMessageConverter().serialize(new Message(content));

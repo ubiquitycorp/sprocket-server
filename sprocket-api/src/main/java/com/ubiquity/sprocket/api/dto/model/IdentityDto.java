@@ -39,11 +39,8 @@ public class IdentityDto {
 	@Size(min = 10, max = 255, groups = ActivationValidation.class)
 	private String accessToken;
 
-	@NotNull(groups = ActivationValidation.class)
+	@NotNull(groups = {ActivationValidation.class, AuthorizationValidation.class})
 	private Integer socialNetworkId;
-
-	@NotNull(groups = AuthorizationValidation.class)
-	private Integer contentNetworkId;
 
 	@Size(min = 10, max = 255, groups = ActivationValidation.class)
 	private String secretToken;
@@ -84,12 +81,8 @@ public class IdentityDto {
 		return identifier;
 	}
 
-	public Integer getSocialNetworkId() {
+	public Integer getexternalNetworkId() {
 		return socialNetworkId;
-	}
-
-	public Integer getContentNetworkId() {
-		return contentNetworkId;
 	}
 
 	public String getCode() {
@@ -106,8 +99,7 @@ public class IdentityDto {
 		private String displayName;
 		private Integer clientPlatformId;
 		private String accessToken;
-		private Integer socialNetworkId;
-		private Integer contentNetworkId;
+		private Integer externalNetworkId;
 		private String secretToken;
 		private String identifier;
 		private String code;
@@ -138,13 +130,8 @@ public class IdentityDto {
 			return this;
 		}
 
-		public Builder socialNetworkId(Integer socialNetworkId) {
-			this.socialNetworkId = socialNetworkId;
-			return this;
-		}
-
-		public Builder contentNetworkId(Integer contentNetworkId) {
-			this.contentNetworkId = contentNetworkId;
+		public Builder externalNetworkId(Integer externalNetworkId) {
+			this.externalNetworkId = externalNetworkId;
 			return this;
 		}
 
@@ -179,8 +166,7 @@ public class IdentityDto {
 		this.displayName = builder.displayName;
 		this.clientPlatformId = builder.clientPlatformId;
 		this.accessToken = builder.accessToken;
-		this.socialNetworkId = builder.socialNetworkId;
-		this.contentNetworkId = builder.contentNetworkId;
+		this.socialNetworkId = builder.externalNetworkId;
 		this.secretToken = builder.secretToken;
 		this.identifier = builder.identifier;
 		this.code = builder.code;
