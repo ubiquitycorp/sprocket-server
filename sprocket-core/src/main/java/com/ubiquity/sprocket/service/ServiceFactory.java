@@ -6,6 +6,7 @@ import com.ubiquity.content.service.ContentService;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.identity.service.UserService;
 import com.ubiquity.social.service.ContactService;
+import com.ubiquity.external.service.ExternalIdentityService;
 import com.ubiquity.social.service.SocialService;
 
 /***
@@ -24,7 +25,7 @@ public class ServiceFactory {
 	private static ContentService contentService;
 	private static ContactService contactService;
 	private static AnalyticsService analyticsService;
-	
+	private static ExternalIdentityService externalIdentityService;
 	/***
 	 * Initializes all services with the specified configuration
 	 * 
@@ -110,6 +111,16 @@ public class ServiceFactory {
 		if(authenticationService == null)
 			authenticationService = new AuthenticationService(configuration);
 		return authenticationService;
+	}
+	
+	/***
+	 * Creates or returns an ExternalNetwork manager
+	 * @return
+	 */
+	public static ExternalIdentityService getExternalIdentityService() {
+		if(externalIdentityService == null)
+			externalIdentityService = new ExternalIdentityService(configuration);
+		return externalIdentityService;
 	}
 }
 

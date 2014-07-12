@@ -13,9 +13,9 @@ import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.social.domain.SocialNetwork;
-import com.ubiquity.social.repository.SocialIdentityRepository;
-import com.ubiquity.social.repository.SocialIdentityRepositoryJpaImpl;
+import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.external.repository.ExternalIdentityRepository;
+import com.ubiquity.external.repository.ExternalIdentityRepositoryJpaImpl;
 
 /***
  * Tests testing basic CRUD operations for a user repository
@@ -27,7 +27,7 @@ public class SocialRepositoryTest {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 
-	private SocialIdentityRepository socialRepository;
+	private ExternalIdentityRepository socialRepository;
 	private UserRepository userRepository;
 	
 	private User user;
@@ -41,7 +41,7 @@ public class SocialRepositoryTest {
 	@Before
 	public void setUp() throws Exception {
 
-		socialRepository = new SocialIdentityRepositoryJpaImpl();
+		socialRepository = new ExternalIdentityRepositoryJpaImpl();
 		userRepository = new UserRepositoryJpaImpl();
 		
 		// create user and identity as we normally would
@@ -60,7 +60,7 @@ public class SocialRepositoryTest {
 			.user(user)
 			.identifier(UUID.randomUUID().toString())
 			.accessToken(UUID.randomUUID().toString())
-			.identityProvider(SocialNetwork.Facebook.getValue())
+			.externalNetwork(ExternalNetwork.Facebook.ordinal())
 			.build();
 		
 		user.getIdentities().add(identity);
@@ -75,7 +75,7 @@ public class SocialRepositoryTest {
 
 	@Test
 	public void testFindSocialIdentityByUserIdAndProvider() throws Exception {
-		ExternalIdentity persisted = socialRepository.findOne(user.getUserId(), SocialNetwork.Facebook);
+		ExternalIdentity persisted = socialRepository.findOne(user.getUserId(), ExternalNetwork.Facebook);
 		Assert.assertNotNull(persisted);
 		Assert.assertEquals(persisted.getIdentityId(), identity.getIdentityId());
 	
@@ -83,7 +83,7 @@ public class SocialRepositoryTest {
 	
 	@Test
 	public void testUpdateSocialIdentity() throws Exception {
-		ExternalIdentity persisted = socialRepository.findOne(user.getUserId(), SocialNetwork.Facebook);
+		ExternalIdentity persisted = socialRepository.findOne(user.getUserId(), ExternalNetwork.Facebook);
 		String newToken = UUID.randomUUID().toString();
 		persisted.setAccessToken(newToken);
 		
@@ -91,7 +91,7 @@ public class SocialRepositoryTest {
 		userRepository.update(user);
 		EntityManagerSupport.commit();
 		
-		persisted = socialRepository.findOne(user.getUserId(), SocialNetwork.Facebook);
+		persisted = socialRepository.findOne(user.getUserId(), ExternalNetwork.Facebook);
 		Assert.assertEquals(persisted.getAccessToken(), newToken);
 
 		

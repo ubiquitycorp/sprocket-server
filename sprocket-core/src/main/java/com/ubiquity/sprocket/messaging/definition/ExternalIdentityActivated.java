@@ -10,11 +10,6 @@ public class ExternalIdentityActivated {
 	private Long identityId;
 	private Long userId;
 	private Integer clientPlatformId;
-	private Integer contentNetworkId;
-
-	public Integer getContentNetworkId() {
-		return contentNetworkId;
-	}
 
 	public Long getIdentityId() {
 		return identityId;
@@ -39,7 +34,6 @@ public class ExternalIdentityActivated {
 		private Long identityId;
 		private Long userId;
 		private Integer clientPlatformId;
-		private Integer contentNetworkId;
 
 		public Builder identityId(Long identityId) {
 			this.identityId = identityId;
@@ -56,11 +50,6 @@ public class ExternalIdentityActivated {
 			return this;
 		}
 
-		public Builder contentNetworkId(Integer contentNetworkId) {
-			this.contentNetworkId = contentNetworkId;
-			return this;
-		}
-
 		public ExternalIdentityActivated build() {
 			return new ExternalIdentityActivated(this);
 		}
@@ -70,6 +59,5 @@ public class ExternalIdentityActivated {
 		this.identityId = builder.identityId;
 		this.userId = builder.userId;
 		this.clientPlatformId = builder.clientPlatformId;
-		this.contentNetworkId = builder.contentNetworkId;
 	}
 }

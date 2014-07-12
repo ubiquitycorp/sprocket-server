@@ -12,7 +12,7 @@ import com.ubiquity.content.api.VimeoAPITest;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Message;
-import com.ubiquity.social.domain.SocialNetwork;
+import com.ubiquity.external.domain.ExternalNetwork;
 
 public class FacebookApiTest {
 	
@@ -29,7 +29,7 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 	@Test
 	public void testGetMessages() {
 		
-		SocialAPI facebookAPI = SocialAPIFactory.createProvider(SocialNetwork.Facebook, ClientPlatform.WEB);
+		SocialAPI facebookAPI = SocialAPIFactory.createProvider(ExternalNetwork.Facebook, ClientPlatform.WEB);
 		List<Message> messages = facebookAPI.listMessages(identity);
 		Assert.assertFalse(messages.isEmpty());
 		// all fb messages will have conversations

@@ -17,7 +17,7 @@ import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.ActivityType;
-import com.ubiquity.social.domain.SocialNetwork;
+import com.ubiquity.external.domain.ExternalNetwork;
 
 /***
  * Tests testing basic CRUD operations for a user repository
@@ -51,10 +51,10 @@ public class ActivityRepositoryTest {
 		EntityManagerSupport.commit();
 		
 		// now create activities based on content
-		statusActivity = TestActivityFactory.createActivityWithMininumRequirements(owner, SocialNetwork.Facebook);
-		videoActivity = TestActivityFactory.createActivityWithMininumRequirements(owner, SocialNetwork.Facebook, new Video.Builder().url("http://my.video.url").build());
-		photoActivity = TestActivityFactory.createActivityWithMininumRequirements(owner, SocialNetwork.Facebook, new Image("http://my.image.url"));
-		linkActivity = TestActivityFactory.createActivityWithMininumRequirements(owner, SocialNetwork.Facebook, "http://my.link.url");
+		statusActivity = TestActivityFactory.createActivityWithMininumRequirements(owner, ExternalNetwork.Facebook);
+		videoActivity = TestActivityFactory.createActivityWithMininumRequirements(owner, ExternalNetwork.Facebook, new Video.Builder().url("http://my.video.url").build());
+		photoActivity = TestActivityFactory.createActivityWithMininumRequirements(owner, ExternalNetwork.Facebook, new Image("http://my.image.url"));
+		linkActivity = TestActivityFactory.createActivityWithMininumRequirements(owner, ExternalNetwork.Facebook, "http://my.link.url");
 
 		EntityManagerSupport.beginTransaction();
 		activityRepository.create(statusActivity);
@@ -113,16 +113,16 @@ public class ActivityRepositoryTest {
 	
 	@Test
 	public void testFindByExternalIdentifier() throws Exception {
-		Activity persisted = activityRepository.getByExternalIdentifierAndSocialNetwork(statusActivity.getExternalIdentifier(), owner.getUserId(), SocialNetwork.Facebook);
+		Activity persisted = activityRepository.getByExternalIdentifierAndSocialNetwork(statusActivity.getExternalIdentifier(), owner.getUserId(), ExternalNetwork.Facebook);
 		Assert.assertNotNull(persisted);
 		Assert.assertTrue(persisted.getActivityId().longValue() == statusActivity.getActivityId().longValue());
 		
 		// query by different user id
-		persisted = activityRepository.getByExternalIdentifierAndSocialNetwork(statusActivity.getExternalIdentifier(), new java.util.Random().nextLong(), SocialNetwork.Facebook);		
+		persisted = activityRepository.getByExternalIdentifierAndSocialNetwork(statusActivity.getExternalIdentifier(), new java.util.Random().nextLong(), ExternalNetwork.Facebook);		
 		Assert.assertNull(persisted);
 
 		// query by same id, different network
-		persisted = activityRepository.getByExternalIdentifierAndSocialNetwork(statusActivity.getExternalIdentifier(), owner.getUserId(), SocialNetwork.Facebook);
+		persisted = activityRepository.getByExternalIdentifierAndSocialNetwork(statusActivity.getExternalIdentifier(), owner.getUserId(), ExternalNetwork.Facebook);
 		Assert.assertNotNull(persisted);
 
 	}
