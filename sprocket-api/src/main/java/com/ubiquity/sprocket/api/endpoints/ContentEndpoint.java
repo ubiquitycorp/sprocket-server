@@ -22,9 +22,9 @@ public class ContentEndpoint {
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 
 	@GET
-	@Path("/users/{userId}/providers/{contentNetworkId}/videos")
+	@Path("/users/{userId}/providers/{externalNetworkId}/videos")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response videos(@PathParam("userId") Long userId, @PathParam("contentNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+	public Response videos(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		
 		VideosDto results = new VideosDto();
 		
