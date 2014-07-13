@@ -3,11 +3,13 @@ package com.ubiquity.sprocket.api.dto.model;
 import java.util.Deque;
 import java.util.LinkedList;
 
-public class MessageDto {
+public class MessageDto implements Comparable<MessageDto>{
 
 	private String subject;
 	private String body;
 	private Long date;
+	private Long lastMessageDate;
+
 	private ContactDto sender;
 	private Integer externalNetworkId;
 	
@@ -38,13 +40,20 @@ public class MessageDto {
 		return conversation;
 	}
 
-
+	public Long getLastMessageDate() {
+		return lastMessageDate;
+	}
+	
+	public void setLastMessageDate(Long lastMessageDate) {
+		this.lastMessageDate = lastMessageDate;
+	}
 	public static class Builder {
 		private String subject;
 		private String body;
 		private Long date;
 		private ContactDto sender;
 		private Integer externalNetworkId;
+		private Long lastMessageDate;
 
 		public Builder subject(String subject) {
 			this.subject = subject;
@@ -60,7 +69,11 @@ public class MessageDto {
 			this.date = date;
 			return this;
 		}
-
+		
+		public Builder lastMessageDate(Long lastMessageDate) {
+			this.lastMessageDate = lastMessageDate;
+			return this;
+		}
 		public Builder sender(ContactDto sender) {
 			this.sender = sender;
 			return this;
@@ -80,7 +93,14 @@ public class MessageDto {
 		this.subject = builder.subject;
 		this.body = builder.body;
 		this.date = builder.date;
+		this.lastMessageDate = builder.lastMessageDate;
 		this.sender = builder.sender;
 		this.externalNetworkId = builder.externalNetworkId;
+	}
+
+	@Override
+	public int compareTo(MessageDto message) {
+		
+		return this.lastMessageDate.compareTo(message.getLastMessageDate());
 	}
 }
