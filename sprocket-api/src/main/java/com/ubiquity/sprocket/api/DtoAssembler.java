@@ -136,12 +136,13 @@ public class DtoAssembler {
 			String conversationIdentifier = message.getConversationIdentifier();
 			if(topLevelMessageDto != null && conversationIdentifier != null && lastConversationIdentifier.equals(conversationIdentifier)) {
 				// we are adding to the conversation
+				topLevelMessageDto.setLastMessageDate(messageDto.getDate());
 				topLevelMessageDto.getConversation().addLast(messageDto);
 			} else {
 				// we have a top level message
 				topLevelMessageDto = messageDto;
 				lastConversationIdentifier = conversationIdentifier;
-				
+				topLevelMessageDto.setLastMessageDate(topLevelMessageDto.getDate());
 				// now add to the main list for a "roll up"
 				messageDtoList.add(topLevelMessageDto);
 			}

@@ -1,6 +1,7 @@
 package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,6 +29,7 @@ import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
+import com.ubiquity.sprocket.api.dto.model.MessageDto;
 import com.ubiquity.sprocket.api.dto.model.SendMessageDto;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
@@ -94,7 +96,9 @@ public class SocialEndpoint {
 		messages.addAll(variant.getCollection());
 		
 		// Assemble into message dto, constructing conversations if they are inherent in the data
-		result.getMessages().addAll(DtoAssembler.assemble(messages));
+		List<MessageDto> conversations =DtoAssembler.assemble(messages);
+		Collections.sort(conversations, Collections.reverseOrder());
+		result.getMessages().addAll(conversations);
 	
 		return Response.ok()
 				.header("Last-Modified", variant.getLastModified())
