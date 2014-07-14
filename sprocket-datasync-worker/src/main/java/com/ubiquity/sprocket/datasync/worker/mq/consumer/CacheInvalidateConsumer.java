@@ -75,6 +75,10 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			processMessages(identity, ExternalNetwork.Facebook);
 			processActivities(identity, ExternalNetwork.Facebook);
 		}
+		else if(identity.getIdentityProvider() == SocialNetwork.LinkedIn.getValue())
+		{
+			processActivities(identity, SocialNetwork.LinkedIn);
+		}
 	} 
 
 	private void processActivities(ExternalIdentity identity,
