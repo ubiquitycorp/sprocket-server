@@ -68,7 +68,7 @@ public class UsersEndpoint {
 	 * 
 	 * @param cookie file
 	 * @return
-	 * @throws IOException 
+	 * @throws Exception 
 	 */
 	//public Response authenticatedlinkedin(@CookieParam("linkedin_oauth_7747wv47q1ili9") String cookie) throws IOException {
 	//	public Response authenticatedlinkedin(@PathParam("userId") Long userId,@CookieParam("linkedin_oauth_7747wv47q1ili9") String cookie) throws IOException {
@@ -76,7 +76,7 @@ public class UsersEndpoint {
 	@GET
 	@Path("/{userId}/authenticatedlinkedin")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response authenticatedlinkedin(@PathParam("userId") Long userId,@CookieParam("linkedin_oauth_7747wv47q1ili9") String cookie) throws IOException {
+	public Response authenticatedlinkedin(@PathParam("userId") Long userId,@CookieParam("linkedin_oauth_7747wv47q1ili9") String cookie) throws Exception {
 		
 		// load user
 				User user = ServiceFactory.getUserService().getUserById(userId);
