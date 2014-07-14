@@ -2,7 +2,6 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
@@ -13,9 +12,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +26,7 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.social.api.linkedin.ExchangeService;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
@@ -42,8 +39,6 @@ import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.messaging.definition.EventTracked;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.service.ServiceFactory;
-
-import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 
 @Path("/1.0/users")
 public class UsersEndpoint {
@@ -59,86 +54,80 @@ public class UsersEndpoint {
 		return Response.ok().entity("{\"message\":\"pong\"}").build();
 	}
 
-	
-	
 	/***
-	 * This method authenticates user's linkedin via native login. Thereafter users can authenticate
+	 * This method authenticates user's linkedin via native login. Thereafter
+	 * users can authenticate
 	 * 
-	 * @param cookie file
+	 * @param cookie
+	 *            file
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
-	//public Response authenticatedlinkedin(@CookieParam("linkedin_oauth_7747wv47q1ili9") String cookie) throws IOException {
-	//	public Response authenticatedlinkedin(@PathParam("userId") Long userId,@CookieParam("linkedin_oauth_7747wv47q1ili9") String cookie) throws IOException {
-	//@Path("/{userId}/authenticatedlinkedin")@Path("/authenticatedlinkedin")
 	@GET
 	@Path("/{userId}/authenticatedlinkedin")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response authenticatedlinkedin(@PathParam("userId") Long userId,@CookieParam("linkedin_oauth_7747wv47q1ili9") String cookie) throws Exception {
-		
+	public Response authenticatedlinkedin(@PathParam("userId") Long userId,
+			@CookieParam("linkedin_oauth_7747wv47q1ili9") String cookie)
+			throws Exception {
+
 		// load user
-				User user = ServiceFactory.getUserService().getUserById(userId);
-				if(user == null)
-					throw new HttpException("Username / password incorrect", 401);
-//		StringWriter writer = new StringWriter();
-//		IOUtils.copy(payload, writer);
-//		String cookieString = writer.toString();
-		String cookieString =java.net.URLDecoder.decode(cookie, "UTF-8");
+		User user = ServiceFactory.getUserService().getUserById(userId);
+		if (user == null)
+			throw new HttpException("Username / password incorrect", 401);
+
+		String cookieString = java.net.URLDecoder.decode(cookie, "UTF-8");
 		ExchangeService exchangservice = new ExchangeService();
-		String[] accesstokens=exchangservice.exchangeToken(cookieString);
-		//System.out.println(accesstoken);
-		
+		String[] accesstokens = exchangservice.exchangeToken(cookieString);
 
-		
-		
-		if(accesstokens[0]==null || accesstokens[0].equalsIgnoreCase(""))
-			throw new HttpException("Autontication Failed no oAuth_token_returned", 401);
-		
+		if (accesstokens[0] == null || accesstokens[0].equalsIgnoreCase(""))
+			throw new HttpException(
+					"Autontication Failed no oAuth_token_returned", 401);
+
 		// create the identity if it does not exist; or use the existing one
-	  ExternalIdentity identity = ServiceFactory.getSocialService().createOrUpdateSocialIdentity(user, accesstokens[0], accesstokens[1], ClientPlatform.WEB, SocialNetwork.LinkedIn);
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+				.createOrUpdateExternalIdentity(user, accesstokens[0],
+						accesstokens[1], ClientPlatform.WEB,
+						ExternalNetwork.LinkedIn);
 
-				
-		return Response.ok()		
-				.build();
-		
+		return Response.ok().build();
+
 	}
-	
-	
-	
-	
-	
-	
-
 
 	/***
-	 * This method authenticates user via native login. Thereafter users can authenticate
+	 * This method authenticates user via native login. Thereafter users can
+	 * authenticate
 	 * 
 	 * @param accessToken
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@POST
 	@Path("/authenticated")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response authenticate(InputStream payload) throws IOException {
-		IdentityDto identityDto = jsonConverter.convertFromPayload(payload, IdentityDto.class, AuthenticationValidation.class);
+		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
+				IdentityDto.class, AuthenticationValidation.class);
 
-		AuthenticationService authenticationService = ServiceFactory.getAuthenticationService();
-		User user = authenticationService.authenticate(identityDto.getUsername(), identityDto.getPassword());
-		if(user == null)
+		AuthenticationService authenticationService = ServiceFactory
+				.getAuthenticationService();
+		User user = authenticationService.authenticate(
+				identityDto.getUsername(), identityDto.getPassword());
+		if (user == null)
 			throw new HttpException("Username / password incorrect", 401);
-		
-		// create api key and pass back associated identities for this user (in case of a login from a different device)
-		String apiKey = authenticationService.generateApiKey();
-		AccountDto accountDto = new AccountDto.Builder()
-		.apiKey(apiKey)
-		.userId(user.getUserId())
-		.build();
 
-		for(Identity identity : user.getIdentities()) {
-			if(identity instanceof ExternalIdentity) {
-				ExternalIdentity socialIdentity = (ExternalIdentity)identity;
-				IdentityDto associatedIdentityDto = new IdentityDto.Builder().identifier(socialIdentity.getIdentifier()).externalNetworkId(socialIdentity.getExternalNetwork()).build();
+		// create api key and pass back associated identities for this user (in
+		// case of a login from a different device)
+		String apiKey = authenticationService.generateApiKey();
+		AccountDto accountDto = new AccountDto.Builder().apiKey(apiKey)
+				.userId(user.getUserId()).build();
+
+		for (Identity identity : user.getIdentities()) {
+			if (identity instanceof ExternalIdentity) {
+				ExternalIdentity socialIdentity = (ExternalIdentity) identity;
+				IdentityDto associatedIdentityDto = new IdentityDto.Builder()
+						.identifier(socialIdentity.getIdentifier())
+						.externalNetworkId(socialIdentity.getExternalNetwork())
+						.build();
 				accountDto.getIdentities().add(associatedIdentityDto);
 			}
 		}
@@ -149,90 +138,99 @@ public class UsersEndpoint {
 		log.debug("Authenticated user {}", user);
 
 		// send notification interested consumers
-		//String message = MessageConverterFactory.getMessageConverter().serialize(new Message(new UserAuthenticated(user.getUserId())));
-		//MessageQueueFactory.getCacheInvalidationQueueProducer().write(message.getBytes());
+		// String message =
+		// MessageConverterFactory.getMessageConverter().serialize(new
+		// Message(new UserAuthenticated(user.getUserId())));
+		// MessageQueueFactory.getCacheInvalidationQueueProducer().write(message.getBytes());
 
-		return Response.ok()
-				.entity(jsonConverter.convertToPayload(accountDto))
+		return Response.ok().entity(jsonConverter.convertToPayload(accountDto))
 				.build();
 	}
 
-
 	/***
-	 * This method registers user via native login. Thereafter users can authenticate
+	 * This method registers user via native login. Thereafter users can
+	 * authenticate
 	 * 
 	 * @param accessToken
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@POST
 	@Path("/registered")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response register(InputStream payload) throws IOException {
-		IdentityDto identityDto = jsonConverter.convertFromPayload(payload, IdentityDto.class, RegistrationValidation.class);
+		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
+				IdentityDto.class, RegistrationValidation.class);
 
-		AuthenticationService authenticationService = ServiceFactory.getAuthenticationService();
+		AuthenticationService authenticationService = ServiceFactory
+				.getAuthenticationService();
 
-		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto.getClientPlatformId());
-		User user = ServiceFactory.getAuthenticationService().register(identityDto.getUsername(), 
-				identityDto.getPassword(),"", "", identityDto.getDisplayName(), clientPlatform, Boolean.TRUE);
+		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
+				.getClientPlatformId());
+		User user = ServiceFactory.getAuthenticationService().register(
+				identityDto.getUsername(), identityDto.getPassword(), "", "",
+				identityDto.getDisplayName(), clientPlatform, Boolean.TRUE);
 
 		// user now has a single, native identity
 		String apiKey = authenticationService.generateApiKey();
 
 		// set the account DTO with an api key and new user id and send it back
-		AccountDto accountDto = new AccountDto.Builder()
-		.apiKey(apiKey)
-		.userId(user.getUserId())
-		.build();
+		AccountDto accountDto = new AccountDto.Builder().apiKey(apiKey)
+				.userId(user.getUserId()).build();
 
 		// Save UserId and APIKey in Redis cache database
 		authenticationService.saveAuthkey(user.getUserId(), apiKey);
 
 		log.debug("Created user {}", user);
 
-	
-		return Response.ok()
-				.entity(jsonConverter.convertToPayload(accountDto))
+		return Response.ok().entity(jsonConverter.convertToPayload(accountDto))
 				.build();
 	}
 
-	
 	@POST
 	@Path("/{userId}/identities")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response activate(@PathParam("userId") Long userId, InputStream payload) throws IOException {
+	public Response activate(@PathParam("userId") Long userId,
+			InputStream payload) throws IOException {
 
 		// convert payload
-		IdentityDto identityDto = jsonConverter.convertFromPayload(payload, IdentityDto.class, ActivationValidation.class);
+		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
+				IdentityDto.class, ActivationValidation.class);
 
-		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto.getClientPlatformId());		
-		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(identityDto.getExternalNetworkId());
-		
+		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
+				.getClientPlatformId());
+		ExternalNetwork externalNetwork = ExternalNetwork
+				.getNetworkById(identityDto.getExternalNetworkId());
+
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
-				
+
 		// create the identity if it does not exist; or use the existing one
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().createOrUpdateExternalIdentity(user, identityDto.getAccessToken(), identityDto.getSecretToken(), clientPlatform, externalNetwork);
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+				.createOrUpdateExternalIdentity(user,
+						identityDto.getAccessToken(),
+						identityDto.getSecretToken(), clientPlatform,
+						externalNetwork);
 
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto);
-		
+
 		// send off to analytics tracker
 		sendEventTrackedMessage(user, identity);
 
-		
-		IdentityDto result = new IdentityDto.Builder().identifier(identity.getIdentifier()).build();
-		return Response.ok()
-				.entity(jsonConverter.convertToPayload(result))
+		IdentityDto result = new IdentityDto.Builder().identifier(
+				identity.getIdentifier()).build();
+		return Response.ok().entity(jsonConverter.convertToPayload(result))
 				.build();
 
 	}
-	
+
 	/***
-	 * This end point authorizes user in the given content network and retrieves access token. 
-	 * Then it saves an external identity for this user in given content network
+	 * This end point authorizes user in the given content network and retrieves
+	 * access token. Then it saves an external identity for this user in given
+	 * content network
+	 * 
 	 * @param userId
 	 * @param payload
 	 * @return
@@ -242,50 +240,67 @@ public class UsersEndpoint {
 	@Path("/{userId}/authorized")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response authorize(@PathParam("userId") Long userId, InputStream payload) throws IOException {
-	
+	public Response authorize(@PathParam("userId") Long userId,
+			InputStream payload) throws IOException {
+
 		// convert payload
-		IdentityDto identityDto = jsonConverter.convertFromPayload(payload, IdentityDto.class, AuthorizationValidation.class);
-		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto.getClientPlatformId());		
-		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(identityDto.getExternalNetworkId());
-		
+		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
+				IdentityDto.class, AuthorizationValidation.class);
+		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
+				.getClientPlatformId());
+		ExternalNetwork externalNetwork = ExternalNetwork
+				.getNetworkById(identityDto.getExternalNetworkId());
+
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
-		ContentAPI contentApi = ContentAPIFactory.createProvider(externalNetwork, clientPlatform);
-		String accessToken = contentApi.getAccessToken(identityDto.getCode(), identityDto.getRedirectUrl());
-		
+		ContentAPI contentApi = ContentAPIFactory.createProvider(
+				externalNetwork, clientPlatform);
+		String accessToken = contentApi.getAccessToken(identityDto.getCode(),
+				identityDto.getRedirectUrl());
+
 		// create the identity if it does not exist; or use the existing one
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().createOrUpdateExternalIdentity(user, accessToken, identityDto.getSecretToken(), clientPlatform, externalNetwork);
-		//ExternalIdentity identity = ServiceFactory.getContentService().getContentIdentityById(5L);
-		
-		//List<VideoContent> synced = ServiceFactory.getContentService().sync(identity, contentNetwork);
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+				.createOrUpdateExternalIdentity(user, accessToken,
+						identityDto.getSecretToken(), clientPlatform,
+						externalNetwork);
+		// ExternalIdentity identity =
+		// ServiceFactory.getContentService().getContentIdentityById(5L);
+
+		// List<VideoContent> synced =
+		// ServiceFactory.getContentService().sync(identity, contentNetwork);
 		sendActivatedMessage(user, identity, identityDto);
-		
+
 		return Response.ok().build();
 
 	}
-	
-	private void sendActivatedMessage(User user, ExternalIdentity identity, IdentityDto identityDto) throws IOException {
+
+	private void sendActivatedMessage(User user, ExternalIdentity identity,
+			IdentityDto identityDto) throws IOException {
 		ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
-		.clientPlatformId(identityDto.getClientPlatformId())
-		.userId(user.getUserId())
-		.identityId(identity.getIdentityId())
-		.build();
+				.clientPlatformId(identityDto.getClientPlatformId())
+				.userId(user.getUserId()).identityId(identity.getIdentityId())
+				.build();
 
 		// serialize and send it
-		String message = MessageConverterFactory.getMessageConverter().serialize(new Message(content));
-		MessageQueueFactory.getCacheInvalidationQueueProducer().write(message.getBytes());
+		String message = MessageConverterFactory.getMessageConverter()
+				.serialize(new Message(content));
+		MessageQueueFactory.getCacheInvalidationQueueProducer().write(
+				message.getBytes());
 	}
-	
-	private void sendEventTrackedMessage(User user, ExternalIdentity identity) throws IOException {
-		EventTracked content = new EventTracked(EventType.UserAddedIdentity.ordinal());
+
+	private void sendEventTrackedMessage(User user, ExternalIdentity identity)
+			throws IOException {
+		EventTracked content = new EventTracked(
+				EventType.UserAddedIdentity.ordinal());
 		content.getProperties().put("user", user.getUserId());
-		content.getProperties().put("social_network", ExternalNetwork.getName(identity.getExternalNetwork()));
-		
+		content.getProperties().put("social_network",
+				ExternalNetwork.getName(identity.getExternalNetwork()));
+
 		// serialize and send it
-		String message = MessageConverterFactory.getMessageConverter().serialize(new Message(content));
+		String message = MessageConverterFactory.getMessageConverter()
+				.serialize(new Message(content));
 		MessageQueueFactory.getTrackQueueProducer().write(message.getBytes());
-		
+
 	}
 
 }
