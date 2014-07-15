@@ -56,7 +56,7 @@ public class SocialEndpoint {
 		if (variant == null)
 			return Response.notModified().build();
 
-		
+
 		for(Activity activity : variant.getCollection()) {
 			results.getActivities().add(DtoAssembler.assemble(activity));
 		}
@@ -68,7 +68,7 @@ public class SocialEndpoint {
 	}
 
 
-	
+
 	/***
 	 * This method returns messages of specific social network
 	 * @param userId
@@ -83,23 +83,23 @@ public class SocialEndpoint {
 		MessagesDto result = new MessagesDto();
 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
-					 
+
 		CollectionVariant<Message> variant = ServiceFactory.getSocialService().findMessagesByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince);
-		
-		
+
+
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
 			return Response.notModified().build();
-		
-		
+
+
 		List<Message> messages = new LinkedList<Message>();
 		messages.addAll(variant.getCollection());
-		
+
 		// Assemble into message dto, constructing conversations if they are inherent in the data
 		List<MessageDto> conversations =DtoAssembler.assemble(messages);
 		Collections.sort(conversations, Collections.reverseOrder());
 		result.getMessages().addAll(conversations);
-	
+
 		return Response.ok()
 				.header("Last-Modified", variant.getLastModified())
 				.entity(jsonConverter.convertToPayload(result))
@@ -123,7 +123,7 @@ public class SocialEndpoint {
 		//Cast the input into SendMessageObject
 		SendMessageDto sendMessageDto = jsonConverter.convertFromPayload(payload, SendMessageDto.class);
 		try{
-			ServiceFactory.getSocialService().SendMessage(identity,socialNetwork, sendMessageDto.getReceiverId(), sendMessageDto.getReceiverName(), sendMessageDto.getText());
+			ServiceFactory.getSocialService().SendMessage(identity, socialNetwork, sendMessageDto.getReceiverId(), sendMessageDto.getReceiverName(), sendMessageDto.getText(), "");
 		}
 		catch(AuthorizationException e)
 		{
@@ -134,9 +134,9 @@ public class SocialEndpoint {
 			throw new HttpException(e.getMessage(), 503);
 		}
 		return Response.ok().build();
-			
+
 	}
-	
+
 	/***
 	 * This method send message to specific user in social network
 	 * @param userId
@@ -149,9 +149,9 @@ public class SocialEndpoint {
 	public Response postactivity(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) {
 
 		// get social network 
-				ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
-				// get the identity from DB
-				ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
+		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
+		// get the identity from DB
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
 		//Cast the input into SendMessageObject
 		PostActivity postActivity = jsonConverter.convertFromPayload(payload, PostActivity.class);
 		try{
@@ -166,7 +166,7 @@ public class SocialEndpoint {
 			throw new HttpException(e.getMessage(), 503);
 		}
 		return Response.ok().build();
-			
+
 	}
 
 }

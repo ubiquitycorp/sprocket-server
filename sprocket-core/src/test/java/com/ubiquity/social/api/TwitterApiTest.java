@@ -57,7 +57,7 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		Date date = new Date();
 		String message = dateFormat.format(date);
 		message = message.replaceAll(" ", "%20");
-		Boolean sent = twitterAPI.sendMessage(identity, null, "engminashafik", message);
+		Boolean sent = twitterAPI.sendMessage(identity, null, "engminashafik", message, "");
 		Assert.assertTrue(sent);
 	}
 	@Test

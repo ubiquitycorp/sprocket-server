@@ -63,7 +63,6 @@
 			<artifactId>ubc-integration</artifactId>
 			<version>0.1.23</version>
 		</dependency>
-
 	
 
 		<dependency>
