@@ -15,7 +15,12 @@ import com.ubiquity.content.api.VimeoAPITest;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.User;
+import com.ubiquity.social.domain.Activity;
+import com.ubiquity.social.domain.ActivityType;
 import com.ubiquity.social.domain.Message;
+import com.ubiquity.social.domain.PostActivity;
+import com.ubiquity.sprocket.service.ServiceFactory;
 
 public class TwitterApiTest {
 private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
@@ -24,9 +29,13 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 	
 	@BeforeClass
 	public static void setUp() throws Exception {
+//		identity = ServiceFactory.getExternalIdentityService().findExternalIdentity((long)1, ExternalNetwork.Twitter);
+//		log.debug("authenticated Twitter with identity {} ", identity);
+		
 		identity = new ExternalIdentity.Builder()
 				.accessToken("2576165924-bjuqdtF54hoIw4fufobnX6O6DCaHfFhp4riitH1")
 				.secretToken("8StcfxfvMzdyuUFRcmf7dtn9kI1VTAvFCoB0deZZy8qkW")
+				.identifier("2576165924")
 				.build();
 		log.debug("authenticated Twitter with identity {} ", identity);
 	}
@@ -43,7 +52,7 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		Assert.assertTrue(sent);
 	}
 	@Test
-	public void testGetMessages() {
+	public void listMessages() {
 		
 		SocialAPI twitterAPI = SocialAPIFactory.createProvider(ExternalNetwork.Twitter, ClientPlatform.WEB);
 		List<Message> messages = twitterAPI.listMessages(identity);
@@ -52,6 +61,34 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		for(Message message : messages) {
 			log.debug("message {}", message);
 			Assert.assertNotNull(message.getConversationIdentifier());
+		}
+		
+	}
+	@Test
+	public void postTweet() {
+		
+		SocialAPI twitterAPI = SocialAPIFactory.createProvider(ExternalNetwork.Twitter, ClientPlatform.WEB);
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH-mm-ss");
+		Date date = new Date();
+		String message = dateFormat.format(date);
+		message = message.replaceAll(" ", "%20");
+		PostActivity postActivity = new PostActivity.Builder()
+									.activityTypeId(ActivityType.STATUS.ordinal())
+									.body(message).build();
+		
+		Boolean sent = twitterAPI.postActivity(identity, postActivity);
+		Assert.assertTrue(sent);
+	}
+	//@Test
+	public void listActivities() {
+		
+		SocialAPI twitterAPI = SocialAPIFactory.createProvider(ExternalNetwork.Twitter, ClientPlatform.WEB);
+		List<Activity> activities = twitterAPI.listActivities(identity);
+		Assert.assertFalse(activities.isEmpty());
+		// all fb messages will have conversations
+		for(Activity activity : activities) {
+			log.debug("message {}", activities);
+			Assert.assertNotNull(activity.getExternalIdentifier());
 		}
 		
 	}
