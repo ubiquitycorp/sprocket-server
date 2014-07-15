@@ -99,7 +99,7 @@
 				<db.password>sprocket9801</db.password>
 				<db.host>sprocket-stage-rds.cvgtvh3iosnx.us-west-1.rds.amazonaws.com</db.host>
 				<hibernate.schema.auto>none</hibernate.schema.auto>
-				<repo.env>prod</repo.env>
+				<repo.env>stage</repo.env>
 				<mq.host>54.215.203.15</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
