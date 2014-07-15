@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.utils.Page;
+import com.ubiquity.content.api.ContentAPI;
+import com.ubiquity.content.api.ContentAPIFactory;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
@@ -20,6 +22,7 @@ import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.external.service.ExternalIdentityService;
 import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.external.domain.Network;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchEngine;
 import com.ubiquity.sprocket.search.SearchKeys;
@@ -187,6 +190,51 @@ public class SearchService {
 		return documents;
 		
 	}
+	
+	/***
+	 * Searches public activities for a social network
+	 * 
+	 * @param searchTerm
+	 * @param userId
+	 * @param externalNetwork
+	 * @return
+	 */
+	public List<Document> searchVideos(String searchTerm, User user, ExternalNetwork externalNetwork, ClientPlatform clientPlatform, Integer page) {
+		List<Document> documents = new LinkedList<Document>();
+		
+		// get the identity and social network
+		ExternalIdentity identity = ExternalIdentityService.getAssociatedExternalIdentity(user, externalNetwork);
+		
+		// determine which API to use
+		if(externalNetwork.getNetwork() == Network.Content) {
+			
+			ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, clientPlatform);
+			List<VideoContent> videos = contentAPI.searchVideos(searchTerm, page, resultsLimit, identity);
+			
+		} else {
+			// for now
+			throw new UnsupportedOperationException();
+		}
+		//SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
+		
+		// calculate offset with page utility based on page limits
+		//int offset = Page.calculateOffsetFromPage(page, resultsLimit, pageLimit);
+		//List<Activity> activities = socialAPI.searchActivities(identity, searchTerm, resultsLimit, offset);
+		
+		// now wrap them in a search document
+		//int rank = 0;
+		//for(Activity activity : activities) {
+			//Document document = new Document(activity.getClass().getSimpleName(), activity, rank);
+			//rank++;
+			//documents.add(document);
+		//}
+		
+		//log.debug("documents {}", documents);
+
+		return documents;
+	}
+	
+	
 	
 	/***
 	 * Searches documents for a social network
