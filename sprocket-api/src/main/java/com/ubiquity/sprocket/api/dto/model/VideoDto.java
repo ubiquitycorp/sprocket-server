@@ -4,7 +4,7 @@ public class VideoDto {
 
 	private String url;
 	private String itemKey;
-	private Integer contentNetworkId;
+	private Integer externalNetworkId;
 	private Long lastUpdated;
 	private String title;
 	private String description;
@@ -23,8 +23,8 @@ public class VideoDto {
 		return itemKey;
 	}
 
-	public Integer getContentNetworkId() {
-		return contentNetworkId;
+	public Integer getExternalNetworkId() {
+		return externalNetworkId;
 	}
 
 	public Long getLastUpdated() {
@@ -46,7 +46,7 @@ public class VideoDto {
 	public static class Builder {
 		private String url;
 		private String itemKey;
-		private Integer contentNetworkId;
+		private Integer externalNetworkId;
 		private Long lastUpdated;
 		private String title;
 		private String description;
@@ -63,8 +63,8 @@ public class VideoDto {
 			return this;
 		}
 
-		public Builder contentNetworkId(Integer contentNetworkId) {
-			this.contentNetworkId = contentNetworkId;
+		public Builder externalNetworkId(Integer externalNetworkId) {
+			this.externalNetworkId = externalNetworkId;
 			return this;
 		}
 
@@ -101,7 +101,7 @@ public class VideoDto {
 	private VideoDto(Builder builder) {
 		this.url = builder.url;
 		this.itemKey = builder.itemKey;
-		this.contentNetworkId = builder.contentNetworkId;
+		this.externalNetworkId = builder.externalNetworkId;
 		this.lastUpdated = builder.lastUpdated;
 		this.title = builder.title;
 		this.description = builder.description;

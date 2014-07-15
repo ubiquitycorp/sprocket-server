@@ -51,7 +51,7 @@ stop() {
     echo
     [ $retval -eq 0 ] && rm -f $lockfile
 
-    kill `ps -ef | grep $name | awk '{ print $2 }'` > /dev/null 2>&1
+    kill `/usr/bin/pgrep -f ${name}.jar | xargs` > /dev/null 2>&1
 
     return $retval
 }

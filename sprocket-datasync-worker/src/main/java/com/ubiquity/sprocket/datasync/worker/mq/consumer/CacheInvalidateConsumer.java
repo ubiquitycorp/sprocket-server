@@ -7,14 +7,14 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
-import com.ubiquity.content.domain.ContentNetwork;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.content.service.ContentService;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.social.domain.Activity;
-import com.ubiquity.social.domain.SocialNetwork;
+import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.external.domain.Network;
 import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
@@ -38,54 +38,55 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		try {
 			Message message = messageConverter.deserialize(msg, Message.class);
 			log.debug("message received: {}", message);
-			if(message.getType().equals(ExternalIdentityActivated.class.getSimpleName()))
-				process((ExternalIdentityActivated)message.getContent());
-			
+			if (message.getType().equals(
+					ExternalIdentityActivated.class.getSimpleName()))
+				process((ExternalIdentityActivated) message.getContent());
 
 		} catch (Exception e) {
-			// For now, log an error and exit until we know all the circumstances under which this can happen
+			// For now, log an error and exit until we know all the
+			// circumstances under which this can happen
 			log.error("Could not process message: {}", e);
-			//System.exit(0);
+			// System.exit(0);
 		}
 	}
 
-	
 	/**
-	 * If an identity has been activated, process all available content; 
+	 * If an identity has been activated, process all available content;
+	 * 
 	 * @param content
 	 */
 	private void process(ExternalIdentityActivated activated) {
 		log.debug("found: {}", activated);
-		
+
 		// get identity from message
-		ExternalIdentity identity = ServiceFactory.getSocialService().getSocialIdentityById(activated.getIdentityId());
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+				.getExternalIdentityById(activated.getIdentityId());
+		ExternalNetwork externalNetwork = ExternalNetwork
+				.getNetworkById(identity.getExternalNetwork());
+
+		if (externalNetwork.network.equals(Network.Content))
+			processVideos(identity, externalNetwork);
+		else if (externalNetwork.equals(ExternalNetwork.Google))
+			processVideos(identity, ExternalNetwork.YouTube);
 		
-		
-		if(activated.getContentNetworkId() != null){
-			ContentNetwork contentNetwork = ContentNetwork.getContentNetworkFromId(activated.getContentNetworkId());
-			// Google has the same identity for both Youtube and Google+
-			if(contentNetwork.equals(ContentNetwork.YouTube))
-				processVideos(identity, contentNetwork);
-			else{
-				// get content identity
-				ExternalIdentity contentIdentity = ServiceFactory.getContentService().getContentIdentityById(activated.getIdentityId());
-				processVideos(contentIdentity, contentNetwork);
-			}
+		if(externalNetwork.equals(ExternalNetwork.Google)||externalNetwork.equals(ExternalNetwork.Twitter)) {
+			processMessages(identity, externalNetwork);
+		}  else if (externalNetwork.equals(ExternalNetwork.Facebook)) {
+			processMessages(identity, ExternalNetwork.Facebook);
+			processActivities(identity, ExternalNetwork.Facebook);
 		}
-		
-		if(identity.getIdentityProvider() == SocialNetwork.Google.getValue()) {
-			processMessages(identity, SocialNetwork.Google);
-		} else if(identity.getIdentityProvider() == SocialNetwork.Facebook.getValue()) {
-			processMessages(identity, SocialNetwork.Facebook);
-			processActivities(identity, SocialNetwork.Facebook);
+		else if(externalNetwork.equals(ExternalNetwork.LinkedIn))
+		{
+			processActivities(identity, ExternalNetwork.LinkedIn);
 		}
 	} 
 
-	
-	private void processActivities(ExternalIdentity identity, SocialNetwork socialNetwork) {
+	private void processActivities(ExternalIdentity identity,
+			ExternalNetwork socialNetwork) {
 		SocialService socialService = ServiceFactory.getSocialService();
-		List<Activity> synced = socialService.syncActivities(identity, socialNetwork);
-		
+		List<Activity> synced = socialService.syncActivities(identity,
+				socialNetwork);
+
 		// index for searching
 		ServiceFactory.getSearchService().indexActivities(synced);
 	}
@@ -94,34 +95,35 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 	 * Process videos for this content provider
 	 * 
 	 * @param identity
-	 * @param contentNetwork
+	 * @param externalNetwork
 	 */
-	private void processVideos(ExternalIdentity identity, ContentNetwork contentNetwork) {
+	private void processVideos(ExternalIdentity identity,
+			ExternalNetwork externalNetwork) {
 
 		ContentService contentService = ServiceFactory.getContentService();
-		List<VideoContent> synced = contentService.sync(identity, contentNetwork);
-		
+		List<VideoContent> synced = contentService.sync(identity,
+				externalNetwork);
+
 		// add videos to search results
-		ServiceFactory.getSearchService().indexVideos(synced, identity.getUser().getUserId());
-		
-		
+		ServiceFactory.getSearchService().indexVideos(synced,
+				identity.getUser().getUserId());
 	}
-	
+
 	/***
-	 * Process messages for this social network
+	 * Process messages for this external network
+	 * 
 	 * @param identity
-	 * @param socialNetwork
+	 * @param network
 	 */
-	private void processMessages(ExternalIdentity identity, SocialNetwork socialNetwork) {
+	private void processMessages(ExternalIdentity identity,
+			ExternalNetwork network) {
 		SocialService socialService = ServiceFactory.getSocialService();
-		
-		List<com.ubiquity.social.domain.Message> messages = socialService.syncMessages(identity, socialNetwork);
-		
-		//add messages to search results
+
+		List<com.ubiquity.social.domain.Message> messages = socialService
+				.syncMessages(identity, network);
+
+		// add messages to search results
 		ServiceFactory.getSearchService().indexMessages(messages);
 	}
-	
-	
-	
-	
+
 }

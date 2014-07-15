@@ -73,7 +73,7 @@ public class DataSyncWorker {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
-				log.warn("Received shutdown signal");
+				log.info("Received shutdown signal");
 				worker.destroy();
 			}
 		});

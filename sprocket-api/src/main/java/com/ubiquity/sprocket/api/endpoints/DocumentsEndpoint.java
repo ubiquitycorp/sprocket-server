@@ -19,7 +19,7 @@ import com.niobium.repository.utils.Page;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.messaging.format.Message;
-import com.ubiquity.social.domain.SocialNetwork;
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.DocumentsDto;
 import com.ubiquity.sprocket.domain.Document;
@@ -70,7 +70,7 @@ public class DocumentsEndpoint {
 	public Response searchIndexed(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
 		DocumentsDto result = new DocumentsDto();
 
-		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialNetworkId);
+		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialNetworkId);
 		
 		List<Document> documents = ServiceFactory.getSearchService().searchIndexedDocuments(q, userId, socialNetwork);
 		for(Document document : documents) {
@@ -86,7 +86,7 @@ public class DocumentsEndpoint {
 	public Response searchLive(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
 		DocumentsDto result = new DocumentsDto();
 
-		SocialNetwork socialNetwork = SocialNetwork.getEnum(socialNetworkId);
+		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialNetworkId);
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		
 		List<Document> documents = ServiceFactory.getSearchService().searchLiveActivities(q, user, socialNetwork, ClientPlatform.Android, page);

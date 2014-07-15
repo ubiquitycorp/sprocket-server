@@ -8,7 +8,7 @@ public class ActivityDto {
 	private ContactDto postedBy;
 	private ImageDto photo;
 	private VideoDto video;
-	private Integer socialProviderId;
+	private Integer externalNetworkId;
 	private String type;
 	private String link;
 
@@ -44,8 +44,8 @@ public class ActivityDto {
 		return postedBy;
 	}
 
-	public Integer getSocialProviderId() {
-		return socialProviderId;
+	public Integer externalNetworkId() {
+		return externalNetworkId;
 	}
 
 	public static class Builder {
@@ -55,7 +55,7 @@ public class ActivityDto {
 		private ContactDto postedBy;
 		private ImageDto photo;
 		private VideoDto video;
-		private Integer socialProviderId;
+		private Integer externalNetworkId;
 		private String type;
 		private String link;
 
@@ -89,8 +89,8 @@ public class ActivityDto {
 			return this;
 		}
 
-		public Builder socialProviderId(Integer socialProviderId) {
-			this.socialProviderId = socialProviderId;
+		public Builder externalNetworkId(Integer externalNetworkId) {
+			this.externalNetworkId = externalNetworkId;
 			return this;
 		}
 
@@ -116,7 +116,7 @@ public class ActivityDto {
 		this.postedBy = builder.postedBy;
 		this.photo = builder.photo;
 		this.video = builder.video;
-		this.socialProviderId = builder.socialProviderId;
+		this.externalNetworkId = builder.externalNetworkId;
 		this.type = builder.type;
 		this.link = builder.link;
 	}

@@ -16,7 +16,7 @@ import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
 import com.ubiquity.integration.factory.TestContactFactory;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
-import com.ubiquity.social.domain.SocialNetwork;
+import com.ubiquity.external.domain.ExternalNetwork;
 
 /***
  * Tests testing basic CRUD operations for a user repository
@@ -53,7 +53,7 @@ public class MessageRepositoryTest {
 		userRepository.create(owner);
 		EntityManagerSupport.commit();
 					
-		sender = TestContactFactory.createContactWithMininumRequiredFieldsAndSocialNetwork(owner, SocialNetwork.Facebook);
+		sender = TestContactFactory.createContactWithMininumRequiredFieldsAndSocialNetwork(owner, ExternalNetwork.Facebook);
 		
 		EntityManagerSupport.beginTransaction();
 		contactRepository.create(sender);
@@ -65,10 +65,10 @@ public class MessageRepositoryTest {
 			.body(UUID.randomUUID().toString())
 			.sentDate(System.currentTimeMillis())
 			.sender(sender)
-			.socialNetwork(SocialNetwork.Facebook)
+			.externalNetwork(ExternalNetwork.Facebook)
 			.externalIdentifier(UUID.randomUUID().toString())
 			.owner(owner)
-			.socialNetwork(SocialNetwork.Facebook)
+			.externalNetwork(ExternalNetwork.Facebook)
 			.build();
 		
 		saveMessage(message);
@@ -106,10 +106,10 @@ public class MessageRepositoryTest {
 			.conversationIdentifier(conversationIdentifier)
 			.sentDate(System.currentTimeMillis())
 			.sender(sender)
-			.socialNetwork(SocialNetwork.Facebook)
+			.externalNetwork(ExternalNetwork.Facebook)
 			.externalIdentifier(UUID.randomUUID().toString())
 			.owner(owner)
-			.socialNetwork(SocialNetwork.Facebook)
+			.externalNetwork(ExternalNetwork.Facebook)
 			.build();
 		saveMessage(first);
 		
@@ -119,15 +119,15 @@ public class MessageRepositoryTest {
 			.conversationIdentifier(conversationIdentifier)
 			.sentDate(System.currentTimeMillis() + 1)
 			.sender(sender)
-			.socialNetwork(SocialNetwork.Facebook)
+			.externalNetwork(ExternalNetwork.Facebook)
 			.externalIdentifier(UUID.randomUUID().toString())
 			.owner(owner)
-			.socialNetwork(SocialNetwork.Facebook)
+			.externalNetwork(ExternalNetwork.Facebook)
 			.build();
 		saveMessage(next);
 
 		// now query, making sure messages are grouped properly
-		List<Message> messages = messageRepository.findByOwnerIdAndSocialNetwork(owner.getUserId(), SocialNetwork.Facebook);
+		List<Message> messages = messageRepository.findByOwnerIdAndSocialNetwork(owner.getUserId(), ExternalNetwork.Facebook);
 		Assert.assertTrue(messages.size() == 3);
 		
 		// let's make sure this one has no id
@@ -155,16 +155,16 @@ public class MessageRepositoryTest {
 	
 	@Test
 	public void testFindByExternalIdentifier() throws Exception {
-		Message persisted = messageRepository.getByExternalIdentifierAndSocialNetwork(message.getExternalIdentifier(), owner.getUserId(), SocialNetwork.Facebook);;
+		Message persisted = messageRepository.getByExternalIdentifierAndSocialNetwork(message.getExternalIdentifier(), owner.getUserId(), ExternalNetwork.Facebook);;
 		Assert.assertNotNull(persisted);
 		Assert.assertTrue(persisted.getMessageId().longValue() == message.getMessageId().longValue());
 		
 		// query by different id
-		persisted = messageRepository.getByExternalIdentifierAndSocialNetwork(UUID.randomUUID().toString(), owner.getUserId(), SocialNetwork.Facebook);;
+		persisted = messageRepository.getByExternalIdentifierAndSocialNetwork(UUID.randomUUID().toString(), owner.getUserId(), ExternalNetwork.Facebook);;
 		Assert.assertNull(persisted);
 		
 		// query by same id, different network
-		persisted = messageRepository.getByExternalIdentifierAndSocialNetwork(message.getExternalIdentifier(), owner.getUserId(), SocialNetwork.Facebook);;
+		persisted = messageRepository.getByExternalIdentifierAndSocialNetwork(message.getExternalIdentifier(), owner.getUserId(), ExternalNetwork.Facebook);;
 		Assert.assertNotNull(persisted);
 				
 	}

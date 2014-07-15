@@ -9,7 +9,7 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.factory.TestMessageFactory;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
-import com.ubiquity.social.domain.SocialNetwork;
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 
 /***
@@ -24,13 +24,13 @@ public class DtoAssemblerTest {
 	@Test
 	public void testAssembleMessageConversation() {
 		
-		List<Message> conversation = TestMessageFactory.createConversation(SocialNetwork.Facebook);
+		List<Message> conversation = TestMessageFactory.createConversation(ExternalNetwork.Facebook);
 		// get the owner and create one orphan message
 		
 		Message aMessage = conversation.get(0);
 		User owner = aMessage.getOwner();
 		Contact sender = aMessage.getSender();
-		conversation.add(TestMessageFactory.createMessageWithMininumRequiredFields(owner, sender, SocialNetwork.Facebook, null));
+		conversation.add(TestMessageFactory.createMessageWithMininumRequiredFields(owner, sender, ExternalNetwork.Facebook, null));
 		
 		List<MessageDto> messageDtoList = DtoAssembler.assemble(conversation);
 		

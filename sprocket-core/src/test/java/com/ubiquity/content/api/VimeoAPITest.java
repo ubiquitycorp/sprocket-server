@@ -7,8 +7,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ubiquity.content.domain.ContentNetwork;
 import com.ubiquity.content.domain.VideoContent;
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 
@@ -26,7 +26,7 @@ public class VimeoAPITest {
 	
 	@Test
 	public void testFindVideosByExternalIdentity() {
-		ContentAPI contentApi = ContentAPIFactory.createProvider(ContentNetwork.Vimeo, ClientPlatform.WEB);
+		ContentAPI contentApi = ContentAPIFactory.createProvider(ExternalNetwork.Vimeo, ClientPlatform.WEB);
 		List<VideoContent> videos = contentApi.findVideosByExternalIdentity(identity);
 		for(VideoContent video : videos) 
 			log.debug("video: {}", video);

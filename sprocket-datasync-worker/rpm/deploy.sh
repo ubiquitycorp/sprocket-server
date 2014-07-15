@@ -1,5 +1,5 @@
 service=sprocket-datasync-worker
-if (( $(ps -ef | grep -v grep | grep $service | wc -l) == 0 ))
+if [ `/usr/bin/pgrep -f ${service}.jar | wc -l` -eq 0 ]
 then
 /etc/init.d/$service start
 else
