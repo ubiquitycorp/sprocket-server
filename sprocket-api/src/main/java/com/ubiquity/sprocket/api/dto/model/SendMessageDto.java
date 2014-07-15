@@ -5,11 +5,17 @@ import javax.validation.constraints.NotNull;
 import com.ubiquity.identity.domain.ClientPlatform;
 
 public class SendMessageDto {
+	private String subject;
 	private String text;
 	private String receiverId;
 	private String receiverName;
 	private ClientPlatform clientPlatform;
 	
+	
+	public String getSubject() {
+		return subject;
+	}
+
 	@NotNull
 	public String getText() {
 		return text;
