@@ -7,7 +7,7 @@
         <dependent-module archiveName="sprocket-core-0.1.16.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/sprocket-core/sprocket-core">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="ubc-integration-0.1.23.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ubc-integration/ubc-integration">
+        <dependent-module archiveName="ubc-integration-0.1.24.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ubc-integration/ubc-integration">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="ubc-media-0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ubc-media/ubc-media">
