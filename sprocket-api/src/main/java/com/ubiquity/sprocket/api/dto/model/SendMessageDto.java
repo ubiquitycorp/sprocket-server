@@ -7,7 +7,7 @@ import com.ubiquity.identity.domain.ClientPlatform;
 public class SendMessageDto {
 	private String subject;
 	private String text;
-	private String receiverId;
+	private Long receiverId;
 	private String receiverName;
 	private ClientPlatform clientPlatform;
 	
@@ -21,7 +21,7 @@ public class SendMessageDto {
 		return text;
 	}
 
-	public String getReceiverId() {
+	public Long getReceiverId() {
 		return receiverId;
 	}
 	public String getReceiverName() {

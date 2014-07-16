@@ -23,6 +23,7 @@ import com.ubiquity.api.exception.HttpException;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.api.exception.AuthorizationException;
 import com.ubiquity.social.domain.Activity;
+import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.PostActivity;
 import com.ubiquity.external.domain.ExternalNetwork;
@@ -123,7 +124,8 @@ public class SocialEndpoint {
 		//Cast the input into SendMessageObject
 		SendMessageDto sendMessageDto = jsonConverter.convertFromPayload(payload, SendMessageDto.class);
 		try{
-			ServiceFactory.getSocialService().SendMessage(identity,socialNetwork, sendMessageDto.getReceiverId(), sendMessageDto.getReceiverName(), sendMessageDto.getText(), sendMessageDto.getSubject());
+			Contact contact = ServiceFactory.getContactService().getByContactId(sendMessageDto.getReceiverId());
+			ServiceFactory.getSocialService().sendMessage(identity,socialNetwork, contact, sendMessageDto.getReceiverName(), sendMessageDto.getText(), sendMessageDto.getSubject());
 		}
 		catch(AuthorizationException e)
 		{
