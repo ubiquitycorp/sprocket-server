@@ -108,22 +108,23 @@ public class SocialEndpoint {
 	/***
 	 * This method send message to specific user in social network
 	 * @param userId
-	 * @param socialProviderId
+	 * @param externalNetworkId
 	 * @return
 	 */
 	@POST
-	@Path("users/{userId}/providers/{socialNetworkId}/sendmessage")
+	@Path("users/{userId}/providers/{externalNetworkId}/sendmessage")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) {
+	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) {
 
 		// get social network 
-		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
+		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		// get the identity from DB
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
 		//Cast the input into SendMessageObject
 		SendMessageDto sendMessageDto = jsonConverter.convertFromPayload(payload, SendMessageDto.class);
 		try{
-			ServiceFactory.getSocialService().SendMessage(identity, socialNetwork, sendMessageDto.getReceiverId(), sendMessageDto.getReceiverName(), sendMessageDto.getText(), "");
+			ServiceFactory.getSocialService().SendMessage(identity,socialNetwork, sendMessageDto.getReceiverId(), sendMessageDto.getReceiverName(), sendMessageDto.getText(), sendMessageDto.getSubject());
+
 		}
 		catch(AuthorizationException e)
 		{
