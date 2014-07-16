@@ -171,6 +171,7 @@ public class DtoAssembler {
 			.externalNetworkId(activity.getExternalNetwork().ordinal())
 			.title(activity.getTitle())
 			.link(activity.getLink())
+			.externalIdentifier(activity.getExternalIdentifier())
 			.postedBy(DtoAssembler.assemble(activity.getPostedBy()));
 		 	
 		 if(activity.getImage() != null)
