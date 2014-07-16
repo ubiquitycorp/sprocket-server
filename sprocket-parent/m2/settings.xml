@@ -84,11 +84,11 @@
 				<syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
 				<redis.host>54.183.115.14</redis.host>
 				<hibernate.debug>false</hibernate.debug>
-				<solr.api.host>54.183.106.223</solr.api.host>
+				<solr.api.host>54.219.144.172</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
-				<social.google.android.apikey>AIzaSyDhTbmc7b30AR2iwU5Ahxwbd9fQegt8AuU</social.google.android.apikey>
-				<social.google.ios.apikey>AIzaSyBLbSDsyGMBbXGVlnIUIpiSP3JKY706Gf0</social.google.ios.apikey>
-				<social.google.web.apikey>AIzaSyCY3woAWsatYnwhkYOeBqVjQ8V9hGa2vt8</social.google.web.apikey>
+				<social.google.android.apikey>AIzaSyBw6HcXRQG2stD6cZST32nxr69q_oG9ghY</social.google.android.apikey>
+				<social.google.ios.apikey>AIzaSyBw6HcXRQG2stD6cZST32nxr69q_oG9ghY</social.google.ios.apikey>
+				<social.google.web.apikey>AIzaSyBw6HcXRQG2stD6cZST32nxr69q_oG9ghY</social.google.web.apikey>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
 				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
