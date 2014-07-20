@@ -10,8 +10,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +28,8 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.social.api.SocialAPI;
+import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.api.linkedin.ExchangeService;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
@@ -274,6 +278,20 @@ public class UsersEndpoint {
 
 	}
 
+	@GET
+	@Path("/{userId}/exchangeToken/providers/{providerId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response exchangeAccessToken(@PathParam("userId") Long userId, @PathParam("providerId") Integer providerId, @QueryParam("accessToken") String accessToken){
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(providerId);
+		// load user
+		User user = ServiceFactory.getUserService().getUserById(userId);
+		SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork, ClientPlatform.WEB);
+		String LongLivedAccessToken = socialApi.exchangeAccessToken(accessToken);
+		
+		return Response.ok("{accessToken:" + LongLivedAccessToken + "}").build();
+	}
+	
 	private void sendActivatedMessage(User user, ExternalIdentity identity,
 			IdentityDto identityDto) throws IOException {
 		ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()

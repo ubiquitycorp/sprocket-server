@@ -10,6 +10,8 @@
 				<hibernate.debug>true</hibernate.debug>
 				<solr.api.host>localhost</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
+				<social.facebook.consumerKey>581153318672017</social.facebook.consumerKey>
+				<social.facebook.consumerSecret>0752b1dfd97a54334b53f3a22ee9b3ca</social.facebook.consumerSecret>
 				<social.google.android.apikey>AIzaSyDhTbmc7b30AR2iwU5Ahxwbd9fQegt8AuU</social.google.android.apikey>
 				<social.google.ios.apikey>AIzaSyBLbSDsyGMBbXGVlnIUIpiSP3JKY706Gf0</social.google.ios.apikey>
 				<social.google.web.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I</social.google.web.apikey>
