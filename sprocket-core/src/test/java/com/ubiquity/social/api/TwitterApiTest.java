@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,6 +33,9 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 	public static void setUp() throws Exception {
 //		identity = ServiceFactory.getExternalIdentityService().findExternalIdentity((long)1, ExternalNetwork.Twitter);
 //		log.debug("authenticated Twitter with identity {} ", identity);
+		Configuration configuration = new PropertiesConfiguration(
+				"sprocketapi.properties");
+		SocialAPIFactory.initialize(configuration);
 		User user = new User.Builder()
 		.lastUpdated(System.currentTimeMillis())
 		.firstName(UUID.randomUUID().toString())
@@ -41,8 +46,8 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		.build();
 		
 		identity = new ExternalIdentity.Builder()
-				.accessToken("2576165924-bjuqdtF54hoIw4fufobnX6O6DCaHfFhp4riitH1")
-				.secretToken("8StcfxfvMzdyuUFRcmf7dtn9kI1VTAvFCoB0deZZy8qkW")
+				.accessToken("2576165924-pD3gk25Aowaa3xOzSOrfoqgBtQx1w2eIkvf10lq")
+				.secretToken("Ba1okul75SDQ4vrKCKqqz9HIsLP76gdM8280ONSVU9sSs")
 				.identifier("2576165924")
 				.user(user)
 				.build();
