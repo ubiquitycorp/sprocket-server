@@ -2,13 +2,11 @@ package com.ubiquity.sprocket.api.dto.model;
 
 import javax.validation.constraints.NotNull;
 
-import com.ubiquity.identity.domain.ClientPlatform;
-
 public class SendMessageDto {
 	private String subject;
 	private String text;
 	private Long contactId;
-	private ClientPlatform clientPlatform;
+	private Integer clientPlatformId;
 	
 	
 	public String getSubject() {
@@ -24,8 +22,8 @@ public class SendMessageDto {
 		return contactId;
 	}
 	
-	public ClientPlatform getClientPlatform() {
-		return clientPlatform;
+	public int getClientPlatformId() {
+		return clientPlatformId;
 	}
 
 }
