@@ -19,6 +19,7 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.ActivityType;
+import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.PostActivity;
 
@@ -56,8 +57,9 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH-mm-ss");
 		Date date = new Date();
 		String message = dateFormat.format(date);
-		message = message.replaceAll(" ", "%20");
-		Boolean sent = twitterAPI.sendMessage(identity, null, "engminashafik", message, "");
+		//message = message.replaceAll(" ", "%20");
+		Contact c = new Contact.Builder().externalIdentity(new ExternalIdentity.Builder().identifier("2607216073").build()).build();
+		Boolean sent = twitterAPI.sendMessage(identity, c, message, "");
 		Assert.assertTrue(sent);
 	}
 	@Test
@@ -80,7 +82,7 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH-mm-ss");
 		Date date = new Date();
 		String message = dateFormat.format(date);
-		message = message.replaceAll(" ", "%20");
+		//message = message.replaceAll(" ", "%20");
 		PostActivity postActivity = new PostActivity.Builder()
 									.activityTypeId(ActivityType.STATUS.ordinal())
 									.body(message).build();

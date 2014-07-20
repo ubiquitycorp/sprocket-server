@@ -124,8 +124,8 @@ public class SocialEndpoint {
 		//Cast the input into SendMessageObject
 		SendMessageDto sendMessageDto = jsonConverter.convertFromPayload(payload, SendMessageDto.class);
 		try{
-			Contact contact = ServiceFactory.getContactService().getByContactId(sendMessageDto.getReceiverId());
-			ServiceFactory.getSocialService().sendMessage(identity,socialNetwork, contact, sendMessageDto.getReceiverName(), sendMessageDto.getText(), sendMessageDto.getSubject());
+			Contact contact = ServiceFactory.getContactService().getByContactId(sendMessageDto.getContactId());
+			ServiceFactory.getSocialService().sendMessage(identity,socialNetwork, contact, sendMessageDto.getText(), sendMessageDto.getSubject());
 		}
 		catch(AuthorizationException e)
 		{
