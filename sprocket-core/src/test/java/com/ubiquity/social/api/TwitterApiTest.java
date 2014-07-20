@@ -10,6 +10,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import com.ubiquity.social.domain.ActivityType;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.PostActivity;
 
+@Ignore
 public class TwitterApiTest {
 private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 	
