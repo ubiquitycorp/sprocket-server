@@ -9,20 +9,20 @@ import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.niobium.repository.utils.Page;
 import com.ubiquity.content.api.ContentAPI;
 import com.ubiquity.content.api.ContentAPIFactory;
 import com.ubiquity.content.domain.VideoContent;
+import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.external.domain.Network;
+import com.ubiquity.external.service.ExternalIdentityService;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
+import com.ubiquity.social.api.util.PaginationUtils;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Message;
-import com.ubiquity.external.service.ExternalIdentityService;
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.external.domain.Network;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchEngine;
 import com.ubiquity.sprocket.search.SearchKeys;
@@ -174,7 +174,7 @@ public class SearchService {
 		SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
 		
 		// calculate offset with page utility based on page limits
-		int offset = Page.calculateOffsetFromPage(page, resultsLimit, pageLimit);
+		int offset = PaginationUtils.calculateOffsetFromPage(page, resultsLimit, pageLimit);
 		List<Activity> activities = socialAPI.searchActivities(identity, searchTerm, resultsLimit, offset);
 		
 		// now wrap them in a search document
