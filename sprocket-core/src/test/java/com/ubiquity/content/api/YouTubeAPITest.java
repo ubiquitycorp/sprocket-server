@@ -54,7 +54,7 @@ public class YouTubeAPITest {
 		videos = contentApi.searchVideos("Karate", 1, 25, identity);
 		Assert.assertTrue(firstFromPageOne.getVideo().getItemKey().equals(videos.get(0).getVideo().getItemKey()));
 		
-		// try reading ahead 2 pages, which isnot supported
+		// try reading ahead 2 pages, which is not supported
 		boolean exceptionThrown = Boolean.FALSE;
 		try {
 			videos = contentApi.searchVideos("Karate", 3, 25, identity);
