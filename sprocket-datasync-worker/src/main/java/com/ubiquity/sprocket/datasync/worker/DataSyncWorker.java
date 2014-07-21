@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.niobium.common.thread.ThreadPool;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.sprocket.datasync.worker.mq.consumer.CacheInvalidateConsumer;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -84,6 +85,7 @@ public class DataSyncWorker {
 		ServiceFactory.initialize(configuration);
 		JedisConnectionFactory.initialize(configuration);
 		MessageQueueFactory.initialize(configuration);
+		SocialAPIFactory.initialize(configuration);
 	}
 
 	private void stopServices() {

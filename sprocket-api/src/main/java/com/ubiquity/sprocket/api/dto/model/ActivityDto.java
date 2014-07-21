@@ -11,6 +11,7 @@ public class ActivityDto {
 	private Integer externalNetworkId;
 	private String type;
 	private String link;
+	private String externalIdentifier;
 
 	public String getLink() {
 		return link;
@@ -48,6 +49,11 @@ public class ActivityDto {
 		return externalNetworkId;
 	}
 
+	public String getExternalIdentifier() {
+		return externalIdentifier;
+	}
+
+
 	public static class Builder {
 		private String title;
 		private String body;
@@ -58,7 +64,8 @@ public class ActivityDto {
 		private Integer externalNetworkId;
 		private String type;
 		private String link;
-
+		private String externalIdentifier;
+		
 		public Builder title(String title) {
 			this.title = title;
 			return this;
@@ -103,6 +110,11 @@ public class ActivityDto {
 			this.link = link;
 			return this;
 		}
+		
+		public Builder externalIdentifier(String externalIdentifier) {
+			this.externalIdentifier = externalIdentifier;
+			return this;
+		}
 
 		public ActivityDto build() {
 			return new ActivityDto(this);
@@ -119,5 +131,6 @@ public class ActivityDto {
 		this.externalNetworkId = builder.externalNetworkId;
 		this.type = builder.type;
 		this.link = builder.link;
+		this.externalIdentifier = builder.externalIdentifier;
 	}
 }
