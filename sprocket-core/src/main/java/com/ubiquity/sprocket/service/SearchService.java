@@ -47,7 +47,10 @@ public class SearchService {
 		log.debug("Using solr api path: {}", config.getProperty("solr.api.path"));
 		resultsLimit = config.getInt("rules.search.results.limit");
 		pageLimit = config.getInt("rules.search.results.page.limit");
-				
+		
+		SocialAPIFactory.initialize(config);
+		ContentAPIFactory.initialize(config);
+
 		searchEngine = new SearchEngineSolrjImpl(config);
 	}
 
@@ -165,75 +168,93 @@ public class SearchService {
 	 * @param externalNetwork
 	 * @return
 	 */
-	public List<Document> searchLiveActivities(String searchTerm, User user, ExternalNetwork externalNetwork, ClientPlatform clientPlatform, Integer page) {
+	public List<Document> searchLiveDocuments(String searchTerm, User user, ExternalNetwork externalNetwork, ClientPlatform clientPlatform, Integer page) {
 
-		List<Document> documents = new LinkedList<Document>();
-		
+		List<Document> documents;
 		// get the identity and social network
 		ExternalIdentity identity = ExternalIdentityService.getAssociatedExternalIdentity(user, externalNetwork);
-		SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
 		
-		// calculate offset with page utility based on page limits
-		int offset = Pagination.calculateOffsetFromPage(page, resultsLimit, pageLimit);
-		List<Activity> activities = socialAPI.searchActivities(identity, searchTerm, resultsLimit, offset);
-		
-		// now wrap them in a search document
-		int rank = 0;
-		for(Activity activity : activities) {
-			Document document = new Document(activity.getClass().getSimpleName(), activity, rank);
-			rank++;
-			documents.add(document);
+		// if it's social, search activities only
+		if(externalNetwork.getNetwork() == Network.Social) {
+			SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
+			// calculate offset with page utility based on page limits
+			int offset = Pagination.calculateOffsetFromPage(page, resultsLimit, pageLimit);
+			List<Activity> activities = socialAPI.searchActivities(identity, searchTerm, resultsLimit, offset);
+			documents = wrapEntitiesInDocuments(activities);
+			
+		} else {
+			// if content, search videos
+			ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, clientPlatform);
+			List<VideoContent> videoContent = contentAPI.searchVideos(searchTerm, page, resultsLimit, identity);
+			documents = wrapEntitiesInDocuments(videoContent);
 		}
-		
-		log.debug("documents {}", documents);
 
 		return documents;
 		
 	}
 	
 	/***
-	 * Searches public activities for a social network
+	 * Wrap entities in documents
 	 * 
-	 * @param searchTerm
-	 * @param userId
-	 * @param externalNetwork
+	 * @param entities
 	 * @return
 	 */
-	public List<Document> searchVideos(String searchTerm, User user, ExternalNetwork externalNetwork, ClientPlatform clientPlatform, Integer page) {
+	private <T> List<Document> wrapEntitiesInDocuments(List<T> entities) {
 		List<Document> documents = new LinkedList<Document>();
-		
-		// get the identity and social network
-		ExternalIdentity identity = ExternalIdentityService.getAssociatedExternalIdentity(user, externalNetwork);
-		
-		// determine which API to use
-		if(externalNetwork.getNetwork() == Network.Content) {
-			
-			ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, clientPlatform);
-			List<VideoContent> videos = contentAPI.searchVideos(searchTerm, page, resultsLimit, identity);
-			
-		} else {
-			// for now
-			throw new UnsupportedOperationException();
-		}
-		//SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
-		
-		// calculate offset with page utility based on page limits
-		//int offset = Page.calculateOffsetFromPage(page, resultsLimit, pageLimit);
-		//List<Activity> activities = socialAPI.searchActivities(identity, searchTerm, resultsLimit, offset);
-		
-		// now wrap them in a search document
-		//int rank = 0;
-		//for(Activity activity : activities) {
-			//Document document = new Document(activity.getClass().getSimpleName(), activity, rank);
-			//rank++;
-			//documents.add(document);
-		//}
-		
-		//log.debug("documents {}", documents);
 
+		int rank = 0;
+		for(T entity : entities) {
+			Document document = new Document(entity.getClass().getSimpleName(), entity, rank);
+			rank++;
+			documents.add(document);
+		}
+			
 		return documents;
 	}
 	
+//	/***
+//	 * Searches public activities for a social network
+//	 * 
+//	 * @param searchTerm
+//	 * @param userId
+//	 * @param externalNetwork
+//	 * @return
+//	 */
+//	public List<Document> searchVideos(String searchTerm, User user, ExternalNetwork externalNetwork, ClientPlatform clientPlatform, Integer page) {
+//		List<Document> documents = new LinkedList<Document>();
+//		
+//		// get the identity and social network
+//		ExternalIdentity identity = ExternalIdentityService.getAssociatedExternalIdentity(user, externalNetwork);
+//		
+//		// determine which API to use
+//		if(externalNetwork.getNetwork() == Network.Content) {
+//			
+//			ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, clientPlatform);
+//			List<VideoContent> videos = contentAPI.searchVideos(searchTerm, page, resultsLimit, identity);
+//			
+//		} else {
+//			// for now
+//			throw new UnsupportedOperationException();
+//		}
+//		//SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
+//		
+//		// calculate offset with page utility based on page limits
+//		//int offset = Page.calculateOffsetFromPage(page, resultsLimit, pageLimit);
+//		//List<Activity> activities = socialAPI.searchActivities(identity, searchTerm, resultsLimit, offset);
+//		
+//		// now wrap them in a search document
+//		//int rank = 0;
+//		//for(Activity activity : activities) {
+//			//Document document = new Document(activity.getClass().getSimpleName(), activity, rank);
+//			//rank++;
+//			//documents.add(document);
+//		//}
+//		
+//		//log.debug("documents {}", documents);
+//
+//		return documents;
+//	}
+//	
 	
 	
 	/***

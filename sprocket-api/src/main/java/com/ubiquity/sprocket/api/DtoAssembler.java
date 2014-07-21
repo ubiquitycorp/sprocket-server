@@ -23,6 +23,7 @@ import com.ubiquity.sprocket.search.SearchKeys;
 
 public class DtoAssembler {
 
+
 	public static DocumentDto assemble(Document document) {
 		
 		Map<String, Object> fields = document.getFields();

@@ -89,7 +89,7 @@ public class DocumentsEndpoint {
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialNetworkId);
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		
-		List<Document> documents = ServiceFactory.getSearchService().searchLiveActivities(q, user, socialNetwork, ClientPlatform.Android, page);
+		List<Document> documents = ServiceFactory.getSearchService().searchLiveDocuments(q, user, socialNetwork, ClientPlatform.Android, page);
 		
 		for(Document document : documents) {
 			result.getDocuments().add(DtoAssembler.assemble(document));
