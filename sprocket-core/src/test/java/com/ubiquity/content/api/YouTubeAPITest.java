@@ -25,7 +25,7 @@ public class YouTubeAPITest {
 	
 	@BeforeClass
 	public static void setUp() throws Exception {
-		identity = new ExternalIdentity.Builder().identifier(UUID.randomUUID().toString()).accessToken("ya29.SACmu4A3pfy-EhwAAAAZoPKNcOtbhrq-fDPXXIJ7Zl6AvtyMJPhuD-Tlu6M2rw").build();
+		identity = new ExternalIdentity.Builder().identifier(UUID.randomUUID().toString()).accessToken("ya29.SQB2VO_3_eUmdRwAAADsiaQSsM4KbypxDanZjckGpGhK2K82m238ysvqQBR1eA").build();
 		log.debug("authenticated YouTube with identity {} ", identity);
 		
 		// intialize services

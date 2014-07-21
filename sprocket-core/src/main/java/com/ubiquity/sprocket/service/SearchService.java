@@ -20,7 +20,7 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
-import com.ubiquity.social.api.util.PaginationUtils;
+import com.ubiquity.social.api.util.Pagination;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.sprocket.domain.Document;
@@ -174,7 +174,7 @@ public class SearchService {
 		SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
 		
 		// calculate offset with page utility based on page limits
-		int offset = PaginationUtils.calculateOffsetFromPage(page, resultsLimit, pageLimit);
+		int offset = Pagination.calculateOffsetFromPage(page, resultsLimit, pageLimit);
 		List<Activity> activities = socialAPI.searchActivities(identity, searchTerm, resultsLimit, offset);
 		
 		// now wrap them in a search document
