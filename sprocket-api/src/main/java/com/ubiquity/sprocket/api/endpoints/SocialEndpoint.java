@@ -125,7 +125,11 @@ public class SocialEndpoint {
 		SendMessageDto sendMessageDto = jsonConverter.convertFromPayload(payload, SendMessageDto.class);
 		try{
 			Contact contact = ServiceFactory.getContactService().getByContactId(sendMessageDto.getReceiverId());
-			ServiceFactory.getSocialService().sendMessage(identity,socialNetwork, contact, sendMessageDto.getReceiverName(), sendMessageDto.getText(), sendMessageDto.getSubject());
+			boolean successful=ServiceFactory.getSocialService().sendMessage(identity,socialNetwork, contact, sendMessageDto.getReceiverName(), sendMessageDto.getText(), sendMessageDto.getSubject());
+			if(!successful)
+			{
+				throw new RuntimeException("sending message failed");
+			}
 		}
 		catch(AuthorizationException e)
 		{
