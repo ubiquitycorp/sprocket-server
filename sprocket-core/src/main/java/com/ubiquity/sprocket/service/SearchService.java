@@ -47,9 +47,6 @@ public class SearchService {
 		log.debug("Using solr api path: {}", config.getProperty("solr.api.path"));
 		resultsLimit = config.getInt("rules.search.results.limit");
 		pageLimit = config.getInt("rules.search.results.page.limit");
-		
-		SocialAPIFactory.initialize(config);
-		ContentAPIFactory.initialize(config);
 
 		searchEngine = new SearchEngineSolrjImpl(config);
 	}

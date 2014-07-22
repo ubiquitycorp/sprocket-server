@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.content.api.ContentAPIFactory;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
@@ -20,6 +21,7 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.UserFactory;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
+import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
@@ -39,6 +41,8 @@ public class SearchServiceTest {
 		searchService = new SearchService(config);
 		
 		JedisConnectionFactory.initialize(config);
+		SocialAPIFactory.initialize(config);
+		ContentAPIFactory.initialize(config);
 
 		searchService.deleteAll();
 	}
