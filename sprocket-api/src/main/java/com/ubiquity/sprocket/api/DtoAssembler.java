@@ -117,7 +117,7 @@ public class DtoAssembler {
 
 	public static VideoDto assemble(VideoContent videoContent) {
 		return new VideoDto.Builder()
-		.externalNetworkId(ExternalNetwork.YouTube.ordinal())
+		.externalNetworkId(videoContent.getExternalNetwork().ordinal())
 		.itemKey(videoContent.getVideo().getItemKey())
 		.thumb(new ImageDto(videoContent.getThumb().getUrl()))
 		.title(videoContent.getTitle())
