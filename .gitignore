@@ -8,3 +8,4 @@ target/*
 *.ear
 *.bin
 /sprocket-api\.settings/*.component
+sprocket-api/.settings/org.eclipse.wst.common.component
