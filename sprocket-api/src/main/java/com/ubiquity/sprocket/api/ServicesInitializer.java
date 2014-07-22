@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.content.api.ContentAPIFactory;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -57,6 +58,8 @@ public class ServicesInitializer implements ServletContextListener {
 			ServiceFactory.initialize(configuration);
 			
 			SocialAPIFactory.initialize(configuration);
+			ContentAPIFactory.initialize(configuration);
+
 
 		} catch (Exception e) {
 			log.error("Unable to initialize dependent services, exiting...", e);

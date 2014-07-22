@@ -16,10 +16,10 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.utils.Page;
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.messaging.format.Message;
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.DocumentsDto;
 import com.ubiquity.sprocket.domain.Document;
@@ -32,47 +32,20 @@ import com.ubiquity.sprocket.service.ServiceFactory;
 @Path("/1.0/documents")
 public class DocumentsEndpoint {
 
+	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
-
-	/***
-	 * Searches over indexed content for all social networks and content providers
-	 * @param userId
-	 * @param q
-	 * @param page
-	 * @return
-	 * @throws IOException
-	 */
-	@GET
-	@Path("users/{userId}/indexed")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response search(@PathParam("userId") Long userId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
-
-		DocumentsDto result = new DocumentsDto();
-		List<Document> documents = ServiceFactory.getSearchService().searchIndexedDocuments(q, userId);
-		
-		Page<Document> pager = new Page<Document>(documents, page, 3);
-		result.getPagination().setHasNextPage(pager.getHasNextPage());
-				
-		for(Document document : pager.getSubList())
-			result.getDocuments().add(DtoAssembler.assemble(document));
-
-		// now track this
-		sendEventTrackedMessage(q);
-
-		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
-	}
 	
 	@GET
-	@Path("users/{userId}/socialnetworks/{socialNetworkId}/indexed")
+	@Path("users/{userId}/providers/{externalNetworkId}/indexed")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response searchIndexed(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
+	public Response searchIndexed(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
 		DocumentsDto result = new DocumentsDto();
 
-		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialNetworkId);
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		
-		List<Document> documents = ServiceFactory.getSearchService().searchIndexedDocuments(q, userId, socialNetwork);
+		List<Document> documents = ServiceFactory.getSearchService().searchIndexedDocuments(q, userId, externalNetwork);
 		for(Document document : documents) {
 			result.getDocuments().add(DtoAssembler.assemble(document));
 		}
@@ -81,15 +54,15 @@ public class DocumentsEndpoint {
 	}
 	
 	@GET
-	@Path("users/{userId}/socialnetworks/{socialNetworkId}/live")
+	@Path("users/{userId}/providers/{externalNetworkId}/live")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response searchLive(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
+	public Response searchLive(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
 		DocumentsDto result = new DocumentsDto();
 
-		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialNetworkId);
+		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		
-		List<Document> documents = ServiceFactory.getSearchService().searchLiveActivities(q, user, socialNetwork, ClientPlatform.Android, page);
+		List<Document> documents = ServiceFactory.getSearchService().searchLiveDocuments(q, user, socialNetwork, ClientPlatform.Android, page);
 		
 		for(Document document : documents) {
 			result.getDocuments().add(DtoAssembler.assemble(document));
