@@ -278,12 +278,19 @@ public class UsersEndpoint {
 
 	}
 
+	/***
+	 * This method exchanges short-lived access token with long-lived one in a given provider.
+	 * @param userId
+	 * @param externalNetworkId
+	 * @param accessToken
+	 * @return
+	 */
 	@GET
-	@Path("/{userId}/exchangeToken/providers/{providerId}")
+	@Path("/{userId}/exchangeToken/providers/{externalNetworkId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response exchangeAccessToken(@PathParam("userId") Long userId, @PathParam("providerId") Integer providerId, @QueryParam("accessToken") String accessToken){
-		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(providerId);
+	public Response exchangeAccessToken(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @QueryParam("accessToken") String accessToken){
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork, ClientPlatform.WEB);
