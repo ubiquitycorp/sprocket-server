@@ -10,15 +10,11 @@ public class SearchKeys {
 		public static final String FIELD_DATA_TYPE = "data_type";
 		public static final String FIELD_BODY = "body";
 		public static final String FIELD_THUMBNAIL = "thumbnail";
-		public static final String FIELD_SOCIAL_NETWORK_ID = "social_network_id";
-		public static final String FIELD_CONTENT_NETWORK_ID = "content_network_id";
+		public static final String FIELD_EXTERNAL_NETWORK_ID = "external_network_id";
 		public static final String FIELD_CATEGORY = "category";
 		public static final String FIELD_ITEM_KEY = "item_key";
 		public static final String FIELD_SENDER = "sender";
 		public static final String FIELD_POSTED_BY = "posted_by";
-
-
-
 	}
 	
 }

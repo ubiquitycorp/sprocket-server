@@ -52,7 +52,7 @@ public class SearchServiceTest {
 	public void testLiveSearchWithFacebook() {
 		
 		User user = UserFactory.createTestUserWithMinimumRequiredProperties();
-		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("CAACEdEose0cBAAqcO5TwZA6cZCcnEsqLhYjomfbHfgRj1Nx3HcEp60ogzOFihbruGhR6QaGyHyCweXBcmF9gyVgJA9qCne96fXsycoSQbIXJ2zd6wrUvlL9zTYily7adqeTelaG8xZBTInBX5xikDme3wgveyGfXLpn07dZAE9H09jUlF2syT5kTRyRqJuP47ZBG8guwrIAr9HvFZCSsBN").externalNetwork(ExternalNetwork.Facebook.ordinal()).build());
+		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("CAACEdEose0cBADv5biV5FN9Vqfxzg0l794hNmHvEvgWE9RtLXTZCalwK6wYGMjttqe8wuTkC5ZC7uIyzrdBTsLUxKiYxREoZCrqLTZAfdwJFv2hbOt8QTnno7t7tWYJIPWh1szP65gLjdxwUOJQUs5QScrWqnPidFDj6U0sZBKh3S9zeAVam0ND7zZAxwNg9RcrZBAI4NoZBqMjVezZB28vLv").externalNetwork(ExternalNetwork.Facebook.ordinal()).build());
 		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.Facebook, ClientPlatform.WEB, 1);
 		log.debug("documents: {}", documents);
 		Assert.assertFalse(documents.isEmpty());

@@ -20,7 +20,6 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
-import com.ubiquity.social.api.util.Pagination;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.sprocket.domain.Document;
@@ -40,14 +39,12 @@ public class SearchService {
 	
 	private SearchEngine searchEngine;
 	
-	private Integer resultsLimit;
-	private Integer pageLimit;
+	private Integer resultsLimit, pageLimit;
 	
 	public SearchService(Configuration config) {
 		log.debug("Using solr api path: {}", config.getProperty("solr.api.path"));
 		resultsLimit = config.getInt("rules.search.results.limit");
-		pageLimit = config.getInt("rules.search.results.page.limit");
-
+		pageLimit = config.getInt("rules.search.page.limit");
 		searchEngine = new SearchEngineSolrjImpl(config);
 	}
 
@@ -71,9 +68,8 @@ public class SearchService {
 
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Message.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_USER_ID, message.getOwner().getUserId());
-			document.getFields().put(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID, message.getExternalNetwork().ordinal());
+			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, message.getExternalNetwork().ordinal());
 			document.getFields().put(SearchKeys.Fields.FIELD_ID, message.getMessageId());
-
 
 			documents.add(document);
 		}
@@ -97,7 +93,7 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_TITLE, activity.getTitle());
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Activity.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_USER_ID, activity.getOwner().getUserId());
-			document.getFields().put(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID, activity.getExternalNetwork().ordinal());
+			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, activity.getExternalNetwork().ordinal());
 			document.getFields().put(SearchKeys.Fields.FIELD_ID, activity.getActivityId()); 
 
 			documents.add(document);
@@ -130,7 +126,9 @@ public class SearchService {
 
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, VideoContent.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_USER_ID, userId);
-			document.getFields().put(SearchKeys.Fields.FIELD_ID, videoContent.getTitle().hashCode());
+			document.getFields().put(SearchKeys.Fields.FIELD_ID, videoContent.getVideoContentId());
+			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, videoContent.getExternalNetwork().ordinal());
+
 
 			documents.add(document);
 		}
@@ -167,6 +165,13 @@ public class SearchService {
 	 */
 	public List<Document> searchLiveDocuments(String searchTerm, User user, ExternalNetwork externalNetwork, ClientPlatform clientPlatform, Integer page) {
 
+		// normalize page
+		page = page == null ? 1 : page;
+			
+		// first check page limit
+		if(page > pageLimit)
+			throw new IllegalArgumentException("Page limit reached");
+			
 		List<Document> documents;
 		// get the identity and social network
 		ExternalIdentity identity = ExternalIdentityService.getAssociatedExternalIdentity(user, externalNetwork);
@@ -175,14 +180,14 @@ public class SearchService {
 		if(externalNetwork.getNetwork() == Network.Social) {
 			SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
 			// calculate offset with page utility based on page limits
-			int offset = Pagination.calculateOffsetFromPage(page, resultsLimit, pageLimit);
-			List<Activity> activities = socialAPI.searchActivities(identity, searchTerm, resultsLimit, offset);
+			List<Activity> activities = socialAPI.searchActivities(searchTerm, page, resultsLimit, identity);
 			documents = wrapEntitiesInDocuments(activities);
 			
 		} else {
 			// if content, search videos
 			ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, clientPlatform);
 			List<VideoContent> videoContent = contentAPI.searchVideos(searchTerm, page, resultsLimit, identity);
+			
 			documents = wrapEntitiesInDocuments(videoContent);
 		}
 
@@ -209,50 +214,6 @@ public class SearchService {
 		return documents;
 	}
 	
-//	/***
-//	 * Searches public activities for a social network
-//	 * 
-//	 * @param searchTerm
-//	 * @param userId
-//	 * @param externalNetwork
-//	 * @return
-//	 */
-//	public List<Document> searchVideos(String searchTerm, User user, ExternalNetwork externalNetwork, ClientPlatform clientPlatform, Integer page) {
-//		List<Document> documents = new LinkedList<Document>();
-//		
-//		// get the identity and social network
-//		ExternalIdentity identity = ExternalIdentityService.getAssociatedExternalIdentity(user, externalNetwork);
-//		
-//		// determine which API to use
-//		if(externalNetwork.getNetwork() == Network.Content) {
-//			
-//			ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, clientPlatform);
-//			List<VideoContent> videos = contentAPI.searchVideos(searchTerm, page, resultsLimit, identity);
-//			
-//		} else {
-//			// for now
-//			throw new UnsupportedOperationException();
-//		}
-//		//SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
-//		
-//		// calculate offset with page utility based on page limits
-//		//int offset = Page.calculateOffsetFromPage(page, resultsLimit, pageLimit);
-//		//List<Activity> activities = socialAPI.searchActivities(identity, searchTerm, resultsLimit, offset);
-//		
-//		// now wrap them in a search document
-//		//int rank = 0;
-//		//for(Activity activity : activities) {
-//			//Document document = new Document(activity.getClass().getSimpleName(), activity, rank);
-//			//rank++;
-//			//documents.add(document);
-//		//}
-//		
-//		//log.debug("documents {}", documents);
-//
-//		return documents;
-//	}
-//	
-	
 	
 	/***
 	 * Searches documents for a social network
@@ -262,12 +223,12 @@ public class SearchService {
 	 * @param socialNetwork
 	 * @return
 	 */
-	public List<Document> searchIndexedDocuments(String searchTerm, Long userId, ExternalNetwork socialNetwork) {
+	public List<Document> searchIndexedDocuments(String searchTerm, Long userId, ExternalNetwork externalNetwork) {
 
 		// filters
 		Map<String, Object> filters = new HashMap<String, Object>();
 		filters.put(SearchKeys.Fields.FIELD_USER_ID, userId);
-		filters.put(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID, socialNetwork.ordinal());
+		filters.put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, externalNetwork.ordinal());
 		
 		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
 
