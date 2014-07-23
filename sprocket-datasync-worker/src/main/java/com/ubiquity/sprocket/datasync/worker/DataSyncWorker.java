@@ -31,8 +31,8 @@ public class DataSyncWorker {
 
 		startServices(configuration);
 
-		log.info("Service initialized.");
-
+		
+		
 		List<CacheInvalidateConsumer> consumers = new LinkedList<CacheInvalidateConsumer>();
 		try {			
 			for(int i = 0; i < DEFAULT_NUM_CONSUMERS; i++)
@@ -46,6 +46,9 @@ public class DataSyncWorker {
 		ThreadPool<CacheInvalidateConsumer> threadPool = new ThreadPool<CacheInvalidateConsumer>();
 		threadPool.start(consumers);
 		
+		log.info("Initialized {} version: {}", configuration.getProperty("application.name"),
+				configuration.getProperty("application.version"));
+		
 		while (true) {
 			try {
 				Thread.sleep(1000);
@@ -54,6 +57,8 @@ public class DataSyncWorker {
 				log.error("Main thread interrupted", e);
 			}
 		}
+		
+		
 	}
 
 	public static void main(String[] args) {
