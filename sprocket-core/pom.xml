@@ -61,7 +61,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-integration</artifactId>
-			<version>0.1.33</version>
+			<version>0.1.34</version>
 		</dependency>
 
 	
