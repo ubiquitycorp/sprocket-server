@@ -10,14 +10,18 @@
 				<hibernate.debug>true</hibernate.debug>
 				<solr.api.host>localhost</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
-				<social.facebook.consumerKey>581153318672017</social.facebook.consumerKey>
-				<social.facebook.consumerSecret>0752b1dfd97a54334b53f3a22ee9b3ca</social.facebook.consumerSecret>
 				<social.twitter.app.consumerKey>mbCvxpZRXtnn170Kk39MbFhsu</social.twitter.app.consumerKey>
 				<social.twitter.app.consumerSecret>rYp1ICQMEPjfj5YrAiDqLZC5oN5UeCh0tmTXMxsqfsOdetpzG3</social.twitter.app.consumerSecret>
+				<social.facebook.consumerKey>581153318672017</social.facebook.consumerKey>
+				<social.facebook.consumerSecret>0752b1dfd97a54334b53f3a22ee9b3ca</social.facebook.consumerSecret>
 				<social.google.android.apikey>AIzaSyDhTbmc7b30AR2iwU5Ahxwbd9fQegt8AuU</social.google.android.apikey>
 				<social.google.ios.apikey>AIzaSyBLbSDsyGMBbXGVlnIUIpiSP3JKY706Gf0</social.google.ios.apikey>
 				<social.google.web.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I</social.google.web.apikey>
 				<social.google.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I</social.google.apikey>
+				<content.vimeo.web.clientId>8aa78eaeb615f47cdbc3806baa64e7b41ea7bb63</content.vimeo.web.clientId>
+				<content.vimeo.web.clientSecret>631651bf50ecde53df4a5a3097e31acee3240ba6</content.vimeo.web.clientSecret>
+				<content.vimeo.mobile.clientId>00a3112427cc0de8be5710eceb5bd83524001a6b</content.vimeo.mobile.clientId>
+				<content.vimeo.mobile.clientSecret>6814eea3b1195e9f8cd81688481c76688fea1120</content.vimeo.mobile.clientSecret>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
 				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
@@ -59,6 +63,10 @@
 				<social.google.android.apikey>AIzaSyDhTbmc7b30AR2iwU5Ahxwbd9fQegt8AuU</social.google.android.apikey>
 				<social.google.ios.apikey>AIzaSyCrTjAqBZK6DkGhFmuAu6-urDMABu0b_vk</social.google.ios.apikey>
 				<social.google.web.apikey>AIzaSyCY3woAWsatYnwhkYOeBqVjQ8V9hGa2vt8</social.google.web.apikey>
+				<content.vimeo.web.clientId>5be395b360ef0be2c11ed838505fe49d39b1c113</content.vimeo.web.clientId>
+				<content.vimeo.web.clientSecret>9258a21966cadc0fb89b45281b70ceb5081f32fa</content.vimeo.web.clientSecret>
+				<content.vimeo.mobile.clientId>00a3112427cc0de8be5710eceb5bd83524001a6b</content.vimeo.mobile.clientId>
+				<content.vimeo.mobile.clientSecret>6814eea3b1195e9f8cd81688481c76688fea1120</content.vimeo.mobile.clientSecret>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
 				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
