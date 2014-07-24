@@ -40,7 +40,7 @@ public class DocumentsEndpoint {
 	@POST
 	@Path("/users/{userId}/live/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response engaged(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, InputStream payload) {
+	public Response engaged(@PathParam("userId") Long userId, InputStream payload) {
 
 		// convert payload
 		DocumentsDto documentsDto = jsonConverter.convertFromPayload(payload, DocumentsDto.class);
@@ -73,7 +73,7 @@ public class DocumentsEndpoint {
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		
-		List<Document> documents = ServiceFactory.getSearchService().searchLiveDocuments(q, user, socialNetwork, ClientPlatform.Android, page);
+		List<Document> documents = ServiceFactory.getSearchService().searchLiveDocuments(q, user, socialNetwork, page);
 		
 		for(Document document : documents) {
 			result.getDocuments().add(DtoAssembler.assemble(document));

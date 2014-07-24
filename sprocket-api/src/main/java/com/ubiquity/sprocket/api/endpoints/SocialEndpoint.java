@@ -20,17 +20,16 @@ import org.slf4j.LoggerFactory;
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
 import com.ubiquity.api.exception.HttpException;
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.api.exception.AuthorizationException;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.PostActivity;
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
-import com.ubiquity.sprocket.api.dto.containers.VideosDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 import com.ubiquity.sprocket.api.dto.model.SendMessageDto;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -47,7 +46,7 @@ public class SocialEndpoint {
 	@POST
 	@Path("/users/{userId}/activities/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response engaged(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, InputStream payload) {
+	public Response engaged(@PathParam("userId") Long userId, InputStream payload) {
 
 		// convert payload
 		ActivitiesDto activitiesDto = jsonConverter.convertFromPayload(payload, ActivitiesDto.class);

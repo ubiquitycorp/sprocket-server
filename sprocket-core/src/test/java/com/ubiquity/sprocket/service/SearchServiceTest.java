@@ -52,8 +52,8 @@ public class SearchServiceTest {
 	public void testLiveSearchWithFacebook() {
 		
 		User user = UserFactory.createTestUserWithMinimumRequiredProperties();
-		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("CAACEdEose0cBADv5biV5FN9Vqfxzg0l794hNmHvEvgWE9RtLXTZCalwK6wYGMjttqe8wuTkC5ZC7uIyzrdBTsLUxKiYxREoZCrqLTZAfdwJFv2hbOt8QTnno7t7tWYJIPWh1szP65gLjdxwUOJQUs5QScrWqnPidFDj6U0sZBKh3S9zeAVam0ND7zZAxwNg9RcrZBAI4NoZBqMjVezZB28vLv").externalNetwork(ExternalNetwork.Facebook.ordinal()).build());
-		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.Facebook, ClientPlatform.WEB, 1);
+		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("CAACEdEose0cBADv5biV5FN9Vqfxzg0l794hNmHvEvgWE9RtLXTZCalwK6wYGMjttqe8wuTkC5ZC7uIyzrdBTsLUxKiYxREoZCrqLTZAfdwJFv2hbOt8QTnno7t7tWYJIPWh1szP65gLjdxwUOJQUs5QScrWqnPidFDj6U0sZBKh3S9zeAVam0ND7zZAxwNg9RcrZBAI4NoZBqMjVezZB28vLv").clientPlatform(ClientPlatform.WEB).externalNetwork(ExternalNetwork.Facebook.ordinal()).build());
+		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.Facebook, 1);
 		log.debug("documents: {}", documents);
 		Assert.assertFalse(documents.isEmpty());
 		
@@ -63,8 +63,8 @@ public class SearchServiceTest {
 	public void testLiveSearchWithVimeo() {
 		
 		User user = UserFactory.createTestUserWithMinimumRequiredProperties();
-		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("a5f46897abbbd2b83501ea79b4916f44").externalNetwork(ExternalNetwork.Vimeo.ordinal()).build());
-		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.Vimeo, ClientPlatform.WEB, 1);
+		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("a5f46897abbbd2b83501ea79b4916f44").clientPlatform(ClientPlatform.WEB).externalNetwork(ExternalNetwork.Vimeo.ordinal()).build());
+		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.Vimeo, 1);
 		log.debug("documents: {}", documents);
 		Assert.assertFalse(documents.isEmpty());
 		
@@ -73,8 +73,8 @@ public class SearchServiceTest {
 	@Test 
 	public void testLiveSearchWithYouTube() {
 		User user = UserFactory.createTestUserWithMinimumRequiredProperties();
-		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("ya29.SQCCPSWqzhtnbxwAAACJpZt8z7tsGirHhSIiUKhaaj2uIe8IkfhTMZSq8kbDzg").externalNetwork(ExternalNetwork.YouTube.ordinal()).build());
-		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.YouTube, ClientPlatform.WEB, 1);
+		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("ya29.SQCCPSWqzhtnbxwAAACJpZt8z7tsGirHhSIiUKhaaj2uIe8IkfhTMZSq8kbDzg").clientPlatform(ClientPlatform.WEB).externalNetwork(ExternalNetwork.YouTube.ordinal()).build());
+		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.YouTube, 1);
 		log.debug("documents: {}", documents);
 		Assert.assertFalse(documents.isEmpty());
 	}

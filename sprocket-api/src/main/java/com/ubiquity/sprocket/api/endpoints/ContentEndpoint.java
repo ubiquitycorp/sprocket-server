@@ -32,7 +32,7 @@ public class ContentEndpoint {
 	@POST
 	@Path("/users/{userId}/videos/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response engaged(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, InputStream payload) {
+	public Response engaged(@PathParam("userId") Long userId, InputStream payload) {
 
 		// convert payload
 		VideosDto videosDto = jsonConverter.convertFromPayload(payload, VideosDto.class);

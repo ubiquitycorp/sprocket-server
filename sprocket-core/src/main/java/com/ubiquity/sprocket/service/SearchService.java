@@ -15,7 +15,6 @@ import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.external.domain.Network;
 import com.ubiquity.external.service.ExternalIdentityService;
-import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.api.SocialAPI;
@@ -163,7 +162,7 @@ public class SearchService {
 	 * @param externalNetwork
 	 * @return
 	 */
-	public List<Document> searchLiveDocuments(String searchTerm, User user, ExternalNetwork externalNetwork, ClientPlatform clientPlatform, Integer page) {
+	public List<Document> searchLiveDocuments(String searchTerm, User user, ExternalNetwork externalNetwork, Integer page) {
 
 		// normalize page
 		page = page == null ? 1 : page;
@@ -178,14 +177,14 @@ public class SearchService {
 		
 		// if it's social, search activities only
 		if(externalNetwork.getNetwork() == Network.Social) {
-			SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
+			SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, identity.getClientPlatform());
 			// calculate offset with page utility based on page limits
 			List<Activity> activities = socialAPI.searchActivities(searchTerm, page, resultsLimit, identity);
 			documents = wrapEntitiesInDocuments(activities);
 			
 		} else {
 			// if content, search videos
-			ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, clientPlatform);
+			ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, identity.getClientPlatform());
 			List<VideoContent> videoContent = contentAPI.searchVideos(searchTerm, page, resultsLimit, identity);
 			
 			documents = wrapEntitiesInDocuments(videoContent);
