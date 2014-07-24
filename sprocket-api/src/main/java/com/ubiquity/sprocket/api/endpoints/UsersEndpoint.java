@@ -10,8 +10,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,13 +21,15 @@ import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.api.exception.HttpException;
 import com.ubiquity.content.api.ContentAPI;
 import com.ubiquity.content.api.ContentAPIFactory;
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.messaging.format.Message;
-import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.social.api.SocialAPI;
+import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.api.linkedin.ExchangeService;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
@@ -274,6 +278,27 @@ public class UsersEndpoint {
 
 	}
 
+	/***
+	 * This method exchanges short-lived access token with long-lived one in a given provider.
+	 * @param userId
+	 * @param externalNetworkId
+	 * @param accessToken
+	 * @return
+	 */
+	@GET
+	@Path("/{userId}/exchangeToken/providers/{externalNetworkId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response exchangeAccessToken(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @QueryParam("accessToken") String accessToken){
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
+		// load user
+		User user = ServiceFactory.getUserService().getUserById(userId);
+		SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork, ClientPlatform.WEB);
+		String LongLivedAccessToken = socialApi.exchangeAccessToken(accessToken);
+		
+		return Response.ok("{accessToken:" + LongLivedAccessToken + "}").build();
+	}
+	
 	private void sendActivatedMessage(User user, ExternalIdentity identity,
 			IdentityDto identityDto) throws IOException {
 		ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()

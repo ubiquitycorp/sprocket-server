@@ -2,6 +2,7 @@ package com.ubiquity.sprocket.api.dto.model;
 
 public class ActivityDto {
 
+	private Long activityId;
 	private String title;
 	private String body;
 	private Long date;
@@ -12,6 +13,14 @@ public class ActivityDto {
 	private String type;
 	private String link;
 	private String externalIdentifier;
+
+	public Long getActivityId() {
+		return activityId;
+	}
+
+	public Integer getExternalNetworkId() {
+		return externalNetworkId;
+	}
 
 	public String getLink() {
 		return link;

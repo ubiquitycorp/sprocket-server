@@ -12,6 +12,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.content.api.ContentAPIFactory;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
@@ -19,6 +21,7 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.UserFactory;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
+import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
@@ -36,20 +39,57 @@ public class SearchServiceTest {
 	public static void setUp() throws Exception {
 		Configuration config = new PropertiesConfiguration("test.properties");
 		searchService = new SearchService(config);
+		
+		JedisConnectionFactory.initialize(config);
+		SocialAPIFactory.initialize(config);
+		ContentAPIFactory.initialize(config);
 
 		searchService.deleteAll();
 	}
 
 	
 	@Test
-	public void testLiveSearch() {
+	public void testLiveSearchWithFacebook() {
 		
 		User user = UserFactory.createTestUserWithMinimumRequiredProperties();
-		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("CAACEdEose0cBAJDovo29F6NOZCBZCFJUTGpCaOhJsCOzvLCGZA8aMWrZApIwvd5xNwkROgkabPFDgFoJhLVfrmTsiIRSTTtmmZCAtdlr7y776bC40Aj4tf5vcKWjyZCmbsgEd9bVtA9zcFMcqV8kaVZBhpYkBvxNLPz2V2mINqctf3V92odSyXPDcXQviaJqHYZD").externalNetwork(ExternalNetwork.Facebook.ordinal()).build());
-		List<Document> documents = searchService.searchLiveActivities("Karate", user, ExternalNetwork.Facebook, ClientPlatform.WEB, 1);
+		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("CAACEdEose0cBADv5biV5FN9Vqfxzg0l794hNmHvEvgWE9RtLXTZCalwK6wYGMjttqe8wuTkC5ZC7uIyzrdBTsLUxKiYxREoZCrqLTZAfdwJFv2hbOt8QTnno7t7tWYJIPWh1szP65gLjdxwUOJQUs5QScrWqnPidFDj6U0sZBKh3S9zeAVam0ND7zZAxwNg9RcrZBAI4NoZBqMjVezZB28vLv").externalNetwork(ExternalNetwork.Facebook.ordinal()).build());
+		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.Facebook, ClientPlatform.WEB, 1);
 		log.debug("documents: {}", documents);
+		Assert.assertFalse(documents.isEmpty());
 		
 	}
+	
+	@Test
+	public void testLiveSearchWithVimeo() {
+		
+		User user = UserFactory.createTestUserWithMinimumRequiredProperties();
+		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("a5f46897abbbd2b83501ea79b4916f44").externalNetwork(ExternalNetwork.Vimeo.ordinal()).build());
+		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.Vimeo, ClientPlatform.WEB, 1);
+		log.debug("documents: {}", documents);
+		Assert.assertFalse(documents.isEmpty());
+		
+	}
+	
+	@Test 
+	public void testLiveSearchWithYouTube() {
+		User user = UserFactory.createTestUserWithMinimumRequiredProperties();
+		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("ya29.SQCCPSWqzhtnbxwAAACJpZt8z7tsGirHhSIiUKhaaj2uIe8IkfhTMZSq8kbDzg").externalNetwork(ExternalNetwork.YouTube.ordinal()).build());
+		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.YouTube, ClientPlatform.WEB, 1);
+		log.debug("documents: {}", documents);
+		Assert.assertFalse(documents.isEmpty());
+	}
+	
+	@Test
+	public void testLiveSearchWithLinkedIn() {
+		
+	}
+	
+	@Test
+	public void testLiveSearchWithTwitter() {
+		
+	}
+	
+	
 
 	@Test
 	public void testAddMessagesReturnsInBasicSearch() {

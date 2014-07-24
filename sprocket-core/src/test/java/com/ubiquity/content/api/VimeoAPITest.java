@@ -2,6 +2,7 @@ package com.ubiquity.content.api;
 
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -30,6 +31,15 @@ public class VimeoAPITest {
 		List<VideoContent> videos = contentApi.findVideosByExternalIdentity(identity);
 		for(VideoContent video : videos) 
 			log.debug("video: {}", video);
+	}
+	
+	@Test
+	public void testSearchVideos() {
+		ContentAPI contentApi = ContentAPIFactory.createProvider(ExternalNetwork.Vimeo, ClientPlatform.WEB);
+		List<VideoContent> videos = contentApi.searchVideos("karate", 1, 25, identity);
+		Assert.assertTrue(videos.size() == 25); // just test the size returns for now
+		for(VideoContent video : videos) 
+			log.debug("video: {}", video); 
 	}
 
 	

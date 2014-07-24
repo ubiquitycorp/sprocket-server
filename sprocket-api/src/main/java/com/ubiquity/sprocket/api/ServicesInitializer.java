@@ -1,5 +1,7 @@
 package com.ubiquity.sprocket.api;
 
+import java.util.Iterator;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -10,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.content.api.ContentAPIFactory;
+import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
@@ -43,7 +47,8 @@ public class ServicesInitializer implements ServletContextListener {
 		try {
 			configuration = new PropertiesConfiguration(
 					"sprocketapi.properties");
-			log.debug("Configuration {}", configuration);
+			log.info("{} version: {}", configuration.getProperty("application.name"),
+					configuration.getProperty("application.version"));
 
 			// start cache services
 			JedisConnectionFactory.initialize(configuration);
@@ -54,6 +59,10 @@ public class ServicesInitializer implements ServletContextListener {
 			MessageQueueFactory.initialize(configuration);
 			
 			ServiceFactory.initialize(configuration);
+			
+			SocialAPIFactory.initialize(configuration);
+			ContentAPIFactory.initialize(configuration);
+
 
 		} catch (Exception e) {
 			log.error("Unable to initialize dependent services, exiting...", e);
