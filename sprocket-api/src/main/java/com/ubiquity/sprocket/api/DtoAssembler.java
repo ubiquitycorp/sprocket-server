@@ -117,7 +117,7 @@ public class DtoAssembler {
 
 	public static VideoDto assemble(VideoContent videoContent) {
 		return new VideoDto.Builder()
-		.externalNetworkId(ExternalNetwork.YouTube.ordinal())
+		.externalNetworkId(videoContent.getExternalNetwork().ordinal())
 		.itemKey(videoContent.getVideo().getItemKey())
 		.thumb(new ImageDto(videoContent.getThumb().getUrl()))
 		.title(videoContent.getTitle())
@@ -168,8 +168,7 @@ public class DtoAssembler {
 		.date(message.getSentDate())
 		.externalNetworkId(message.getExternalNetwork().ordinal())
 		.body(message.getBody())
-		.sender(
-				assemble(message.getSender())).build();
+		.sender(assemble(message.getSender())).build();
 	}
 
 	public static ActivityDto assemble(Activity activity) {
@@ -177,7 +176,7 @@ public class DtoAssembler {
 
 		activityDtoBuilder.body(activity.getBody())
 		.type(activity.getActivityType().toString().toLowerCase())
-		.date(System.currentTimeMillis())
+		.date(activity.getCreationDate())
 		.externalNetworkId(activity.getExternalNetwork().ordinal())
 		.title(activity.getTitle())
 		.link(activity.getLink())

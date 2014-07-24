@@ -30,6 +30,7 @@ import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
+import com.ubiquity.sprocket.api.dto.containers.VideosDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 import com.ubiquity.sprocket.api.dto.model.SendMessageDto;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -43,6 +44,18 @@ public class SocialEndpoint {
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 
 
+	@POST
+	@Path("/users/{userId}/activities/engaged")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response engaged(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, InputStream payload) {
+
+		// convert payload
+		ActivitiesDto activitiesDto = jsonConverter.convertFromPayload(payload, ActivitiesDto.class);
+		log.debug("activities engaged {}", activitiesDto);
+		
+		return Response.ok().build();
+	}
+	
 	@GET
 	@Path("users/{userId}/providers/{socialNetworkId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)

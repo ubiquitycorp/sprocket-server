@@ -1,5 +1,7 @@
 package com.ubiquity.sprocket.api;
 
+import java.util.Iterator;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -45,7 +47,8 @@ public class ServicesInitializer implements ServletContextListener {
 		try {
 			configuration = new PropertiesConfiguration(
 					"sprocketapi.properties");
-			log.debug("Configuration {}", configuration);
+			log.info("{} version: {}", configuration.getProperty("application.name"),
+					configuration.getProperty("application.version"));
 
 			// start cache services
 			JedisConnectionFactory.initialize(configuration);

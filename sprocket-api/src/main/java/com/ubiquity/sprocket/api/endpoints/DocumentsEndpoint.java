@@ -1,9 +1,11 @@
 package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -15,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
-import com.niobium.repository.utils.Page;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.User;
@@ -32,11 +33,21 @@ import com.ubiquity.sprocket.service.ServiceFactory;
 @Path("/1.0/documents")
 public class DocumentsEndpoint {
 
-	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 	
+	@POST
+	@Path("/users/{userId}/live/engaged")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response engaged(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, InputStream payload) {
+
+		// convert payload
+		DocumentsDto documentsDto = jsonConverter.convertFromPayload(payload, DocumentsDto.class);
+		log.debug("documents engaged {}", documentsDto);
+		
+		return Response.ok().build();
+	}
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/indexed")
 	@Produces(MediaType.APPLICATION_JSON)
