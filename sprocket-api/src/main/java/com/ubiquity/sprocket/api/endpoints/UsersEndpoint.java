@@ -10,7 +10,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -32,6 +31,7 @@ import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.api.linkedin.ExchangeService;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
+import com.ubiquity.sprocket.api.dto.model.ExchangeTokenDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
@@ -267,11 +267,7 @@ public class UsersEndpoint {
 				.createOrUpdateExternalIdentity(user, accessToken,
 						identityDto.getSecretToken(), clientPlatform,
 						externalNetwork);
-		// ExternalIdentity identity =
-		// ServiceFactory.getContentService().getContentIdentityById(5L);
-
-		// List<VideoContent> synced =
-		// ServiceFactory.getContentService().sync(identity, contentNetwork);
+		
 		sendActivatedMessage(user, identity, identityDto);
 
 		return Response.ok().build();
@@ -285,18 +281,20 @@ public class UsersEndpoint {
 	 * @param accessToken
 	 * @return
 	 */
-	@GET
-	@Path("/{userId}/exchangeToken/providers/{externalNetworkId}")
+	@POST
+	@Path("/{userId}/exchangedToken")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response exchangeAccessToken(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @QueryParam("accessToken") String accessToken){
-		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
+	public Response exchangeAccessToken(@PathParam("userId") Long userId, InputStream payload){
+		
+		ExchangeTokenDto exchangeTokenDto = jsonConverter.convertFromPayload(payload, ExchangeTokenDto.class);
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(exchangeTokenDto.getExternalNetworkId());
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork, ClientPlatform.WEB);
-		String LongLivedAccessToken = socialApi.exchangeAccessToken(accessToken);
+		String LongLivedAccessToken = socialApi.exchangeAccessToken(exchangeTokenDto.getAccessToken());
 		
-		return Response.ok("{accessToken:" + LongLivedAccessToken + "}").build();
+		return Response.ok("{\"accessToken\":\"" + LongLivedAccessToken + "\"}").build();
 	}
 	
 	private void sendActivatedMessage(User user, ExternalIdentity identity,
