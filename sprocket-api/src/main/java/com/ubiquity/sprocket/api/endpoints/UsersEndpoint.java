@@ -71,7 +71,7 @@ public class UsersEndpoint {
 	@Path("/{userId}/authenticatedlinkedin")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response authenticatedlinkedin(@PathParam("userId") Long userId,
-			@CookieParam("linkedin_oauth_7747wv47q1ili9") String cookie)
+			@CookieParam("linkedin_oauth_77fa6kjljumj8x") String cookie)
 			throws Exception {
 
 		// load user
