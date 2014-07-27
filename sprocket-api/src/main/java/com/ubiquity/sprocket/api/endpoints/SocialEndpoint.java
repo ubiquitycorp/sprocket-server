@@ -1,5 +1,6 @@
 package com.ubiquity.sprocket.api.endpoints;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -22,6 +23,7 @@ import com.niobium.repository.CollectionVariant;
 import com.ubiquity.api.exception.HttpException;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.api.exception.AuthorizationException;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
@@ -30,14 +32,17 @@ import com.ubiquity.social.domain.PostActivity;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
+import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 import com.ubiquity.sprocket.api.dto.model.SendMessageDto;
+import com.ubiquity.sprocket.messaging.MessageConverterFactory;
+import com.ubiquity.sprocket.messaging.MessageQueueFactory;
+import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/social")
 public class SocialEndpoint {
 
-	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
@@ -46,12 +51,15 @@ public class SocialEndpoint {
 	@POST
 	@Path("/users/{userId}/activities/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response engaged(@PathParam("userId") Long userId, InputStream payload) {
+	public Response engaged(@PathParam("userId") Long userId, InputStream payload) throws IOException {
 
 		// convert payload
 		ActivitiesDto activitiesDto = jsonConverter.convertFromPayload(payload, ActivitiesDto.class);
-		log.debug("activities engaged {}", activitiesDto);
 		
+		for(ActivityDto activityDto : activitiesDto.getActivities()) {
+			log.debug("tracking activity {}", activityDto);
+			sendTrackAndSyncMessage(userId, activityDto);			
+		}
 		return Response.ok().build();
 	}
 	
@@ -185,6 +193,26 @@ public class SocialEndpoint {
 		}
 		return Response.ok().build();
 			
+	}
+	
+	/**
+	 * Drops a message for tracking this event
+	 * 
+	 * @param userId
+	 * @param activityDto
+	 * @throws IOException
+	 */
+	private void sendTrackAndSyncMessage(Long userId, ActivityDto activityDto) throws IOException {
+		
+		Activity activity = DtoAssembler.assemble(activityDto);
+				
+		UserEngagedActivity messageContent = new UserEngagedActivity(userId, activity);
+		String message = MessageConverterFactory.getMessageConverter().serialize(new com.ubiquity.messaging.format.Message(messageContent));
+		byte[] bytes = message.getBytes();
+		MessageQueueFactory.getTrackQueueProducer().write(bytes);
+		MessageQueueFactory.getCacheInvalidationQueueProducer().write(bytes);
+
+
 	}
 
 }

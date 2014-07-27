@@ -5,12 +5,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.google.gson.JsonParser;
+import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.media.domain.Image;
+import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.domain.Activity;
+import com.ubiquity.social.domain.ActivityType;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
+import com.ubiquity.social.domain.factories.ActivityFactory;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
@@ -23,6 +29,59 @@ import com.ubiquity.sprocket.search.SearchKeys;
 
 public class DtoAssembler {
 
+
+	public static Activity assemble(ActivityDto activityDto) {
+		// convert to domain entity with required fields
+		Activity.Builder activityBuilder = ActivityFactory.createPublicActivityBuilderWithRequiredFields(ActivityType.valueOf(activityDto.getType().toUpperCase()), 
+				ExternalNetwork.getNetworkById(activityDto.getExternalNetworkId()), 
+				activityDto.getDate(), 
+				activityDto.getExternalIdentifier());
+
+		// set optional fields
+		activityBuilder.title(activityDto.getTitle());
+		activityBuilder.body(activityDto.getBody());
+		activityBuilder.link(activityDto.getLink());
+
+		// set video / photo urls if we have them
+		VideoDto videoDto = activityDto.getVideo();
+		if(videoDto != null)
+			activityBuilder.video(new Video.Builder().url(videoDto.getUrl()).build());
+
+		ImageDto imageDto = activityDto.getPhoto();
+		if(imageDto != null)
+			activityBuilder.image(new Image(imageDto.getUrl()));
+
+		activityBuilder.postedBy(assemble(activityDto.getPostedBy()));
+
+		return activityBuilder.build();
+
+	}
+
+
+	public static Contact assemble(ContactDto contactDto) {
+
+		Contact.Builder contactBuilder = new Contact.Builder()
+		.displayName(contactDto.getDisplayName())
+		.firstName(contactDto.getFirstName())
+		.lastName(contactDto.getLastName())
+		.lastUpdated(System.currentTimeMillis())
+		.profileUrl(contactDto.getProfileUrl());
+
+		if(contactDto.getImageUrl() != null) {
+			contactBuilder.image(new Image(contactDto.getImageUrl()));
+		}
+
+		contactBuilder.externalIdentity(
+				new ExternalIdentity.Builder()
+				.identifier(contactDto.getIdentity().getIdentifier())
+				.externalNetwork(contactDto.getIdentity().getExternalNetworkId())
+				.isActive(Boolean.TRUE)
+				.lastUpdated(System.currentTimeMillis())
+				.build()
+				);
+
+		return contactBuilder.build();
+	}
 
 	public static DocumentDto assemble(Document document) {
 
@@ -41,7 +100,7 @@ public class DtoAssembler {
 				VideoContent videoContent = (VideoContent)document.getData();
 				data = assemble(videoContent);
 			} else {
-			
+
 				data = new VideoDto.Builder()
 				.externalNetworkId(ExternalNetwork.YouTube.ordinal())
 				.itemKey((String)fields.get(SearchKeys.Fields.FIELD_ITEM_KEY))
@@ -191,6 +250,31 @@ public class DtoAssembler {
 		return activityDtoBuilder.build();
 
 
+	}
+	
+	
+	
+	@SuppressWarnings("unchecked")
+	public static Document assemble(DocumentDto documentDto) {
+		Document document;
+		String dataType = documentDto.getDataType();
+		if(dataType.equals(Activity.class.getSimpleName())) {
+			//document = new Document(
+			
+		    Map<String, Object> map = (Map<String, Object>)documentDto.getData();
+		    ActivityDto activityDto = JsonConverter.getInstance().convertFromObject(map, ActivityDto.class);
+		    // now convert to entity
+		    Activity activity = assemble(activityDto);
+			document = new Document(dataType, activity, documentDto.getRank());
+		    
+		} else if(dataType.equals(VideoContent.class.getSimpleName())) {
+			document = new Document(dataType);
+		} else if(dataType.equals(Message.class.getSimpleName())) {
+			document = new Document(dataType); // TODO: change me
+		} else {
+			throw new IllegalArgumentException("Uknown data type for document: " + dataType);
+		}
+		return document;
 	}
 
 }

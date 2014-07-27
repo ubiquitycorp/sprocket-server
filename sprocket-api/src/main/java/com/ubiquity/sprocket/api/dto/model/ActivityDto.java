@@ -4,6 +4,7 @@ public class ActivityDto {
 
 	private Long activityId;
 	private String title;
+	
 	private String body;
 	private Long date;
 	private ContactDto postedBy;
@@ -142,4 +143,16 @@ public class ActivityDto {
 		this.link = builder.link;
 		this.externalIdentifier = builder.externalIdentifier;
 	}
+
+	@Override
+	public String toString() {
+		return "ActivityDto [activityId=" + activityId + ", title=" + title
+				+ ", body=" + body + ", date=" + date + ", postedBy="
+				+ postedBy + ", photo=" + photo + ", video=" + video
+				+ ", externalNetworkId=" + externalNetworkId + ", type=" + type
+				+ ", link=" + link + ", externalIdentifier="
+				+ externalIdentifier + "]";
+	}
+	
+	
 }

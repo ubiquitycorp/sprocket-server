@@ -30,8 +30,6 @@ public class DataSyncWorker {
 	public void initialize(Configuration configuration) throws SchedulerException, IOException {
 
 		startServices(configuration);
-
-		
 		
 		List<CacheInvalidateConsumer> consumers = new LinkedList<CacheInvalidateConsumer>();
 		try {			

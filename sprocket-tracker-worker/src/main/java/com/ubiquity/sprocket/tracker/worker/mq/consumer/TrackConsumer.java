@@ -5,13 +5,14 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
+import com.ubiquity.identity.domain.User;
+import com.ubiquity.media.domain.Image;
+import com.ubiquity.media.domain.Video;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
-import com.ubiquity.sprocket.domain.Event;
-import com.ubiquity.sprocket.domain.EventType;
+import com.ubiquity.social.domain.Activity;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
-import com.ubiquity.sprocket.messaging.definition.EventTracked;
-import com.ubiquity.sprocket.service.AnalyticsService;
+import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 /***
@@ -38,8 +39,8 @@ public class TrackConsumer extends AbstractConsumerThread {
 		try {
 			Message message = messageConverter.deserialize(msg, Message.class);
 			log.debug("message received: {}", message);
-			if(message.getType().equals(EventTracked.class.getSimpleName()))
-				process((EventTracked)message.getContent());
+			if(message.getType().equals(UserEngagedActivity.class.getSimpleName()))
+				process((UserEngagedActivity)message.getContent());
 			
 		} catch (Exception e) {
 			// For now, log an error and exit until we know all the circumstances under which this can happen
@@ -48,13 +49,23 @@ public class TrackConsumer extends AbstractConsumerThread {
 		}
 	}
 
-	private void process(EventTracked messageContent) {		
-		// get event from message and convert to domain entity
-		Event event = new Event(EventType.values()[messageContent.getEventTypeId()]);
-		event.getProperties().putAll(messageContent.getProperties());
+	private void process(UserEngagedActivity messageContent) {		
 		
-		AnalyticsService tracker = ServiceFactory.getAnalyticsService();
-		tracker.track(event);
+		Activity activity = new Activity.Builder()
+			.activityType(messageContent.getActivityType())
+			.title(messageContent.getTitle())
+			.body(messageContent.getBody())
+			.creationDate(messageContent.getCreationDate())
+			.externalIdentifier(messageContent.getExternalIdentifier())
+			.externalNetwork(messageContent.getExternalNetwork())
+			.video(new Video.Builder().url(messageContent.getVideoUrl()).build())
+			.image(new Image(messageContent.getPhotoUrl()))
+			.link(messageContent.getLink())
+			.build();
+				
+		// track this
+		ServiceFactory.getAnalyticsService().track(null, activity);
+		
 	} 
 	
 }

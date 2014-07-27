@@ -2,6 +2,7 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -13,21 +14,30 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.messaging.format.Message;
+import com.ubiquity.social.domain.Activity;
+import com.ubiquity.social.domain.Message;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.DocumentsDto;
+import com.ubiquity.sprocket.api.dto.model.ActivityDto;
+import com.ubiquity.sprocket.api.dto.model.DocumentDto;
 import com.ubiquity.sprocket.domain.Document;
-import com.ubiquity.sprocket.domain.EventType;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
-import com.ubiquity.sprocket.messaging.definition.EventTracked;
+import com.ubiquity.sprocket.messaging.definition.UserEngagedDocument;
+//import com.ubiquity.sprocket.messaging.definition.EventTracked;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/documents")
@@ -40,11 +50,31 @@ public class DocumentsEndpoint {
 	@POST
 	@Path("/users/{userId}/live/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response engaged(@PathParam("userId") Long userId, InputStream payload) {
+	public Response engaged(@PathParam("userId") Long userId, InputStream payload) throws IOException {
 
+		
+		 
+//		 JsonParser parser = new JsonParser();
+//		 String str = IOUtils.toString(payload);
+//		 JsonObject object = parser.parse(str).getAsJsonObject();
+//		 JsonArray array = object.getAsJsonArray("documents");
+//		 Iterator<JsonElement> it = array.iterator();
+//		 while(it.hasNext()) {
+//			 JsonElement element = it.next();
+//			 JsonObject jsonObject = element.getAsJsonObject();
+//			 JsonElement dataElement = jsonObject.get("data");
+//			 
+//			ActivityDto activityDto = new Gson().fromJson(dataElement, ActivityDto.class);
+//			log.debug("activityDto {}", activityDto);
+//		 }
+		    
 		// convert payload
 		DocumentsDto documentsDto = jsonConverter.convertFromPayload(payload, DocumentsDto.class);
 		log.debug("documents engaged {}", documentsDto);
+		for(DocumentDto documentDto : documentsDto.getDocuments()) {
+		
+			sendTrackAndSyncMessage(userId, documentDto);
+		}
 		
 		return Response.ok().build();
 	}
@@ -83,22 +113,34 @@ public class DocumentsEndpoint {
 		
 	}
 	
-	
-	
-	
-	
-	
-	
-	
+	/**
+	 * Drops a message for tracking this event
+	 * 
+	 * @param userId
+	 * @param activityDto
+	 * @throws IOException
+	 */
+	private void sendTrackAndSyncMessage(Long userId, DocumentDto documentDto) throws IOException {
+		
+		
+		Document document = DtoAssembler.assemble(documentDto);
+		String dataType = document.getDataType();
+		
+		UserEngagedDocument messageContent;
+		if(dataType.equalsIgnoreCase(Activity.class.getSimpleName()))
+			messageContent = new UserEngagedDocument(userId, (Activity)document.getData(), dataType);
+		else if(dataType.equalsIgnoreCase(VideoContent.class.getSimpleName()))
+			messageContent = new UserEngagedDocument(userId, (VideoContent)document.getData(), dataType);
+		else if(dataType.equalsIgnoreCase(Message.class.getSimpleName()))
+			messageContent = new UserEngagedDocument(userId, (Message)document.getData(), dataType);
+		else
+			throw new IllegalArgumentException("Unknown data type for document: " + dataType);
+		
+		String message = MessageConverterFactory.getMessageConverter().serialize(new com.ubiquity.messaging.format.Message(messageContent));
+		byte[] bytes = message.getBytes();
+		MessageQueueFactory.getTrackQueueProducer().write(bytes);
+		MessageQueueFactory.getCacheInvalidationQueueProducer().write(bytes);
 
-
-	private void sendEventTrackedMessage(String q) throws IOException {
-		EventTracked content = new EventTracked(EventType.Search.ordinal());
-		content.getProperties().put("q", q);
-
-		// serialize and send itit
-		String message = MessageConverterFactory.getMessageConverter().serialize(new Message(content));
-		MessageQueueFactory.getTrackQueueProducer().write(message.getBytes());
 
 	}
 

@@ -22,6 +22,7 @@ import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.sprocket.domain.Document;
+import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
 import com.ubiquity.sprocket.search.SearchEngine;
 import com.ubiquity.sprocket.search.SearchKeys;
 import com.ubiquity.sprocket.search.solr.SearchEngineSolrjImpl;
@@ -47,6 +48,7 @@ public class SearchService {
 		searchEngine = new SearchEngineSolrjImpl(config);
 	}
 
+	
 	/***
 	 * Adds a list of message entities to the search index for the owner of the message
 	 * 
@@ -81,6 +83,27 @@ public class SearchService {
 	 * 
 	 * @param messages
 	 */
+	public void indexActivities(Long userFilterId, List<Activity> activities) {
+		List<Document> documents = new LinkedList<Document>();
+		for(Activity activity : activities) {
+
+			Document document = new Document(Activity.class.getName());
+
+			document.getFields().put(SearchKeys.Fields.FIELD_POSTED_BY, activity.getPostedBy().getDisplayName());
+			document.getFields().put(SearchKeys.Fields.FIELD_BODY, activity.getBody());
+			document.getFields().put(SearchKeys.Fields.FIELD_TITLE, activity.getTitle());
+			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Activity.class.getSimpleName());
+			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, activity.getExternalNetwork().ordinal());
+			document.getFields().put(SearchKeys.Fields.FIELD_ID, activity.getActivityId()); 
+			document.getFields().put(SearchKeys.Fields.FIELD_USER_ID, userFilterId);
+
+			documents.add(document);
+		}
+
+		addDocuments(documents);
+	}
+	
+	
 	public void indexActivities(List<Activity> activities) {
 		List<Document> documents = new LinkedList<Document>();
 		for(Activity activity : activities) {
@@ -91,14 +114,15 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_BODY, activity.getBody());
 			document.getFields().put(SearchKeys.Fields.FIELD_TITLE, activity.getTitle());
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Activity.class.getSimpleName());
-			document.getFields().put(SearchKeys.Fields.FIELD_USER_ID, activity.getOwner().getUserId());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, activity.getExternalNetwork().ordinal());
 			document.getFields().put(SearchKeys.Fields.FIELD_ID, activity.getActivityId()); 
+			document.getFields().put(SearchKeys.Fields.FIELD_USER_ID, activity.getOwner().getUserId());
 
 			documents.add(document);
 		}
 
 		addDocuments(documents);
+
 	}
 
 	/***
