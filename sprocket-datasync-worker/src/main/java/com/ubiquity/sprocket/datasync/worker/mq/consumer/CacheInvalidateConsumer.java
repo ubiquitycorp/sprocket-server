@@ -62,7 +62,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			// persist it or update the activity if it exists already
 			log.debug("saving the activity to db...");
 			Activity activity = engagedDocument.getActivity();
-			ServiceFactory.getSocialService().createOrUpdate(activity);
+			activity = ServiceFactory.getSocialService().findOrCreate(activity);
 			
 			// index for search (this will update the index if the record exists already)
 			ServiceFactory.getSearchService().indexActivities(
@@ -79,7 +79,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		Activity activity = engagedActivity.getActivity();
 		
 		// persist it or update it if it exists already
-		ServiceFactory.getSocialService().createOrUpdate(activity);
+		ServiceFactory.getSocialService().findOrCreate(activity);
 		
 		// index for search (this will update the index if the record exists already)
 		ServiceFactory.getSearchService().indexActivities(

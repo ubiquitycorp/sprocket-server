@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.google.gson.JsonParser;
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
@@ -29,6 +28,12 @@ import com.ubiquity.sprocket.search.SearchKeys;
 
 public class DtoAssembler {
 
+	// converter for any secondary parsing (for elements with type erasure, for example)
+	private static JsonConverter jsonConverter;
+	
+	static {
+		jsonConverter = JsonConverter.getInstance();
+	}
 
 	public static Activity assemble(ActivityDto activityDto) {
 		// convert to domain entity with required fields
@@ -258,23 +263,49 @@ public class DtoAssembler {
 	public static Document assemble(DocumentDto documentDto) {
 		Document document;
 		String dataType = documentDto.getDataType();
-		if(dataType.equals(Activity.class.getSimpleName())) {
-			//document = new Document(
-			
-		    Map<String, Object> map = (Map<String, Object>)documentDto.getData();
-		    ActivityDto activityDto = JsonConverter.getInstance().convertFromObject(map, ActivityDto.class);
+	    Map<String, Object> map = (Map<String, Object>)documentDto.getData();
+
+		if(dataType.equals(Activity.class.getSimpleName())) {			
+		    ActivityDto activityDto = jsonConverter.convertFromObject(map, ActivityDto.class);
 		    // now convert to entity
 		    Activity activity = assemble(activityDto);
 			document = new Document(dataType, activity, documentDto.getRank());
 		    
 		} else if(dataType.equals(VideoContent.class.getSimpleName())) {
-			document = new Document(dataType);
+		    VideoDto videoDto = jsonConverter.convertFromObject(map, VideoDto.class);
+		    VideoContent videoContent = assemble(videoDto);
+		    document = new Document(dataType, videoContent, documentDto.getRank());
 		} else if(dataType.equals(Message.class.getSimpleName())) {
-			document = new Document(dataType); // TODO: change me
+			MessageDto messageDto = jsonConverter.convertFromObject(map, MessageDto.class);
+			Message message = assemble(messageDto);
+		    document = new Document(dataType, message, documentDto.getRank());
+			
 		} else {
 			throw new IllegalArgumentException("Uknown data type for document: " + dataType);
 		}
 		return document;
+	}
+
+
+	private static Message assemble(MessageDto messageDto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	private static VideoContent assemble(VideoDto videoDto) {
+		Video video = new Video.Builder().itemKey(videoDto.getItemKey()).url(videoDto.getUrl()).build();
+		VideoContent content = new VideoContent.Builder()
+				.video(video)
+				.title(videoDto.getTitle())
+				.category(videoDto.getCategory())
+				.description(videoDto.getDescription())
+				.externalNetwork(ExternalNetwork.getNetworkById(videoDto.getExternalNetworkId()))
+				.thumb(new Image(videoDto.getThumb().getUrl()))
+				.lastUpdated(System.currentTimeMillis())
+				.build();
+		return content;
+				
 	}
 
 }

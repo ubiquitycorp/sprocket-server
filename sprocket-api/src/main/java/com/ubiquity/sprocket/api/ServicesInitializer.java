@@ -1,7 +1,5 @@
 package com.ubiquity.sprocket.api;
 
-import java.util.Iterator;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 

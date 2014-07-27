@@ -124,6 +124,17 @@ public class ActivityRepositoryTest {
 		// query by same id, different network
 		persisted = activityRepository.getByExternalIdentifierAndSocialNetwork(statusActivity.getExternalIdentifier(), owner.getUserId(), ExternalNetwork.Facebook);
 		Assert.assertNotNull(persisted);
+		
+		// create one with a null id (i.e. public), everything else the same
+		Activity publicStatusActivity = TestActivityFactory.createActivityWithMininumRequirements(null, ExternalNetwork.Facebook);
+		EntityManagerSupport.beginTransaction();
+		activityRepository.create(publicStatusActivity);
+		EntityManagerSupport.commit();
+
+		
+		persisted = activityRepository.getByExternalIdentifierAndNetwork(publicStatusActivity.getExternalIdentifier(), ExternalNetwork.Facebook);
+		Assert.assertNotNull(persisted);
+		
 
 	}
 
