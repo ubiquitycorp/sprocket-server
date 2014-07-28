@@ -1,10 +1,15 @@
 package com.ubiquity.sprocket.api.dto.model;
 
+import javax.validation.constraints.NotNull;
+
 
 public class DocumentDto {
 
+	@NotNull
 	private String dataType;
 	private Integer rank;
+	
+	@NotNull
 	private Object data;
 
 	public String getDataType() {

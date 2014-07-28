@@ -25,6 +25,7 @@ import com.ubiquity.social.domain.Message;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.DocumentsDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
+import com.ubiquity.sprocket.api.validation.EngagementValidation;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
@@ -44,7 +45,7 @@ public class DocumentsEndpoint {
 	public Response engaged(@PathParam("userId") Long userId, InputStream payload) throws IOException {
 
 		// convert payload
-		DocumentsDto documentsDto = jsonConverter.convertFromPayload(payload, DocumentsDto.class);
+		DocumentsDto documentsDto = jsonConverter.convertFromPayload(payload, DocumentsDto.class, EngagementValidation.class);
 		log.debug("documents engaged {}", documentsDto);
 		for(DocumentDto documentDto : documentsDto.getDocuments()) {
 			sendTrackAndSyncMessage(userId, documentDto);
@@ -67,6 +68,7 @@ public class DocumentsEndpoint {
 		
 		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
 	}
+	
 	
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/live")
@@ -97,7 +99,7 @@ public class DocumentsEndpoint {
 	private void sendTrackAndSyncMessage(Long userId, DocumentDto documentDto) throws IOException {
 		
 		// convert to domain entity and prepare to send to MQ
-		Document document = DtoAssembler.assemble(documentDto);
+		Document document = DtoAssembler.assemble(documentDto, EngagementValidation.class);
 		String dataType = document.getDataType();
 		
 		// create message content with strongly typed references to the actual domain entity (for easier de-serialization on the consumer end)

@@ -30,7 +30,7 @@ public class DtoAssembler {
 
 	// converter for any secondary parsing (for elements with type erasure, for example)
 	private static JsonConverter jsonConverter;
-	
+
 	static {
 		jsonConverter = JsonConverter.getInstance();
 	}
@@ -121,7 +121,7 @@ public class DtoAssembler {
 			.date(System.currentTimeMillis())
 			.externalNetworkId((Integer)fields.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
 			.body((String)fields.get(SearchKeys.Fields.FIELD_BODY))
-			.sender(new ContactDto.Builder().contactId(1l).displayName((String)fields.get(SearchKeys.Fields.FIELD_SENDER)).imageUrl(SearchKeys.Fields.FIELD_THUMBNAIL).build())
+			.sender(assemble(fields))
 			.build();
 
 		} else if(dataType.equals(Activity.class.getSimpleName())) {
@@ -137,7 +137,7 @@ public class DtoAssembler {
 				.date(System.currentTimeMillis())
 				.externalNetworkId((Integer)fields.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
 				.body((String)fields.get(SearchKeys.Fields.FIELD_BODY))
-				.postedBy(new ContactDto.Builder().contactId(1l).displayName((String)fields.get(SearchKeys.Fields.FIELD_POSTED_BY)).imageUrl(SearchKeys.Fields.FIELD_THUMBNAIL).build())
+				.postedBy(assemble(fields))
 				.build();
 			}
 
@@ -153,6 +153,17 @@ public class DtoAssembler {
 
 
 		return documentDto;
+	}
+
+	private static ContactDto assemble(Map<String, Object> fields) {
+		return new ContactDto.Builder()
+		.displayName((String)fields.get(SearchKeys.Fields.FIELD_CONTACT_DISPLAY_NAME))
+		.identity(new IdentityDto.Builder()
+		.externalNetworkId((Integer)fields.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
+		.identifier((String)fields.get(SearchKeys.Fields.FIELD_CONTACT_IDENTIFIER))
+		.build())
+		.imageUrl(SearchKeys.Fields.FIELD_CONTACT_THUMBNAIL).build();
+
 	}
 
 
@@ -256,30 +267,38 @@ public class DtoAssembler {
 
 
 	}
-	
-	
-	
+
+
+
 	@SuppressWarnings("unchecked")
-	public static Document assemble(DocumentDto documentDto) {
+	/***
+	 * 
+	 * Assembles a document after validating input
+	 * 
+	 * @param documentDto document dto
+	 * @param validationGroup validator for the "data" property of the document dto
+	 * @return
+	 */
+	public static Document assemble(DocumentDto documentDto, Class<?> validationGroup) {
 		Document document;
 		String dataType = documentDto.getDataType();
-	    Map<String, Object> map = (Map<String, Object>)documentDto.getData();
+		Map<String, Object> map = (Map<String, Object>)documentDto.getData();
 
 		if(dataType.equals(Activity.class.getSimpleName())) {			
-		    ActivityDto activityDto = jsonConverter.convertFromObject(map, ActivityDto.class);
-		    // now convert to entity
-		    Activity activity = assemble(activityDto);
+			ActivityDto activityDto = jsonConverter.convertFromObject(map, ActivityDto.class, validationGroup);
+			// now convert to entity
+			Activity activity = assemble(activityDto);
 			document = new Document(dataType, activity, documentDto.getRank());
-		    
+
 		} else if(dataType.equals(VideoContent.class.getSimpleName())) {
-		    VideoDto videoDto = jsonConverter.convertFromObject(map, VideoDto.class);
-		    VideoContent videoContent = assemble(videoDto);
-		    document = new Document(dataType, videoContent, documentDto.getRank());
+			VideoDto videoDto = jsonConverter.convertFromObject(map, VideoDto.class);
+			VideoContent videoContent = assemble(videoDto);
+			document = new Document(dataType, videoContent, documentDto.getRank());
 		} else if(dataType.equals(Message.class.getSimpleName())) {
 			MessageDto messageDto = jsonConverter.convertFromObject(map, MessageDto.class);
 			Message message = assemble(messageDto);
-		    document = new Document(dataType, message, documentDto.getRank());
-			
+			document = new Document(dataType, message, documentDto.getRank());
+
 		} else {
 			throw new IllegalArgumentException("Uknown data type for document: " + dataType);
 		}
@@ -296,16 +315,16 @@ public class DtoAssembler {
 	private static VideoContent assemble(VideoDto videoDto) {
 		Video video = new Video.Builder().itemKey(videoDto.getItemKey()).url(videoDto.getUrl()).build();
 		VideoContent content = new VideoContent.Builder()
-				.video(video)
-				.title(videoDto.getTitle())
-				.category(videoDto.getCategory())
-				.description(videoDto.getDescription())
-				.externalNetwork(ExternalNetwork.getNetworkById(videoDto.getExternalNetworkId()))
-				.thumb(new Image(videoDto.getThumb().getUrl()))
-				.lastUpdated(System.currentTimeMillis())
-				.build();
+		.video(video)
+		.title(videoDto.getTitle())
+		.category(videoDto.getCategory())
+		.description(videoDto.getDescription())
+		.externalNetwork(ExternalNetwork.getNetworkById(videoDto.getExternalNetworkId()))
+		.thumb(new Image(videoDto.getThumb().getUrl()))
+		.lastUpdated(System.currentTimeMillis())
+		.build();
 		return content;
-				
+
 	}
 
 }

@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.identity.factory.UserFactory;
+import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
 import com.ubiquity.integration.factory.TestContactFactory;
@@ -47,7 +47,7 @@ public class MessageRepositoryTest {
 		contactRepository = new ContactRepositoryJpaImpl();
 
 		
-		owner = UserFactory.createTestUserWithMinimumRequiredProperties();
+		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 		
 		EntityManagerSupport.beginTransaction();
 		userRepository.create(owner);

@@ -14,7 +14,7 @@ import com.ubiquity.content.repository.VideoContentRepository;
 import com.ubiquity.content.repository.VideoContentRepositoryJpaImpl;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.identity.factory.UserFactory;
+import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.integration.factory.TestVideoContentFactory;
 
 /***
@@ -42,7 +42,7 @@ public class VideoContentRepositoryTest {
 		videoContentRepository = new VideoContentRepositoryJpaImpl();
 		userRepository = new UserRepositoryJpaImpl();
 		
-		owner = UserFactory.createTestUserWithMinimumRequiredProperties();
+		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 		persistUser(owner);
 		
 		videoContent = TestVideoContentFactory.createVideoContentWithMininumRequiredFields(owner, ExternalNetwork.YouTube);
@@ -98,7 +98,7 @@ public class VideoContentRepositoryTest {
 		
 		
 		// create a video for another user
-		User anotherUser = UserFactory.createTestUserWithMinimumRequiredProperties();
+		User anotherUser = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 		persistUser(anotherUser);
 		VideoContent videoThatShouldRemain = TestVideoContentFactory.createVideoContentWithMininumRequiredFields(anotherUser, ExternalNetwork.YouTube);
 		persistVideoContent(videoThatShouldRemain);

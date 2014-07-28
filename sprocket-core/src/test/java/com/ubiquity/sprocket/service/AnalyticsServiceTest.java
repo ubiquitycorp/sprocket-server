@@ -9,8 +9,10 @@ import org.slf4j.LoggerFactory;
 
 public class AnalyticsServiceTest {
 
+	@SuppressWarnings("unused")
 	private static AnalyticsService analyticsService;
 
+	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	@BeforeClass
@@ -20,7 +22,8 @@ public class AnalyticsServiceTest {
 	}
 	
 	@Test
-	public void test() {}
+	public void test() {
+	}
 
 
 

@@ -17,11 +17,11 @@ import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.service.SocialService;
-import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedDocument;
+import com.ubiquity.sprocket.search.SearchKeys;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 public class CacheInvalidateConsumer extends AbstractConsumerThread {
@@ -56,36 +56,46 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 
 	private void process(UserEngagedDocument engagedDocument) {
 		log.debug("found: {}", engagedDocument);
-		
+
 		String dataType = engagedDocument.getDataType();
 		if(dataType.equalsIgnoreCase(Activity.class.getSimpleName())) {
 			// persist it or update the activity if it exists already
 			log.debug("saving the activity to db...");
 			Activity activity = engagedDocument.getActivity();
 			activity = ServiceFactory.getSocialService().findOrCreate(activity);
-			
+
 			// index for search (this will update the index if the record exists already)
-			ServiceFactory.getSearchService().indexActivities(
-					engagedDocument.getUserId(), 
+			Long userFilterId = SearchKeys.generateOwnerId(engagedDocument.getUserId());
+			ServiceFactory.getSearchService().indexActivities(userFilterId,
 					Arrays.asList(new Activity[] { activity }));
+		} else if(dataType.equalsIgnoreCase(VideoContent.class.getSimpleName())) {
+			// persist it or update the activity if it exists already
+			log.debug("saving the video to db...");
+			VideoContent videoContent = engagedDocument.getVideoContent();
+			videoContent = ServiceFactory.getContentService().findOrCreate(videoContent);
+
+			// index for search (this will update the index if the record exists already)
+			Long userFilterId = SearchKeys.generateOwnerId(engagedDocument.getUserId());
+			ServiceFactory.getSearchService().indexVideos(userFilterId,
+					Arrays.asList(new VideoContent[] { videoContent }));
 		}
-				
+
 	}
-	
+
 	private void process(UserEngagedActivity engagedActivity) {
 		log.debug("found: {}", engagedActivity);
-		
+
 		// build it
 		Activity activity = engagedActivity.getActivity();
-		
+
 		// persist it or update it if it exists already
 		ServiceFactory.getSocialService().findOrCreate(activity);
-		
+
 		// index for search (this will update the index if the record exists already)
 		ServiceFactory.getSearchService().indexActivities(
 				engagedActivity.getUserId(), 
 				Arrays.asList(new Activity[] { activity }));
-		
+
 	}
 	/**
 	 * If an identity has been activated, process all available content;
@@ -105,7 +115,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			processVideos(identity, externalNetwork);
 		else if (externalNetwork.equals(ExternalNetwork.Google))
 			processVideos(identity, ExternalNetwork.YouTube);
-		
+
 		if(externalNetwork.equals(ExternalNetwork.Google) ) {
 			processMessages(identity, externalNetwork);
 		}  else if ( externalNetwork.equals(ExternalNetwork.Facebook)||externalNetwork.equals(ExternalNetwork.Twitter)) {
@@ -125,7 +135,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 				socialNetwork);
 
 		// index for searching
-		ServiceFactory.getSearchService().indexActivities(synced);
+		ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), synced);
 	}
 
 	/***
@@ -142,8 +152,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 				externalNetwork);
 
 		// add videos to search results
-		ServiceFactory.getSearchService().indexVideos(synced,
-				identity.getUser().getUserId());
+		ServiceFactory.getSearchService().indexVideos(identity.getUser().getUserId(), synced);
 	}
 
 	/***

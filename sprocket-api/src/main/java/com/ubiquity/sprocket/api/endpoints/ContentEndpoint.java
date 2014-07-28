@@ -20,6 +20,7 @@ import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.VideosDto;
+import com.ubiquity.sprocket.api.validation.EngagementValidation;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/content")
@@ -35,7 +36,7 @@ public class ContentEndpoint {
 	public Response engaged(@PathParam("userId") Long userId, InputStream payload) {
 
 		// convert payload
-		VideosDto videosDto = jsonConverter.convertFromPayload(payload, VideosDto.class);
+		VideosDto videosDto = jsonConverter.convertFromPayload(payload, VideosDto.class, EngagementValidation.class);
 		log.debug("videos engaged {}", videosDto);
 		
 		return Response.ok().build();
