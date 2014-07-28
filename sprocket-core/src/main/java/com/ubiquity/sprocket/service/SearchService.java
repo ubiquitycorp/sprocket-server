@@ -269,6 +269,7 @@ public class SearchService {
 		
 		Long ownerId = SearchKeys.generateOwnerId(userIdFilter);
 		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId);
+		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, SearchKeys.Values.EMPTY_OWNER_ID);
 		filters.put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, externalNetwork.ordinal());
 		
 		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
@@ -292,6 +293,7 @@ public class SearchService {
 		
 		Long ownerId = SearchKeys.generateOwnerId(userIdFilter);
 		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId);
+		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, SearchKeys.Values.EMPTY_OWNER_ID);
 		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
 	}
 

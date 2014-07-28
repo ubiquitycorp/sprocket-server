@@ -24,8 +24,6 @@ import com.ubiquity.integration.factory.TestActivityFactory;
 import com.ubiquity.integration.factory.TestContactFactory;
 import com.ubiquity.integration.factory.TestMessageFactory;
 import com.ubiquity.integration.factory.TestVideoContentFactory;
-import com.ubiquity.media.domain.Image;
-import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
@@ -122,6 +120,25 @@ public class SearchServiceTest {
 
 
 	}
+	
+	@Test
+	public void testAddPublicActvityIsAvailableToAnyUser() {
+		// create an activity with no owner
+		Activity activity = TestActivityFactory.createActivityWithMininumRequirements(null, ExternalNetwork.LinkedIn);
+		Contact postedBy = TestContactFactory.createContactWithMininumRequiredFieldsAndSocialNetwork(owner, ExternalNetwork.LinkedIn);
+		activity.setPostedBy(postedBy);
+		
+		// save 
+		searchService.indexActivities(null,
+				Arrays.asList(new Activity[] { activity }));
+		
+		// search for this user; should return public even though the user fitler is set
+		List<Document> documents = searchService.searchIndexedDocuments(activity.getTitle(), owner.getUserId());
+		log.debug("documents: {}", documents);
+		Assert.assertTrue(documents.size() == 1);
+		
+		
+	}
 
 	@Test
 	public void testDedupe() {
@@ -208,6 +225,8 @@ public class SearchServiceTest {
 		// pick a network that is not the passed in network
 		documents = searchService.searchIndexedDocuments(searchTerm, owner.getUserId(), anotherNetwork);
 		Assert.assertTrue(documents.isEmpty());
+		
+		
 	}
 
 
