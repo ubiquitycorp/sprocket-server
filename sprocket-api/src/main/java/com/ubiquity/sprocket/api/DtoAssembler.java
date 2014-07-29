@@ -225,9 +225,15 @@ public class DtoAssembler {
 				topLevelMessageDto.getConversation().addLast(messageDto);
 			} else {
 				// we have a top level message
-				topLevelMessageDto = messageDto;
+				topLevelMessageDto = new MessageDto.Builder()
+							.externalNetworkId(message.getExternalNetwork().ordinal())
+							.lastMessageDate(messageDto.getDate())
+							.build();
+				topLevelMessageDto.getConversation().add(messageDto);
 				lastConversationIdentifier = conversationIdentifier;
-				topLevelMessageDto.setLastMessageDate(topLevelMessageDto.getDate());
+				for (Contact contact : message.getReceivers()) {
+					topLevelMessageDto.getReceivers().add(assemble(contact));
+				}
 				// now add to the main list for a "roll up"
 				messageDtoList.add(topLevelMessageDto);
 			}
@@ -241,7 +247,7 @@ public class DtoAssembler {
 		return new MessageDto.Builder()
 		.subject(message.getTitle())
 		.date(message.getSentDate())
-		.externalNetworkId(message.getExternalNetwork().ordinal())
+		//.externalNetworkId(message.getExternalNetwork().ordinal())
 		.body(message.getBody())
 		.sender(assemble(message.getSender())).build();
 	}

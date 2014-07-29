@@ -1,7 +1,9 @@
 package com.ubiquity.sprocket.api.dto.model;
 
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 public class MessageDto implements Comparable<MessageDto>{
 
@@ -15,6 +17,8 @@ public class MessageDto implements Comparable<MessageDto>{
 	
 	private Deque<MessageDto> conversation = new LinkedList<MessageDto>();
 
+	private Set<ContactDto> receivers = new HashSet<ContactDto>();
+	
 	public Integer getExternalNetworkId() {
 		return externalNetworkId;
 	}
@@ -47,6 +51,11 @@ public class MessageDto implements Comparable<MessageDto>{
 	public void setLastMessageDate(Long lastMessageDate) {
 		this.lastMessageDate = lastMessageDate;
 	}
+	
+	public Set<ContactDto> getReceivers() {
+		return receivers;
+	}
+
 	public static class Builder {
 		private String subject;
 		private String body;

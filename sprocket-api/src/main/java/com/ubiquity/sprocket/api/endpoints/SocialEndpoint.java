@@ -23,7 +23,6 @@ import com.niobium.repository.CollectionVariant;
 import com.ubiquity.api.exception.HttpException;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
-import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.api.exception.AuthorizationException;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
@@ -117,7 +116,7 @@ public class SocialEndpoint {
 		messages.addAll(variant.getCollection());
 		
 		// Assemble into message dto, constructing conversations if they are inherent in the data
-		List<MessageDto> conversations =DtoAssembler.assemble(messages);
+		List<MessageDto> conversations = DtoAssembler.assemble(messages);
 		Collections.sort(conversations, Collections.reverseOrder());
 		result.getMessages().addAll(conversations);
 	
