@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.identity.factory.UserFactory;
+import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
 import com.ubiquity.integration.factory.TestActivityFactory;
@@ -44,7 +44,7 @@ public class ActivityRepositoryTest {
 		activityRepository = new ActivityRepositoryJpaImpl();
 		userRepository = new UserRepositoryJpaImpl();
 		
-		owner = UserFactory.createTestUserWithMinimumRequiredProperties();
+		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 		
 		EntityManagerSupport.beginTransaction();
 		userRepository.create(owner);
@@ -124,6 +124,17 @@ public class ActivityRepositoryTest {
 		// query by same id, different network
 		persisted = activityRepository.getByExternalIdentifierAndSocialNetwork(statusActivity.getExternalIdentifier(), owner.getUserId(), ExternalNetwork.Facebook);
 		Assert.assertNotNull(persisted);
+		
+		// create one with a null id (i.e. public), everything else the same
+		Activity publicStatusActivity = TestActivityFactory.createActivityWithMininumRequirements(null, ExternalNetwork.Facebook);
+		EntityManagerSupport.beginTransaction();
+		activityRepository.create(publicStatusActivity);
+		EntityManagerSupport.commit();
+
+		
+		persisted = activityRepository.getByExternalIdentifierAndNetwork(publicStatusActivity.getExternalIdentifier(), ExternalNetwork.Facebook);
+		Assert.assertNotNull(persisted);
+		
 
 	}
 

@@ -5,12 +5,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.media.domain.Image;
+import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.domain.Activity;
+import com.ubiquity.social.domain.ActivityType;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
+import com.ubiquity.social.domain.factories.ActivityFactory;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
@@ -23,6 +28,65 @@ import com.ubiquity.sprocket.search.SearchKeys;
 
 public class DtoAssembler {
 
+	// converter for any secondary parsing (for elements with type erasure, for example)
+	private static JsonConverter jsonConverter;
+
+	static {
+		jsonConverter = JsonConverter.getInstance();
+	}
+
+	public static Activity assemble(ActivityDto activityDto) {
+		// convert to domain entity with required fields
+		Activity.Builder activityBuilder = ActivityFactory.createPublicActivityBuilderWithRequiredFields(ActivityType.valueOf(activityDto.getType().toUpperCase()), 
+				ExternalNetwork.getNetworkById(activityDto.getExternalNetworkId()), 
+				activityDto.getDate(), 
+				activityDto.getExternalIdentifier());
+
+		// set optional fields
+		activityBuilder.title(activityDto.getTitle());
+		activityBuilder.body(activityDto.getBody());
+		activityBuilder.link(activityDto.getLink());
+
+		// set video / photo urls if we have them
+		VideoDto videoDto = activityDto.getVideo();
+		if(videoDto != null)
+			activityBuilder.video(new Video.Builder().url(videoDto.getUrl()).build());
+
+		ImageDto imageDto = activityDto.getPhoto();
+		if(imageDto != null)
+			activityBuilder.image(new Image(imageDto.getUrl()));
+
+		activityBuilder.postedBy(assemble(activityDto.getPostedBy()));
+
+		return activityBuilder.build();
+
+	}
+
+
+	public static Contact assemble(ContactDto contactDto) {
+
+		Contact.Builder contactBuilder = new Contact.Builder()
+		.displayName(contactDto.getDisplayName())
+		.firstName(contactDto.getFirstName())
+		.lastName(contactDto.getLastName())
+		.lastUpdated(System.currentTimeMillis())
+		.profileUrl(contactDto.getProfileUrl());
+
+		if(contactDto.getImageUrl() != null) {
+			contactBuilder.image(new Image(contactDto.getImageUrl()));
+		}
+
+		contactBuilder.externalIdentity(
+				new ExternalIdentity.Builder()
+				.identifier(contactDto.getIdentity().getIdentifier())
+				.externalNetwork(contactDto.getIdentity().getExternalNetworkId())
+				.isActive(Boolean.TRUE)
+				.lastUpdated(System.currentTimeMillis())
+				.build()
+				);
+
+		return contactBuilder.build();
+	}
 
 	public static DocumentDto assemble(Document document) {
 
@@ -41,7 +105,7 @@ public class DtoAssembler {
 				VideoContent videoContent = (VideoContent)document.getData();
 				data = assemble(videoContent);
 			} else {
-			
+
 				data = new VideoDto.Builder()
 				.externalNetworkId(ExternalNetwork.YouTube.ordinal())
 				.itemKey((String)fields.get(SearchKeys.Fields.FIELD_ITEM_KEY))
@@ -57,7 +121,7 @@ public class DtoAssembler {
 			.date(System.currentTimeMillis())
 			.externalNetworkId((Integer)fields.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
 			.body((String)fields.get(SearchKeys.Fields.FIELD_BODY))
-			.sender(new ContactDto.Builder().contactId(1l).displayName((String)fields.get(SearchKeys.Fields.FIELD_SENDER)).imageUrl(SearchKeys.Fields.FIELD_THUMBNAIL).build())
+			.sender(assemble(fields))
 			.build();
 
 		} else if(dataType.equals(Activity.class.getSimpleName())) {
@@ -73,7 +137,7 @@ public class DtoAssembler {
 				.date(System.currentTimeMillis())
 				.externalNetworkId((Integer)fields.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
 				.body((String)fields.get(SearchKeys.Fields.FIELD_BODY))
-				.postedBy(new ContactDto.Builder().contactId(1l).displayName((String)fields.get(SearchKeys.Fields.FIELD_POSTED_BY)).imageUrl(SearchKeys.Fields.FIELD_THUMBNAIL).build())
+				.postedBy(assemble(fields))
 				.build();
 			}
 
@@ -89,6 +153,17 @@ public class DtoAssembler {
 
 
 		return documentDto;
+	}
+
+	private static ContactDto assemble(Map<String, Object> fields) {
+		return new ContactDto.Builder()
+		.displayName((String)fields.get(SearchKeys.Fields.FIELD_CONTACT_DISPLAY_NAME))
+		.identity(new IdentityDto.Builder()
+		.externalNetworkId((Integer)fields.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
+		.identifier((String)fields.get(SearchKeys.Fields.FIELD_CONTACT_IDENTIFIER))
+		.build())
+		.imageUrl(SearchKeys.Fields.FIELD_CONTACT_THUMBNAIL).build();
+
 	}
 
 
@@ -190,6 +265,65 @@ public class DtoAssembler {
 
 		return activityDtoBuilder.build();
 
+
+	}
+
+
+
+	@SuppressWarnings("unchecked")
+	/***
+	 * 
+	 * Assembles a document after validating input
+	 * 
+	 * @param documentDto document dto
+	 * @param validationGroup validator for the "data" property of the document dto
+	 * @return
+	 */
+	public static Document assemble(DocumentDto documentDto, Class<?> validationGroup) {
+		Document document;
+		String dataType = documentDto.getDataType();
+		Map<String, Object> map = (Map<String, Object>)documentDto.getData();
+
+		if(dataType.equals(Activity.class.getSimpleName())) {			
+			ActivityDto activityDto = jsonConverter.convertFromObject(map, ActivityDto.class, validationGroup);
+			// now convert to entity
+			Activity activity = assemble(activityDto);
+			document = new Document(dataType, activity, documentDto.getRank());
+
+		} else if(dataType.equals(VideoContent.class.getSimpleName())) {
+			VideoDto videoDto = jsonConverter.convertFromObject(map, VideoDto.class);
+			VideoContent videoContent = assemble(videoDto);
+			document = new Document(dataType, videoContent, documentDto.getRank());
+		} else if(dataType.equals(Message.class.getSimpleName())) {
+			MessageDto messageDto = jsonConverter.convertFromObject(map, MessageDto.class);
+			Message message = assemble(messageDto);
+			document = new Document(dataType, message, documentDto.getRank());
+
+		} else {
+			throw new IllegalArgumentException("Uknown data type for document: " + dataType);
+		}
+		return document;
+	}
+
+
+	private static Message assemble(MessageDto messageDto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	public static VideoContent assemble(VideoDto videoDto) {
+		Video video = new Video.Builder().itemKey(videoDto.getItemKey()).url(videoDto.getUrl()).build();
+		VideoContent content = new VideoContent.Builder()
+		.video(video)
+		.title(videoDto.getTitle())
+		.category(videoDto.getCategory())
+		.description(videoDto.getDescription())
+		.externalNetwork(ExternalNetwork.getNetworkById(videoDto.getExternalNetworkId()))
+		.thumb(new Image(videoDto.getThumb().getUrl()))
+		.lastUpdated(System.currentTimeMillis())
+		.build();
+		return content;
 
 	}
 

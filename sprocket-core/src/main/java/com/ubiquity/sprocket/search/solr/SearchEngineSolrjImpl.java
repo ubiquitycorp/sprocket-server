@@ -104,6 +104,7 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 	}
 	
 	private String[] createFilterArguments(Map<String, Object> filter) {
+	
 		String[] filters = new String[filter.size()];
 		int i = 0;
 		for(String key : filter.keySet()) {
@@ -111,6 +112,7 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 			filters[i] = key + ":" + value;
 			i++;
 		}
+	
 		return filters;
 	}
 

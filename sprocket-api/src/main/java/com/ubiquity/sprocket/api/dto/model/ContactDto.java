@@ -1,10 +1,13 @@
 package com.ubiquity.sprocket.api.dto.model;
 
+import javax.validation.constraints.NotNull;
+
+import com.ubiquity.sprocket.api.validation.EngagementValidation;
+
 public class ContactDto {
 
 	private Long contactId;
 	private Boolean active;
-	private String displayName;
 	private String firstName;
 	private String lastName;
 	private String email;
@@ -12,8 +15,12 @@ public class ContactDto {
 	private String imageUrl;
 	private String etag;
 
+	@NotNull(groups = { EngagementValidation.class })
+	private String displayName;
+	
+	@NotNull(groups = { EngagementValidation.class })
 	private IdentityDto identity;
-
+	
 	public String getEtag() {
 		return etag;
 	}

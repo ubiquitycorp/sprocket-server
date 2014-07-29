@@ -1,4 +1,4 @@
-package com.ubiquity.identity.repository;
+package com.ubiquity.sprocket.repository;
 
 import java.util.UUID;
 
@@ -13,6 +13,8 @@ import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.repository.UserRepository;
+import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.external.repository.ExternalIdentityRepository;
 import com.ubiquity.external.repository.ExternalIdentityRepositoryJpaImpl;

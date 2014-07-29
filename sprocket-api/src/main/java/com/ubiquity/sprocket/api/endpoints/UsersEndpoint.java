@@ -10,7 +10,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -32,15 +31,15 @@ import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.api.linkedin.ExchangeService;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
+import com.ubiquity.sprocket.api.dto.model.ExchangeTokenDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.AuthorizationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
-import com.ubiquity.sprocket.domain.EventType;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
-import com.ubiquity.sprocket.messaging.definition.EventTracked;
+//import com.ubiquity.sprocket.messaging.definition.EventTracked;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
@@ -71,7 +70,7 @@ public class UsersEndpoint {
 	@Path("/{userId}/authenticatedlinkedin")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response authenticatedlinkedin(@PathParam("userId") Long userId,
-			@CookieParam("linkedin_oauth_7747wv47q1ili9") String cookie)
+			@CookieParam("linkedin_oauth_77fa6kjljumj8x") String cookie)
 			throws Exception {
 
 		// load user
@@ -221,7 +220,7 @@ public class UsersEndpoint {
 		sendActivatedMessage(user, identity, identityDto);
 
 		// send off to analytics tracker
-		sendEventTrackedMessage(user, identity);
+		//sendEventTrackedMessage(user, identity);
 
 		IdentityDto result = new IdentityDto.Builder().identifier(
 				identity.getIdentifier()).build();
@@ -267,11 +266,7 @@ public class UsersEndpoint {
 				.createOrUpdateExternalIdentity(user, accessToken,
 						identityDto.getSecretToken(), clientPlatform,
 						externalNetwork);
-		// ExternalIdentity identity =
-		// ServiceFactory.getContentService().getContentIdentityById(5L);
-
-		// List<VideoContent> synced =
-		// ServiceFactory.getContentService().sync(identity, contentNetwork);
+		
 		sendActivatedMessage(user, identity, identityDto);
 
 		return Response.ok().build();
@@ -285,18 +280,20 @@ public class UsersEndpoint {
 	 * @param accessToken
 	 * @return
 	 */
-	@GET
-	@Path("/{userId}/exchangeToken/providers/{externalNetworkId}")
+	@POST
+	@Path("/{userId}/exchangedToken")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response exchangeAccessToken(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @QueryParam("accessToken") String accessToken){
-		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
+	public Response exchangeAccessToken(@PathParam("userId") Long userId, InputStream payload){
+		
+		ExchangeTokenDto exchangeTokenDto = jsonConverter.convertFromPayload(payload, ExchangeTokenDto.class);
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(exchangeTokenDto.getExternalNetworkId());
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork, ClientPlatform.WEB);
-		String LongLivedAccessToken = socialApi.exchangeAccessToken(accessToken);
+		String LongLivedAccessToken = socialApi.exchangeAccessToken(exchangeTokenDto.getAccessToken());
 		
-		return Response.ok("{accessToken:" + LongLivedAccessToken + "}").build();
+		return Response.ok("{\"accessToken\":\"" + LongLivedAccessToken + "\"}").build();
 	}
 	
 	private void sendActivatedMessage(User user, ExternalIdentity identity,
@@ -313,19 +310,5 @@ public class UsersEndpoint {
 				message.getBytes());
 	}
 
-	private void sendEventTrackedMessage(User user, ExternalIdentity identity)
-			throws IOException {
-		EventTracked content = new EventTracked(
-				EventType.UserAddedIdentity.ordinal());
-		content.getProperties().put("user", user.getUserId());
-		content.getProperties().put("social_network",
-				ExternalNetwork.getName(identity.getExternalNetwork()));
-
-		// serialize and send it
-		String message = MessageConverterFactory.getMessageConverter()
-				.serialize(new Message(content));
-		MessageQueueFactory.getTrackQueueProducer().write(message.getBytes());
-
-	}
 
 }

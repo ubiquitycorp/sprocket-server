@@ -17,17 +17,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.messaging.format.Message;
+import com.ubiquity.social.domain.Activity;
+import com.ubiquity.social.domain.Message;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.DocumentsDto;
+import com.ubiquity.sprocket.api.dto.model.DocumentDto;
+import com.ubiquity.sprocket.api.validation.EngagementValidation;
 import com.ubiquity.sprocket.domain.Document;
-import com.ubiquity.sprocket.domain.EventType;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
-import com.ubiquity.sprocket.messaging.definition.EventTracked;
+import com.ubiquity.sprocket.messaging.definition.UserEngagedDocument;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/documents")
@@ -40,11 +42,14 @@ public class DocumentsEndpoint {
 	@POST
 	@Path("/users/{userId}/live/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response engaged(@PathParam("userId") Long userId, InputStream payload) {
+	public Response engaged(@PathParam("userId") Long userId, InputStream payload) throws IOException {
 
 		// convert payload
-		DocumentsDto documentsDto = jsonConverter.convertFromPayload(payload, DocumentsDto.class);
+		DocumentsDto documentsDto = jsonConverter.convertFromPayload(payload, DocumentsDto.class, EngagementValidation.class);
 		log.debug("documents engaged {}", documentsDto);
+		for(DocumentDto documentDto : documentsDto.getDocuments()) {
+			sendTrackAndSyncMessage(userId, documentDto);
+		}
 		
 		return Response.ok().build();
 	}
@@ -64,6 +69,7 @@ public class DocumentsEndpoint {
 		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
 	}
 	
+	
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/live")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -73,7 +79,7 @@ public class DocumentsEndpoint {
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		
-		List<Document> documents = ServiceFactory.getSearchService().searchLiveDocuments(q, user, socialNetwork, ClientPlatform.Android, page);
+		List<Document> documents = ServiceFactory.getSearchService().searchLiveDocuments(q, user, socialNetwork, page);
 		
 		for(Document document : documents) {
 			result.getDocuments().add(DtoAssembler.assemble(document));
@@ -83,22 +89,40 @@ public class DocumentsEndpoint {
 		
 	}
 	
-	
-	
-	
-	
-	
-	
-	
+	/**
+	 * Drops a message for tracking this event
+	 * 
+	 * @param userId
+	 * @param activityDto
+	 * @throws IOException
+	 */
+	private void sendTrackAndSyncMessage(Long userId, DocumentDto documentDto) throws IOException {
+		
+		// convert to domain entity and prepare to send to MQ
+		Document document = DtoAssembler.assemble(documentDto, EngagementValidation.class);
+		String dataType = document.getDataType();
+		
+		// create message content with strongly typed references to the actual domain entity (for easier de-serialization on the consumer end)
+		UserEngagedDocument messageContent;
+		if(dataType.equalsIgnoreCase(Activity.class.getSimpleName()))
+			messageContent = new UserEngagedDocument(userId, (Activity)document.getData(), dataType);
+		else if(dataType.equalsIgnoreCase(VideoContent.class.getSimpleName()))
+			messageContent = new UserEngagedDocument(userId, (VideoContent)document.getData(), dataType);
+		else if(dataType.equalsIgnoreCase(Message.class.getSimpleName()))
+			messageContent = new UserEngagedDocument(userId, (Message)document.getData(), dataType);
+		else
+			throw new IllegalArgumentException("Unknown data type for document: " + dataType);
+		
+		// convert to raw bytes and send it off
+		String message = MessageConverterFactory.getMessageConverter().serialize(new com.ubiquity.messaging.format.Message(messageContent));
+		byte[] bytes = message.getBytes();
+		
+		// send to data warehouse / analytics tracker
+		MessageQueueFactory.getTrackQueueProducer().write(bytes);
+		
+		// will ensure the domain entity gets saved to the store if it does not exist and indexed for faster search
+		MessageQueueFactory.getCacheInvalidationQueueProducer().write(bytes);
 
-
-	private void sendEventTrackedMessage(String q) throws IOException {
-		EventTracked content = new EventTracked(EventType.Search.ordinal());
-		content.getProperties().put("q", q);
-
-		// serialize and send itit
-		String message = MessageConverterFactory.getMessageConverter().serialize(new Message(content));
-		MessageQueueFactory.getTrackQueueProducer().write(message.getBytes());
 
 	}
 
