@@ -312,7 +312,7 @@ public class DtoAssembler {
 	}
 
 
-	private static VideoContent assemble(VideoDto videoDto) {
+	public static VideoContent assemble(VideoDto videoDto) {
 		Video video = new Video.Builder().itemKey(videoDto.getItemKey()).url(videoDto.getUrl()).build();
 		VideoContent content = new VideoContent.Builder()
 		.video(video)

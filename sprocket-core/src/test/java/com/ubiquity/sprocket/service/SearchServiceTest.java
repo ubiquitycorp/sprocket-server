@@ -116,9 +116,41 @@ public class SearchServiceTest {
 		Document result = documents.get(0);
 		Assert.assertEquals(Message.class.getSimpleName(), result.getFields().get(SearchKeys.Fields.FIELD_DATA_TYPE));
 
-		testUserAndSocialNetworkFilter(message.getSender().getDisplayName(), owner.getUserId(), ExternalNetwork.Facebook);
+	}
+	
+	@Test
+	public void testAddPublicVideoUserFilter() {
+		// create an activity with no owner
+		VideoContent videoContent = TestVideoContentFactory.createVideoContentWithMininumRequiredFields(null, ExternalNetwork.YouTube);
+		ServiceFactory.getContentService().create(videoContent);
 
-
+		// save with no use filter
+		searchService.indexVideos(null,
+				Arrays.asList(new VideoContent[] { videoContent }));
+		
+		// search for this user; should return public even though the user fitler is set
+		List<Document> documents = searchService.searchIndexedDocuments(videoContent.getDescription(), null, ExternalNetwork.YouTube);
+		log.debug("documents: {}", documents);
+		Assert.assertTrue(documents.size() == 1);	
+		
+		// save with user filter
+		searchService.indexVideos(owner.getUserId(),
+				Arrays.asList(new VideoContent[] { videoContent }));
+		
+		// search for this user; should return when searching with this user filter specified
+		documents = searchService.searchIndexedDocuments(videoContent.getDescription(), owner.getUserId(), ExternalNetwork.YouTube);
+		log.debug("documents: {}", documents);
+		Assert.assertTrue(documents.size() == 1);	
+		
+		// search for this user; should not return when a different user is specified
+		documents = searchService.searchIndexedDocuments(videoContent.getDescription(), owner.getUserId() + 1, ExternalNetwork.YouTube);
+		log.debug("documents: {}", documents);
+		Assert.assertTrue(documents.isEmpty());	
+		
+		
+		
+		
+		
 	}
 	
 	@Test
@@ -176,9 +208,6 @@ public class SearchServiceTest {
 		Document result = documents.get(0);
 		Assert.assertEquals(Activity.class.getSimpleName(), result.getFields().get(SearchKeys.Fields.FIELD_DATA_TYPE));
 
-		testUserAndSocialNetworkFilter(activity.getPostedBy().getDisplayName(), owner.getUserId(), ExternalNetwork.LinkedIn);
-
-
 
 	}
 
@@ -205,29 +234,29 @@ public class SearchServiceTest {
 
 	}	
 
-	/***
-	 * Convenience method for testing if the social network and user id filters are filtering properly
-	 * 
-	 * @param searchTerm
-	 * @param userId
-	 * @param socialNetwork
-	 */
-	private void testUserAndSocialNetworkFilter(String searchTerm, Long userId, ExternalNetwork socialNetwork) {
-		// test the user filter
-		List<Document> documents = searchService.searchIndexedDocuments(searchTerm, userId + 1);
-		Assert.assertTrue(documents.isEmpty());
-
-		// test the social filter
-		documents = searchService.searchIndexedDocuments(searchTerm, userId, socialNetwork);
-		Assert.assertTrue(!documents.isEmpty());
-
-		ExternalNetwork anotherNetwork = socialNetwork.ordinal() == 0 ? ExternalNetwork.values()[1] : ExternalNetwork.values()[0];
-		// pick a network that is not the passed in network
-		documents = searchService.searchIndexedDocuments(searchTerm, owner.getUserId(), anotherNetwork);
-		Assert.assertTrue(documents.isEmpty());
-		
-		
-	}
+//	/***
+//	 * Convenience method for testing if the social network and user id filters are filtering properly
+//	 * 
+//	 * @param searchTerm
+//	 * @param userId
+//	 * @param socialNetwork
+//	 */
+//	private void testUserAndSocialNetworkFilter(String searchTerm, Long userId, ExternalNetwork socialNetwork) {
+//		// test the user filter
+//		List<Document> documents = searchService.searchIndexedDocuments(searchTerm, userId + 1);
+//		Assert.assertTrue(documents.isEmpty());
+//
+//		// test the social filter
+//		documents = searchService.searchIndexedDocuments(searchTerm, userId, socialNetwork);
+//		Assert.assertTrue(!documents.isEmpty());
+//
+//		ExternalNetwork anotherNetwork = socialNetwork.ordinal() == 0 ? ExternalNetwork.values()[1] : ExternalNetwork.values()[0];
+//		// pick a network that is not the passed in network
+//		documents = searchService.searchIndexedDocuments(searchTerm, owner.getUserId(), anotherNetwork);
+//		Assert.assertTrue(documents.isEmpty());
+//		
+//		
+//	}
 
 
 
