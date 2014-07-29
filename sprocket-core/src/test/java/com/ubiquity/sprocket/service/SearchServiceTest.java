@@ -154,24 +154,26 @@ public class SearchServiceTest {
 	}
 	
 	@Test
-	public void testAddPublicActvityIsAvailableToAnyUser() {
-		// create an activity with no owner
-		Activity activity = TestActivityFactory.createActivityWithMininumRequirements(null, ExternalNetwork.LinkedIn);
-		Contact postedBy = TestContactFactory.createContactWithMininumRequiredFieldsAndSocialNetwork(owner, ExternalNetwork.LinkedIn);
+	public void testAddPublicActivityUserFilter() {
+		Activity activity = TestActivityFactory.createActivityWithMininumRequirements(null, ExternalNetwork.Facebook);
+		Contact postedBy = TestContactFactory.createContactWithMininumRequiredFieldsAndSocialNetwork(owner, ExternalNetwork.Facebook);
 		activity.setPostedBy(postedBy);
 		
-		// save 
 		searchService.indexActivities(null,
 				Arrays.asList(new Activity[] { activity }));
 		
-		// search for this user; should return public even though the user fitler is set
-		List<Document> documents = searchService.searchIndexedDocuments(activity.getTitle(), owner.getUserId());
+		// search by sender display name, making sure that only this entity shows up and it's of type "Message"
+		List<Document> documents = searchService.searchIndexedDocuments(activity.getTitle(), null, ExternalNetwork.Facebook);
 		log.debug("documents: {}", documents);
 		Assert.assertTrue(documents.size() == 1);
 		
+		documents = searchService.searchIndexedDocuments(activity.getTitle(), owner.getUserId(), ExternalNetwork.Facebook);
+		log.debug("documents: {}", documents);
+		Assert.assertTrue(documents.isEmpty());
+		
 		
 	}
-
+	
 	@Test
 	public void testDedupe() {
 		// build a video content with random strings so that it contains the same signature 
@@ -206,7 +208,11 @@ public class SearchServiceTest {
 		log.debug("documents: {}", documents);
 		Assert.assertTrue(documents.size() == 1);
 		Document result = documents.get(0);
+		
 		Assert.assertEquals(Activity.class.getSimpleName(), result.getFields().get(SearchKeys.Fields.FIELD_DATA_TYPE));
+		
+		Assert.assertEquals(activity.getTitle(), result.getFields().get(SearchKeys.Fields.FIELD_TITLE));
+		Assert.assertEquals(activity.getBody(), result.getFields().get(SearchKeys.Fields.FIELD_BODY));
 
 
 	}
@@ -234,29 +240,7 @@ public class SearchServiceTest {
 
 	}	
 
-//	/***
-//	 * Convenience method for testing if the social network and user id filters are filtering properly
-//	 * 
-//	 * @param searchTerm
-//	 * @param userId
-//	 * @param socialNetwork
-//	 */
-//	private void testUserAndSocialNetworkFilter(String searchTerm, Long userId, ExternalNetwork socialNetwork) {
-//		// test the user filter
-//		List<Document> documents = searchService.searchIndexedDocuments(searchTerm, userId + 1);
-//		Assert.assertTrue(documents.isEmpty());
-//
-//		// test the social filter
-//		documents = searchService.searchIndexedDocuments(searchTerm, userId, socialNetwork);
-//		Assert.assertTrue(!documents.isEmpty());
-//
-//		ExternalNetwork anotherNetwork = socialNetwork.ordinal() == 0 ? ExternalNetwork.values()[1] : ExternalNetwork.values()[0];
-//		// pick a network that is not the passed in network
-//		documents = searchService.searchIndexedDocuments(searchTerm, owner.getUserId(), anotherNetwork);
-//		Assert.assertTrue(documents.isEmpty());
-//		
-//		
-//	}
+
 
 
 

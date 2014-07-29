@@ -14,12 +14,14 @@ public class SearchKeys {
 		public static final String FIELD_DESCRIPTION = "description";
 		public static final String FIELD_DATA_TYPE = "data_type";
 		public static final String FIELD_BODY = "body";
+		public static final String FIELD_DATE = "date";		
 		public static final String FIELD_THUMBNAIL = "thumbnail";
 		public static final String FIELD_CATEGORY = "category";
 		public static final String FIELD_ITEM_KEY = "item_key";
 		public static final String FIELD_CONTACT_DISPLAY_NAME = "contact_display_name";
 		public static final String FIELD_CONTACT_IDENTIFIER = "contact_identifier";
 		public static final String FIELD_CONTACT_THUMBNAIL = "contact_thumbnail";
+		
 
 		public static final String FIELD_URL = "url";
 		public static final String FIELD_ACTIVITY_TYPE = "activity_type";

@@ -53,6 +53,24 @@ public class DocumentsEndpoint {
 		
 		return Response.ok().build();
 	}
+	
+	
+	@GET
+	@Path("providers/{externalNetworkId}/indexed")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response searchIndexed(@PathParam("externalNetworkId") Integer externalNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
+		DocumentsDto result = new DocumentsDto();
+
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
+		
+		List<Document> documents = ServiceFactory.getSearchService().searchIndexedDocuments(q, null, externalNetwork);
+		for(Document document : documents) {
+			result.getDocuments().add(DtoAssembler.assemble(document));
+		}
+		
+		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
+	}
+	
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/indexed")
 	@Produces(MediaType.APPLICATION_JSON)

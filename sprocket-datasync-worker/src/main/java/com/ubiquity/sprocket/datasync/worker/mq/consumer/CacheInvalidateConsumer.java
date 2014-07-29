@@ -66,8 +66,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			activity = ServiceFactory.getSocialService().findOrCreate(activity);
 
 			// index for search (this will update the index if the record exists already)
-			Long userFilterId = SearchKeys.generateOwnerId(engagedDocument.getUserId());
-			ServiceFactory.getSearchService().indexActivities(userFilterId,
+			ServiceFactory.getSearchService().indexActivities(null,
 					Arrays.asList(new Activity[] { activity }));
 		} else if(dataType.equalsIgnoreCase(VideoContent.class.getSimpleName())) {
 			// persist it or update the activity if it exists already
@@ -76,8 +75,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			videoContent = ServiceFactory.getContentService().findOrCreate(videoContent);
 
 			// index for search (this will update the index if the record exists already)
-			Long userFilterId = SearchKeys.generateOwnerId(engagedDocument.getUserId());
-			ServiceFactory.getSearchService().indexVideos(userFilterId,
+			ServiceFactory.getSearchService().indexVideos(null,
 					Arrays.asList(new VideoContent[] { videoContent }));
 		}
 
@@ -164,7 +162,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		List<VideoContent> synced = contentService.sync(identity,
 				externalNetwork);
 
-		// add videos to search results
+		// add videos to search results for this specific user
 		ServiceFactory.getSearchService().indexVideos(identity.getUser().getUserId(), synced);
 	}
 
