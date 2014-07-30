@@ -21,6 +21,7 @@ import com.ubiquity.api.exception.HttpException;
 import com.ubiquity.content.api.ContentAPI;
 import com.ubiquity.content.api.ContentAPIFactory;
 import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.external.domain.Network;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
@@ -30,6 +31,7 @@ import com.ubiquity.messaging.format.Message;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.api.linkedin.ExchangeService;
+import com.ubiquity.social.api.twitter.TwitterAPI;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.ExchangeTokenDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
@@ -87,7 +89,7 @@ public class UsersEndpoint {
 					"Autontication Failed no oAuth_token_returned", 401);
 
 		// create the identity if it does not exist; or use the existing one
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+		ServiceFactory.getExternalIdentityService()
 				.createOrUpdateExternalIdentity(user, accesstokens[0],
 						accesstokens[1], ClientPlatform.WEB,
 						ExternalNetwork.LinkedIn);
@@ -95,7 +97,46 @@ public class UsersEndpoint {
 		return Response.ok().build();
 
 	}
+	
+	/***
+	 * This method used to request Token
+	 * 
+	 * @param cookie
+	 *            InputStream
+	 * @return
+	 * @throws Exception
+	 */
+	@GET
+	@Path("/{userId}/requesttoken")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response requesttoken(@PathParam("userId") Long userId,
+			InputStream payload)
+			throws Exception {
 
+		// load user
+		ServiceFactory.getUserService().getUserById(userId);
+		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
+				IdentityDto.class, AuthenticationValidation.class);
+//		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
+//				.getClientPlatformId());
+		ExternalNetwork externalNetwork = ExternalNetwork
+				.getNetworkById(identityDto.getExternalNetworkId());
+		if(externalNetwork == ExternalNetwork.Twitter)
+		{
+			SocialAPI socialApi = SocialAPIFactory.createTwitterProvider(identityDto.getRedirectUrl());
+			TwitterAPI twitterApi = (TwitterAPI) socialApi;
+			String requestToken = twitterApi.requesttoken();
+			if (requestToken == null || requestToken.equalsIgnoreCase(""))
+				throw new HttpException(
+						"Autontication Failed no oAuth_token_returned", 401);
+			else
+				Response.ok("{\"oauthToken\":\"" + requestToken + "\"}")
+				//.entity(jsonConverter.convertToPayload(requestToken))
+				.build();
+		}
+		return Response.ok().build();
+
+	}
 	/***
 	 * This method authenticates user via native login. Thereafter users can
 	 * authenticate
@@ -253,23 +294,50 @@ public class UsersEndpoint {
 				.getClientPlatformId());
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identityDto.getExternalNetworkId());
-
+		ExternalIdentity identity = null ;
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
-		ContentAPI contentApi = ContentAPIFactory.createProvider(
-				externalNetwork, clientPlatform);
-		String accessToken = contentApi.getAccessToken(identityDto.getCode(),
-				identityDto.getRedirectUrl());
-
-		// create the identity if it does not exist; or use the existing one
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
-				.createOrUpdateExternalIdentity(user, accessToken,
-						identityDto.getSecretToken(), clientPlatform,
-						externalNetwork);
+		if(externalNetwork.network == Network.Content)
+		{
+			
+			ContentAPI contentApi = ContentAPIFactory.createProvider(
+					externalNetwork, clientPlatform);
+			String accessToken = contentApi.getAccessToken(identityDto.getCode(),
+					identityDto.getRedirectUrl());
+	
+			// create the identity if it does not exist; or use the existing one
+			identity = ServiceFactory.getExternalIdentityService()
+					.createOrUpdateExternalIdentity(user, accessToken,
+							identityDto.getSecretToken(), clientPlatform,
+							externalNetwork);
+			
+			sendActivatedMessage(user, identity, identityDto);
+		}
+		else if(externalNetwork.network == Network.Social)
+		{
+			SocialAPI socialApi = SocialAPIFactory.createProvider(
+					externalNetwork, clientPlatform);
+			ExternalIdentity externalidentity = socialApi.getAccessToken(identityDto.getOauthToken(), identityDto.getOauthVerifier());
+			
+			identity = ServiceFactory.getExternalIdentityService()
+			.createOrUpdateExternalIdentity(user,
+					externalidentity.getAccessToken(),
+					externalidentity.getSecretToken(), clientPlatform,
+					externalNetwork);
+			
+		}
 		
+
+		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto);
 
-		return Response.ok().build();
+		// send off to analytics tracker
+		//sendEventTrackedMessage(user, identity);
+
+		IdentityDto result = new IdentityDto.Builder().identifier(
+				identity.getIdentifier()).build();
+		return Response.ok().entity(jsonConverter.convertToPayload(result))
+				.build();
 
 	}
 
@@ -289,11 +357,11 @@ public class UsersEndpoint {
 		ExchangeTokenDto exchangeTokenDto = jsonConverter.convertFromPayload(payload, ExchangeTokenDto.class);
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(exchangeTokenDto.getExternalNetworkId());
 		// load user
-		User user = ServiceFactory.getUserService().getUserById(userId);
+		//User user = ServiceFactory.getUserService().getUserById(userId);
 		SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork, ClientPlatform.WEB);
 		String LongLivedAccessToken = socialApi.exchangeAccessToken(exchangeTokenDto.getAccessToken());
 		
-		return Response.ok("{\"accessToken\":\"" + LongLivedAccessToken + "\"}").build();
+		return Response.ok().entity("{\"accessToken\":\"" + LongLivedAccessToken + "\"}").build();
 	}
 	
 	private void sendActivatedMessage(User user, ExternalIdentity identity,
