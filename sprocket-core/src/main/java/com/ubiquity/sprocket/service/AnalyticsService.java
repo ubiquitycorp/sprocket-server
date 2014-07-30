@@ -1,6 +1,5 @@
 package com.ubiquity.sprocket.service;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
@@ -45,7 +44,7 @@ public class AnalyticsService {
 	 * @return
 	 */
 	public List<Activity> getRecommendedActivities(Long userId) {
-		return activityRepository.findAllWithoutOwner();
+		return activityRepository.findAllWithoutOwner(2);
 	}
 	
 	/***
@@ -55,9 +54,7 @@ public class AnalyticsService {
 	 * @return
 	 */
 	public List<VideoContent> getRecommendedVideos(Long userId) {
-		List<VideoContent> videos = new LinkedList<VideoContent>();
-		
-		return videos;
+		return videoContentRepository.findAllWithoutOwner(2);
 	}
 	
 	
