@@ -113,6 +113,9 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 			i++;
 		}
 	
+		for(String argument : filters) {
+			log.debug("solr filter arg: {}", argument);
+		}
 		return filters;
 	}
 
