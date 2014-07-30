@@ -59,6 +59,9 @@ public class IdentityDto {
 	private String oauthToken;
 	
 	@Size(min = 10, max = 255, groups = AuthorizationValidation.class)
+	private String oauthTokenSecret;
+	
+	@Size(min = 10, max = 255, groups = AuthorizationValidation.class)
 	private String oauthVerifier;
 	
 	public String getUsername() {
@@ -104,6 +107,10 @@ public class IdentityDto {
 	
 	public String getOauthToken() {
 		return oauthToken;
+	}
+	
+	public String getOauthTokenSecret() {
+		return oauthTokenSecret;
 	}
 
 	public String getOauthVerifier() {

@@ -13,6 +13,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang.NotImplementedException;
+import org.scribe.model.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +108,7 @@ public class UsersEndpoint {
 	 * @return
 	 * @throws Exception
 	 */
-	@GET
+	@POST
 	@Path("/{userId}/requesttoken")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response requesttoken(@PathParam("userId") Long userId,
@@ -116,7 +118,7 @@ public class UsersEndpoint {
 		// load user
 		ServiceFactory.getUserService().getUserById(userId);
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
-				IdentityDto.class, AuthenticationValidation.class);
+				IdentityDto.class, AuthorizationValidation.class);
 //		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
 //				.getClientPlatformId());
 		ExternalNetwork externalNetwork = ExternalNetwork
@@ -125,16 +127,16 @@ public class UsersEndpoint {
 		{
 			SocialAPI socialApi = SocialAPIFactory.createTwitterProvider(identityDto.getRedirectUrl());
 			TwitterAPI twitterApi = (TwitterAPI) socialApi;
-			String requestToken = twitterApi.requesttoken();
-			if (requestToken == null || requestToken.equalsIgnoreCase(""))
+			Token requestToken = twitterApi.requesttoken();
+			if (requestToken == null || requestToken.getToken().equalsIgnoreCase(""))
 				throw new HttpException(
 						"Autontication Failed no oAuth_token_returned", 401);
 			else
-				Response.ok("{\"oauthToken\":\"" + requestToken + "\"}")
+				return Response.ok().entity("{\"oauthToken\":\"" + requestToken.getToken() + "\",\"oauthTokenSecret\":\"" + requestToken.getSecret() + "\"}")
 				//.entity(jsonConverter.convertToPayload(requestToken))
 				.build();
 		}
-		return Response.ok().build();
+		throw new NotImplementedException("ExternalNetwork is not supported");
 
 	}
 	/***
@@ -317,7 +319,7 @@ public class UsersEndpoint {
 		{
 			SocialAPI socialApi = SocialAPIFactory.createProvider(
 					externalNetwork, clientPlatform);
-			ExternalIdentity externalidentity = socialApi.getAccessToken(identityDto.getOauthToken(), identityDto.getOauthVerifier());
+			ExternalIdentity externalidentity = socialApi.getAccessToken(identityDto.getOauthToken(), identityDto.getOauthVerifier() ,identityDto.getOauthTokenSecret());
 			
 			identity = ServiceFactory.getExternalIdentityService()
 			.createOrUpdateExternalIdentity(user,
