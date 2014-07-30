@@ -182,7 +182,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-identity-test</artifactId>
-			<version>0.1.1</version>
+			<version>0.1.2</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 			<optional>false</optional>
