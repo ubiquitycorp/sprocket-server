@@ -17,6 +17,7 @@ import com.ubiquity.external.domain.Network;
 import com.ubiquity.external.service.ExternalIdentityService;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.media.domain.Image;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Activity;
@@ -103,10 +104,13 @@ public class SearchService {
 			String id = SearchKeys.generateDocumentKeyForId(userFilterId, activity.getActivityId(), dataType);
 			document.getFields().put(SearchKeys.Fields.FIELD_ID, id); 
 
-			// contact
+			// contact, add image if we have one
 			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_DISPLAY_NAME, activity.getPostedBy().getDisplayName());
 			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_IDENTIFIER, activity.getPostedBy().getExternalIdentity().getIdentifier());
-
+			Image thumb = activity.getPostedBy().getImage();
+			if(thumb != null)
+				document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_THUMBNAIL, activity.getPostedBy().getImage().getUrl());
+			
 			// content fields
 			document.getFields().put(SearchKeys.Fields.FIELD_BODY, activity.getBody());
 			document.getFields().put(SearchKeys.Fields.FIELD_TITLE, activity.getTitle());
@@ -127,6 +131,7 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_ACTIVITY_TYPE, activity.getActivityType().toString());
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Activity.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, activity.getExternalNetwork().ordinal());
+			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_IDENTIFIER, activity.getExternalIdentifier());
 			document.getFields().put(SearchKeys.Fields.FIELD_DATE, activity.getCreationDate());
 
 			

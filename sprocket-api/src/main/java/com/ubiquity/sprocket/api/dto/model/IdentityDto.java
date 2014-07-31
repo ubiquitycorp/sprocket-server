@@ -54,7 +54,16 @@ public class IdentityDto {
 
 	@Size(min = 10, max = 255, groups = AuthorizationValidation.class)
 	private String redirectUrl;
-
+	
+	@Size(min = 10, max = 255, groups = AuthorizationValidation.class)
+	private String oauthToken;
+	
+	@Size(min = 10, max = 255, groups = AuthorizationValidation.class)
+	private String oauthTokenSecret;
+	
+	@Size(min = 10, max = 255, groups = AuthorizationValidation.class)
+	private String oauthVerifier;
+	
 	public String getUsername() {
 		return username;
 	}
@@ -94,6 +103,20 @@ public class IdentityDto {
 	public String getRedirectUrl() {
 		return redirectUrl;
 	}
+	
+	
+	public String getOauthToken() {
+		return oauthToken;
+	}
+	
+	public String getOauthTokenSecret() {
+		return oauthTokenSecret;
+	}
+
+	public String getOauthVerifier() {
+		return oauthVerifier;
+	}
+
 
 	public static class Builder {
 		private String username;

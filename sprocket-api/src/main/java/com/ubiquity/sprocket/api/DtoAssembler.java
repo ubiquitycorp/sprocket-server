@@ -130,7 +130,7 @@ public class DtoAssembler {
 							(Integer) fields
 									.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
 					.body((String) fields.get(SearchKeys.Fields.FIELD_BODY))
-					.sender(assemble(fields)).build();
+					.sender(assembleContactDtoFromDocumentFields(fields)).build();
 
 		} else if (dataType.equals(Activity.class.getSimpleName())) {
 			// if we have an object, build from the entity data
@@ -143,8 +143,11 @@ public class DtoAssembler {
 						.title((String) fields
 								.get(SearchKeys.Fields.FIELD_TITLE))
 						.body((String) fields.get(SearchKeys.Fields.FIELD_BODY))
+						.externalIdentifier((String)fields.get(SearchKeys.Fields.FIELD_EXTERNAL_IDENTIFIER))
+						.externalNetworkId((Integer)fields.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
 						.date((Long) fields.get(SearchKeys.Fields.FIELD_DATE));
 
+				// add in content based on type
 				String activityType = (String) fields
 						.get(SearchKeys.Fields.FIELD_ACTIVITY_TYPE);
 				builder.type(activityType.toLowerCase());
@@ -167,6 +170,9 @@ public class DtoAssembler {
 							.get(SearchKeys.Fields.FIELD_THUMBNAIL)));
 				}
 
+				// now do the contact
+				builder.postedBy(assembleContactDtoFromDocumentFields(fields));
+				
 				data = builder.build();
 			}
 
@@ -180,7 +186,7 @@ public class DtoAssembler {
 		return documentDto;
 	}
 
-	private static ContactDto assemble(Map<String, Object> fields) {
+	private static ContactDto assembleContactDtoFromDocumentFields(Map<String, Object> fields) {
 		return new ContactDto.Builder()
 				.displayName(
 						(String) fields
@@ -194,7 +200,7 @@ public class DtoAssembler {
 										(String) fields
 												.get(SearchKeys.Fields.FIELD_CONTACT_IDENTIFIER))
 								.build())
-				.imageUrl(SearchKeys.Fields.FIELD_CONTACT_THUMBNAIL).build();
+				.imageUrl((String)fields.get(SearchKeys.Fields.FIELD_CONTACT_THUMBNAIL)).build();
 
 	}
 
