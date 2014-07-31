@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.redis.JedisConnectionFactory;
-import com.ubiquity.content.api.ContentAPIFactory;
 import com.ubiquity.content.api.VimeoAPITest;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
@@ -52,8 +51,8 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		.build();
 		
 		identity = new ExternalIdentity.Builder()
-				.accessToken("2576165924-pD3gk25Aowaa3xOzSOrfoqgBtQx1w2eIkvf10lq")
-				.secretToken("Ba1okul75SDQ4vrKCKqqz9HIsLP76gdM8280ONSVU9sSs")
+				.accessToken("2607216073-MlFGdYpMjqf2qVMvSgyy70cpFs7H7HcNMZl4vra")
+				.secretToken("r6iepYY8QjvqpWNUEHiy0YrlpSPPoLpLiM9zuIe2l6xPv")
 				.identifier("2576165924")
 				.user(user)
 				.build();
