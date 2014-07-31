@@ -23,7 +23,7 @@
 		<properties>
 
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
-			<property name="hibernate.connection.url" value="jdbc:mysql://${db.host}:3306/sprocket" />
+			<property name="hibernate.connection.url" value="jdbc:mysql://${db.host}:3306/sprocket?autoReconnect=true" />
 			<property name="hibernate.connection.username" value="${db.username}" />
 			<property name="hibernate.connection.password" value="${db.password}" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
