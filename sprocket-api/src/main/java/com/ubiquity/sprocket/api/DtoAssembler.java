@@ -143,7 +143,7 @@ public class DtoAssembler {
 						.title((String) fields
 								.get(SearchKeys.Fields.FIELD_TITLE))
 						.body((String) fields.get(SearchKeys.Fields.FIELD_BODY))
-						.externalIdentifier((String)SearchKeys.Fields.FIELD_EXTERNAL_IDENTIFIER)
+						.externalIdentifier((String)fields.get(SearchKeys.Fields.FIELD_EXTERNAL_IDENTIFIER))
 						.externalNetworkId((Integer)fields.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
 						.date((Long) fields.get(SearchKeys.Fields.FIELD_DATE));
 
@@ -200,7 +200,7 @@ public class DtoAssembler {
 										(String) fields
 												.get(SearchKeys.Fields.FIELD_CONTACT_IDENTIFIER))
 								.build())
-				.imageUrl(SearchKeys.Fields.FIELD_CONTACT_THUMBNAIL).build();
+				.imageUrl((String)fields.get(SearchKeys.Fields.FIELD_CONTACT_THUMBNAIL)).build();
 
 	}
 
