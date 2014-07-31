@@ -312,8 +312,6 @@ public class UsersEndpoint {
 					.createOrUpdateExternalIdentity(user, accessToken,
 							identityDto.getSecretToken(), clientPlatform,
 							externalNetwork);
-			
-			sendActivatedMessage(user, identity, identityDto);
 		}
 		else if(externalNetwork.network == Network.Social)
 		{
