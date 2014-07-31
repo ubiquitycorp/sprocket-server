@@ -91,7 +91,7 @@ public class UsersEndpoint {
 					"Autontication Failed no oAuth_token_returned", 401);
 
 		// create the identity if it does not exist; or use the existing one
-		ServiceFactory.getExternalIdentityService()
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.createOrUpdateExternalIdentity(user, accesstokens[0],
 						accesstokens[1], ClientPlatform.WEB,
 						ExternalNetwork.LinkedIn);
