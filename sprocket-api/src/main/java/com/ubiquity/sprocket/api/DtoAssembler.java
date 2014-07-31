@@ -106,9 +106,10 @@ public class DtoAssembler {
 				VideoContent videoContent = (VideoContent) document.getData();
 				data = assemble(videoContent);
 			} else {
-
+				
 				data = new VideoDto.Builder()
-						.externalNetworkId(ExternalNetwork.YouTube.ordinal())
+						.externalNetworkId((Integer)fields
+								.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
 						.itemKey(
 								(String) fields
 										.get(SearchKeys.Fields.FIELD_ITEM_KEY))
