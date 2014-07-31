@@ -115,8 +115,9 @@ public class SearchService {
 			// if it's a video, set the url and thumbnail to the video url and image respectively
 			if(type == ActivityType.VIDEO) {
 				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getVideo().getUrl());
+				// use image as thumb
 				if(activity.getImage() != null)
-					document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getVideo().getUrl());
+					document.getFields().put(SearchKeys.Fields.FIELD_THUMBNAIL, activity.getImage().getUrl());
 			} else if(type == ActivityType.PHOTO) {
 				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getImage().getUrl());
 			} else if(type == ActivityType.LINK) {
@@ -126,6 +127,7 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_ACTIVITY_TYPE, activity.getActivityType().toString());
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Activity.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, activity.getExternalNetwork().ordinal());
+			document.getFields().put(SearchKeys.Fields.FIELD_DATE, activity.getCreationDate());
 
 			
 			documents.add(document);
@@ -266,10 +268,11 @@ public class SearchService {
 
 		// filters
 		Map<String, Object> filters = new HashMap<String, Object>();
+
 		
+		filters.put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, externalNetwork.ordinal());
 		Long ownerId = SearchKeys.generateOwnerId(userIdFilter);
 		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId);
-		filters.put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, externalNetwork.ordinal());
 		
 		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
 
@@ -292,6 +295,8 @@ public class SearchService {
 		
 		Long ownerId = SearchKeys.generateOwnerId(userIdFilter);
 		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId);
+
+
 		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
 	}
 

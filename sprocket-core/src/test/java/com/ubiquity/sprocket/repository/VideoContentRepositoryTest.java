@@ -1,4 +1,4 @@
-package com.ubiquity.identity.repository;
+package com.ubiquity.sprocket.repository;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +15,8 @@ import com.ubiquity.content.repository.VideoContentRepositoryJpaImpl;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
+import com.ubiquity.identity.repository.UserRepository;
+import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
 import com.ubiquity.integration.factory.TestVideoContentFactory;
 
 /***

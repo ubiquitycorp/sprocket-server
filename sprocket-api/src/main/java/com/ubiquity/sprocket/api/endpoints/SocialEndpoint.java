@@ -23,7 +23,6 @@ import com.niobium.repository.CollectionVariant;
 import com.ubiquity.api.exception.HttpException;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
-import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.api.exception.AuthorizationException;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
