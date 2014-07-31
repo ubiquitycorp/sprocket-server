@@ -2,9 +2,7 @@ package com.ubiquity.sprocket.api.dto.model;
 
 import javax.validation.constraints.NotNull;
 
-import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
-import com.ubiquity.sprocket.api.validation.RegistrationValidation;
 
 /***
  * Dto representing an activity (i.e. a post, news feed item)
