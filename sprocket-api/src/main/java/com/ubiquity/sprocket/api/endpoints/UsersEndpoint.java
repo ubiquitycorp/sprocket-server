@@ -95,8 +95,12 @@ public class UsersEndpoint {
 				.createOrUpdateExternalIdentity(user, accesstokens[0],
 						accesstokens[1], ClientPlatform.WEB,
 						ExternalNetwork.LinkedIn);
-
-		return Response.ok().build();
+		
+		IdentityDto result = new IdentityDto.Builder().identifier(
+				identity.getIdentifier()).build();
+		
+		return Response.ok().entity(jsonConverter.convertToPayload(result))
+				.build();
 
 	}
 	
