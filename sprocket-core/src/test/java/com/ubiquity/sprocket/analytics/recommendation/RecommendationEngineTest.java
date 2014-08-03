@@ -1,7 +1,5 @@
 package com.ubiquity.sprocket.analytics.recommendation;
 
-import java.util.Arrays;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang3.Range;
@@ -23,15 +21,11 @@ public class RecommendationEngineTest {
 	private RecommendationEngine engine;
 	
 	private Logger log = LoggerFactory.getLogger(getClass());
-	
-	private User male;
-	
+		
 	@Before
 	public void setUp() throws Exception {
 		Configuration config = new PropertiesConfiguration("test.properties");
-		engine = new RecommendationEngineSparkImpl(config);
-		male = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-		
+		engine = new RecommendationEngineSparkImpl(config);		
 		// add gender as a dimension
 		engine.addDimension(createFromEnum("gender", Gender.class));
 	}
