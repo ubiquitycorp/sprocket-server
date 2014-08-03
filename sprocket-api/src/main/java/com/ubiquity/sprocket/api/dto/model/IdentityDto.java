@@ -6,6 +6,7 @@ import javax.validation.constraints.Size;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.AuthorizationValidation;
+import com.ubiquity.sprocket.api.validation.EngagementValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
 
 /***
@@ -39,12 +40,13 @@ public class IdentityDto {
 	@Size(min = 10, max = 255, groups = ActivationValidation.class)
 	private String accessToken;
 
-	@NotNull(groups = {ActivationValidation.class, AuthorizationValidation.class})
+	@NotNull(groups = {ActivationValidation.class, AuthorizationValidation.class, EngagementValidation.class})
 	private Integer externalNetworkId;
 
 	@Size(min = 10, max = 255, groups = ActivationValidation.class)
 	private String secretToken;
 
+	@NotNull(groups = { EngagementValidation.class })
 	private String identifier;
 	
 	@NotNull(groups = AuthorizationValidation.class)
@@ -52,7 +54,16 @@ public class IdentityDto {
 
 	@Size(min = 10, max = 255, groups = AuthorizationValidation.class)
 	private String redirectUrl;
-
+	
+	@Size(min = 10, max = 255, groups = AuthorizationValidation.class)
+	private String oauthToken;
+	
+	@Size(min = 10, max = 255, groups = AuthorizationValidation.class)
+	private String oauthTokenSecret;
+	
+	@Size(min = 10, max = 255, groups = AuthorizationValidation.class)
+	private String oauthVerifier;
+	
 	public String getUsername() {
 		return username;
 	}
@@ -92,6 +103,20 @@ public class IdentityDto {
 	public String getRedirectUrl() {
 		return redirectUrl;
 	}
+	
+	
+	public String getOauthToken() {
+		return oauthToken;
+	}
+	
+	public String getOauthTokenSecret() {
+		return oauthTokenSecret;
+	}
+
+	public String getOauthVerifier() {
+		return oauthVerifier;
+	}
+
 
 	public static class Builder {
 		private String username;

@@ -1,14 +1,28 @@
 package com.ubiquity.sprocket.api.dto.model;
 
+import javax.validation.constraints.NotNull;
+
 public class VideoDto {
 
 	private String url;
 	private String itemKey;
+	
+	/***
+	 * Constraints applied when this DTO is used to carry an input payload; these 3 properties are needed to determine
+	 * if a record has already been persisted
+	 */
+	@NotNull
 	private Integer externalNetworkId;
-	private Long lastUpdated;
+	
+	@NotNull
 	private String title;
+	
+	@NotNull
 	private String description;
+	
 	private String category;
+	
+	private Long lastUpdated;
 	private ImageDto thumb;
 
 	public ImageDto getThumb() {

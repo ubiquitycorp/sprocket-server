@@ -7,12 +7,8 @@ import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
-import com.ubiquity.sprocket.domain.Event;
-import com.ubiquity.sprocket.domain.EventType;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
-import com.ubiquity.sprocket.messaging.definition.EventTracked;
-import com.ubiquity.sprocket.service.AnalyticsService;
-import com.ubiquity.sprocket.service.ServiceFactory;
+import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
 
 /***
  * Consumer will consume messages from the event tracking queue and store them into the event data store
@@ -38,8 +34,8 @@ public class TrackConsumer extends AbstractConsumerThread {
 		try {
 			Message message = messageConverter.deserialize(msg, Message.class);
 			log.debug("message received: {}", message);
-			if(message.getType().equals(EventTracked.class.getSimpleName()))
-				process((EventTracked)message.getContent());
+			if(message.getType().equals(UserEngagedActivity.class.getSimpleName()))
+				process((UserEngagedActivity)message.getContent());
 			
 		} catch (Exception e) {
 			// For now, log an error and exit until we know all the circumstances under which this can happen
@@ -48,13 +44,8 @@ public class TrackConsumer extends AbstractConsumerThread {
 		}
 	}
 
-	private void process(EventTracked messageContent) {		
-		// get event from message and convert to domain entity
-		Event event = new Event(EventType.values()[messageContent.getEventTypeId()]);
-		event.getProperties().putAll(messageContent.getProperties());
+	private void process(UserEngagedActivity messageContent) {		
 		
-		AnalyticsService tracker = ServiceFactory.getAnalyticsService();
-		tracker.track(event);
 	} 
 	
 }

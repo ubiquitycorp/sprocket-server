@@ -1,9 +1,11 @@
 package com.ubiquity.sprocket.messaging;
 
 import com.ubiquity.messaging.MessageConverter;
-import com.ubiquity.sprocket.messaging.definition.EventTracked;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.messaging.definition.UserAuthenticated;
+import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
+import com.ubiquity.sprocket.messaging.definition.UserEngagedDocument;
+import com.ubiquity.sprocket.messaging.definition.UserEngagedVideo;
 import com.ubiquity.sprocket.messaging.definition.UserRegistered;
 
 public class MessageConverterFactory {
@@ -16,7 +18,9 @@ public class MessageConverterFactory {
 				.registerMessageType(ExternalIdentityActivated.class)
 				.registerMessageType(UserAuthenticated.class)
 				.registerMessageType(UserRegistered.class)
-				.registerMessageType(EventTracked.class)
+				.registerMessageType(UserEngagedActivity.class)
+				.registerMessageType(UserEngagedDocument.class)
+				.registerMessageType(UserEngagedVideo.class)
 				.build();
 		}
 		return converter;

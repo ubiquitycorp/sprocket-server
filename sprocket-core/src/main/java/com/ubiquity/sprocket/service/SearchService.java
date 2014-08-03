@@ -9,17 +9,20 @@ import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.niobium.repository.utils.Page;
+import com.ubiquity.content.api.ContentAPI;
+import com.ubiquity.content.api.ContentAPIFactory;
 import com.ubiquity.content.domain.VideoContent;
-import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.external.domain.Network;
+import com.ubiquity.external.service.ExternalIdentityService;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.media.domain.Image;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Activity;
+import com.ubiquity.social.domain.ActivityType;
 import com.ubiquity.social.domain.Message;
-import com.ubiquity.external.service.ExternalIdentityService;
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchEngine;
 import com.ubiquity.sprocket.search.SearchKeys;
@@ -37,19 +40,19 @@ public class SearchService {
 	
 	private SearchEngine searchEngine;
 	
-	private Integer resultsLimit;
-	private Integer pageLimit;
+	private Integer resultsLimit, pageLimit;
 	
 	public SearchService(Configuration config) {
 		log.debug("Using solr api path: {}", config.getProperty("solr.api.path"));
 		resultsLimit = config.getInt("rules.search.results.limit");
-		pageLimit = config.getInt("rules.search.results.page.limit");
-				
+		pageLimit = config.getInt("rules.search.page.limit");
 		searchEngine = new SearchEngineSolrjImpl(config);
 	}
 
+	
 	/***
-	 * Adds a list of message entities to the search index for the owner of the message
+	 * Adds a list of message entities to the search index for the owner of the message; this method automatically
+	 * sets a user filter since all direct messages are private
 	 * 
 	 * @param messages
 	 */
@@ -62,15 +65,17 @@ public class SearchService {
 
 			Document document = new Document(Message.class.getName());
 
-			document.getFields().put(SearchKeys.Fields.FIELD_SENDER, message.getSender().getDisplayName());
+			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_DISPLAY_NAME, message.getSender().getDisplayName());
+			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_IDENTIFIER, message.getSender().getExternalIdentity().getIdentifier());
+
+			document.getFields().put(SearchKeys.Fields.FIELD_OWNER_ID, message.getOwner().getUserId());
+
 			document.getFields().put(SearchKeys.Fields.FIELD_BODY, message.getBody());
 			document.getFields().put(SearchKeys.Fields.FIELD_TITLE, message.getTitle());
 
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Message.class.getSimpleName());
-			document.getFields().put(SearchKeys.Fields.FIELD_USER_ID, message.getOwner().getUserId());
-			document.getFields().put(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID, message.getExternalNetwork().ordinal());
+			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, message.getExternalNetwork().ordinal());
 			document.getFields().put(SearchKeys.Fields.FIELD_ID, message.getMessageId());
-
 
 			documents.add(document);
 		}
@@ -79,24 +84,57 @@ public class SearchService {
 	}
 
 	/***
-	 * Adds a list of activity entities to the search index for the owner of the activity
-	 * 
-	 * @param messages
+	 * Adds a list of activity entities to the search index with a user filter
+     *
+	 * @param userFilterId
+	 * @param activities
 	 */
-	public void indexActivities(List<Activity> activities) {
+	public void indexActivities(Long userFilterId, List<Activity> activities) {
 		List<Document> documents = new LinkedList<Document>();
 		for(Activity activity : activities) {
 
-			Document document = new Document(Activity.class.getName());
+			String dataType = Activity.class.getName();
+			Document document = new Document(dataType);
+			
+			Long ownerId = SearchKeys.generateOwnerId(userFilterId);
+			document.getFields().put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId); 
 
-			document.getFields().put(SearchKeys.Fields.FIELD_POSTED_BY, activity.getPostedBy().getDisplayName());
+		
+			// create identifier from the user filter (or default), the pk of the entity, and the data type
+			String id = SearchKeys.generateDocumentKeyForId(userFilterId, activity.getActivityId(), dataType);
+			document.getFields().put(SearchKeys.Fields.FIELD_ID, id); 
+
+			// contact, add image if we have one
+			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_DISPLAY_NAME, activity.getPostedBy().getDisplayName());
+			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_IDENTIFIER, activity.getPostedBy().getExternalIdentity().getIdentifier());
+			Image thumb = activity.getPostedBy().getImage();
+			if(thumb != null)
+				document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_THUMBNAIL, activity.getPostedBy().getImage().getUrl());
+			
+			// content fields
 			document.getFields().put(SearchKeys.Fields.FIELD_BODY, activity.getBody());
 			document.getFields().put(SearchKeys.Fields.FIELD_TITLE, activity.getTitle());
-			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Activity.class.getSimpleName());
-			document.getFields().put(SearchKeys.Fields.FIELD_USER_ID, activity.getOwner().getUserId());
-			document.getFields().put(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID, activity.getExternalNetwork().ordinal());
-			document.getFields().put(SearchKeys.Fields.FIELD_ID, activity.getActivityId()); 
+			
+			ActivityType type = activity.getActivityType();
+			// if it's a video, set the url and thumbnail to the video url and image respectively
+			if(type == ActivityType.VIDEO) {
+				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getVideo().getUrl());
+				// use image as thumb
+				if(activity.getImage() != null)
+					document.getFields().put(SearchKeys.Fields.FIELD_THUMBNAIL, activity.getImage().getUrl());
+			} else if(type == ActivityType.PHOTO) {
+				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getImage().getUrl());
+			} else if(type == ActivityType.LINK) {
+				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getLink());
+			}
 
+			document.getFields().put(SearchKeys.Fields.FIELD_ACTIVITY_TYPE, activity.getActivityType().toString());
+			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Activity.class.getSimpleName());
+			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, activity.getExternalNetwork().ordinal());
+			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_IDENTIFIER, activity.getExternalIdentifier());
+			document.getFields().put(SearchKeys.Fields.FIELD_DATE, activity.getCreationDate());
+
+			
 			documents.add(document);
 		}
 
@@ -104,17 +142,26 @@ public class SearchService {
 	}
 
 	/***
-	 * Adds a list of video entities to the search index for this user
+	 * Adds a list of video entities to the search index for this user with an optional user filter
 	 * 
 	 * @param videos
 	 * @param userId
 	 */
-	public void indexVideos(List<VideoContent> videos, Long userId) {
+	public void indexVideos(Long userId, List<VideoContent> videos) {
 
 		List<Document> documents = new LinkedList<Document>();
 		for(VideoContent videoContent : videos) {
 
-			Document document = new Document(VideoContent.class.getSimpleName());
+			String dataType = VideoContent.class.getSimpleName();
+			Document document = new Document(dataType);
+
+			// create identifier from the user filter (or default), the pk of the entity, and the data type
+			String id = SearchKeys.generateDocumentKeyForId(userId, videoContent.getVideoContentId(), dataType);
+			document.getFields().put(SearchKeys.Fields.FIELD_ID, id);
+			
+			Long ownerId = SearchKeys.generateOwnerId(userId);
+			document.getFields().put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId);
+
 
 			document.getFields().put(SearchKeys.Fields.FIELD_TITLE, videoContent.getTitle());
 			document.getFields().put(SearchKeys.Fields.FIELD_DESCRIPTION, videoContent.getDescription());
@@ -126,8 +173,8 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_ITEM_KEY, videoContent.getVideo().getItemKey());
 
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, VideoContent.class.getSimpleName());
-			document.getFields().put(SearchKeys.Fields.FIELD_USER_ID, userId);
-			document.getFields().put(SearchKeys.Fields.FIELD_ID, videoContent.getTitle().hashCode());
+			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, videoContent.getExternalNetwork().ordinal());
+
 
 			documents.add(document);
 		}
@@ -162,63 +209,99 @@ public class SearchService {
 	 * @param externalNetwork
 	 * @return
 	 */
-	public List<Document> searchLiveActivities(String searchTerm, User user, ExternalNetwork externalNetwork, ClientPlatform clientPlatform, Integer page) {
+	public List<Document> searchLiveDocuments(String searchTerm, User user, ExternalNetwork externalNetwork, Integer page) {
 
-		List<Document> documents = new LinkedList<Document>();
-		
+		// normalize page
+		page = page == null ? 1 : page;
+			
+		// first check page limit
+		if(page > pageLimit)
+			throw new IllegalArgumentException("Page limit reached");
+			
+		List<Document> documents;
 		// get the identity and social network
 		ExternalIdentity identity = ExternalIdentityService.getAssociatedExternalIdentity(user, externalNetwork);
-		SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
 		
-		// calculate offset with page utility based on page limits
-		int offset = Page.calculateOffsetFromPage(page, resultsLimit, pageLimit);
-		List<Activity> activities = socialAPI.searchActivities(identity, searchTerm, resultsLimit, offset);
-		
-		// now wrap them in a search document
-		int rank = 0;
-		for(Activity activity : activities) {
-			Document document = new Document(activity.getClass().getSimpleName(), activity, rank);
-			rank++;
-			documents.add(document);
+		// if it's social, search activities only
+		if(externalNetwork.getNetwork() == Network.Social) {
+			SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, identity.getClientPlatform());
+			// calculate offset with page utility based on page limits
+			List<Activity> activities = socialAPI.searchActivities(searchTerm, page, resultsLimit, identity);
+			documents = wrapEntitiesInDocuments(activities);
+			
+		} else {
+			// if content, search videos
+			ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, identity.getClientPlatform());
+			List<VideoContent> videoContent = contentAPI.searchVideos(searchTerm, page, resultsLimit, identity);
+			
+			documents = wrapEntitiesInDocuments(videoContent);
 		}
-		
-		log.debug("documents {}", documents);
 
 		return documents;
 		
 	}
 	
 	/***
+	 * Wrap entities in documents
+	 * 
+	 * @param entities
+	 * @return
+	 */
+	private <T> List<Document> wrapEntitiesInDocuments(List<T> entities) {
+		List<Document> documents = new LinkedList<Document>();
+
+		int rank = 0;
+		for(T entity : entities) {
+			Document document = new Document(entity.getClass().getSimpleName(), entity, rank);
+			rank++;
+			documents.add(document);
+		}
+			
+		return documents;
+	}
+	
+	
+	/***
 	 * Searches documents for a social network
 	 * 
 	 * @param searchTerm
-	 * @param userId
+	 * @param userIdFilter
 	 * @param socialNetwork
 	 * @return
 	 */
-	public List<Document> searchIndexedDocuments(String searchTerm, Long userId, ExternalNetwork socialNetwork) {
+	public List<Document> searchIndexedDocuments(String searchTerm, Long userIdFilter, ExternalNetwork externalNetwork) {
 
 		// filters
 		Map<String, Object> filters = new HashMap<String, Object>();
-		filters.put(SearchKeys.Fields.FIELD_USER_ID, userId);
-		filters.put(SearchKeys.Fields.FIELD_SOCIAL_NETWORK_ID, socialNetwork.ordinal());
+
+		
+		filters.put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, externalNetwork.ordinal());
+		Long ownerId = SearchKeys.generateOwnerId(userIdFilter);
+		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId);
 		
 		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
 
 	}
+	
+	
+	
 
 	/***
 	 * Searches documents by a search term and user id across all social networks and content providers
 	 * 
 	 * @param searchTerm
-	 * @param userId
+	 * @param userIdFilter
 	 * @return
 	 */
-	public List<Document> searchIndexedDocuments(String searchTerm, Long userId) {
+	public List<Document> searchIndexedDocuments(String searchTerm, Long userIdFilter) {
 
 		// filters
 		Map<String, Object> filters = new HashMap<String, Object>();
-		filters.put(SearchKeys.Fields.FIELD_USER_ID, userId);
+		
+		Long ownerId = SearchKeys.generateOwnerId(userIdFilter);
+		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId);
+
+
 		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
 	}
 
@@ -235,8 +318,7 @@ public class SearchService {
 				SearchKeys.Fields.FIELD_TITLE,
 				SearchKeys.Fields.FIELD_DESCRIPTION,
 				SearchKeys.Fields.FIELD_BODY,
-				SearchKeys.Fields.FIELD_SENDER,
-				SearchKeys.Fields.FIELD_POSTED_BY,
+				SearchKeys.Fields.FIELD_CONTACT_DISPLAY_NAME,
 				SearchKeys.Fields.FIELD_CATEGORY
 		};
 	}

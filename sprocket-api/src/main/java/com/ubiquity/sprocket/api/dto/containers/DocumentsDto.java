@@ -14,14 +14,8 @@ public class DocumentsDto {
 	
 	private List<DocumentDto> documents = new LinkedList<DocumentDto>();
 
-	private PaginationDto pagination = new PaginationDto();
-	
 	public List<DocumentDto> getDocuments() {
 		return documents;
-	}
-
-	public PaginationDto getPagination() {
-		return pagination;
 	}	
 
 }

@@ -1,17 +1,51 @@
 package com.ubiquity.sprocket.api.dto.model;
 
+import javax.validation.constraints.NotNull;
+
+import com.ubiquity.sprocket.api.validation.EngagementValidation;
+
+/***
+ * Dto representing an activity (i.e. a post, news feed item)
+ * 
+ * @author chris
+ *
+ */
 public class ActivityDto {
+
+	private Long activityId;
+	
+	/***
+	 * Constraints applied when this DTO is used to carry an input payload; these 3 properties are needed to determine
+	 * if a record has already been persisted
+	 */
+	@NotNull(groups = { EngagementValidation.class })
+	private Integer externalNetworkId;
+	
+	@NotNull(groups = { EngagementValidation.class })
+	private String type;
+	
+	@NotNull(groups = { EngagementValidation.class })
+	private String externalIdentifier;
 
 	private String title;
 	private String body;
 	private Long date;
+	
+	@NotNull(groups = { EngagementValidation.class })
 	private ContactDto postedBy;
+	
 	private ImageDto photo;
 	private VideoDto video;
-	private Integer externalNetworkId;
-	private String type;
+	
 	private String link;
-	private String externalIdentifier;
+
+	public Long getActivityId() {
+		return activityId;
+	}
+
+	public Integer getExternalNetworkId() {
+		return externalNetworkId;
+	}
 
 	public String getLink() {
 		return link;
@@ -133,4 +167,16 @@ public class ActivityDto {
 		this.link = builder.link;
 		this.externalIdentifier = builder.externalIdentifier;
 	}
+
+	@Override
+	public String toString() {
+		return "ActivityDto [activityId=" + activityId + ", title=" + title
+				+ ", body=" + body + ", date=" + date + ", postedBy="
+				+ postedBy + ", photo=" + photo + ", video=" + video
+				+ ", externalNetworkId=" + externalNetworkId + ", type=" + type
+				+ ", link=" + link + ", externalIdentifier="
+				+ externalIdentifier + "]";
+	}
+	
+	
 }

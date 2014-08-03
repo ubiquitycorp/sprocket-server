@@ -20,10 +20,11 @@ public class SprocketApplication extends Application {
 	  public SprocketApplication() {
 		  
 	    singletons.add(new DocumentsEndpoint());
-	    singletons.add(new AnalyticsEndpoint());
 	    singletons.add(new SocialEndpoint());
 	    singletons.add(new UsersEndpoint());
 	    singletons.add(new ContentEndpoint());
+	    singletons.add(new AnalyticsEndpoint());
+
 	  }
 
 	  @Override

@@ -1,5 +1,6 @@
 package com.ubiquity.sprocket.api.endpoints;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -19,30 +20,46 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
-import com.ubiquity.api.exception.HttpException;
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
-import com.ubiquity.social.api.exception.AuthorizationException;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.PostActivity;
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
+import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 import com.ubiquity.sprocket.api.dto.model.SendMessageDto;
+import com.ubiquity.sprocket.messaging.MessageConverterFactory;
+import com.ubiquity.sprocket.messaging.MessageQueueFactory;
+import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/social")
 public class SocialEndpoint {
 
-	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 
 
+	@POST
+	@Path("/users/{userId}/activities/engaged")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response engaged(@PathParam("userId") Long userId, InputStream payload) throws IOException {
+
+		// convert payload
+		ActivitiesDto activitiesDto = jsonConverter.convertFromPayload(payload, ActivitiesDto.class);
+		
+		for(ActivityDto activityDto : activitiesDto.getActivities()) {
+			log.debug("tracking activity {}", activityDto);
+			sendTrackAndSyncMessage(userId, activityDto);			
+		}
+		return Response.ok().build();
+	}
+	
 	@GET
 	@Path("users/{userId}/providers/{socialNetworkId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -111,11 +128,12 @@ public class SocialEndpoint {
 	 * @param userId
 	 * @param externalNetworkId
 	 * @return
+	 * @throws org.jets3t.service.impl.rest.HttpException 
 	 */
 	@POST
 	@Path("users/{userId}/providers/{externalNetworkId}/sendmessage")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) {
+	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
 
 		// get social network 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
@@ -123,18 +141,10 @@ public class SocialEndpoint {
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
 		//Cast the input into SendMessageObject
 		SendMessageDto sendMessageDto = jsonConverter.convertFromPayload(payload, SendMessageDto.class);
-		try{
-			Contact contact = ServiceFactory.getContactService().getByContactId(sendMessageDto.getContactId());
-			ServiceFactory.getSocialService().sendMessage(identity,socialNetwork, contact, sendMessageDto.getText(), sendMessageDto.getSubject());
-		}
-		catch(AuthorizationException e)
-		{
-			throw new AuthorizationException(e.getMessage());
-		}
-		catch(RuntimeException e)
-		{
-			throw new HttpException(e.getMessage(), 503);
-		}
+
+		Contact contact = ServiceFactory.getContactService().getByContactId(sendMessageDto.getReceiverId());
+		ServiceFactory.getSocialService().sendMessage(identity,socialNetwork, contact, sendMessageDto.getReceiverName(), sendMessageDto.getText(), sendMessageDto.getSubject());
+	
 		return Response.ok().build();
 			
 	}
@@ -144,11 +154,12 @@ public class SocialEndpoint {
 	 * @param userId
 	 * @param socialProviderId
 	 * @return
+	 * @throws org.jets3t.service.impl.rest.HttpException 
 	 */
 	@POST
 	@Path("users/{userId}/providers/{socialNetworkId}/postactivity")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response postactivity(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) {
+	public Response postactivity(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
 
 		// get social network 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
@@ -156,19 +167,30 @@ public class SocialEndpoint {
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
 		//Cast the input into SendMessageObject
 		PostActivity postActivity = jsonConverter.convertFromPayload(payload, PostActivity.class);
-		try{
-			ServiceFactory.getSocialService().PostActivity(identity, socialNetwork, postActivity);
-		}
-		catch(AuthorizationException e)
-		{
-			throw new AuthorizationException(e.getMessage());
-		}
-		catch(RuntimeException e)
-		{
-			throw new HttpException(e.getMessage(), 503);
-		}
+		ServiceFactory.getSocialService().PostActivity(identity, socialNetwork, postActivity);
+
 		return Response.ok().build();
 			
+	}
+	
+	/**
+	 * Drops a message for tracking this event
+	 * 
+	 * @param userId
+	 * @param activityDto
+	 * @throws IOException
+	 */
+	private void sendTrackAndSyncMessage(Long userId, ActivityDto activityDto) throws IOException {
+		
+		Activity activity = DtoAssembler.assemble(activityDto);
+				
+		UserEngagedActivity messageContent = new UserEngagedActivity(userId, activity);
+		String message = MessageConverterFactory.getMessageConverter().serialize(new com.ubiquity.messaging.format.Message(messageContent));
+		byte[] bytes = message.getBytes();
+		MessageQueueFactory.getTrackQueueProducer().write(bytes);
+		MessageQueueFactory.getCacheInvalidationQueueProducer().write(bytes);
+
+
 	}
 
 }

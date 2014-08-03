@@ -4,7 +4,7 @@
 	<artifactId>sprocket-api</artifactId>
 	<name>Sprocket API</name>
 	<packaging>war</packaging>
-	<version>1.2.15</version>
+	<version>1.4.3</version>
 	<!-- Note, parameterize this -->
 	<properties>
 		<app.home>/var/lib/tomcat7/webapps/sprocket-api</app.home>
@@ -12,10 +12,6 @@
 
 	<!-- turns on resource filtering -->
 	<build>
-
-
-
-
 		<finalName>sprocket-api</finalName>
 		<resources>
 			<resource>
@@ -66,12 +62,12 @@
 				</executions>
 				<configuration>
 					<copyright>2013, Ubiquity</copyright>
-					<distribution>Gift Sender API</distribution>
+					<distribution>Sprocket API</distribution>
 					<group>Application/Mobile</group>
 					<packager>Ubiquity</packager>
 					<prefix>/var/lib/tomcat7</prefix>
 					<defineStatements>
-						<defineStatement>stop and start gift sender api</defineStatement>
+						<defineStatement>stop and start sprocket api</defineStatement>
 					</defineStatements>
 					<mappings>
 						<mapping>
@@ -152,7 +148,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>sprocket-core</artifactId>
-			<version>0.1.16</version>
+			<version>0.1.4</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.jboss.resteasy</groupId>
@@ -186,7 +182,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-identity-test</artifactId>
-			<version>0.1.1</version>
+			<version>0.1.2</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 			<optional>false</optional>
