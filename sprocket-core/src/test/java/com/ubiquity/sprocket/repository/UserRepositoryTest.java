@@ -10,10 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.NativeIdentity;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
 
@@ -41,23 +41,8 @@ public class UserRepositoryTest {
 
 		userRepository = new UserRepositoryJpaImpl();
 
-		user = new User.Builder()
-				.lastUpdated(System.currentTimeMillis())
-				.firstName(UUID.randomUUID().toString())
-				.lastName(UUID.randomUUID().toString())
-				.email(UUID.randomUUID().toString())
-				.clientPlatform(ClientPlatform.Android)
-				.displayName(UUID.randomUUID().toString())
-				.build();
-		
-		identity = new NativeIdentity.Builder()
-			.isActive(Boolean.TRUE)
-			.lastUpdated(System.currentTimeMillis())
-			.user(user)
-			.username(UUID.randomUUID().toString())
-			.password(UUID.randomUUID().toString())
-			.build();
-		user.getIdentities().add(identity);
+		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		identity = (NativeIdentity)user.getIdentities().iterator().next();
 		
 		EntityManagerSupport.beginTransaction();
 		userRepository.create(user);
@@ -75,6 +60,23 @@ public class UserRepositoryTest {
 		Assert.assertNotNull(persistedIdentity);
 	}
 
+	
+	@Test
+	public void testGroups() throws Exception {
+		String group = UUID.randomUUID().toString();
+		user.getGroups().add(group);
+		EntityManagerSupport.beginTransaction();
+		userRepository.update(user);
+		EntityManagerSupport.commit();
+		
+		// now get from db and ensure persisted
+		User persisted = userRepository.read(user.getUserId());
+		Assert.assertEquals(1, persisted.getGroups().size());
+		
+		Assert.assertEquals(group, persisted.getGroups().get(0));
+		
+		
+	}
 	@Test
 	public void testSearchByUsernameAndPassword() {
 		// Now read back from db, making sure social identity was persisted
