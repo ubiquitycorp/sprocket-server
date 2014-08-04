@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
-import com.ubiquity.api.exception.HttpException;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.api.exception.AuthorizationException;
@@ -130,11 +129,12 @@ public class SocialEndpoint {
 	 * @param userId
 	 * @param externalNetworkId
 	 * @return
+	 * @throws org.jets3t.service.impl.rest.HttpException 
 	 */
 	@POST
 	@Path("users/{userId}/providers/{externalNetworkId}/sendmessage")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) {
+	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
 
 		// get social network 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
@@ -142,22 +142,10 @@ public class SocialEndpoint {
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
 		//Cast the input into SendMessageObject
 		SendMessageDto sendMessageDto = jsonConverter.convertFromPayload(payload, SendMessageDto.class);
-		try{
-			Contact contact = ServiceFactory.getContactService().getByContactId(sendMessageDto.getReceiverId());
-			boolean successful=ServiceFactory.getSocialService().sendMessage(identity,socialNetwork, contact, sendMessageDto.getReceiverName(), sendMessageDto.getText(), sendMessageDto.getSubject());
-			if(!successful)
-			{
-				throw new RuntimeException("sending message failed");
-			}
-		}
-		catch(AuthorizationException e)
-		{
-			throw new AuthorizationException(e.getMessage());
-		}
-		catch(RuntimeException e)
-		{
-			throw new HttpException(e.getMessage(), 503);
-		}
+
+		Contact contact = ServiceFactory.getContactService().getByContactId(sendMessageDto.getReceiverId());
+		ServiceFactory.getSocialService().sendMessage(identity,socialNetwork, contact, sendMessageDto.getReceiverName(), sendMessageDto.getText(), sendMessageDto.getSubject());
+	
 		return Response.ok().build();
 			
 	}
@@ -167,11 +155,12 @@ public class SocialEndpoint {
 	 * @param userId
 	 * @param socialProviderId
 	 * @return
+	 * @throws org.jets3t.service.impl.rest.HttpException 
 	 */
 	@POST
 	@Path("users/{userId}/providers/{socialNetworkId}/postactivity")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response postactivity(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) {
+	public Response postactivity(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
 
 		// get social network 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
@@ -179,17 +168,8 @@ public class SocialEndpoint {
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
 		//Cast the input into SendMessageObject
 		PostActivity postActivity = jsonConverter.convertFromPayload(payload, PostActivity.class);
-		try{
-			ServiceFactory.getSocialService().PostActivity(identity, socialNetwork, postActivity);
-		}
-		catch(AuthorizationException e)
-		{
-			throw new AuthorizationException(e.getMessage());
-		}
-		catch(RuntimeException e)
-		{
-			throw new HttpException(e.getMessage(), 503);
-		}
+		ServiceFactory.getSocialService().PostActivity(identity, socialNetwork, postActivity);
+
 		return Response.ok().build();
 			
 	}

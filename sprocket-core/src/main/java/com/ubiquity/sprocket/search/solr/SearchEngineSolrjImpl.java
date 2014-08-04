@@ -104,12 +104,17 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 	}
 	
 	private String[] createFilterArguments(Map<String, Object> filter) {
+	
 		String[] filters = new String[filter.size()];
 		int i = 0;
 		for(String key : filter.keySet()) {
 			Object value = filter.get(key);
 			filters[i] = key + ":" + value;
 			i++;
+		}
+	
+		for(String argument : filters) {
+			log.debug("solr filter arg: {}", argument);
 		}
 		return filters;
 	}

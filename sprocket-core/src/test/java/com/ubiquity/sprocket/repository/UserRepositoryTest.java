@@ -1,4 +1,4 @@
-package com.ubiquity.identity.repository;
+package com.ubiquity.sprocket.repository;
 
 import java.util.UUID;
 
@@ -14,6 +14,8 @@ import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.NativeIdentity;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.repository.UserRepository;
+import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
 
 /***
  * Tests testing basic CRUD operations for a user repository

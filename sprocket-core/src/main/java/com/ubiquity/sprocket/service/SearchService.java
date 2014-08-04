@@ -17,6 +17,7 @@ import com.ubiquity.external.domain.Network;
 import com.ubiquity.external.service.ExternalIdentityService;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.media.domain.Image;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Activity;
@@ -103,10 +104,13 @@ public class SearchService {
 			String id = SearchKeys.generateDocumentKeyForId(userFilterId, activity.getActivityId(), dataType);
 			document.getFields().put(SearchKeys.Fields.FIELD_ID, id); 
 
-			// contact
+			// contact, add image if we have one
 			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_DISPLAY_NAME, activity.getPostedBy().getDisplayName());
 			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_IDENTIFIER, activity.getPostedBy().getExternalIdentity().getIdentifier());
-
+			Image thumb = activity.getPostedBy().getImage();
+			if(thumb != null)
+				document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_THUMBNAIL, activity.getPostedBy().getImage().getUrl());
+			
 			// content fields
 			document.getFields().put(SearchKeys.Fields.FIELD_BODY, activity.getBody());
 			document.getFields().put(SearchKeys.Fields.FIELD_TITLE, activity.getTitle());
@@ -115,8 +119,9 @@ public class SearchService {
 			// if it's a video, set the url and thumbnail to the video url and image respectively
 			if(type == ActivityType.VIDEO) {
 				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getVideo().getUrl());
+				// use image as thumb
 				if(activity.getImage() != null)
-					document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getVideo().getUrl());
+					document.getFields().put(SearchKeys.Fields.FIELD_THUMBNAIL, activity.getImage().getUrl());
 			} else if(type == ActivityType.PHOTO) {
 				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getImage().getUrl());
 			} else if(type == ActivityType.LINK) {
@@ -126,6 +131,8 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_ACTIVITY_TYPE, activity.getActivityType().toString());
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Activity.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, activity.getExternalNetwork().ordinal());
+			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_IDENTIFIER, activity.getExternalIdentifier());
+			document.getFields().put(SearchKeys.Fields.FIELD_DATE, activity.getCreationDate());
 
 			
 			documents.add(document);
@@ -266,10 +273,11 @@ public class SearchService {
 
 		// filters
 		Map<String, Object> filters = new HashMap<String, Object>();
+
 		
+		filters.put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, externalNetwork.ordinal());
 		Long ownerId = SearchKeys.generateOwnerId(userIdFilter);
 		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId);
-		filters.put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, externalNetwork.ordinal());
 		
 		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
 
@@ -292,6 +300,8 @@ public class SearchService {
 		
 		Long ownerId = SearchKeys.generateOwnerId(userIdFilter);
 		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId);
+
+
 		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
 	}
 
