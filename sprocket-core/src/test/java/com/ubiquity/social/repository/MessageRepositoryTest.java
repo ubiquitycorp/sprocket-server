@@ -15,6 +15,7 @@ import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
 import com.ubiquity.integration.factory.TestContactFactory;
 import com.ubiquity.social.domain.Contact;
+import com.ubiquity.social.domain.Conversation;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.external.domain.ExternalNetwork;
 
@@ -98,12 +99,14 @@ public class MessageRepositoryTest {
 	public void testConversationGroupingAndMessageOrdering() {
 		
 		String conversationIdentifier = UUID.randomUUID().toString();
-
+		Conversation conversation = new Conversation.Builder()
+								.conversationIdentifier(conversationIdentifier)
+								.build();
 		// add 2 messages with a conversation identifier
 		Message first  = new Message.Builder()
 			.title(UUID.randomUUID().toString())
 			.body(UUID.randomUUID().toString())
-			.conversationIdentifier(conversationIdentifier)
+			.conversation(conversation)
 			.sentDate(System.currentTimeMillis())
 			.sender(sender)
 			.externalNetwork(ExternalNetwork.Facebook)
@@ -116,7 +119,7 @@ public class MessageRepositoryTest {
 		Message next  = new Message.Builder()
 			.title(UUID.randomUUID().toString())
 			.body(UUID.randomUUID().toString())
-			.conversationIdentifier(conversationIdentifier)
+			.conversation(conversation)
 			.sentDate(System.currentTimeMillis() + 1)
 			.sender(sender)
 			.externalNetwork(ExternalNetwork.Facebook)
@@ -132,18 +135,18 @@ public class MessageRepositoryTest {
 		
 		// let's make sure this one has no id
 		Message persisted = messages.get(0);
-		Assert.assertNull(persisted.getConversationIdentifier());
+		Assert.assertNull(persisted.getConversation().getConversationIdentifier());
 		
 		// test sorting and that they have the same conversation
 		persisted = messages.get(1);
 		Assert.assertTrue(persisted.getMessageId().longValue() == first.getMessageId().longValue());
-		Assert.assertNotNull(persisted.getConversationIdentifier());
-		Assert.assertTrue(persisted.getConversationIdentifier().equals(first.getConversationIdentifier()));
+		Assert.assertNotNull(persisted.getConversation().getConversationIdentifier());
+		Assert.assertTrue(persisted.getConversation().getConversationIdentifier().equals(first.getConversation().getConversationIdentifier()));
 		
 		persisted = messages.get(2);
 		Assert.assertTrue(persisted.getMessageId().longValue() == next.getMessageId().longValue());
-		Assert.assertNotNull(persisted.getConversationIdentifier());
-		Assert.assertTrue(persisted.getConversationIdentifier().equals(first.getConversationIdentifier()));
+		Assert.assertNotNull(persisted.getConversation().getConversationIdentifier());
+		Assert.assertTrue(persisted.getConversation().getConversationIdentifier().equals(first.getConversation().getConversationIdentifier()));
 
 	}
 	

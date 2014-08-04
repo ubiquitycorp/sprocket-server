@@ -35,7 +35,7 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		// all fb messages will have conversations
 		for(Message message : messages) {
 			log.debug("message {}", message);
-			Assert.assertNotNull(message.getConversationIdentifier());
+			Assert.assertNotNull(message.getConversation().getConversationIdentifier());
 		}
 		
 	}

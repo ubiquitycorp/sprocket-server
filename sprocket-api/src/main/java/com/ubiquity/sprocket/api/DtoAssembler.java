@@ -255,7 +255,7 @@ public class DtoAssembler {
 		for (Message message : messages) {
 
 			MessageDto messageDto = assemble(message);
-			String conversationIdentifier = message.getConversationIdentifier();
+			String conversationIdentifier = message.getConversation().getConversationIdentifier();
 			if (topLevelMessageDto != null
 					&& conversationIdentifier != null
 					&& lastConversationIdentifier
@@ -271,7 +271,7 @@ public class DtoAssembler {
 							.build();
 				topLevelMessageDto.getConversation().add(messageDto);
 				lastConversationIdentifier = conversationIdentifier;
-				for (Contact contact : message.getReceivers()) {
+				for (Contact contact : message.getConversation().getReceivers()) {
 					topLevelMessageDto.getReceivers().add(assemble(contact));
 				}
 				// now add to the main list for a "roll up"
