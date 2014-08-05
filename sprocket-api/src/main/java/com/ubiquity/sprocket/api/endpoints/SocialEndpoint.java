@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
-import com.ubiquity.api.exception.HttpException;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.social.domain.Activity;
