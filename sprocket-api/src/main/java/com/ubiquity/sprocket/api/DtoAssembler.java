@@ -227,13 +227,18 @@ public class DtoAssembler {
 	}
 
 	public static VideoDto assemble(VideoContent videoContent) {
-		return new VideoDto.Builder()
-				.externalNetworkId(videoContent.getExternalNetwork().ordinal())
-				.itemKey(videoContent.getVideo().getItemKey())
-				.thumb(new ImageDto(videoContent.getThumb().getUrl()))
-				.title(videoContent.getTitle())
-				.description(videoContent.getDescription()).build();
-
+		VideoDto.Builder videoBuilder = new VideoDto.Builder()
+				.externalNetworkId(videoContent.getExternalNetwork().ordinal());
+		
+				if(videoContent.getVideo() != null)
+					videoBuilder.itemKey(videoContent.getVideo().getItemKey());
+				
+				if(videoContent.getThumb() != null)
+					videoBuilder.thumb(new ImageDto(videoContent.getThumb().getUrl()));
+				
+				videoBuilder.title(videoContent.getTitle()).description(videoContent.getDescription());
+		
+				return videoBuilder.build();
 	}
 
 	/***
