@@ -96,8 +96,13 @@ public class UsersEndpoint {
 						accesstokens[1], ClientPlatform.WEB,
 						ExternalNetwork.LinkedIn);
 		
+		
+		
 		IdentityDto result = new IdentityDto.Builder().identifier(
 				identity.getIdentifier()).build();
+		
+		// now send the message activated message to cache invalidate
+		sendActivatedMessage(user, identity, result);
 		
 		return Response.ok().entity(jsonConverter.convertToPayload(result))
 				.build();
