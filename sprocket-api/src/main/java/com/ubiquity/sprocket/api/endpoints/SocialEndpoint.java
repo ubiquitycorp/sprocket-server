@@ -22,7 +22,6 @@ import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
-import com.ubiquity.social.api.exception.AuthorizationException;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
