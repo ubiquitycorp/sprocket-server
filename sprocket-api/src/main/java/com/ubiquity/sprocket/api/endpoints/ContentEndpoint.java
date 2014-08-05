@@ -1,5 +1,6 @@
 package com.ubiquity.sprocket.api.endpoints;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.ws.rs.GET;
@@ -11,16 +12,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.VideosDto;
+import com.ubiquity.sprocket.api.dto.model.VideoDto;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
+import com.ubiquity.sprocket.messaging.MessageConverterFactory;
+import com.ubiquity.sprocket.messaging.MessageQueueFactory;
+import com.ubiquity.sprocket.messaging.definition.UserEngagedVideo;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/content")
@@ -28,16 +30,16 @@ public class ContentEndpoint {
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 
-	private Logger log = LoggerFactory.getLogger(getClass());
-
 	@POST
 	@Path("/users/{userId}/videos/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response engaged(@PathParam("userId") Long userId, InputStream payload) {
+	public Response engaged(@PathParam("userId") Long userId, InputStream payload) throws IOException {
 
 		// convert payload
 		VideosDto videosDto = jsonConverter.convertFromPayload(payload, VideosDto.class, EngagementValidation.class);
-		log.debug("videos engaged {}", videosDto);
+		for(VideoDto videoDto : videosDto.getVideos()) {
+			sendTrackAndSyncMessage(userId, videoDto);
+		}
 		
 		return Response.ok().build();
 	}
@@ -60,6 +62,33 @@ public class ContentEndpoint {
 			results.getVideos().add(DtoAssembler.assemble(videoContent));
 
 		return Response.ok().header("Last-Modified", variant.getLastModified()).entity(jsonConverter.convertToPayload(results)).build();
+	}
+	
+	/**
+	 * Drops a message for tracking this event
+	 * 
+	 * @param userId
+	 * @param activityDto
+	 * @throws IOException
+	 */
+	private void sendTrackAndSyncMessage(Long userId, VideoDto videoDto) throws IOException {
+		
+		VideoContent video = DtoAssembler.assemble(videoDto);
+		
+		// create message content with strongly typed references to the actual domain entity (for easier de-serialization on the consumer end)
+		UserEngagedVideo messageContent = new UserEngagedVideo(userId, video);
+		
+		// convert to raw bytes and send it off
+		String message = MessageConverterFactory.getMessageConverter().serialize(new com.ubiquity.messaging.format.Message(messageContent));
+		byte[] bytes = message.getBytes();
+		
+		// send to data warehouse / analytics tracker
+		MessageQueueFactory.getTrackQueueProducer().write(bytes);
+		
+		// will ensure the domain entity gets saved to the store if it does not exist and indexed for faster search
+		MessageQueueFactory.getCacheInvalidationQueueProducer().write(bytes);
+
+
 	}
 
 }

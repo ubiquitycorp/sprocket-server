@@ -10,11 +10,11 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.content.api.VimeoAPITest;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
@@ -22,10 +22,10 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.ActivityType;
+import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.PostActivity;
 
-@Ignore
 public class TwitterApiTest {
 private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 	
@@ -36,7 +36,10 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 //		identity = ServiceFactory.getExternalIdentityService().findExternalIdentity((long)1, ExternalNetwork.Twitter);
 //		log.debug("authenticated Twitter with identity {} ", identity);
 		Configuration configuration = new PropertiesConfiguration(
-				"sprocketapi.properties");
+				"test.properties");
+		
+		JedisConnectionFactory.initialize(configuration);
+		
 		SocialAPIFactory.initialize(configuration);
 		User user = new User.Builder()
 		.lastUpdated(System.currentTimeMillis())
@@ -48,8 +51,8 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		.build();
 		
 		identity = new ExternalIdentity.Builder()
-				.accessToken("2576165924-pD3gk25Aowaa3xOzSOrfoqgBtQx1w2eIkvf10lq")
-				.secretToken("Ba1okul75SDQ4vrKCKqqz9HIsLP76gdM8280ONSVU9sSs")
+				.accessToken("2607216073-MlFGdYpMjqf2qVMvSgyy70cpFs7H7HcNMZl4vra")
+				.secretToken("r6iepYY8QjvqpWNUEHiy0YrlpSPPoLpLiM9zuIe2l6xPv")
 				.identifier("2576165924")
 				.user(user)
 				.build();
@@ -63,8 +66,10 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH-mm-ss");
 		Date date = new Date();
 		String message = dateFormat.format(date);
-		message = message.replaceAll(" ", "%20");
-		Boolean sent = twitterAPI.sendMessage(identity, null, "engminashafik", message, "");
+		Contact c = new Contact.Builder()
+						.externalIdentity(new ExternalIdentity.Builder()
+										.externalNetwork(ExternalNetwork.Twitter.ordinal()).identifier("2607216073").build()).build(); 
+		Boolean sent = twitterAPI.sendMessage(identity, c, null , message, "");
 		Assert.assertTrue(sent);
 	}
 	@Test
@@ -87,7 +92,7 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH-mm-ss");
 		Date date = new Date();
 		String message = dateFormat.format(date);
-		message = message.replaceAll(" ", "%20");
+		
 		PostActivity postActivity = new PostActivity.Builder()
 									.activityTypeId(ActivityType.STATUS.ordinal())
 									.body(message).build();
@@ -103,9 +108,24 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		Assert.assertFalse(activities.isEmpty());
 		// all fb messages will have conversations
 		for(Activity activity : activities) {
-			log.debug("message {}", activities);
+			log.debug("activities {}", activities);
 			Assert.assertNotNull(activity.getExternalIdentifier());
 		}
 		
 	}
+	
+	@Test
+	public void searchActivities() {
+		
+		SocialAPI twitterAPI = SocialAPIFactory.createProvider(ExternalNetwork.Twitter, ClientPlatform.WEB);
+		List<Activity> activities = twitterAPI.searchActivities("test", 1, 5, identity);
+		Assert.assertFalse(activities.isEmpty());
+		// all fb messages will have conversations
+		for(Activity activity : activities) {
+			log.debug("activities {}", activities);
+			Assert.assertNotNull(activity.getExternalIdentifier());
+		}
+		
+	}
+	
 }

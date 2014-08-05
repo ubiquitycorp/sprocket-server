@@ -31,7 +31,6 @@ public interface SearchEngine {
 	 */
 	public List<Document> searchDocuments(String searchTerm, String[] fields, Map<String, Object> filter);
 	
-
 	/***
 	 * Removes all documents 
 	 */

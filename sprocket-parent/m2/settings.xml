@@ -10,11 +10,11 @@
 				<hibernate.debug>true</hibernate.debug>
 				<solr.api.host>localhost</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
-				<social.twitter.app.consumerKey>mbCvxpZRXtnn170Kk39MbFhsu</social.twitter.app.consumerKey>
-				<social.twitter.app.consumerSecret>rYp1ICQMEPjfj5YrAiDqLZC5oN5UeCh0tmTXMxsqfsOdetpzG3</social.twitter.app.consumerSecret>
+				<social.twitter.app.consumerKey>eIxhGVt1wo8yNs7cTq0mNHsi0</social.twitter.app.consumerKey>
+				<social.twitter.app.consumerSecret>qBTsSTelIlh0Lq4ILPlxgeTfhKk1GR8uetrlgaGExNulfxx37n</social.twitter.app.consumerSecret>
 				<social.facebook.consumerKey>581153318672017</social.facebook.consumerKey>
 				<social.facebook.consumerSecret>0752b1dfd97a54334b53f3a22ee9b3ca</social.facebook.consumerSecret>
-				<social.google.android.apikey>AIzaSyDhTbmc7b30AR2iwU5Ahxwbd9fQegt8AuU</social.google.android.apikey>
+				<social.google.android.apikey>AIzaSyC-EfEn6WHFEDg3UjuaNxb-ZhqsCzY1D84</social.google.android.apikey>
 				<social.google.ios.apikey>AIzaSyBLbSDsyGMBbXGVlnIUIpiSP3JKY706Gf0</social.google.ios.apikey>
 				<social.google.web.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I</social.google.web.apikey>
 				<social.google.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I</social.google.apikey>
@@ -56,11 +56,11 @@
 				<hibernate.debug>true</hibernate.debug>
 				<solr.api.host>localhost</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
-				<social.twitter.app.consumerKey>c6jR4jw7TlioL9nlwpFpnvjlT</social.twitter.app.consumerKey>
-				<social.twitter.app.consumerSecret>X6hvFAwT1tSOoQeSI288HlDT3ufMW837RGwnSBSbavvj346gi8</social.twitter.app.consumerSecret>
+				<social.twitter.app.consumerKey>eIxhGVt1wo8yNs7cTq0mNHsi0</social.twitter.app.consumerKey>
+				<social.twitter.app.consumerSecret>qBTsSTelIlh0Lq4ILPlxgeTfhKk1GR8uetrlgaGExNulfxx37n</social.twitter.app.consumerSecret>
 				<social.facebook.consumerKey>554461001341249</social.facebook.consumerKey>
 				<social.facebook.consumerSecret>06b1a984c9a65db7a42bdbe83c2738f1</social.facebook.consumerSecret>
-				<social.google.android.apikey>AIzaSyDhTbmc7b30AR2iwU5Ahxwbd9fQegt8AuU</social.google.android.apikey>
+				<social.google.android.apikey>AIzaSyC-EfEn6WHFEDg3UjuaNxb-ZhqsCzY1D84</social.google.android.apikey>
 				<social.google.ios.apikey>AIzaSyCrTjAqBZK6DkGhFmuAu6-urDMABu0b_vk</social.google.ios.apikey>
 				<social.google.web.apikey>AIzaSyCY3woAWsatYnwhkYOeBqVjQ8V9hGa2vt8</social.google.web.apikey>
 				<content.vimeo.web.clientId>5be395b360ef0be2c11ed838505fe49d39b1c113</content.vimeo.web.clientId>

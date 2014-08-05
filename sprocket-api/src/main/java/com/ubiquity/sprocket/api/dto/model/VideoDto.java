@@ -20,7 +20,6 @@ public class VideoDto {
 	@NotNull
 	private String description;
 	
-	@NotNull
 	private String category;
 	
 	private Long lastUpdated;
