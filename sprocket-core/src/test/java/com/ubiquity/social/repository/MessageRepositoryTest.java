@@ -60,12 +60,18 @@ public class MessageRepositoryTest {
 		contactRepository.create(sender);
 		EntityManagerSupport.commit();
 		
+		String conversationIdentifier = UUID.randomUUID().toString();
+		Conversation conversation = new Conversation.Builder()
+								.conversationIdentifier(conversationIdentifier)
+								.externalNetwork(ExternalNetwork.Facebook)
+								.build();
 		// now create a message
 		message  = new Message.Builder()
 			.title(UUID.randomUUID().toString())
 			.body(UUID.randomUUID().toString())
 			.sentDate(System.currentTimeMillis())
 			.sender(sender)
+			.conversation(conversation)
 			.externalNetwork(ExternalNetwork.Facebook)
 			.externalIdentifier(UUID.randomUUID().toString())
 			.owner(owner)
@@ -101,7 +107,10 @@ public class MessageRepositoryTest {
 		String conversationIdentifier = UUID.randomUUID().toString();
 		Conversation conversation = new Conversation.Builder()
 								.conversationIdentifier(conversationIdentifier)
+								.externalNetwork(ExternalNetwork.Facebook)
 								.build();
+		message.setConversation(conversation);
+		
 		// add 2 messages with a conversation identifier
 		Message first  = new Message.Builder()
 			.title(UUID.randomUUID().toString())
@@ -135,7 +144,7 @@ public class MessageRepositoryTest {
 		
 		// let's make sure this one has no id
 		Message persisted = messages.get(0);
-		Assert.assertNull(persisted.getConversation().getConversationIdentifier());
+		Assert.assertNotNull(persisted.getConversation().getConversationIdentifier());
 		
 		// test sorting and that they have the same conversation
 		persisted = messages.get(1);
