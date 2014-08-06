@@ -22,7 +22,6 @@ import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
-import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
@@ -137,7 +136,7 @@ public class SocialEndpoint {
 	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
 
 		// load user
-		User user = ServiceFactory.getUserService().getUserById(userId);
+		ServiceFactory.getUserService().getUserById(userId);
 		// get social network 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		// get the identity from DB
@@ -165,7 +164,7 @@ public class SocialEndpoint {
 	public Response postactivity(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
 
 		// load user
-		User user = ServiceFactory.getUserService().getUserById(userId);
+		ServiceFactory.getUserService().getUserById(userId);
 		// get social network 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
 		// get the identity from DB
