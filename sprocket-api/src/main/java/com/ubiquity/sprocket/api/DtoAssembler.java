@@ -227,13 +227,18 @@ public class DtoAssembler {
 	}
 
 	public static VideoDto assemble(VideoContent videoContent) {
-		return new VideoDto.Builder()
-				.externalNetworkId(videoContent.getExternalNetwork().ordinal())
-				.itemKey(videoContent.getVideo().getItemKey())
-				.thumb(new ImageDto(videoContent.getThumb().getUrl()))
-				.title(videoContent.getTitle())
-				.description(videoContent.getDescription()).build();
-
+		VideoDto.Builder videoBuilder = new VideoDto.Builder()
+				.externalNetworkId(videoContent.getExternalNetwork().ordinal());
+		
+				if(videoContent.getVideo() != null)
+					videoBuilder.itemKey(videoContent.getVideo().getItemKey());
+				
+				if(videoContent.getThumb() != null)
+					videoBuilder.thumb(new ImageDto(videoContent.getThumb().getUrl()));
+				
+				videoBuilder.title(videoContent.getTitle()).description(videoContent.getDescription());
+		
+				return videoBuilder.build();
 	}
 
 	/***
@@ -255,7 +260,7 @@ public class DtoAssembler {
 		for (Message message : messages) {
 
 			MessageDto messageDto = assemble(message);
-			String conversationIdentifier = message.getConversationIdentifier();
+			String conversationIdentifier = message.getConversation().getConversationIdentifier();
 			if (topLevelMessageDto != null
 					&& conversationIdentifier != null
 					&& lastConversationIdentifier
@@ -265,10 +270,18 @@ public class DtoAssembler {
 				topLevelMessageDto.getConversation().addLast(messageDto);
 			} else {
 				// we have a top level message
-				topLevelMessageDto = messageDto;
+				topLevelMessageDto = new MessageDto.Builder()
+							.externalNetworkId(message.getExternalNetwork().ordinal())
+							.lastMessageDate(messageDto.getDate())
+							.build();
+				topLevelMessageDto.getConversation().add(messageDto);
 				lastConversationIdentifier = conversationIdentifier;
-				topLevelMessageDto.setLastMessageDate(topLevelMessageDto
-						.getDate());
+				if(message.getConversation().getReceivers() != null)
+				{
+					for (Contact contact : message.getConversation().getReceivers()) {
+						topLevelMessageDto.getReceivers().add(assemble(contact));
+					}
+				}
 				// now add to the main list for a "roll up"
 				messageDtoList.add(topLevelMessageDto);
 			}
@@ -278,11 +291,12 @@ public class DtoAssembler {
 	}
 
 	public static MessageDto assemble(Message message) {
-		return new MessageDto.Builder().subject(message.getTitle())
-				.date(message.getSentDate())
-				.externalNetworkId(message.getExternalNetwork().ordinal())
-				.body(message.getBody()).sender(assemble(message.getSender()))
-				.build();
+		return new MessageDto.Builder()
+		.subject(message.getTitle())
+		.date(message.getSentDate())
+		//.externalNetworkId(message.getExternalNetwork().ordinal())
+		.body(message.getBody())
+		.sender(assemble(message.getSender())).build();
 	}
 
 	public static ActivityDto assemble(Activity activity) {

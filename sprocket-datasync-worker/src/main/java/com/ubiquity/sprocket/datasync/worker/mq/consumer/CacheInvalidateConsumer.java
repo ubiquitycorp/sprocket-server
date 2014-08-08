@@ -22,7 +22,6 @@ import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedDocument;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedVideo;
-import com.ubiquity.sprocket.search.SearchKeys;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 public class CacheInvalidateConsumer extends AbstractConsumerThread {

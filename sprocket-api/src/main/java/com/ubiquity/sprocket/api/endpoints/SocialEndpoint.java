@@ -114,7 +114,7 @@ public class SocialEndpoint {
 		messages.addAll(variant.getCollection());
 		
 		// Assemble into message dto, constructing conversations if they are inherent in the data
-		List<MessageDto> conversations =DtoAssembler.assemble(messages);
+		List<MessageDto> conversations = DtoAssembler.assemble(messages);
 		Collections.sort(conversations, Collections.reverseOrder());
 		result.getMessages().addAll(conversations);
 	
@@ -135,6 +135,8 @@ public class SocialEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
 
+		// load user
+		ServiceFactory.getUserService().getUserById(userId);
 		// get social network 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		// get the identity from DB
@@ -161,6 +163,8 @@ public class SocialEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response postactivity(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
 
+		// load user
+		ServiceFactory.getUserService().getUserById(userId);
 		// get social network 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
 		// get the identity from DB

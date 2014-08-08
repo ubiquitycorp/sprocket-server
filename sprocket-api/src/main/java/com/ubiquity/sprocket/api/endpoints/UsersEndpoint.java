@@ -3,6 +3,7 @@ package com.ubiquity.sprocket.api.endpoints;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.persistence.NoResultException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
@@ -34,7 +35,10 @@ import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.api.linkedin.ExchangeService;
 import com.ubiquity.social.api.twitter.TwitterAPI;
+import com.ubiquity.social.domain.Contact;
+import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
+import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.ExchangeTokenDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
@@ -98,9 +102,23 @@ public class UsersEndpoint {
 		
 		IdentityDto result = new IdentityDto.Builder().identifier(
 				identity.getIdentifier()).build();
+		// now send the message activated message to cache invalidate
+		sendActivatedMessage(user, identity, result);
 		
-		return Response.ok().entity(jsonConverter.convertToPayload(result))
-				.build();
+		try
+		{
+		
+			Contact contact = ServiceFactory.getContactService().getBySocialIdentityId(identity.getIdentityId());
+			ContactDto contactDto = DtoAssembler.assemble(contact);
+			return Response.ok().entity(jsonConverter.convertToPayload(contactDto))
+					.build();
+		}
+		catch(NoResultException ex)
+		{
+
+			return Response.ok().entity(jsonConverter.convertToPayload(result))
+					.build();
+		}
 
 	}
 	
@@ -262,18 +280,27 @@ public class UsersEndpoint {
 						identityDto.getAccessToken(),
 						identityDto.getSecretToken(), clientPlatform,
 						externalNetwork);
-
+		
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto);
 
 		// send off to analytics tracker
 		//sendEventTrackedMessage(user, identity);
-
-		IdentityDto result = new IdentityDto.Builder().identifier(
-				identity.getIdentifier()).build();
-		return Response.ok().entity(jsonConverter.convertToPayload(result))
-				.build();
-
+		try
+		{
+		
+			Contact contact = ServiceFactory.getContactService().getBySocialIdentityId(identity.getIdentityId());
+			ContactDto contactDto = DtoAssembler.assemble(contact);
+			return Response.ok().entity(jsonConverter.convertToPayload(contactDto))
+					.build();
+		}
+		catch(NoResultException ex)
+		{
+			IdentityDto result = new IdentityDto.Builder().identifier(
+					identity.getIdentifier()).build();
+			return Response.ok().entity(jsonConverter.convertToPayload(result))
+					.build();
+		}
 	}
 
 	/***
@@ -338,10 +365,21 @@ public class UsersEndpoint {
 		// send off to analytics tracker
 		//sendEventTrackedMessage(user, identity);
 
-		IdentityDto result = new IdentityDto.Builder().identifier(
-				identity.getIdentifier()).build();
-		return Response.ok().entity(jsonConverter.convertToPayload(result))
-				.build();
+		try
+		{
+		
+			Contact contact = ServiceFactory.getContactService().getBySocialIdentityId(identity.getIdentityId());
+			ContactDto contactDto = DtoAssembler.assemble(contact);
+			return Response.ok().entity(jsonConverter.convertToPayload(contactDto))
+					.build();
+		}
+		catch(NoResultException ex)
+		{
+			IdentityDto result = new IdentityDto.Builder().identifier(
+					identity.getIdentifier()).build();
+			return Response.ok().entity(jsonConverter.convertToPayload(result))
+					.build();
+		}
 
 	}
 
