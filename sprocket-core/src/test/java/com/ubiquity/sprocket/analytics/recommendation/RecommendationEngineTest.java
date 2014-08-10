@@ -28,6 +28,7 @@ public class RecommendationEngineTest {
 		engine = new RecommendationEngineSparkImpl(config);		
 		// add gender as a dimension
 		engine.addDimension(createFromEnum("gender", Gender.class));
+		
 	}
 	
 	private static Dimension createFromEnum(String name, Class<? extends Enum<?>> enumClass) {

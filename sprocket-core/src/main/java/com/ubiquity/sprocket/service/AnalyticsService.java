@@ -6,13 +6,16 @@ import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.content.repository.VideoContentRepository;
 import com.ubiquity.content.repository.VideoContentRepositoryJpaImpl;
-import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.repository.ActivityRepository;
 import com.ubiquity.social.repository.ActivityRepositoryJpaImpl;
+import com.ubiquity.sprocket.domain.EngagedItem;
+import com.ubiquity.sprocket.repository.EngagedItemRepository;
+import com.ubiquity.sprocket.repository.EngagedItemRepositoryJpaImpl;
 
 public class AnalyticsService {
 		
@@ -20,6 +23,7 @@ public class AnalyticsService {
 	
 	private ActivityRepository activityRepository;
 	private VideoContentRepository videoContentRepository;
+	private EngagedItemRepository engagedItemRepository;
 	
 	/***
 	 * Sets up redis cache interfaces for each event type
@@ -29,11 +33,14 @@ public class AnalyticsService {
 	public AnalyticsService(Configuration configuration) {
 		activityRepository = new ActivityRepositoryJpaImpl();
 		videoContentRepository = new VideoContentRepositoryJpaImpl();
-
+		engagedItemRepository = new EngagedItemRepositoryJpaImpl();
 	}
 
-	public void track(User user, Activity activity) {
-		log.debug("tracking activity {}", activity);
+	public void track(EngagedItem engagedItem) {
+		log.debug("tracking activity {}", engagedItem);
+		EntityManagerSupport.beginTransaction();
+		engagedItemRepository.create(engagedItem);
+		EntityManagerSupport.commit();
 	}
 	
 	

@@ -9,6 +9,12 @@
 
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 
+		<class>com.ubiquity.sprocket.domain.EngagedVideo</class>
+		<class>com.ubiquity.sprocket.domain.EngagedActivity</class>
+		<class>com.ubiquity.sprocket.domain.EngagedDocument</class>
+		<class>com.ubiquity.sprocket.domain.EngagedItem</class>
+
+
 		<class>com.ubiquity.content.domain.VideoContent</class>
 		<class>com.ubiquity.identity.domain.User</class>
 		<class>com.ubiquity.identity.domain.Identity</class>
@@ -23,7 +29,8 @@
 		<properties>
 
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
-			<property name="hibernate.connection.url" value="jdbc:mysql://${db.host}:3306/sprocket?autoReconnect=true" />
+			<property name="hibernate.connection.url"
+				value="jdbc:mysql://${db.host}:3306/sprocket?autoReconnect=true" />
 			<property name="hibernate.connection.username" value="${db.username}" />
 			<property name="hibernate.connection.password" value="${db.password}" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
@@ -34,7 +41,7 @@
 
 			<property name="hibernate.hbm2ddl.auto" value="${hibernate.schema.auto}" />
 
-<!-- Connection Pooling settings -->
+			<!-- Connection Pooling settings -->
 			<property name="hibernate.connection.provider_class"
 				value="com.jolbox.bonecp.provider.BoneCPConnectionProvider" />
 			<property name="bonecp.idleConnectionTestPeriodInMinutes"
@@ -50,9 +57,9 @@
 			<property name="bonecp.releaseHelperThreads" value="2" />
 			<property name="bonecp.statementCachePerConnection" value="10" />
 			<property name="acquireRetryAttempts" value="5" />
-			
+
 			<property name="hibernate.hbm2ddl.auto" value="${hibernate.schema.auto}" />
-			
+
 
 		</properties>
 	</persistence-unit>

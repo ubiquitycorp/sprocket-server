@@ -284,8 +284,6 @@ public class UsersEndpoint {
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto);
 
-		// send off to analytics tracker
-		//sendEventTrackedMessage(user, identity);
 		try
 		{
 		
@@ -361,9 +359,6 @@ public class UsersEndpoint {
 
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto);
-
-		// send off to analytics tracker
-		//sendEventTrackedMessage(user, identity);
 
 		try
 		{

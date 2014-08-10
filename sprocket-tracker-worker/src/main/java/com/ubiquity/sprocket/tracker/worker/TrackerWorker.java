@@ -58,7 +58,7 @@ public class TrackerWorker {
 	public static void main(String[] args) {
 		final TrackerWorker worker = new TrackerWorker();
 		try {
-			worker.initialize(new PropertiesConfiguration("datasyncworker.properties"));
+			worker.initialize(new PropertiesConfiguration("trackerworker.properties"));
 		} catch (ConfigurationException e) {
 			log.error("Unable to configure service", e);
 			System.exit(-1);

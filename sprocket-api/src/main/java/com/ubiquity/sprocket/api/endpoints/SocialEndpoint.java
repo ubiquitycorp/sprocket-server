@@ -191,10 +191,7 @@ public class SocialEndpoint {
 		UserEngagedActivity messageContent = new UserEngagedActivity(userId, activity);
 		String message = MessageConverterFactory.getMessageConverter().serialize(new com.ubiquity.messaging.format.Message(messageContent));
 		byte[] bytes = message.getBytes();
-		MessageQueueFactory.getTrackQueueProducer().write(bytes);
 		MessageQueueFactory.getCacheInvalidationQueueProducer().write(bytes);
-
-
 	}
 
 }
