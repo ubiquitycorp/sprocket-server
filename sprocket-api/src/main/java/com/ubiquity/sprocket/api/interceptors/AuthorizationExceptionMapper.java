@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.ubiquity.api.domain.ServerErrorCode;
 import com.ubiquity.api.dto.model.ErrorDto;
 import com.ubiquity.social.api.exception.AuthorizationException;
 
@@ -32,11 +33,9 @@ public class AuthorizationExceptionMapper implements ExceptionMapper<Authorizati
 		log.error("[ERROR]", e.getMessage(), e);
 		
 		ErrorDto response = new ErrorDto();
-		response.getMessages().add(e.getMessage());
-		
+		response.getMessages().add("Could not authenticate with provider: " +e.getMessage());
+		response.setCode(ServerErrorCode.ExternalAPI.getCode());
 		return Response.status(Status.UNAUTHORIZED).entity(new Gson().toJson(response)).build();
-
-
 	}
 
 }
