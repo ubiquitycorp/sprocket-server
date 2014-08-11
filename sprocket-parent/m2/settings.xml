@@ -22,6 +22,8 @@
 				<social.google.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I</social.google.apikey>
 				<social.google.web.clientId>963651180860-gdgpmd4pqpsetql8932mrgbif8f4t89p.apps.googleusercontent.com</social.google.web.clientId>
 				<social.google.web.clientSecret>NRWmgbRuewuTUmL-IgMsuVzG</social.google.web.clientSecret>
+				<social.google.android.clientId>518857244614-l8o1ccr71sqsmmjb54hqbm4huq2tc367.apps.googleusercontent.com</social.google.android.clientId>
+				<social.google.android.clientSecret>nrI11zOIQR2B750Rdz85wxze</social.google.android.clientSecret>
 				<social.google.ios.clientId>798637804367-oeuq4acmf6jivul2gbqnig7pcspjirfu.apps.googleusercontent.com</social.google.ios.clientId>
 				<social.google.ios.clientSecret>7ND3-wtvZg2GUZhWxZesE4qp</social.google.ios.clientSecret>
 				<content.vimeo.web.clientId>8aa78eaeb615f47cdbc3806baa64e7b41ea7bb63</content.vimeo.web.clientId>
@@ -73,6 +75,8 @@
 				<social.google.web.apikey>AIzaSyCY3woAWsatYnwhkYOeBqVjQ8V9hGa2vt8</social.google.web.apikey>
 				<social.google.web.clientId>320470378854-06esrc32feq3nstb9t9ovp95jm50skvu.apps.googleusercontent.com</social.google.web.clientId>
 				<social.google.web.clientSecret>gI2eS5OH9zp_PPB089sDafjR</social.google.web.clientSecret>
+				<social.google.android.clientId>518857244614-l8o1ccr71sqsmmjb54hqbm4huq2tc367.apps.googleusercontent.com</social.google.android.clientId>
+				<social.google.android.clientSecret>nrI11zOIQR2B750Rdz85wxze</social.google.android.clientSecret>
 				<social.google.ios.clientId>74160880049-aji0lam7cfclo2a370ep2ugf7niii982.apps.googleusercontent.com</social.google.ios.clientId>
 				<social.google.ios.clientSecret>JZ52sjm4ifLV0sE1Lxwxk6pb</social.google.ios.clientSecret>
 				<content.vimeo.web.clientId>5be395b360ef0be2c11ed838505fe49d39b1c113</content.vimeo.web.clientId>
