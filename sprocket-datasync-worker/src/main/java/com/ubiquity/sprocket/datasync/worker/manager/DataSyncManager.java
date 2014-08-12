@@ -106,7 +106,7 @@ public class DataSyncManager {
 		int numRefreshed = 0;
 
 		try {	
-			List<User> users = ServiceFactory.getUserService().findAll();
+			List<User> users = ServiceFactory.getUserService().findAllActiveUsers();
 			for(User user : users) {
 				numRefreshed += syncDataForUser(user);
 			}

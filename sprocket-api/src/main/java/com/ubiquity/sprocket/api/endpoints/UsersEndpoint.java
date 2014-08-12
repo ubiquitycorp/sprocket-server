@@ -62,7 +62,6 @@ public class UsersEndpoint {
 	@Path("/ping")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response ping() {
-		//throw new UnsupportedOperationException("LinkedIn get Access Token is not supported at this time.");
 		return Response.ok().entity("{\"message\":\"pong\"}").build();
 	}
 
@@ -183,7 +182,10 @@ public class UsersEndpoint {
 				identityDto.getUsername(), identityDto.getPassword());
 		if (user == null)
 			throw new HttpException("Username / password incorrect", 401);
-
+		
+		// update user last login 
+		user.setLastLogin(System.currentTimeMillis());
+		ServiceFactory.getUserService().update(user);
 		// create api key and pass back associated identities for this user (in
 		// case of a login from a different device)
 		String apiKey = authenticationService.generateApiKey();
