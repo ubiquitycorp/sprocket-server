@@ -67,6 +67,9 @@ public class IdentityDto {
 	@Size(min = 10, max = 255, groups = AuthorizationValidation.class)
 	private String oauthVerifier;
 	
+	
+	private Long expiresIn;
+	
 	public String getUsername() {
 		return username;
 	}
@@ -123,6 +126,12 @@ public class IdentityDto {
 		return oauthVerifier;
 	}
 
+	public Long getExpiresIn() {
+		return expiresIn;
+	}
+
+
+
 	public static class Builder {
 		private String username;
 		private String password;
@@ -135,7 +144,8 @@ public class IdentityDto {
 		private String identifier;
 		private String code;
 		public String redirectUrl;
-
+		public Long expiresIn;
+		
 		public Builder username(String username) {
 			this.username = username;
 			return this;
@@ -190,6 +200,11 @@ public class IdentityDto {
 			this.redirectUrl = redirectUrl;
 			return this;
 		}
+		
+		public Builder expiresIn(Long expiresIn) {
+			this.expiresIn = expiresIn;
+			return this;
+		}
 
 		public IdentityDto build() {
 			return new IdentityDto(this);
@@ -208,5 +223,6 @@ public class IdentityDto {
 		this.identifier = builder.identifier;
 		this.code = builder.code;
 		this.redirectUrl = builder.redirectUrl;
+		this.expiresIn = builder.expiresIn;
 	}
 }

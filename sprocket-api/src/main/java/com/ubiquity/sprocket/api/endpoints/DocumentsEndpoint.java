@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Message;
@@ -53,7 +54,6 @@ public class DocumentsEndpoint {
 		
 		return Response.ok().build();
 	}
-	
 	
 	@GET
 	@Path("providers/{externalNetworkId}/indexed")
@@ -94,10 +94,14 @@ public class DocumentsEndpoint {
 	public Response searchLive(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
 		DocumentsDto result = new DocumentsDto();
 
-		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		
-		List<Document> documents = ServiceFactory.getSearchService().searchLiveDocuments(q, user, socialNetwork, page);
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, externalNetwork);
+		
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
+		
+		List<Document> documents = ServiceFactory.getSearchService().searchLiveDocuments(q, user, externalNetwork, page);
 		
 		for(Document document : documents) {
 			result.getDocuments().add(DtoAssembler.assemble(document));

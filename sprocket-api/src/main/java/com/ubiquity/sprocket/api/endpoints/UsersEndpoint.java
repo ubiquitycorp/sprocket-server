@@ -15,7 +15,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.scribe.model.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +35,7 @@ import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.api.linkedin.ExchangeService;
 import com.ubiquity.social.api.twitter.TwitterAPI;
 import com.ubiquity.social.domain.Contact;
+import com.ubiquity.social.domain.SocialToken;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
@@ -99,7 +99,7 @@ public class UsersEndpoint {
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.createOrUpdateExternalIdentity(user, accesstokens[0],
 						accesstokens[1], null, ClientPlatform.WEB,
-						ExternalNetwork.LinkedIn);
+						ExternalNetwork.LinkedIn, null);
 
 		IdentityDto result = new IdentityDto.Builder().identifier(
 				identity.getIdentifier()).build();
@@ -147,17 +147,17 @@ public class UsersEndpoint {
 			SocialAPI socialApi = SocialAPIFactory
 					.createTwitterProvider(identityDto.getRedirectUrl());
 			TwitterAPI twitterApi = (TwitterAPI) socialApi;
-			Token requestToken = twitterApi.requesttoken();
+			SocialToken requestToken = twitterApi.requesttoken();
 			if (requestToken == null
-					|| requestToken.getToken().equalsIgnoreCase(""))
+					|| requestToken.getAccessToken().equalsIgnoreCase(""))
 				throw new HttpException(
 						"Autontication Failed no oAuth_token_returned", 401);
 			else
 				return Response
 						.ok()
-						.entity("{\"oauthToken\":\"" + requestToken.getToken()
+						.entity("{\"oauthToken\":\"" + requestToken.getAccessToken()
 								+ "\",\"oauthTokenSecret\":\""
-								+ requestToken.getSecret() + "\"}")
+								+ requestToken.getSecretToken() + "\"}")
 						// .entity(jsonConverter.convertToPayload(requestToken))
 						.build();
 		}
@@ -284,7 +284,7 @@ public class UsersEndpoint {
 						identityDto.getAccessToken(),
 						identityDto.getSecretToken(),
 						identityDto.getRefreshToken(), clientPlatform,
-						externalNetwork);
+						externalNetwork, identityDto.getExpiresIn());
 
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto);
@@ -345,9 +345,11 @@ public class UsersEndpoint {
 					.createOrUpdateExternalIdentity(user, accessToken,
 							identityDto.getSecretToken(),
 							identityDto.getRefreshToken(), clientPlatform,
-							externalNetwork);
+							externalNetwork, null);
 		} else if (externalNetwork.network == Network.Social) {
 			SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
+			
+			// the expiredAt value in externalIdentity object returned from getAccessToken() is equal to expiresIn value
 			ExternalIdentity externalidentity = socialApi.getAccessToken(
 					identityDto.getCode(),
 					identityDto.getOauthToken(),
@@ -358,7 +360,7 @@ public class UsersEndpoint {
 							externalidentity.getAccessToken(),
 							externalidentity.getSecretToken(),
 							externalidentity.getRefreshToken(), clientPlatform,
-							externalNetwork);
+							externalNetwork, externalidentity.getExpiredAt());
 
 		}
 
@@ -408,11 +410,11 @@ public class UsersEndpoint {
 		// User user = ServiceFactory.getUserService().getUserById(userId);
 		SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork,
 				ClientPlatform.WEB);
-		String LongLivedAccessToken = socialApi
+		SocialToken token = socialApi
 				.exchangeAccessToken(exchangeTokenDto.getAccessToken());
 
 		return Response.ok()
-				.entity("{\"accessToken\":\"" + LongLivedAccessToken + "\"}")
+				.entity("{\"accessToken\":\"" + token.getAccessToken() + "\"}")
 				.build();
 	}
 
