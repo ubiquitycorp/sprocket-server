@@ -92,6 +92,51 @@
 			</activation>
 		</profile>
 		
+		<profile>
+			<id>env-stage</id>
+			<properties>
+				<syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
+				<redis.host>54.183.115.14</redis.host>
+				<hibernate.debug>false</hibernate.debug>
+				<solr.api.host>54.219.144.172</solr.api.host>
+				<solr.api.port>8080</solr.api.port>
+				<social.google.android.apikey>AIzaSyBw6HcXRQG2stD6cZST32nxr69q_oG9ghY</social.google.android.apikey>
+				<social.google.ios.apikey>AIzaSyBw6HcXRQG2stD6cZST32nxr69q_oG9ghY</social.google.ios.apikey>
+				<social.google.web.apikey>AIzaSyBw6HcXRQG2stD6cZST32nxr69q_oG9ghY</social.google.web.apikey>
+				<social.twitter.app.consumerKey>f5cMrdDfL4mxP1eaUOwAvUtfJ</social.twitter.app.consumerKey>
+				<social.twitter.app.consumerSecret>Z7Q61m3kHejh09muK0aX97Ed1baamdF70svowkM2nKLYvh6EYp</social.twitter.app.consumerSecret>
+				<social.facebook.consumerKey>581439761976706</social.facebook.consumerKey>
+				<social.facebook.consumerSecret>5968babeab5c14f940ac925da686c63f</social.facebook.consumerSecret>
+				<social.google.android.apikey>AIzaSyC-EfEn6WHFEDg3UjuaNxb-ZhqsCzY1D84</social.google.android.apikey>
+				<social.google.ios.apikey>AIzaSyDcW0lXISh704Z6tVwru78yLLuG6629bAk</social.google.ios.apikey>
+				<social.google.web.apikey>AIzaSyAAohwXAj4cwNQt5Gjylf7ZV7ObZiMZH_o</social.google.web.apikey>
+				<content.vimeo.web.clientId>32de4824c358a86ff15b5f53f7b840b044317390</content.vimeo.web.clientId>
+				<content.vimeo.web.clientSecret>ac0720d3536d96815996ed0da0471418a0c55524</content.vimeo.web.clientSecret>
+				<content.vimeo.mobile.clientId>00a3112427cc0de8be5710eceb5bd83524001a6b</content.vimeo.mobile.clientId>
+				<content.vimeo.mobile.clientSecret>6814eea3b1195e9f8cd81688481c76688fea1120</content.vimeo.mobile.clientSecret>
+				<db.pool.maxActive>50</db.pool.maxActive>
+				<db.pool.maxIdle>3</db.pool.maxIdle>
+				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
+				<db.pool.maxWait>10000</db.pool.maxWait>
+				<db.pool.idleConnectionTestPeriod>60
+				</db.pool.idleConnectionTestPeriod>
+				<db.username>sprocketusr</db.username>
+				<db.password>sprocket9801</db.password>
+				<db.host>sprocket-stage-rds.cvgtvh3iosnx.us-west-1.rds.amazonaws.com</db.host>
+				<hibernate.schema.auto>none</hibernate.schema.auto>
+				<repo.env>stage</repo.env>
+				<mq.host>54.215.203.15</mq.host>
+				<mq.username>netappusr</mq.username>
+				<mq.password>blackdeer</mq.password>
+			</properties>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>stage</value>
+				</property>
+			</activation>
+		</profile>
+		
 	
 
 	</profiles>
