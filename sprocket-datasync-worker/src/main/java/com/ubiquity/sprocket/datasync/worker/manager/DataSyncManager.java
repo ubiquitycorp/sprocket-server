@@ -1,6 +1,7 @@
 package com.ubiquity.sprocket.datasync.worker.manager;
 
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import com.ubiquity.content.service.ContentService;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.external.domain.Network;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.service.SocialService;
@@ -123,11 +125,12 @@ public class DataSyncManager {
 	 * @return
 	 */
 	public int syncDataForUser(User user) {
-		List<ExternalIdentity> identities = ServiceFactory.getExternalIdentityService().findExternalIdentityByUserID(user.getUserId());
-		for (ExternalIdentity identity : identities) {
+		Set<Identity> identities = user.getIdentities();
+		//List<ExternalIdentity> identities = ServiceFactory.getExternalIdentityService().findExternalIdentityByUserID(user.getUserId());
+		for (Identity identity : identities) {
 			try
 			{
-				processSync(identity);
+				processSync((ExternalIdentity)identity);
 			}catch(Exception ex)
 			{
 				log.debug(ex.getMessage());
