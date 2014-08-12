@@ -62,6 +62,7 @@ public class UsersEndpoint {
 	@Path("/ping")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response ping() {
+		//throw new UnsupportedOperationException("LinkedIn get Access Token is not supported at this time.");
 		return Response.ok().entity("{\"message\":\"pong\"}").build();
 	}
 
