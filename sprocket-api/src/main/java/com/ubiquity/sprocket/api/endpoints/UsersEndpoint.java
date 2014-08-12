@@ -348,12 +348,15 @@ public class UsersEndpoint {
 							externalNetwork, null);
 		} else if (externalNetwork.network == Network.Social) {
 			SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
-			
+			String redirectUri = null;
+			if((externalNetwork.equals(ExternalNetwork.Google) || externalNetwork.equals(ExternalNetwork.YouTube)) 
+					&& clientPlatform.equals(ClientPlatform.WEB))
+				redirectUri = "postmessage";
 			// the expiredAt value in externalIdentity object returned from getAccessToken() is equal to expiresIn value
 			ExternalIdentity externalidentity = socialApi.getAccessToken(
 					identityDto.getCode(),
 					identityDto.getOauthToken(),
-					identityDto.getOauthTokenSecret());
+					identityDto.getOauthTokenSecret(), redirectUri);
 
 			identity = ServiceFactory.getExternalIdentityService()
 					.createOrUpdateExternalIdentity(user,
