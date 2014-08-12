@@ -116,7 +116,6 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		ServiceFactory.getAnalyticsService().track(engagedItem);
 	}
 
-	@SuppressWarnings("unused")
 	private void process(UserEngagedActivity engagedActivity) {
 		log.debug("found: {}", engagedActivity);
 
