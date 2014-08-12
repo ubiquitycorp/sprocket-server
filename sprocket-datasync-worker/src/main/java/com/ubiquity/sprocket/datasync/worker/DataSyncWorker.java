@@ -4,10 +4,21 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.quartz.DateBuilder.futureDate;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.TriggerKey.triggerKey;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.quartz.DateBuilder.IntervalUnit;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +26,7 @@ import com.niobium.common.thread.ThreadPool;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.social.api.SocialAPIFactory;
+import com.ubiquity.sprocket.datasync.worker.jobs.DataSyncJob;
 import com.ubiquity.sprocket.datasync.worker.mq.consumer.CacheInvalidateConsumer;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -43,7 +55,7 @@ public class DataSyncWorker {
 		// start the thread pool, 10 consumer threads
 		ThreadPool<CacheInvalidateConsumer> threadPool = new ThreadPool<CacheInvalidateConsumer>();
 		threadPool.start(consumers);
-		
+		startScheduler();
 		log.info("Initialized {} version: {}", configuration.getProperty("application.name"),
 				configuration.getProperty("application.version"));
 		
@@ -95,6 +107,25 @@ public class DataSyncWorker {
 		JedisConnectionFactory.destroyPool();
 		EntityManagerSupport.closeEntityManagerFactory();
 		// TODO: we need an mq disconnect
+	}
+	
+	private void startScheduler() throws SchedulerException {
+		Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+		scheduler.start();
+
+		JobDetail job = newJob(DataSyncJob.class)
+				.withIdentity("dataSync", "sync")
+				.build();
+
+		Trigger trigger = newTrigger() 
+				.withIdentity(triggerKey("dataTrigger", "trigger"))
+				.withSchedule(simpleSchedule()
+						.withIntervalInMinutes(4)
+						.repeatForever())
+						.startAt(futureDate(1, IntervalUnit.MINUTE))
+						.build();
+
+		scheduler.scheduleJob(job, trigger);
 	}
 
 }
