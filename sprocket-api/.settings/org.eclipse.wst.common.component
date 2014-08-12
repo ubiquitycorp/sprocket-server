@@ -28,6 +28,9 @@
         <dependent-module archiveName="niobium-data-access-0.7.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/niobium-data-access/niobium-data-access">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="ubc-identity-0.2.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ubc-identity/ubc-identity">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="java-output-path" value="/sprocket-api/target/classes"/>
         <property name="context-root" value="sprocket-api"/>
     </wb-module>
