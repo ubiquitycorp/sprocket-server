@@ -25,7 +25,7 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 	
 	@BeforeClass
 	public static void setUp() throws Exception {
-		identity = new ExternalIdentity.Builder().accessToken("CAACEdEose0cBAJ4aTuAzGhp5s7Hb7Sc487AWjOIYNsv7rTkaKfsQ8seo2xaH7RR54HtBz1UIZCdztqcwluBI9MeW0lLGaDZAgxZBrONsCArQCfFDexiNfhfOZC79lKI2jLYnbYN1lIfvuLuecP9nSZAKtssaa1iDQhcNzkui0wUEyNz3Imc5LbZCsJA1IQMdzLQDFLOZAyDPIZBqlayRZCMXZA").build();
+		identity = new ExternalIdentity.Builder().accessToken("CAACEdEose0cBANZAbbx6aoU1euJGZCVZCC8kmPpZC2jKAWurSuPcL6uvSh9WxYChg7JLlFemDjojsHzDWH0GSqPkj2RHvWZBDbSczDhu5JcrIQDwZCgaX7SYa7HWhxANhBnbcVZAB849GfVZAaqhhbMJK8kpHEZAFyuZAs6K3Dt4jcGxIXr8BcY2ZBRu9YIIgtKD0uUFyMUGH48mahBzOWXx8lQ").build();
 		log.debug("authenticated Facebook with identity {} ", identity);
 		Configuration configuration = new PropertiesConfiguration(
 				"test.properties");

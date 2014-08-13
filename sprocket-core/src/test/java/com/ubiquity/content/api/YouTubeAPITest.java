@@ -25,7 +25,8 @@ public class YouTubeAPITest {
 	
 	@BeforeClass
 	public static void setUp() throws Exception {
-		identity = new ExternalIdentity.Builder().identifier(UUID.randomUUID().toString()).accessToken("ya29.SQB2VO_3_eUmdRwAAADsiaQSsM4KbypxDanZjckGpGhK2K82m238ysvqQBR1eA").build();
+		identity = new ExternalIdentity.Builder().identifier(UUID.randomUUID().toString())
+				.accessToken("ya29.YADq4neRcxr8kiIAAABXuPKmNyMLWRUfEOtm3zfio0Ua5xIuW9sho7Mbms1nCTs96nsseog3eWo7vq2sdLw").build();
 		log.debug("authenticated YouTube with identity {} ", identity);
 		
 		// intialize services
@@ -33,14 +34,13 @@ public class YouTubeAPITest {
 		JedisConnectionFactory.initialize(config);
 		ContentAPIFactory.initialize(config);
 		
-		
 	}
 	
 	
 	
 	@Test
 	public void testFindVideosByExternalIdentityAndPagination() {
-		ContentAPI contentApi = ContentAPIFactory.createProvider(ExternalNetwork.YouTube, ClientPlatform.WEB);
+		ContentAPI contentApi = ContentAPIFactory.createProvider(ExternalNetwork.YouTube, ClientPlatform.Android);
 		List<VideoContent> videos = contentApi.searchVideos("Karate", 1, 25, identity);
 		Assert.assertTrue(videos.size() == 25);
 		

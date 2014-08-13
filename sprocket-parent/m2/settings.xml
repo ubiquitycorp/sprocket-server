@@ -12,12 +12,20 @@
 				<solr.api.port>8080</solr.api.port>
 				<social.twitter.app.consumerKey>eIxhGVt1wo8yNs7cTq0mNHsi0</social.twitter.app.consumerKey>
 				<social.twitter.app.consumerSecret>qBTsSTelIlh0Lq4ILPlxgeTfhKk1GR8uetrlgaGExNulfxx37n</social.twitter.app.consumerSecret>
+				<social.linkedin.app.consumerKey>77fa6kjljumj8x</social.linkedin.app.consumerKey>
+				<social.linkedin.app.consumerSecret>Qp7qxRm1usYix65e</social.linkedin.app.consumerSecret>
 				<social.facebook.consumerKey>581153318672017</social.facebook.consumerKey>
 				<social.facebook.consumerSecret>0752b1dfd97a54334b53f3a22ee9b3ca</social.facebook.consumerSecret>
 				<social.google.android.apikey>AIzaSyC-EfEn6WHFEDg3UjuaNxb-ZhqsCzY1D84</social.google.android.apikey>
 				<social.google.ios.apikey>AIzaSyBLbSDsyGMBbXGVlnIUIpiSP3JKY706Gf0</social.google.ios.apikey>
 				<social.google.web.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I</social.google.web.apikey>
 				<social.google.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I</social.google.apikey>
+				<social.google.web.clientId>963651180860-gdgpmd4pqpsetql8932mrgbif8f4t89p.apps.googleusercontent.com</social.google.web.clientId>
+				<social.google.web.clientSecret>NRWmgbRuewuTUmL-IgMsuVzG</social.google.web.clientSecret>
+				<social.google.android.clientId>518857244614-l8o1ccr71sqsmmjb54hqbm4huq2tc367.apps.googleusercontent.com</social.google.android.clientId>
+				<social.google.android.clientSecret>nrI11zOIQR2B750Rdz85wxze</social.google.android.clientSecret>
+				<social.google.ios.clientId>798637804367-oeuq4acmf6jivul2gbqnig7pcspjirfu.apps.googleusercontent.com</social.google.ios.clientId>
+				<social.google.ios.clientSecret>7ND3-wtvZg2GUZhWxZesE4qp</social.google.ios.clientSecret>
 				<content.vimeo.web.clientId>8aa78eaeb615f47cdbc3806baa64e7b41ea7bb63</content.vimeo.web.clientId>
 				<content.vimeo.web.clientSecret>631651bf50ecde53df4a5a3097e31acee3240ba6</content.vimeo.web.clientSecret>
 				<content.vimeo.mobile.clientId>00a3112427cc0de8be5710eceb5bd83524001a6b</content.vimeo.mobile.clientId>
@@ -58,11 +66,19 @@
 				<solr.api.port>8080</solr.api.port>
 				<social.twitter.app.consumerKey>eIxhGVt1wo8yNs7cTq0mNHsi0</social.twitter.app.consumerKey>
 				<social.twitter.app.consumerSecret>qBTsSTelIlh0Lq4ILPlxgeTfhKk1GR8uetrlgaGExNulfxx37n</social.twitter.app.consumerSecret>
+				<social.linkedin.app.consumerKey>77fa6kjljumj8x</social.linkedin.app.consumerKey>
+				<social.linkedin.app.consumerSecret>Qp7qxRm1usYix65e</social.linkedin.app.consumerSecret>
 				<social.facebook.consumerKey>554461001341249</social.facebook.consumerKey>
 				<social.facebook.consumerSecret>06b1a984c9a65db7a42bdbe83c2738f1</social.facebook.consumerSecret>
 				<social.google.android.apikey>AIzaSyC-EfEn6WHFEDg3UjuaNxb-ZhqsCzY1D84</social.google.android.apikey>
 				<social.google.ios.apikey>AIzaSyCrTjAqBZK6DkGhFmuAu6-urDMABu0b_vk</social.google.ios.apikey>
 				<social.google.web.apikey>AIzaSyCY3woAWsatYnwhkYOeBqVjQ8V9hGa2vt8</social.google.web.apikey>
+				<social.google.web.clientId>320470378854-06esrc32feq3nstb9t9ovp95jm50skvu.apps.googleusercontent.com</social.google.web.clientId>
+				<social.google.web.clientSecret>gI2eS5OH9zp_PPB089sDafjR</social.google.web.clientSecret>
+				<social.google.android.clientId>518857244614-l8o1ccr71sqsmmjb54hqbm4huq2tc367.apps.googleusercontent.com</social.google.android.clientId>
+				<social.google.android.clientSecret>nrI11zOIQR2B750Rdz85wxze</social.google.android.clientSecret>
+				<social.google.ios.clientId>74160880049-aji0lam7cfclo2a370ep2ugf7niii982.apps.googleusercontent.com</social.google.ios.clientId>
+				<social.google.ios.clientSecret>JZ52sjm4ifLV0sE1Lxwxk6pb</social.google.ios.clientSecret>
 				<content.vimeo.web.clientId>5be395b360ef0be2c11ed838505fe49d39b1c113</content.vimeo.web.clientId>
 				<content.vimeo.web.clientSecret>9258a21966cadc0fb89b45281b70ceb5081f32fa</content.vimeo.web.clientSecret>
 				<content.vimeo.mobile.clientId>00a3112427cc0de8be5710eceb5bd83524001a6b</content.vimeo.mobile.clientId>
