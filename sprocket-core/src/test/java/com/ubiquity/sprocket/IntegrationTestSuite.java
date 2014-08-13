@@ -33,8 +33,7 @@ import com.ubiquity.sprocket.service.AuthenticationServiceTest;
 	UserRepositoryTest.class, 
 	ActivityRepositoryTest.class, 
 	MessageRepositoryTest.class,
-	VideoContentRepositoryTest.class,
-	TwitterApiTest.class
+	VideoContentRepositoryTest.class
 	})
 public class IntegrationTestSuite {
 	

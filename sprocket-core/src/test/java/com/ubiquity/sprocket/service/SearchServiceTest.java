@@ -60,7 +60,7 @@ public class SearchServiceTest {
 	public void testLiveSearchWithFacebook() {
 		
 		User user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("CAACEdEose0cBADv5biV5FN9Vqfxzg0l794hNmHvEvgWE9RtLXTZCalwK6wYGMjttqe8wuTkC5ZC7uIyzrdBTsLUxKiYxREoZCrqLTZAfdwJFv2hbOt8QTnno7t7tWYJIPWh1szP65gLjdxwUOJQUs5QScrWqnPidFDj6U0sZBKh3S9zeAVam0ND7zZAxwNg9RcrZBAI4NoZBqMjVezZB28vLv").clientPlatform(ClientPlatform.WEB).externalNetwork(ExternalNetwork.Facebook.ordinal()).build());
+		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("CAAIQjk0elpEBAHOw7lgI0DEXgr9WZATxvFqWIwZCdbq7PuxEkBD3fjLE1oP6Www1J8T21f1XITpNDijPu2xlaoh8AdviGZCLIIzp5eTmrfnuWcy6D1OKn6GRliPuJQZA5LmUxqTRthADMuhbGUXPiYllUgl09CUfevjSSMSphsyBwPFZCLy9fX8QFYYieYRUZD").clientPlatform(ClientPlatform.WEB).externalNetwork(ExternalNetwork.Facebook.ordinal()).build());
 		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.Facebook, 1);
 		log.debug("documents: {}", documents);
 		Assert.assertFalse(documents.isEmpty());
@@ -81,7 +81,7 @@ public class SearchServiceTest {
 	@Test 
 	public void testLiveSearchWithYouTube() {
 		User user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("ya29.SQCCPSWqzhtnbxwAAACJpZt8z7tsGirHhSIiUKhaaj2uIe8IkfhTMZSq8kbDzg").clientPlatform(ClientPlatform.WEB).externalNetwork(ExternalNetwork.YouTube.ordinal()).build());
+		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("ya29.YADq4neRcxr8kiIAAABXuPKmNyMLWRUfEOtm3zfio0Ua5xIuW9sho7Mbms1nCTs96nsseog3eWo7vq2sdLw").clientPlatform(ClientPlatform.Android).externalNetwork(ExternalNetwork.YouTube.ordinal()).build());
 		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.YouTube, 1);
 		log.debug("documents: {}", documents);
 		Assert.assertFalse(documents.isEmpty());
