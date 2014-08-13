@@ -15,7 +15,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.scribe.model.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +35,7 @@ import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.api.linkedin.ExchangeService;
 import com.ubiquity.social.api.twitter.TwitterAPI;
 import com.ubiquity.social.domain.Contact;
+import com.ubiquity.social.domain.SocialToken;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
@@ -91,38 +91,36 @@ public class UsersEndpoint {
 		ExchangeService exchangservice = new ExchangeService();
 		String[] accesstokens = exchangservice.exchangeToken(cookieString);
 
+		
 		if (accesstokens[0] == null || accesstokens[0].equalsIgnoreCase(""))
-			throw new HttpException(
-					"Autontication Failed no oAuth_token_returned", 401);
+			throw new HttpException("Autontication Failed no oAuth_token_returned", 401);
 
 		// create the identity if it does not exist; or use the existing one
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.createOrUpdateExternalIdentity(user, accesstokens[0],
-						accesstokens[1], ClientPlatform.WEB,
-						ExternalNetwork.LinkedIn);
-		
+						accesstokens[1], null, ClientPlatform.WEB,
+						ExternalNetwork.LinkedIn, null);
+
 		IdentityDto result = new IdentityDto.Builder().identifier(
 				identity.getIdentifier()).build();
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, result);
-		
-		try
-		{
-		
-			Contact contact = ServiceFactory.getContactService().getBySocialIdentityId(identity.getIdentityId());
+
+		try {
+
+			Contact contact = ServiceFactory.getContactService()
+					.getBySocialIdentityId(identity.getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
-			return Response.ok().entity(jsonConverter.convertToPayload(contactDto))
-					.build();
-		}
-		catch(NoResultException ex)
-		{
+			return Response.ok()
+					.entity(jsonConverter.convertToPayload(contactDto)).build();
+		} catch (NoResultException ex) {
 
 			return Response.ok().entity(jsonConverter.convertToPayload(result))
 					.build();
 		}
 
 	}
-	
+
 	/***
 	 * This method used to request Token
 	 * 
@@ -135,33 +133,38 @@ public class UsersEndpoint {
 	@Path("/{userId}/requesttoken")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response requesttoken(@PathParam("userId") Long userId,
-			InputStream payload)
-			throws Exception {
+			InputStream payload) throws Exception {
 
 		// load user
 		ServiceFactory.getUserService().getUserById(userId);
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
 				IdentityDto.class, AuthorizationValidation.class);
-//		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
-//				.getClientPlatformId());
+		// ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
+		// .getClientPlatformId());
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identityDto.getExternalNetworkId());
-		if(externalNetwork == ExternalNetwork.Twitter)
-		{
-			SocialAPI socialApi = SocialAPIFactory.createTwitterProvider(identityDto.getRedirectUrl());
+		if (externalNetwork == ExternalNetwork.Twitter) {
+			SocialAPI socialApi = SocialAPIFactory
+					.createTwitterProvider(identityDto.getRedirectUrl());
 			TwitterAPI twitterApi = (TwitterAPI) socialApi;
-			Token requestToken = twitterApi.requesttoken();
-			if (requestToken == null || requestToken.getToken().equalsIgnoreCase(""))
+			SocialToken requestToken = twitterApi.requesttoken();
+			if (requestToken == null
+					|| requestToken.getAccessToken().equalsIgnoreCase(""))
 				throw new HttpException(
 						"Autontication Failed no oAuth_token_returned", 401);
 			else
-				return Response.ok().entity("{\"oauthToken\":\"" + requestToken.getToken() + "\",\"oauthTokenSecret\":\"" + requestToken.getSecret() + "\"}")
-				//.entity(jsonConverter.convertToPayload(requestToken))
-				.build();
+				return Response
+						.ok()
+						.entity("{\"oauthToken\":\"" + requestToken.getAccessToken()
+								+ "\",\"oauthTokenSecret\":\""
+								+ requestToken.getSecretToken() + "\"}")
+						// .entity(jsonConverter.convertToPayload(requestToken))
+						.build();
 		}
 		throw new NotImplementedException("ExternalNetwork is not supported");
 
 	}
+
 	/***
 	 * This method authenticates user via native login. Thereafter users can
 	 * authenticate
@@ -279,24 +282,23 @@ public class UsersEndpoint {
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.createOrUpdateExternalIdentity(user,
 						identityDto.getAccessToken(),
-						identityDto.getSecretToken(), clientPlatform,
-						externalNetwork);
-		
+						identityDto.getSecretToken(),
+						identityDto.getRefreshToken(), clientPlatform,
+						externalNetwork, identityDto.getExpiresIn());
+
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto);
 
 		// send off to analytics tracker
-		//sendEventTrackedMessage(user, identity);
-		try
-		{
-		
-			Contact contact = ServiceFactory.getContactService().getBySocialIdentityId(identity.getIdentityId());
+		// sendEventTrackedMessage(user, identity);
+		try {
+
+			Contact contact = ServiceFactory.getContactService()
+					.getBySocialIdentityId(identity.getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
-			return Response.ok().entity(jsonConverter.convertToPayload(contactDto))
-					.build();
-		}
-		catch(NoResultException ex)
-		{
+			return Response.ok()
+					.entity(jsonConverter.convertToPayload(contactDto)).build();
+		} catch (NoResultException ex) {
 			IdentityDto result = new IdentityDto.Builder().identifier(
 					identity.getIdentifier()).build();
 			return Response.ok().entity(jsonConverter.convertToPayload(result))
@@ -328,54 +330,57 @@ public class UsersEndpoint {
 				.getClientPlatformId());
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identityDto.getExternalNetworkId());
-		ExternalIdentity identity = null ;
+		ExternalIdentity identity = null;
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
-		if(externalNetwork.network == Network.Content)
-		{
-			
+		if (externalNetwork.network == Network.Content) {
+
 			ContentAPI contentApi = ContentAPIFactory.createProvider(
 					externalNetwork, clientPlatform);
-			String accessToken = contentApi.getAccessToken(identityDto.getCode(),
-					identityDto.getRedirectUrl());
-	
+			String accessToken = contentApi.getAccessToken(
+					identityDto.getCode(), identityDto.getRedirectUrl());
+
 			// create the identity if it does not exist; or use the existing one
 			identity = ServiceFactory.getExternalIdentityService()
 					.createOrUpdateExternalIdentity(user, accessToken,
-							identityDto.getSecretToken(), clientPlatform,
-							externalNetwork);
-		}
-		else if(externalNetwork.network == Network.Social)
-		{
-			SocialAPI socialApi = SocialAPIFactory.createProvider(
-					externalNetwork, clientPlatform);
-			ExternalIdentity externalidentity = socialApi.getAccessToken(identityDto.getOauthToken(), identityDto.getOauthVerifier() ,identityDto.getOauthTokenSecret());
-			
+							identityDto.getSecretToken(),
+							identityDto.getRefreshToken(), clientPlatform,
+							externalNetwork, null);
+		} else if (externalNetwork.network == Network.Social) {
+			SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
+			String redirectUri = null;
+			if((externalNetwork.equals(ExternalNetwork.Google) || externalNetwork.equals(ExternalNetwork.YouTube)) 
+					&& clientPlatform.equals(ClientPlatform.WEB))
+				redirectUri = "postmessage";
+			// the expiredAt value in externalIdentity object returned from getAccessToken() is equal to expiresIn value
+			ExternalIdentity externalidentity = socialApi.getAccessToken(
+					identityDto.getCode(),
+					identityDto.getOauthToken(),
+					identityDto.getOauthTokenSecret(), redirectUri);
+
 			identity = ServiceFactory.getExternalIdentityService()
-			.createOrUpdateExternalIdentity(user,
-					externalidentity.getAccessToken(),
-					externalidentity.getSecretToken(), clientPlatform,
-					externalNetwork);
-			
+					.createOrUpdateExternalIdentity(user,
+							externalidentity.getAccessToken(),
+							externalidentity.getSecretToken(),
+							externalidentity.getRefreshToken(), clientPlatform,
+							externalNetwork, externalidentity.getExpiredAt());
+
 		}
-		
 
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto);
 
 		// send off to analytics tracker
-		//sendEventTrackedMessage(user, identity);
+		// sendEventTrackedMessage(user, identity);
 
-		try
-		{
-		
-			Contact contact = ServiceFactory.getContactService().getBySocialIdentityId(identity.getIdentityId());
+		try {
+
+			Contact contact = ServiceFactory.getContactService()
+					.getBySocialIdentityId(identity.getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
-			return Response.ok().entity(jsonConverter.convertToPayload(contactDto))
-					.build();
-		}
-		catch(NoResultException ex)
-		{
+			return Response.ok()
+					.entity(jsonConverter.convertToPayload(contactDto)).build();
+		} catch (NoResultException ex) {
 			IdentityDto result = new IdentityDto.Builder().identifier(
 					identity.getIdentifier()).build();
 			return Response.ok().entity(jsonConverter.convertToPayload(result))
@@ -385,7 +390,9 @@ public class UsersEndpoint {
 	}
 
 	/***
-	 * This method exchanges short-lived access token with long-lived one in a given provider.
+	 * This method exchanges short-lived access token with long-lived one in a
+	 * given provider.
+	 * 
 	 * @param userId
 	 * @param externalNetworkId
 	 * @param accessToken
@@ -395,18 +402,25 @@ public class UsersEndpoint {
 	@Path("/{userId}/exchangedToken")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response exchangeAccessToken(@PathParam("userId") Long userId, InputStream payload){
-		
-		ExchangeTokenDto exchangeTokenDto = jsonConverter.convertFromPayload(payload, ExchangeTokenDto.class);
-		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(exchangeTokenDto.getExternalNetworkId());
+	public Response exchangeAccessToken(@PathParam("userId") Long userId,
+			InputStream payload) {
+
+		ExchangeTokenDto exchangeTokenDto = jsonConverter.convertFromPayload(
+				payload, ExchangeTokenDto.class);
+		ExternalNetwork externalNetwork = ExternalNetwork
+				.getNetworkById(exchangeTokenDto.getExternalNetworkId());
 		// load user
-		//User user = ServiceFactory.getUserService().getUserById(userId);
-		SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork, ClientPlatform.WEB);
-		String LongLivedAccessToken = socialApi.exchangeAccessToken(exchangeTokenDto.getAccessToken());
-		
-		return Response.ok().entity("{\"accessToken\":\"" + LongLivedAccessToken + "\"}").build();
+		// User user = ServiceFactory.getUserService().getUserById(userId);
+		SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork,
+				ClientPlatform.WEB);
+		SocialToken token = socialApi
+				.exchangeAccessToken(exchangeTokenDto.getAccessToken());
+
+		return Response.ok()
+				.entity("{\"accessToken\":\"" + token.getAccessToken() + "\"}")
+				.build();
 	}
-	
+
 	private void sendActivatedMessage(User user, ExternalIdentity identity,
 			IdentityDto identityDto) throws IOException {
 		ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
@@ -420,6 +434,5 @@ public class UsersEndpoint {
 		MessageQueueFactory.getCacheInvalidationQueueProducer().write(
 				message.getBytes());
 	}
-
 
 }

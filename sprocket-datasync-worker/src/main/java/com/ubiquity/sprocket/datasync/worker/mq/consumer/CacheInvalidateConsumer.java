@@ -121,6 +121,8 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identity.getExternalNetwork());
 
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
+		
 		if (externalNetwork.network.equals(Network.Content))
 			processVideos(identity, externalNetwork);
 		else if (externalNetwork.equals(ExternalNetwork.Google))
@@ -138,8 +140,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		}
 	} 
 
-	private void processActivities(ExternalIdentity identity,
-			ExternalNetwork socialNetwork) {
+	private void processActivities(ExternalIdentity identity, ExternalNetwork socialNetwork) {
 		SocialService socialService = ServiceFactory.getSocialService();
 		List<Activity> synced = socialService.syncActivities(identity,
 				socialNetwork);
@@ -154,12 +155,11 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 	 * @param identity
 	 * @param externalNetwork
 	 */
-	private void processVideos(ExternalIdentity identity,
-			ExternalNetwork externalNetwork) {
+	private void processVideos(ExternalIdentity identity, ExternalNetwork externalNetwork) {
 
 		ContentService contentService = ServiceFactory.getContentService();
-		List<VideoContent> synced = contentService.sync(identity,
-				externalNetwork);
+		
+		List<VideoContent> synced = contentService.sync(identity, externalNetwork);
 
 		// add videos to search results for this specific user
 		ServiceFactory.getSearchService().indexVideos(identity.getUser().getUserId(), synced);
