@@ -123,8 +123,8 @@ public class DtoAssembler {
 						.build();
 			}
 		} else if (dataType.equals(Message.class.getSimpleName())) {
-
-			data = new MessageDto.Builder()
+			
+			MessageDto message = new MessageDto.Builder()
 					.subject((String) fields.get(SearchKeys.Fields.FIELD_TITLE))
 					.date(System.currentTimeMillis())
 					.externalNetworkId(
@@ -132,7 +132,12 @@ public class DtoAssembler {
 									.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
 					.body((String) fields.get(SearchKeys.Fields.FIELD_BODY))
 					.sender(assembleContactDtoFromDocumentFields(fields)).build();
-
+			MessageDto topMessage = new MessageDto.Builder()
+				.externalNetworkId(message.getExternalNetworkId())
+				.lastMessageDate(message.getDate())
+				.build();
+				topMessage.getConversation().add(message);
+			data = topMessage;
 		} else if (dataType.equals(Activity.class.getSimpleName())) {
 			// if we have an object, build from the entity data
 			if (document.getData() != null) {
