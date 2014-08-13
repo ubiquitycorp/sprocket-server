@@ -67,7 +67,7 @@ public class SearchService {
 
 			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_DISPLAY_NAME, message.getSender().getDisplayName());
 			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_IDENTIFIER, message.getSender().getExternalIdentity().getIdentifier());
-
+			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_THUMBNAIL, message.getSender().getImage().getUrl());
 			document.getFields().put(SearchKeys.Fields.FIELD_OWNER_ID, message.getOwner().getUserId());
 
 			document.getFields().put(SearchKeys.Fields.FIELD_BODY, message.getBody());
