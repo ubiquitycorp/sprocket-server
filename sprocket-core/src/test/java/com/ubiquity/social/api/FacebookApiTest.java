@@ -14,6 +14,10 @@ import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.content.api.VimeoAPITest;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.factory.TestUserFactory;
+import com.ubiquity.social.domain.Contact;
+import com.ubiquity.social.domain.Gender;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.external.domain.ExternalNetwork;
 
@@ -25,7 +29,11 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 	
 	@BeforeClass
 	public static void setUp() throws Exception {
-		identity = new ExternalIdentity.Builder().accessToken("CAACEdEose0cBAJ4aTuAzGhp5s7Hb7Sc487AWjOIYNsv7rTkaKfsQ8seo2xaH7RR54HtBz1UIZCdztqcwluBI9MeW0lLGaDZAgxZBrONsCArQCfFDexiNfhfOZC79lKI2jLYnbYN1lIfvuLuecP9nSZAKtssaa1iDQhcNzkui0wUEyNz3Imc5LbZCsJA1IQMdzLQDFLOZAyDPIZBqlayRZCMXZA").build();
+		
+		User user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		identity = new ExternalIdentity.Builder().user(user).accessToken("CAACEdEose0cBAI3v23IiMqfqQjqaNAMbi7ZBEij505CbZCPGWZAS3ZA7c5jZAYxSlRpmUaBKQLlnsCFy3dJ4kqwaGahDkq7pLTiHU85flw64XqcU1JdWaLPmkmsYxCO1wLKd7ZCTI0kIvuDCh2IA3xllR1wjlZALBRNHZCz0Ly0Y7CZAbzETzJdZC4wgsZCR7PS0XmbmWFxA5oDbC316w5GZBNRM").build();
+		
+		
 		log.debug("authenticated Facebook with identity {} ", identity);
 		Configuration configuration = new PropertiesConfiguration(
 				"test.properties");
@@ -47,6 +55,14 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 			Assert.assertNotNull(message.getConversation().getConversationIdentifier());
 		}
 		
+	}
+	
+	@Test
+	public void testAuthenticateReturnsGenderAgeRange() {
+		SocialAPI facebookAPI = SocialAPIFactory.createProvider(ExternalNetwork.Facebook, ClientPlatform.WEB);
+		Contact contact = facebookAPI.authenticateUser(identity);
+		Assert.assertTrue(contact.getGender() != null);	
+		Assert.assertTrue(contact.getAgeRange() != null);
 	}
 
 }
