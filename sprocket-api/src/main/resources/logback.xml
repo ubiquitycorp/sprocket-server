@@ -19,7 +19,7 @@
 		<appender-ref ref="STDOUT" />
 	</root> -->
 
-	<root level="INFO">
+	<root level="DEBUG">
 		<appender-ref ref="SYSLOG" />
 		<appender-ref ref="STDOUT" />
 	</root>
