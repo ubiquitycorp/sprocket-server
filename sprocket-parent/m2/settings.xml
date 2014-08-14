@@ -5,6 +5,7 @@
 		<profile>
 			<id>env-vm</id>
 			<properties>
+				<app.log.level>DEBUG</app.log.level>
 				<syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
 				<redis.host>localhost</redis.host>
 				<hibernate.debug>true</hibernate.debug>
@@ -59,6 +60,7 @@
 		<profile>
 			<id>env-qa</id>
 			<properties>
+				<app.log.level>INFO</app.log.level>
 				<syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
 				<redis.host>localhost</redis.host>
 				<hibernate.debug>true</hibernate.debug>
@@ -111,6 +113,7 @@
 		<profile>
 			<id>env-stage</id>
 			<properties>
+				<app.log.level>INFO</app.log.level>
 				<syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
 				<redis.host>54.183.115.14</redis.host>
 				<hibernate.debug>false</hibernate.debug>
