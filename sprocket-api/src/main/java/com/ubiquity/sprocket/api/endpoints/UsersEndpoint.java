@@ -41,6 +41,7 @@ import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.ExchangeTokenDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
+import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.AuthorizationValidation;
@@ -263,6 +264,7 @@ public class UsersEndpoint {
 	@Path("/{userId}/identities")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response activate(@PathParam("userId") Long userId,
 			InputStream payload) throws IOException {
 
