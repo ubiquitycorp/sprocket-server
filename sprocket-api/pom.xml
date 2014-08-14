@@ -160,7 +160,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-api</artifactId>
-			<version>0.3.2</version>
+			<version>0.3.3</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>commons-codec</artifactId>

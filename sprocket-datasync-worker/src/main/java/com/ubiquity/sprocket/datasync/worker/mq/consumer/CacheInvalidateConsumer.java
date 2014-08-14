@@ -3,6 +3,7 @@ package com.ubiquity.sprocket.datasync.worker.mq.consumer;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 				process((UserEngagedVideo)message.getContent());
 
 		} catch (Exception e) {
-			log.error("Could not process message: {}", e);
+			log.error("Could not process, message: {}, root cause message: {}",ExceptionUtils.getMessage(e), ExceptionUtils.getRootCauseMessage(e));
 		}
 	}
 
