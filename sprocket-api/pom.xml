@@ -4,7 +4,7 @@
 	<artifactId>sprocket-api</artifactId>
 	<name>Sprocket API</name>
 	<packaging>war</packaging>
-	<version>1.4.17</version>
+	<version>1.4.18</version>
 	<!-- Note, parameterize this -->
 	<properties>
 		<app.home>/var/lib/tomcat7/webapps/sprocket-api</app.home>
@@ -148,7 +148,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>sprocket-core</artifactId>
-			<version>0.1.5</version>
+			<version>0.1.6</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.jboss.resteasy</groupId>
@@ -160,7 +160,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-api</artifactId>
-			<version>0.3.3</version>
+			<version>0.3.4</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>commons-codec</artifactId>
