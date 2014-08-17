@@ -14,6 +14,7 @@ import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.RecommendationsDto;
+import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.service.AnalyticsService;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
@@ -25,6 +26,7 @@ public class AnalyticsEndpoint {
 	@GET
 	@Path("users/{userId}/recommendations")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response recommendations(@PathParam("userId") Long userId) {
 
 		RecommendationsDto recommendationsDto = new RecommendationsDto();
