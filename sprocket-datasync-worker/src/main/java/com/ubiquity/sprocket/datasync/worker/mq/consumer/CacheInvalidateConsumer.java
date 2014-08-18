@@ -1,6 +1,7 @@
 package com.ubiquity.sprocket.datasync.worker.mq.consumer;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -9,9 +10,14 @@ import org.slf4j.LoggerFactory;
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
 import com.ubiquity.content.domain.VideoContent;
+import com.ubiquity.content.service.ContentService;
+import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.external.domain.Network;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.social.domain.Activity;
+import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.datasync.worker.manager.DataSyncManager;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
