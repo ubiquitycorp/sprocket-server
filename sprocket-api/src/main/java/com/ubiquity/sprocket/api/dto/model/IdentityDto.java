@@ -45,6 +45,9 @@ public class IdentityDto {
 
 	@Size(min = 10, max = 255, groups = ActivationValidation.class)
 	private String secretToken;
+	
+	@Size(min = 10, groups = ActivationValidation.class)
+	private String refreshToken;
 
 	@NotNull(groups = { EngagementValidation.class })
 	private String identifier;
@@ -63,6 +66,9 @@ public class IdentityDto {
 	
 	@Size(min = 10, max = 255, groups = AuthorizationValidation.class)
 	private String oauthVerifier;
+	
+	
+	private Long expiresIn;
 	
 	public String getUsername() {
 		return username;
@@ -88,6 +94,10 @@ public class IdentityDto {
 		return secretToken;
 	}
 
+	public String getRefreshToken() {
+		return refreshToken;
+	}
+
 	public String getIdentifier() {
 		return identifier;
 	}
@@ -104,7 +114,6 @@ public class IdentityDto {
 		return redirectUrl;
 	}
 	
-	
 	public String getOauthToken() {
 		return oauthToken;
 	}
@@ -117,6 +126,11 @@ public class IdentityDto {
 		return oauthVerifier;
 	}
 
+	public Long getExpiresIn() {
+		return expiresIn;
+	}
+
+
 
 	public static class Builder {
 		private String username;
@@ -126,10 +140,12 @@ public class IdentityDto {
 		private String accessToken;
 		private Integer externalNetworkId;
 		private String secretToken;
+		private String refreshToken;
 		private String identifier;
 		private String code;
 		public String redirectUrl;
-
+		public Long expiresIn;
+		
 		public Builder username(String username) {
 			this.username = username;
 			return this;
@@ -164,6 +180,11 @@ public class IdentityDto {
 			this.secretToken = secretToken;
 			return this;
 		}
+		
+		public Builder refreshToken(String refreshToken) {
+			this.refreshToken = refreshToken;
+			return this;
+		}
 
 		public Builder identifier(String identifier) {
 			this.identifier = identifier;
@@ -177,6 +198,11 @@ public class IdentityDto {
 		
 		public Builder redirectUrl(String redirectUrl) {
 			this.redirectUrl = redirectUrl;
+			return this;
+		}
+		
+		public Builder expiresIn(Long expiresIn) {
+			this.expiresIn = expiresIn;
 			return this;
 		}
 
@@ -193,8 +219,10 @@ public class IdentityDto {
 		this.accessToken = builder.accessToken;
 		this.externalNetworkId = builder.externalNetworkId;
 		this.secretToken = builder.secretToken;
+		this.refreshToken = builder.refreshToken;
 		this.identifier = builder.identifier;
 		this.code = builder.code;
 		this.redirectUrl = builder.redirectUrl;
+		this.expiresIn = builder.expiresIn;
 	}
 }

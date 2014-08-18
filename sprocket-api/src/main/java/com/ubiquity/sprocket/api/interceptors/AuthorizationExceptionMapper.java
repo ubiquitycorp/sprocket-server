@@ -5,6 +5,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ public class AuthorizationExceptionMapper implements ExceptionMapper<Authorizati
 	 * Returns error response and sets the response code
 	 */
 	public Response toResponse(AuthorizationException e) {
-		log.error("[ERROR]", e.getMessage(), e);
+		log.error("[ERROR] {}", ExceptionUtils.getRootCauseMessage(e));
 		
 		ErrorDto response = new ErrorDto();
 		response.getMessages().add("Could not authenticate with provider: " +e.getMessage());

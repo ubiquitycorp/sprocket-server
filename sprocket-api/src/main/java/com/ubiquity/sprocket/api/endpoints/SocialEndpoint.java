@@ -43,8 +43,7 @@ public class SocialEndpoint {
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
-
-
+	
 	@POST
 	@Path("/users/{userId}/activities/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -85,8 +84,6 @@ public class SocialEndpoint {
 				.build();
 	}
 
-
-	
 	/***
 	 * This method returns messages of specific social network
 	 * @param userId
@@ -135,16 +132,20 @@ public class SocialEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
 
+		//Cast the input into SendMessageObject
+		SendMessageDto sendMessageDto = jsonConverter.convertFromPayload(payload, SendMessageDto.class);
+			
 		// load user
 		ServiceFactory.getUserService().getUserById(userId);
 		// get social network 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		// get the identity from DB
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
-		//Cast the input into SendMessageObject
-		SendMessageDto sendMessageDto = jsonConverter.convertFromPayload(payload, SendMessageDto.class);
-
+		
 		Contact contact = ServiceFactory.getContactService().getByContactId(sendMessageDto.getReceiverId());
+		
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
+		
 		ServiceFactory.getSocialService().sendMessage(identity,socialNetwork, contact, sendMessageDto.getReceiverName(), sendMessageDto.getText(), sendMessageDto.getSubject());
 	
 		return Response.ok().build();
@@ -163,14 +164,18 @@ public class SocialEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response postactivity(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
 
+		//Cast the input into SendMessageObject
+		PostActivity postActivity = jsonConverter.convertFromPayload(payload, PostActivity.class);
+				
 		// load user
 		ServiceFactory.getUserService().getUserById(userId);
 		// get social network 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
 		// get the identity from DB
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
-		//Cast the input into SendMessageObject
-		PostActivity postActivity = jsonConverter.convertFromPayload(payload, PostActivity.class);
+		
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
+		
 		ServiceFactory.getSocialService().PostActivity(identity, socialNetwork, postActivity);
 
 		return Response.ok().build();
