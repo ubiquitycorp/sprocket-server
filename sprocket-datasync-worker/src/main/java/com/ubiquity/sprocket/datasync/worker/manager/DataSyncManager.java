@@ -15,6 +15,7 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.domain.Activity;
+import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -32,9 +33,9 @@ public class DataSyncManager {
 		// get identity from message
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.getExternalIdentityById(activated.getIdentityId());
-		processSync(identity);
+		processSync(identity,null);
 	} 
-	private void processSync(ExternalIdentity identity)
+	private void processSync(ExternalIdentity identity,String lastMessageIdentifier)
 	{
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identity.getExternalNetwork());
@@ -45,9 +46,9 @@ public class DataSyncManager {
 			processVideos(identity, ExternalNetwork.YouTube);
 
 		if(externalNetwork.equals(ExternalNetwork.Google) ) {
-			processMessages(identity, externalNetwork);
+			processMessages(identity, externalNetwork, lastMessageIdentifier);
 		}  else if ( externalNetwork.equals(ExternalNetwork.Facebook)||externalNetwork.equals(ExternalNetwork.Twitter)) {
-			processMessages(identity, externalNetwork);
+			processMessages(identity, externalNetwork, lastMessageIdentifier);
 			processActivities(identity, externalNetwork);
 		}
 		else if(externalNetwork.equals(ExternalNetwork.LinkedIn))
@@ -90,11 +91,11 @@ public class DataSyncManager {
 	 * @param network
 	 */
 	private void processMessages(ExternalIdentity identity,
-			ExternalNetwork network) {
+			ExternalNetwork network,String lastMessageIdentifier) {
 		SocialService socialService = ServiceFactory.getSocialService();
 
 		List<com.ubiquity.social.domain.Message> messages = socialService
-				.syncMessages(identity, network);
+				.syncMessages(identity, network, lastMessageIdentifier);
 
 		// add messages to search results
 		ServiceFactory.getSearchService().indexMessages(messages);
@@ -130,7 +131,9 @@ public class DataSyncManager {
 		for (Identity identity : identities) {
 			try
 			{
-				processSync((ExternalIdentity)identity);
+				ExternalIdentity externalIdentity =(ExternalIdentity)identity;
+				Message message  = ServiceFactory.getSocialService().getLastSyncedMessage(user.getUserId(),ExternalNetwork.getNetworkById(externalIdentity.getExternalNetwork()));
+				processSync(externalIdentity ,message.getExternalIdentifier());
 			}catch(Exception ex)
 			{
 				log.debug(ex.getMessage());

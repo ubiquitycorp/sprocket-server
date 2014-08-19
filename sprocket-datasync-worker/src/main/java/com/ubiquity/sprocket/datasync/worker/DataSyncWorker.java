@@ -120,7 +120,7 @@ public class DataSyncWorker {
 		Trigger trigger = newTrigger() 
 				.withIdentity(triggerKey("dataTrigger", "trigger"))
 				.withSchedule(simpleSchedule()
-						.withIntervalInMinutes(4)
+						.withIntervalInMinutes(8)
 						.repeatForever())
 						.startAt(futureDate(1, IntervalUnit.MINUTE))
 						.build();

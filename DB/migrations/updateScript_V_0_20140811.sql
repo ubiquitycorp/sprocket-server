@@ -16,5 +16,4 @@ ALTER TABLE activity ADD INDEX external_network (idx_external_network);
 ALTER TABLE message ADD INDEX identifier (idx_external_identifier);
 ALTER TABLE message ADD INDEX external_network (idx_external_network);
 
-
 ALTER IGNORE TABLE external_identity ADD COLUMN expiry_time (Long)
