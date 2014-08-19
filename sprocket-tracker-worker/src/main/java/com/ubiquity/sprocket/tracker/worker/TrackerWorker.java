@@ -26,9 +26,9 @@ public class TrackerWorker {
 	public void destroy() {
 		stopServices();
 	}
-	public void initialize(Configuration configuration) throws SchedulerException, IOException {
+	public void initialize(Configuration configuration, Configuration errorsConfiguration) throws SchedulerException, IOException {
 
-		startServices(configuration);
+		startServices(configuration, errorsConfiguration);
 
 		log.info("Service initialized.");
 
@@ -58,7 +58,8 @@ public class TrackerWorker {
 	public static void main(String[] args) {
 		final TrackerWorker worker = new TrackerWorker();
 		try {
-			worker.initialize(new PropertiesConfiguration("datasyncworker.properties"));
+			worker.initialize(new PropertiesConfiguration("datasyncworker.properties"),
+					new PropertiesConfiguration("messages.properties"));
 		} catch (ConfigurationException e) {
 			log.error("Unable to configure service", e);
 			System.exit(-1);
@@ -80,8 +81,8 @@ public class TrackerWorker {
 
 	}
 
-	private void startServices(Configuration configuration) throws IOException {
-		ServiceFactory.initialize(configuration);
+	private void startServices(Configuration configuration, Configuration errorsConfiguration) throws IOException {
+		ServiceFactory.initialize(configuration, errorsConfiguration);
 		JedisConnectionFactory.initialize(configuration);
 		MessageQueueFactory.initialize(configuration);
 	}

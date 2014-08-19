@@ -42,12 +42,14 @@ public class SearchServiceTest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 		Configuration config = new PropertiesConfiguration("test.properties");
+		Configuration errorsConfiguration = new PropertiesConfiguration("messages.properties");
+		
 		searchService = new SearchService(config);
 		
 		JedisConnectionFactory.initialize(config);
 		SocialAPIFactory.initialize(config);
 		ContentAPIFactory.initialize(config);
-		ServiceFactory.initialize(config);
+		ServiceFactory.initialize(config, errorsConfiguration);
 		
 		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 		ServiceFactory.getUserService().create(owner);

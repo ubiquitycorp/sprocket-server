@@ -18,6 +18,7 @@ import com.ubiquity.social.service.SocialService;
 public class ServiceFactory {
 		
 	private static Configuration configuration;
+	private static Configuration errorsConfiguration;
 	private static AuthenticationService authenticationService;
 	private static UserService userService;
 	private static SocialService socialService;
@@ -26,13 +27,15 @@ public class ServiceFactory {
 	private static ContactService contactService;
 	private static AnalyticsService analyticsService;
 	private static ExternalIdentityService externalIdentityService;
+	private static ErrorsConfigurationService errorsConfigurationService;
 	/***
 	 * Initializes all services with the specified configuration
 	 * 
 	 * @param configuration
 	 */
-	public static void initialize(Configuration config) {
+	public static void initialize(Configuration config, Configuration errorsConfig) {
 		configuration = config;
+		errorsConfiguration = errorsConfig;
 	}
 	
 	
@@ -121,6 +124,16 @@ public class ServiceFactory {
 		if(externalIdentityService == null)
 			externalIdentityService = new ExternalIdentityService(configuration);
 		return externalIdentityService;
+	}
+	
+	/**
+	 * Creates or returns a new errors configuration service
+	 * @return
+	 */
+	public static ErrorsConfigurationService getErrorsConfigurationService() {
+		if(errorsConfigurationService == null)
+			errorsConfigurationService = new ErrorsConfigurationService(errorsConfiguration);
+		return errorsConfigurationService;
 	}
 }
 

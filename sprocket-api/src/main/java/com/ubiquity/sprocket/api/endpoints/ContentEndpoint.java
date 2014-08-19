@@ -19,6 +19,7 @@ import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.VideosDto;
 import com.ubiquity.sprocket.api.dto.model.VideoDto;
+import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
@@ -33,6 +34,7 @@ public class ContentEndpoint {
 	@POST
 	@Path("/users/{userId}/videos/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response engaged(@PathParam("userId") Long userId, InputStream payload) throws IOException {
 
 		// convert payload
@@ -40,13 +42,13 @@ public class ContentEndpoint {
 		for(VideoDto videoDto : videosDto.getVideos()) {
 			sendTrackAndSyncMessage(userId, videoDto);
 		}
-		
 		return Response.ok().build();
 	}
 	
 	@GET
 	@Path("/users/{userId}/providers/{externalNetworkId}/videos")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response videos(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		VideosDto results = new VideosDto();
