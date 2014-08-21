@@ -11,6 +11,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -29,6 +30,7 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
+import com.ubiquity.identity.service.UserService;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
@@ -51,6 +53,7 @@ import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 //import com.ubiquity.sprocket.messaging.definition.EventTracked;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.service.ServiceFactory;
+import com.ubiquity.sprocket.util.TokenUtil;
 
 @Path("/1.0/users")
 public class UsersEndpoint {
@@ -244,7 +247,7 @@ public class UsersEndpoint {
 				.getClientPlatformId());
 		User user = ServiceFactory.getAuthenticationService().register(
 				identityDto.getUsername(), identityDto.getPassword(), "", "",
-				identityDto.getDisplayName(), clientPlatform, Boolean.TRUE);
+				identityDto.getDisplayName(), identityDto.getEmail(), clientPlatform, Boolean.TRUE);
 
 		// user now has a single, native identity
 		String apiKey = authenticationService.generateApiKey();
@@ -427,6 +430,33 @@ public class UsersEndpoint {
 				.entity("{\"accessToken\":\"" + token.getAccessToken() + "\"}")
 				.build();
 	}
+	
+	/***
+	 * 
+	 * @param userId
+	 * @param payload
+	 * @return
+	 * @throws IOException
+	 */
+	@GET
+	@Path("/PasswordReset")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response resetPassword(@QueryParam("email") String email) throws IOException {
+		UserService userService = ServiceFactory.getUserService();
+		User user = userService.getUserByEmail(email);
+		String token = TokenUtil.generateUniqueToken();
+		
+		Long expiryTime = userService.getForgetTokenExpiryTimeInSeconds();
+		user.setResetExpiryTime(System.currentTimeMillis() + expiryTime);
+		user.setResetToken(token);
+		user.setIsResetVerified(false);
+		userService.update(user);
+		
+		Object[] arguments = {user.getDisplayName(), user.getEmail(), userService.getResetUrl() + token};
+		ServiceFactory.getEmailService().sendUsingTemplate(user.getEmail(),"Password reset email", arguments, "resetPassword_emailTemplate.html");
+		return Response.ok().build();
+	 }
 
 	private void sendActivatedMessage(User user, ExternalIdentity identity,
 			IdentityDto identityDto) throws IOException {

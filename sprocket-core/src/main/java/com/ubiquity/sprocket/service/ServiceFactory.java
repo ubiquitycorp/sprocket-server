@@ -28,6 +28,7 @@ public class ServiceFactory {
 	private static AnalyticsService analyticsService;
 	private static ExternalIdentityService externalIdentityService;
 	private static ErrorsConfigurationService errorsConfigurationService;
+	private static EmailService emailService;
 	/***
 	 * Initializes all services with the specified configuration
 	 * 
@@ -134,6 +135,16 @@ public class ServiceFactory {
 		if(errorsConfigurationService == null)
 			errorsConfigurationService = new ErrorsConfigurationService(errorsConfiguration);
 		return errorsConfigurationService;
+	}
+	
+	/**
+	 * Creates or returns a new email service
+	 * @return
+	 */
+	public static EmailService getEmailService() {
+		if(emailService == null)
+			emailService = new EmailService(configuration);
+		return emailService;
 	}
 }
 

@@ -3,6 +3,8 @@ package com.ubiquity.sprocket.api.dto.model;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.Email;
+
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.AuthorizationValidation;
@@ -28,9 +30,13 @@ public class IdentityDto {
 			AuthenticationValidation.class })
 	private String password;
 
-	@NotNull(groups = RegistrationValidation.class)
+	//@NotNull(groups = RegistrationValidation.class)
 	@Size(min = 3, max = 100, groups = RegistrationValidation.class)
 	private String displayName;
+	
+	@NotNull(groups = RegistrationValidation.class)
+	@Email(groups = RegistrationValidation.class)
+	private String email;
 
 	@NotNull(groups = { RegistrationValidation.class,
 			ActivationValidation.class, AuthenticationValidation.class, AuthorizationValidation.class })
@@ -80,6 +86,10 @@ public class IdentityDto {
 
 	public String getDisplayName() {
 		return displayName;
+	}
+
+	public String getEmail() {
+		return email;
 	}
 
 	public Integer getClientPlatformId() {
@@ -136,6 +146,7 @@ public class IdentityDto {
 		private String username;
 		private String password;
 		private String displayName;
+		private String email;
 		private Integer clientPlatformId;
 		private String accessToken;
 		private Integer externalNetworkId;
@@ -158,6 +169,11 @@ public class IdentityDto {
 
 		public Builder displayName(String displayName) {
 			this.displayName = displayName;
+			return this;
+		}
+		
+		public Builder email(String email) {
+			this.email = email;
 			return this;
 		}
 
@@ -215,6 +231,7 @@ public class IdentityDto {
 		this.username = builder.username;
 		this.password = builder.password;
 		this.displayName = builder.displayName;
+		this.email = builder.email;
 		this.clientPlatformId = builder.clientPlatformId;
 		this.accessToken = builder.accessToken;
 		this.externalNetworkId = builder.externalNetworkId;
