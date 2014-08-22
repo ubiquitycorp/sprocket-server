@@ -30,7 +30,6 @@ public class IdentityDto {
 			AuthenticationValidation.class })
 	private String password;
 
-	//@NotNull(groups = RegistrationValidation.class)
 	@Size(min = 3, max = 100, groups = RegistrationValidation.class)
 	private String displayName;
 	
