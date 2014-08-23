@@ -44,6 +44,8 @@ import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.ExchangeTokenDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
+import com.ubiquity.sprocket.api.dto.model.ResetPasswordDto;
+import com.ubiquity.sprocket.api.interceptors.ErrorKeys;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
@@ -433,20 +435,29 @@ public class UsersEndpoint {
 	
 	/***
 	 * 
-	 * @param userId
-	 * @param payload
+	 * @param email
 	 * @return
 	 * @throws IOException
 	 */
 	@GET
-	@Path("/PasswordReset")
+	@Path("/PasswordResetRequest")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	//@ValidateRequest
-	public Response resetPassword(@QueryParam("email") @NotNull @Email String email) throws IOException {
+	public Response sendResetEmail(@QueryParam("email") @NotNull @Email String email) throws IOException {
 		if(email == null || email.isEmpty())
-			throw new IllegalArgumentException("email is required");
-		ServiceFactory.getUserService().resetPassword(email);
+			throw new IllegalArgumentException(ServiceFactory.getErrorsConfigurationService().getErrorMessage(ErrorKeys.EMAIL_REQUIRED));
+		ServiceFactory.getUserService().SendResetPasswordEmail(email);
+		return Response.ok().build();
+	 }
+	
+	@POST
+	@Path("/PasswordReset")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response resetPassword(InputStream payload) throws IOException {
+		ResetPasswordDto resetPasswordDto = jsonConverter.convertFromPayload(payload, ResetPasswordDto.class);
+		ServiceFactory.getUserService().resetPassword(resetPasswordDto.getToken(), resetPasswordDto.getPassword());
 		return Response.ok().build();
 	 }
 
