@@ -132,7 +132,7 @@ public class SocialEndpoint {
 	 * @throws org.jets3t.service.impl.rest.HttpException 
 	 */
 	@POST
-	@Path("users/{userId}/providers/{externalNetworkId}/sendmessage")
+	@Path("users/{userId}/providers/{externalNetworkId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
@@ -165,7 +165,7 @@ public class SocialEndpoint {
 	 * @throws org.jets3t.service.impl.rest.HttpException 
 	 */
 	@POST
-	@Path("users/{userId}/providers/{socialNetworkId}/postactivity")
+	@Path("users/{userId}/providers/{socialNetworkId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response postactivity(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {

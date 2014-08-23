@@ -10,6 +10,7 @@ import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.AuthorizationValidation;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
+import com.ubiquity.sprocket.api.validation.ResetValidation;
 
 /***
  * 
@@ -19,9 +20,9 @@ import com.ubiquity.sprocket.api.validation.RegistrationValidation;
 public class IdentityDto {
 
 	@NotNull(groups = { RegistrationValidation.class,
-			AuthenticationValidation.class })
+			AuthenticationValidation.class, ResetValidation.class })
 	@Size(min = 3, max = 80, groups = { RegistrationValidation.class,
-			AuthenticationValidation.class })
+			AuthenticationValidation.class, ResetValidation.class })
 	private String username;
 
 	@NotNull(groups = { RegistrationValidation.class,
