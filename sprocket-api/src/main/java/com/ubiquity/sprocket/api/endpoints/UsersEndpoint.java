@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.persistence.NoResultException;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
@@ -16,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.hibernate.validator.constraints.Email;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -440,7 +442,10 @@ public class UsersEndpoint {
 	@Path("/PasswordReset")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response resetPassword(@QueryParam("email") String email) throws IOException {
+	//@ValidateRequest
+	public Response resetPassword(@QueryParam("email") @NotNull @Email String email) throws IOException {
+		if(email == null || email.isEmpty())
+			throw new IllegalArgumentException("email is required");
 		ServiceFactory.getUserService().resetPassword(email);
 		return Response.ok().build();
 	 }
