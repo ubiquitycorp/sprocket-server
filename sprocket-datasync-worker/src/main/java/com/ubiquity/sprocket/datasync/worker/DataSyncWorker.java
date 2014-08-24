@@ -39,9 +39,9 @@ public class DataSyncWorker {
 	public void destroy() {
 		stopServices();
 	}
-	public void initialize(Configuration configuration) throws SchedulerException, IOException {
+	public void initialize(Configuration configuration, Configuration errorsConfiguration) throws SchedulerException, IOException {
 
-		startServices(configuration);
+		startServices(configuration, errorsConfiguration);
 		
 		List<CacheInvalidateConsumer> consumers = new LinkedList<CacheInvalidateConsumer>();
 		try {			
@@ -74,7 +74,8 @@ public class DataSyncWorker {
 	public static void main(String[] args) {
 		final DataSyncWorker worker = new DataSyncWorker();
 		try {
-			worker.initialize(new PropertiesConfiguration("datasyncworker.properties"));
+			worker.initialize(new PropertiesConfiguration("datasyncworker.properties"),  
+					new PropertiesConfiguration("messages.properties"));
 		} catch (ConfigurationException e) {
 			log.error("Unable to configure service", e);
 			System.exit(-1);
@@ -96,8 +97,8 @@ public class DataSyncWorker {
 
 	}
 
-	private void startServices(Configuration configuration) throws IOException {
-		ServiceFactory.initialize(configuration);
+	private void startServices(Configuration configuration, Configuration errorsConfiguration) throws IOException {
+		ServiceFactory.initialize(configuration, errorsConfiguration);
 		JedisConnectionFactory.initialize(configuration);
 		MessageQueueFactory.initialize(configuration);
 		SocialAPIFactory.initialize(configuration);

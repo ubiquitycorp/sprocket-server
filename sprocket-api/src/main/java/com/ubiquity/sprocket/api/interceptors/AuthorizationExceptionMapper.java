@@ -34,8 +34,12 @@ public class AuthorizationExceptionMapper implements ExceptionMapper<Authorizati
 		log.error("[ERROR] {}", ExceptionUtils.getRootCauseMessage(e));
 		
 		ErrorDto response = new ErrorDto();
-		response.getMessages().add("Could not authenticate with provider: " +e.getMessage());
-		response.setCode(ServerErrorCode.ExternalAPI.getCode());
+		response.getMessages().add(e.getMessage());
+		if(e.isExternalNetwork)
+			response.setCode(ServerErrorCode.ExternalAPI.getCode());
+		else
+			response.setCode(ServerErrorCode.SprocketAPI.getCode());
+		
 		return Response.status(Status.UNAUTHORIZED).entity(new Gson().toJson(response)).build();
 	}
 

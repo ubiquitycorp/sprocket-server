@@ -32,6 +32,7 @@ import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 import com.ubiquity.sprocket.api.dto.model.SendMessageDto;
+import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
@@ -47,6 +48,7 @@ public class SocialEndpoint {
 	@POST
 	@Path("/users/{userId}/activities/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response engaged(@PathParam("userId") Long userId, InputStream payload) throws IOException {
 
 		// convert payload
@@ -62,6 +64,7 @@ public class SocialEndpoint {
 	@GET
 	@Path("users/{userId}/providers/{socialNetworkId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response activities(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		ActivitiesDto results = new ActivitiesDto();
 
@@ -93,6 +96,7 @@ public class SocialEndpoint {
 	@GET
 	@Path("users/{userId}/providers/{socialNetworkId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response messages(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		MessagesDto result = new MessagesDto();
@@ -130,6 +134,7 @@ public class SocialEndpoint {
 	@POST
 	@Path("users/{userId}/providers/{externalNetworkId}/sendmessage")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
 
 		//Cast the input into SendMessageObject
@@ -162,6 +167,7 @@ public class SocialEndpoint {
 	@POST
 	@Path("users/{userId}/providers/{socialNetworkId}/postactivity")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response postactivity(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
 
 		//Cast the input into SendMessageObject
