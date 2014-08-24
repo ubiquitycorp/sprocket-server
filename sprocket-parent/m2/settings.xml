@@ -43,7 +43,7 @@
 				<hibernate.schema.auto>update</hibernate.schema.auto>
 				<stripe.api.client>pk_test_ujJiLWzAZymWRzD10MqT2tej</stripe.api.client>
 				<stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO</stripe.api.secret>
-				<repo.env>dev</repo.env>
+				<repo.env>vm</repo.env>
 				<mq.host>localhost</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
