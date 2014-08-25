@@ -30,6 +30,7 @@
 				<content.vimeo.web.clientSecret>631651bf50ecde53df4a5a3097e31acee3240ba6</content.vimeo.web.clientSecret>
 				<content.vimeo.mobile.clientId>00a3112427cc0de8be5710eceb5bd83524001a6b</content.vimeo.mobile.clientId>
 				<content.vimeo.mobile.clientSecret>6814eea3b1195e9f8cd81688481c76688fea1120</content.vimeo.mobile.clientSecret>
+				<constants.resetUrl>http://192.168.12.118/sprocket-web/src/#/reset?token=</constants.resetUrl>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
 				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
@@ -83,6 +84,7 @@
 				<content.vimeo.web.clientSecret>9258a21966cadc0fb89b45281b70ceb5081f32fa</content.vimeo.web.clientSecret>
 				<content.vimeo.mobile.clientId>00a3112427cc0de8be5710eceb5bd83524001a6b</content.vimeo.mobile.clientId>
 				<content.vimeo.mobile.clientSecret>6814eea3b1195e9f8cd81688481c76688fea1120</content.vimeo.mobile.clientSecret>
+				<constants.resetUrl>http://sprocket-qa.ubiquitycorp.com/#/reset?token=</constants.resetUrl>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
 				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
@@ -131,6 +133,7 @@
 				<content.vimeo.web.clientSecret>ac0720d3536d96815996ed0da0471418a0c55524</content.vimeo.web.clientSecret>
 				<content.vimeo.mobile.clientId>00a3112427cc0de8be5710eceb5bd83524001a6b</content.vimeo.mobile.clientId>
 				<content.vimeo.mobile.clientSecret>6814eea3b1195e9f8cd81688481c76688fea1120</content.vimeo.mobile.clientSecret>
+				<constants.resetUrl>sprocket-web-stage.ubiquitycorp.com/#/reset?token=</constants.resetUrl>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
 				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
