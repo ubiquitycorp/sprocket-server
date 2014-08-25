@@ -35,8 +35,7 @@ public class YouTubeAPITest {
 		ContentAPIFactory.initialize(config);
 		
 	}
-	
-	
+
 	
 	@Test
 	public void testFindVideosByExternalIdentityAndPagination() {
