@@ -443,7 +443,7 @@ public class UsersEndpoint {
 	//@ValidateRequest
 	public Response sendResetEmail(InputStream payload) throws IOException {
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload, IdentityDto.class, ResetValidation.class);
-		ServiceFactory.getUserService().SendResetPasswordEmail(identityDto.getUsername());
+		ServiceFactory.getUserService().sendResetPasswordEmail(identityDto.getUsername());
 		return Response.ok().build();
 	 }
 	
