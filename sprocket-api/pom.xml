@@ -4,7 +4,7 @@
 	<artifactId>sprocket-api</artifactId>
 	<name>Sprocket API</name>
 	<packaging>war</packaging>
-	<version>1.4.16</version>
+	<version>1.4.25</version>
 	<!-- Note, parameterize this -->
 	<properties>
 		<app.home>/var/lib/tomcat7/webapps/sprocket-api</app.home>
@@ -40,11 +40,11 @@
 			</plugin>
 
 
-				   <plugin>
-			        <groupId>org.mortbay.jetty</groupId>
-			        <artifactId>jetty-maven-plugin</artifactId>
-			        <version>7.6.8.v20121106</version>
-			      </plugin>
+			<plugin>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>7.6.8.v20121106</version>
+			</plugin>
 
 
 			<!-- RPM Packaging -->
@@ -137,6 +137,13 @@
 			</exclusions>
 		</dependency>
 
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.jboss.resteasy</groupId> -->
+<!-- 			<artifactId>resteasy-hibernatevalidator-provider</artifactId> -->
+<!-- 			<version>3.0.8.Final</version> -->
+<!-- 		</dependency> -->
+
+
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
@@ -148,7 +155,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>sprocket-core</artifactId>
-			<version>0.1.5</version>
+			<version>0.1.6</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.jboss.resteasy</groupId>
@@ -160,7 +167,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-api</artifactId>
-			<version>0.3.2</version>
+			<version>0.3.4</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>commons-codec</artifactId>

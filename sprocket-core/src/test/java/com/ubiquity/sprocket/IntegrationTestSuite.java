@@ -4,6 +4,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -25,6 +26,7 @@ import com.ubiquity.sprocket.service.AuthenticationServiceTest;
  * @author chris
  *
  */
+@Ignore
 @RunWith(Suite.class)
 @SuiteClasses({ 
 	AuthenticationServiceTest.class, 
@@ -34,7 +36,8 @@ import com.ubiquity.sprocket.service.AuthenticationServiceTest;
 	ActivityRepositoryTest.class, 
 	MessageRepositoryTest.class,
 	VideoContentRepositoryTest.class,
-	EngagedItemRepositoryTest.class
+	EngagedItemRepositoryTest.class,
+	VideoContentRepositoryTest.class
 	})
 public class IntegrationTestSuite {
 	

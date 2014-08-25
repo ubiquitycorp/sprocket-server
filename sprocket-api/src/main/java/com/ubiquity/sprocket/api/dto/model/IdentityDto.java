@@ -3,11 +3,14 @@ package com.ubiquity.sprocket.api.dto.model;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.Email;
+
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.AuthorizationValidation;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
+import com.ubiquity.sprocket.api.validation.ResetValidation;
 
 /***
  * 
@@ -17,9 +20,9 @@ import com.ubiquity.sprocket.api.validation.RegistrationValidation;
 public class IdentityDto {
 
 	@NotNull(groups = { RegistrationValidation.class,
-			AuthenticationValidation.class })
+			AuthenticationValidation.class, ResetValidation.class })
 	@Size(min = 3, max = 80, groups = { RegistrationValidation.class,
-			AuthenticationValidation.class })
+			AuthenticationValidation.class, ResetValidation.class })
 	private String username;
 
 	@NotNull(groups = { RegistrationValidation.class,
@@ -28,9 +31,12 @@ public class IdentityDto {
 			AuthenticationValidation.class })
 	private String password;
 
-	@NotNull(groups = RegistrationValidation.class)
 	@Size(min = 3, max = 100, groups = RegistrationValidation.class)
 	private String displayName;
+	
+	@NotNull(groups = RegistrationValidation.class)
+	@Email(groups = RegistrationValidation.class)
+	private String email;
 
 	@NotNull(groups = { RegistrationValidation.class,
 			ActivationValidation.class, AuthenticationValidation.class, AuthorizationValidation.class })
@@ -45,6 +51,9 @@ public class IdentityDto {
 
 	@Size(min = 10, max = 255, groups = ActivationValidation.class)
 	private String secretToken;
+	
+	@Size(min = 10, groups = ActivationValidation.class)
+	private String refreshToken;
 
 	@NotNull(groups = { EngagementValidation.class })
 	private String identifier;
@@ -64,6 +73,9 @@ public class IdentityDto {
 	@Size(min = 10, max = 255, groups = AuthorizationValidation.class)
 	private String oauthVerifier;
 	
+	
+	private Long expiresIn;
+	
 	public String getUsername() {
 		return username;
 	}
@@ -76,6 +88,10 @@ public class IdentityDto {
 		return displayName;
 	}
 
+	public String getEmail() {
+		return email;
+	}
+
 	public Integer getClientPlatformId() {
 		return clientPlatformId;
 	}
@@ -86,6 +102,10 @@ public class IdentityDto {
 
 	public String getSecretToken() {
 		return secretToken;
+	}
+
+	public String getRefreshToken() {
+		return refreshToken;
 	}
 
 	public String getIdentifier() {
@@ -104,7 +124,6 @@ public class IdentityDto {
 		return redirectUrl;
 	}
 	
-	
 	public String getOauthToken() {
 		return oauthToken;
 	}
@@ -117,19 +136,27 @@ public class IdentityDto {
 		return oauthVerifier;
 	}
 
+	public Long getExpiresIn() {
+		return expiresIn;
+	}
+
+
 
 	public static class Builder {
 		private String username;
 		private String password;
 		private String displayName;
+		private String email;
 		private Integer clientPlatformId;
 		private String accessToken;
 		private Integer externalNetworkId;
 		private String secretToken;
+		private String refreshToken;
 		private String identifier;
 		private String code;
 		public String redirectUrl;
-
+		public Long expiresIn;
+		
 		public Builder username(String username) {
 			this.username = username;
 			return this;
@@ -142,6 +169,11 @@ public class IdentityDto {
 
 		public Builder displayName(String displayName) {
 			this.displayName = displayName;
+			return this;
+		}
+		
+		public Builder email(String email) {
+			this.email = email;
 			return this;
 		}
 
@@ -164,6 +196,11 @@ public class IdentityDto {
 			this.secretToken = secretToken;
 			return this;
 		}
+		
+		public Builder refreshToken(String refreshToken) {
+			this.refreshToken = refreshToken;
+			return this;
+		}
 
 		public Builder identifier(String identifier) {
 			this.identifier = identifier;
@@ -179,6 +216,11 @@ public class IdentityDto {
 			this.redirectUrl = redirectUrl;
 			return this;
 		}
+		
+		public Builder expiresIn(Long expiresIn) {
+			this.expiresIn = expiresIn;
+			return this;
+		}
 
 		public IdentityDto build() {
 			return new IdentityDto(this);
@@ -189,12 +231,15 @@ public class IdentityDto {
 		this.username = builder.username;
 		this.password = builder.password;
 		this.displayName = builder.displayName;
+		this.email = builder.email;
 		this.clientPlatformId = builder.clientPlatformId;
 		this.accessToken = builder.accessToken;
 		this.externalNetworkId = builder.externalNetworkId;
 		this.secretToken = builder.secretToken;
+		this.refreshToken = builder.refreshToken;
 		this.identifier = builder.identifier;
 		this.code = builder.code;
 		this.redirectUrl = builder.redirectUrl;
+		this.expiresIn = builder.expiresIn;
 	}
 }

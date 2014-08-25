@@ -4,6 +4,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,7 @@ public class ExternalNetworkExceptionMapper implements ExceptionMapper<ExternalN
 	 * Returns error response and sets the response code
 	 */
 	public Response toResponse(ExternalNetworkException e) {
-		log.error("[ERROR]", e.getMessage(), e);
+		log.error("[ERROR] {}", ExceptionUtils.getRootCauseMessage(e));
 		
 		ErrorDto response = new ErrorDto();
 		response.getMessages().add(e.getMessage());

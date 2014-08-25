@@ -41,10 +41,14 @@ public class ServicesInitializer implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent event) {
 		log.info("Initializing services...");
 		// get the properties configuration
-		Configuration configuration;
+		Configuration configuration, errorsConfiguration;
 		try {
 			configuration = new PropertiesConfiguration(
 					"sprocketapi.properties");
+			
+			errorsConfiguration = new PropertiesConfiguration(
+					"messages.properties");
+			
 			log.info("{} version: {}", configuration.getProperty("application.name"),
 					configuration.getProperty("application.version"));
 
@@ -56,7 +60,7 @@ public class ServicesInitializer implements ServletContextListener {
 			// start MQ services
 			MessageQueueFactory.initialize(configuration);
 			
-			ServiceFactory.initialize(configuration);
+			ServiceFactory.initialize(configuration, errorsConfiguration);
 			
 			SocialAPIFactory.initialize(configuration);
 			ContentAPIFactory.initialize(configuration);

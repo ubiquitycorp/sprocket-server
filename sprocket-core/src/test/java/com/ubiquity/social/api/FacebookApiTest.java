@@ -12,14 +12,11 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.content.api.VimeoAPITest;
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
-import com.ubiquity.identity.domain.User;
-import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.Gender;
 import com.ubiquity.social.domain.Message;
-import com.ubiquity.external.domain.ExternalNetwork;
 
 public class FacebookApiTest {
 	
@@ -30,10 +27,8 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 	@BeforeClass
 	public static void setUp() throws Exception {
 		
-		User user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-		identity = new ExternalIdentity.Builder().user(user).accessToken("CAACEdEose0cBAI3v23IiMqfqQjqaNAMbi7ZBEij505CbZCPGWZAS3ZA7c5jZAYxSlRpmUaBKQLlnsCFy3dJ4kqwaGahDkq7pLTiHU85flw64XqcU1JdWaLPmkmsYxCO1wLKd7ZCTI0kIvuDCh2IA3xllR1wjlZALBRNHZCz0Ly0Y7CZAbzETzJdZC4wgsZCR7PS0XmbmWFxA5oDbC316w5GZBNRM").build();
-		
-		
+		identity = new ExternalIdentity.Builder().accessToken("CAACEdEose0cBANZAbbx6aoU1euJGZCVZCC8kmPpZC2jKAWurSuPcL6uvSh9WxYChg7JLlFemDjojsHzDWH0GSqPkj2RHvWZBDbSczDhu5JcrIQDwZCgaX7SYa7HWhxANhBnbcVZAB849GfVZAaqhhbMJK8kpHEZAFyuZAs6K3Dt4jcGxIXr8BcY2ZBRu9YIIgtKD0uUFyMUGH48mahBzOWXx8lQ").build();
+
 		log.debug("authenticated Facebook with identity {} ", identity);
 		Configuration configuration = new PropertiesConfiguration(
 				"test.properties");

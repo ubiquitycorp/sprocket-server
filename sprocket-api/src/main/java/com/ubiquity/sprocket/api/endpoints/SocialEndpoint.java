@@ -32,6 +32,7 @@ import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 import com.ubiquity.sprocket.api.dto.model.SendMessageDto;
+import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
@@ -43,11 +44,11 @@ public class SocialEndpoint {
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
-
-
+	
 	@POST
 	@Path("/users/{userId}/activities/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response engaged(@PathParam("userId") Long userId, InputStream payload) throws IOException {
 
 		// convert payload
@@ -63,6 +64,7 @@ public class SocialEndpoint {
 	@GET
 	@Path("users/{userId}/providers/{socialNetworkId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response activities(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		ActivitiesDto results = new ActivitiesDto();
 
@@ -85,8 +87,6 @@ public class SocialEndpoint {
 				.build();
 	}
 
-
-	
 	/***
 	 * This method returns messages of specific social network
 	 * @param userId
@@ -96,6 +96,7 @@ public class SocialEndpoint {
 	@GET
 	@Path("users/{userId}/providers/{socialNetworkId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response messages(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		MessagesDto result = new MessagesDto();
@@ -131,20 +132,25 @@ public class SocialEndpoint {
 	 * @throws org.jets3t.service.impl.rest.HttpException 
 	 */
 	@POST
-	@Path("users/{userId}/providers/{externalNetworkId}/sendmessage")
+	@Path("users/{userId}/providers/{externalNetworkId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
 
+		//Cast the input into SendMessageObject
+		SendMessageDto sendMessageDto = jsonConverter.convertFromPayload(payload, SendMessageDto.class);
+			
 		// load user
 		ServiceFactory.getUserService().getUserById(userId);
 		// get social network 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		// get the identity from DB
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
-		//Cast the input into SendMessageObject
-		SendMessageDto sendMessageDto = jsonConverter.convertFromPayload(payload, SendMessageDto.class);
-
+		
 		Contact contact = ServiceFactory.getContactService().getByContactId(sendMessageDto.getReceiverId());
+		
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
+		
 		ServiceFactory.getSocialService().sendMessage(identity,socialNetwork, contact, sendMessageDto.getReceiverName(), sendMessageDto.getText(), sendMessageDto.getSubject());
 	
 		return Response.ok().build();
@@ -159,18 +165,23 @@ public class SocialEndpoint {
 	 * @throws org.jets3t.service.impl.rest.HttpException 
 	 */
 	@POST
-	@Path("users/{userId}/providers/{socialNetworkId}/postactivity")
+	@Path("users/{userId}/providers/{socialNetworkId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response postactivity(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
 
+		//Cast the input into SendMessageObject
+		PostActivity postActivity = jsonConverter.convertFromPayload(payload, PostActivity.class);
+				
 		// load user
 		ServiceFactory.getUserService().getUserById(userId);
 		// get social network 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
 		// get the identity from DB
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
-		//Cast the input into SendMessageObject
-		PostActivity postActivity = jsonConverter.convertFromPayload(payload, PostActivity.class);
+		
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
+		
 		ServiceFactory.getSocialService().PostActivity(identity, socialNetwork, postActivity);
 
 		return Response.ok().build();

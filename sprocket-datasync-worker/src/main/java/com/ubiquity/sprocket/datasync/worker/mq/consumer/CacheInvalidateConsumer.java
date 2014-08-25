@@ -3,6 +3,7 @@ package com.ubiquity.sprocket.datasync.worker.mq.consumer;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			else if(message.getType().equals(UserEngagedActivity.class.getSimpleName()))
 				process((UserEngagedActivity)message.getContent());
 		} catch (Exception e) {
-			log.error("Could not process message: {}", e);
+			log.error("Could not process, message: {}, root cause message: {}",ExceptionUtils.getMessage(e), ExceptionUtils.getRootCauseMessage(e));
 		}
 	}
 
@@ -152,6 +153,8 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identity.getExternalNetwork());
 
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
+		
 		if (externalNetwork.network.equals(Network.Content))
 			processVideos(identity, externalNetwork);
 		else if (externalNetwork.equals(ExternalNetwork.Google))
@@ -169,8 +172,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		}
 	} 
 
-	private void processActivities(ExternalIdentity identity,
-			ExternalNetwork socialNetwork) {
+	private void processActivities(ExternalIdentity identity, ExternalNetwork socialNetwork) {
 		SocialService socialService = ServiceFactory.getSocialService();
 		List<Activity> synced = socialService.syncActivities(identity,
 				socialNetwork);
@@ -185,12 +187,11 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 	 * @param identity
 	 * @param externalNetwork
 	 */
-	private void processVideos(ExternalIdentity identity,
-			ExternalNetwork externalNetwork) {
+	private void processVideos(ExternalIdentity identity, ExternalNetwork externalNetwork) {
 
 		ContentService contentService = ServiceFactory.getContentService();
-		List<VideoContent> synced = contentService.sync(identity,
-				externalNetwork);
+		
+		List<VideoContent> synced = contentService.sync(identity, externalNetwork);
 
 		// add videos to search results for this specific user
 		ServiceFactory.getSearchService().indexVideos(identity.getUser().getUserId(), synced);

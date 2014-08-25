@@ -19,12 +19,14 @@ import org.slf4j.LoggerFactory;
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.DocumentsDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
+import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
@@ -42,6 +44,7 @@ public class DocumentsEndpoint {
 	@POST
 	@Path("/users/{userId}/live/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response engaged(@PathParam("userId") Long userId, InputStream payload) throws IOException {
 
 		// convert payload
@@ -53,7 +56,6 @@ public class DocumentsEndpoint {
 		
 		return Response.ok().build();
 	}
-	
 	
 	@GET
 	@Path("providers/{externalNetworkId}/indexed")
@@ -74,6 +76,7 @@ public class DocumentsEndpoint {
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/indexed")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response searchIndexed(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
 		DocumentsDto result = new DocumentsDto(q);
 
@@ -91,13 +94,18 @@ public class DocumentsEndpoint {
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/live")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response searchLive(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
 		DocumentsDto result = new DocumentsDto(q);
 
-		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		
-		List<Document> documents = ServiceFactory.getSearchService().searchLiveDocuments(q, user, socialNetwork, page);
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, externalNetwork);
+		
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
+		
+		List<Document> documents = ServiceFactory.getSearchService().searchLiveDocuments(q, user, externalNetwork, page);
 		
 		for(Document document : documents) {
 			result.getDocuments().add(DtoAssembler.assemble(document));
