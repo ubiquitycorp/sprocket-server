@@ -5,6 +5,7 @@
 		<profile>
 			<id>env-vm</id>
 			<properties>
+				<app.log.level>DEBUG</app.log.level>
 				<syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
 				<redis.host>localhost</redis.host>
 				<hibernate.debug>true</hibernate.debug>
@@ -22,8 +23,8 @@
 				<social.google.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I</social.google.apikey>
 				<social.google.web.clientId>963651180860-gdgpmd4pqpsetql8932mrgbif8f4t89p.apps.googleusercontent.com</social.google.web.clientId>
 				<social.google.web.clientSecret>NRWmgbRuewuTUmL-IgMsuVzG</social.google.web.clientSecret>
-				<social.google.android.clientId>518857244614-9pqdpl3ss461qhb15k0up02ns7t766gh.apps.googleusercontent.com</social.google.android.clientId>
-				<social.google.android.clientSecret>nrI11zOIQR2B750Rdz85wxze</social.google.android.clientSecret>
+				<social.google.android.clientId>518857244614-odu6ukf381cd2vmg8e0rphkp0hfksg9l.apps.googleusercontent.com</social.google.android.clientId>
+				<social.google.android.clientSecret>iLUKupqRjUl6gybpP7YYINE6</social.google.android.clientSecret>
 				<social.google.ios.clientId>798637804367-oeuq4acmf6jivul2gbqnig7pcspjirfu.apps.googleusercontent.com</social.google.ios.clientId>
 				<social.google.ios.clientSecret>7ND3-wtvZg2GUZhWxZesE4qp</social.google.ios.clientSecret>
 				<content.vimeo.web.clientId>8aa78eaeb615f47cdbc3806baa64e7b41ea7bb63</content.vimeo.web.clientId>
@@ -60,6 +61,7 @@
 		<profile>
 			<id>env-qa</id>
 			<properties>
+				<app.log.level>INFO</app.log.level>
 				<syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
 				<redis.host>localhost</redis.host>
 				<hibernate.debug>true</hibernate.debug>
@@ -76,8 +78,8 @@
 				<social.google.web.apikey>AIzaSyCY3woAWsatYnwhkYOeBqVjQ8V9hGa2vt8</social.google.web.apikey>
 				<social.google.web.clientId>320470378854-06esrc32feq3nstb9t9ovp95jm50skvu.apps.googleusercontent.com</social.google.web.clientId>
 				<social.google.web.clientSecret>gI2eS5OH9zp_PPB089sDafjR</social.google.web.clientSecret>
-				<social.google.android.clientId>518857244614-9pqdpl3ss461qhb15k0up02ns7t766gh.apps.googleusercontent.com</social.google.android.clientId>
-				<social.google.android.clientSecret>nrI11zOIQR2B750Rdz85wxze</social.google.android.clientSecret>
+				<social.google.android.clientId>518857244614-odu6ukf381cd2vmg8e0rphkp0hfksg9l.apps.googleusercontent.com</social.google.android.clientId>
+				<social.google.android.clientSecret>iLUKupqRjUl6gybpP7YYINE6</social.google.android.clientSecret>
 				<social.google.ios.clientId>74160880049-aji0lam7cfclo2a370ep2ugf7niii982.apps.googleusercontent.com</social.google.ios.clientId>
 				<social.google.ios.clientSecret>JZ52sjm4ifLV0sE1Lxwxk6pb</social.google.ios.clientSecret>
 				<content.vimeo.web.clientId>5be395b360ef0be2c11ed838505fe49d39b1c113</content.vimeo.web.clientId>
@@ -113,6 +115,7 @@
 		<profile>
 			<id>env-stage</id>
 			<properties>
+				<app.log.level>INFO</app.log.level>
 				<syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
 				<redis.host>54.183.115.14</redis.host>
 				<hibernate.debug>false</hibernate.debug>
@@ -128,7 +131,8 @@
 				<social.google.android.apikey>AIzaSyC-EfEn6WHFEDg3UjuaNxb-ZhqsCzY1D84</social.google.android.apikey>
 				<social.google.ios.apikey>AIzaSyDcW0lXISh704Z6tVwru78yLLuG6629bAk</social.google.ios.apikey>
 				<social.google.web.apikey>AIzaSyAAohwXAj4cwNQt5Gjylf7ZV7ObZiMZH_o</social.google.web.apikey>
-				
+				<social.google.android.clientId>518857244614-odu6ukf381cd2vmg8e0rphkp0hfksg9l.apps.googleusercontent.com</social.google.android.clientId>
+				<social.google.android.clientSecret>iLUKupqRjUl6gybpP7YYINE6</social.google.android.clientSecret>
 				<content.vimeo.web.clientId>32de4824c358a86ff15b5f53f7b840b044317390</content.vimeo.web.clientId>
 				<content.vimeo.web.clientSecret>ac0720d3536d96815996ed0da0471418a0c55524</content.vimeo.web.clientSecret>
 				<content.vimeo.mobile.clientId>00a3112427cc0de8be5710eceb5bd83524001a6b</content.vimeo.mobile.clientId>
