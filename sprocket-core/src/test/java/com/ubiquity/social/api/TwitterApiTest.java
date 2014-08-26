@@ -51,9 +51,9 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		.build();
 		
 		identity = new ExternalIdentity.Builder()
-				.accessToken("2607216073-MlFGdYpMjqf2qVMvSgyy70cpFs7H7HcNMZl4vra")
-				.secretToken("r6iepYY8QjvqpWNUEHiy0YrlpSPPoLpLiM9zuIe2l6xPv")
-				.identifier("2576165924")
+			.accessToken("2576165924-pD3gk25Aowaa3xOzSOrfoqgBtQx1w2eIkvf10lq")
+			.secretToken("Ba1okul75SDQ4vrKCKqqz9HIsLP76gdM8280ONSVU9sSs")
+			.identifier("2576165924")
 				.user(user)
 				.build();
 		log.debug("authenticated Twitter with identity {} ", identity);
@@ -68,10 +68,11 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		String message = dateFormat.format(date);
 		Contact c = new Contact.Builder()
 						.externalIdentity(new ExternalIdentity.Builder()
-										.externalNetwork(ExternalNetwork.Twitter.ordinal()).identifier("2607216073").build()).build(); 
+										.externalNetwork(ExternalNetwork.Twitter.ordinal()).identifier("2576165924").build()).build(); 
 		Boolean sent = twitterAPI.sendMessage(identity, c, null , message, "");
 		Assert.assertTrue(sent);
 	}
+	
 	@Test
 	public void listMessages() {
 		
