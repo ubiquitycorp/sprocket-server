@@ -4,7 +4,7 @@
 	<artifactId>sprocket-api</artifactId>
 	<name>Sprocket API</name>
 	<packaging>war</packaging>
-	<version>1.4.27</version>
+	<version>1.4.28</version>
 	<!-- Note, parameterize this -->
 	<properties>
 		<app.home>/var/lib/tomcat7/webapps/sprocket-api</app.home>
@@ -19,12 +19,12 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-		<testResources>
+		<!-- <testResources>
 			<testResource>
 				<directory>src/test/resources</directory>
 				<filtering>true</filtering>
 			</testResource>
-		</testResources>
+		</testResources> -->
 		<plugins>
 
 			<!-- This compiler plugin is included via parent but needed here for a 
