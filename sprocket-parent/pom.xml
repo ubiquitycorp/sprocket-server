@@ -53,7 +53,6 @@
 		<module>../sprocket-core</module>
 		<module>../sprocket-datasync-worker</module>
 		<module>../sprocket-tracker-worker</module>
-		<module>sprocket-load</module>
 	</modules>
 
 </project>
