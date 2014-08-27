@@ -45,9 +45,12 @@
 				<stripe.api.client>pk_test_ujJiLWzAZymWRzD10MqT2tej</stripe.api.client>
 				<stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO</stripe.api.secret>
 				<repo.env>dev</repo.env>
-				<mq.host>localhost</mq.host>
-				<mq.username>netappusr</mq.username>
-				<mq.password>blackdeer</mq.password>
+				<mq.queue.cacheinvalidate.host>localhost</mq.queue.cacheinvalidate.host>
+				<mq.queue.cacheinvalidate.username>netappusr</mq.queue.cacheinvalidate.username>
+				<mq.queue.cacheinvalidate.password>blackdeer</mq.queue.cacheinvalidate.password>
+				<mq.queue.track.host>localhost</mq.queue.track.host>
+				<mq.queue.track.username>netappusr</mq.queue.track.username>
+				<mq.queue.track.password>blackdeer</mq.queue.track.password>
 			</properties>
 			<activation>
 				<property>
@@ -100,9 +103,12 @@
 				<stripe.api.client>pk_test_ujJiLWzAZymWRzD10MqT2tej</stripe.api.client>
 				<stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO</stripe.api.secret>
 				<repo.env>qa</repo.env>
-				<mq.host>localhost</mq.host>
-				<mq.username>netappusr</mq.username>
-				<mq.password>blackdeer</mq.password>
+				<mq.queue.cacheinvalidate.host>localhost</mq.queue.cacheinvalidate.host>
+				<mq.queue.cacheinvalidate.username>netappusr</mq.queue.cacheinvalidate.username>
+				<mq.queue.cacheinvalidate.password>blackdeer</mq.queue.cacheinvalidate.password>
+				<mq.queue.track.host>localhost</mq.queue.track.host>
+				<mq.queue.track.username>netappusr</mq.queue.track.username>
+				<mq.queue.track.password>blackdeer</mq.queue.track.password>
 			</properties>
 			<activation>
 				<property>
@@ -149,9 +155,12 @@
 				<db.host>sprocket-stage-rds.cvgtvh3iosnx.us-west-1.rds.amazonaws.com</db.host>
 				<hibernate.schema.auto>none</hibernate.schema.auto>
 				<repo.env>stage</repo.env>
-				<mq.host>54.215.203.15</mq.host>
-				<mq.username>netappusr</mq.username>
-				<mq.password>blackdeer</mq.password>
+				<mq.queue.cacheinvalidate.host>54.215.203.15</mq.queue.cacheinvalidate.host>
+				<mq.queue.cacheinvalidate.username>netappusr</mq.queue.cacheinvalidate.username>
+				<mq.queue.cacheinvalidate.password>blackdeer</mq.queue.cacheinvalidate.password>
+				<mq.queue.track.host>54.215.203.15</mq.queue.track.host>
+				<mq.queue.track.username>netappusr</mq.queue.track.username>
+				<mq.queue.track.password>blackdeer</mq.queue.track.password>
 			</properties>
 			<activation>
 				<property>
