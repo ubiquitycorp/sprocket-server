@@ -43,13 +43,13 @@ public class IdentityDto {
 	private Integer clientPlatformId;
 
 	@NotNull(groups = ActivationValidation.class)
-	@Size(min = 10, max = 255, groups = ActivationValidation.class)
+	@Size(min = 10, max = 350, groups = ActivationValidation.class)
 	private String accessToken;
 
 	@NotNull(groups = {ActivationValidation.class, AuthorizationValidation.class, EngagementValidation.class})
 	private Integer externalNetworkId;
 
-	@Size(min = 10, max = 255, groups = ActivationValidation.class)
+	@Size(min = 10, max = 350, groups = ActivationValidation.class)
 	private String secretToken;
 	
 	@Size(min = 10, groups = ActivationValidation.class)
