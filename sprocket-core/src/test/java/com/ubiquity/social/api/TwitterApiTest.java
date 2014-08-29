@@ -33,8 +33,7 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 	
 	@BeforeClass
 	public static void setUp() throws Exception {
-//		identity = ServiceFactory.getExternalIdentityService().findExternalIdentity((long)1, ExternalNetwork.Twitter);
-//		log.debug("authenticated Twitter with identity {} ", identity);
+
 		Configuration configuration = new PropertiesConfiguration(
 				"test.properties");
 		
@@ -51,9 +50,9 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		.build();
 		
 		identity = new ExternalIdentity.Builder()
-			.accessToken("2576165924-pD3gk25Aowaa3xOzSOrfoqgBtQx1w2eIkvf10lq")
-			.secretToken("Ba1okul75SDQ4vrKCKqqz9HIsLP76gdM8280ONSVU9sSs")
-			.identifier("2576165924")
+				.accessToken("Ba1okul75SDQ4vrKCKqqz9HIsLP76gdM8280ONSVU9sSs")
+				.secretToken("rYp1ICQMEPjfj5YrAiDqLZC5oN5UeCh0tmTXMxsqfsOdetpzG3")
+				.identifier("2576165924")
 				.user(user)
 				.build();
 		log.debug("authenticated Twitter with identity {} ", identity);

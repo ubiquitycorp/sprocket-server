@@ -4,7 +4,7 @@
 	<artifactId>sprocket-api</artifactId>
 	<name>Sprocket API</name>
 	<packaging>war</packaging>
-	<version>1.4.25</version>
+	<version>1.4.36</version>
 	<!-- Note, parameterize this -->
 	<properties>
 		<app.home>/var/lib/tomcat7/webapps/sprocket-api</app.home>
@@ -25,7 +25,17 @@
 				<filtering>true</filtering>
 			</testResource>
 		</testResources>
+		
 		<plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <escapeString>\</escapeString>
+        </configuration>
+      </plugin>
+    
 
 			<!-- This compiler plugin is included via parent but needed here for a 
 				bug in dynamic web module with Java 1.7 -->
