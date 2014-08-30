@@ -60,23 +60,6 @@ public class UserRepositoryTest {
 		Assert.assertNotNull(persistedIdentity);
 	}
 
-	
-	@Test
-	public void testGroups() throws Exception {
-		String group = UUID.randomUUID().toString();
-		user.getGroups().add(group);
-		EntityManagerSupport.beginTransaction();
-		userRepository.update(user);
-		EntityManagerSupport.commit();
-		
-		// now get from db and ensure persisted
-		User persisted = userRepository.read(user.getUserId());
-		Assert.assertEquals(1, persisted.getGroups().size());
-		
-		Assert.assertEquals(group, persisted.getGroups().get(0));
-		
-		
-	}
 	@Test
 	public void testSearchByUsernameAndPassword() {
 		// Now read back from db, making sure social identity was persisted

@@ -41,6 +41,10 @@ public class Dimension implements Serializable {
 		this.weight = weight;
 	}
 	
+	public static Dimension createFromEnum(String name, Class<? extends Enum<?>> enumClass) {
+		Range<Double> range = Range.between(0.0, new Double(enumClass.getEnumConstants().length));
+		return new Dimension(name, range);
+	}
 	
 	public static Double computeCoordinates(Enum<?> fieldValue, Dimension dimension) {
 		Range<Double> range = dimension.getRange();

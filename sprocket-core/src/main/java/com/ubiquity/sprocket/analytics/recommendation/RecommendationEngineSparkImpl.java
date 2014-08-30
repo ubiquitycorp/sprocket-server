@@ -14,9 +14,7 @@ import org.apache.spark.mllib.linalg.Vectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 
 public class RecommendationEngineSparkImpl implements RecommendationEngine {
@@ -32,8 +30,9 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 	private JavaRDD<Contact> distData;
 	private JavaSparkContext sparkContext;
 	private List<Contact> dataStore = new LinkedList<Contact>();
-
-
+	
+	private UserMembershipListener membershipListener;
+	
 	/**
 	 * Represents the instance space
 	 */
@@ -41,23 +40,14 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 
 	private List<Dimension> dimensions = new ArrayList<Dimension>();
 
-
-
-	public RecommendationEngineSparkImpl(Configuration configuration) {
+	public RecommendationEngineSparkImpl(Configuration configuration, UserMembershipListener membershipListener) {
+		assert(membershipListener != null);
+		this.membershipListener = membershipListener;
+		
 		sparkContext = new JavaSparkContext(configuration.getString("recommendation.engine.hadoop.master"), configuration.getString("recommendation.engine.appname"));
 		kMeansMaxIterations = configuration.getInt("recommendation.engine.alg.kmeans.iterations");
 		kMeansRuns = configuration.getInt("recommendation.engine.alg.kmeans.runs");
 		kMeansK = configuration.getInt("recommendation.engine.alg.kmeans.k");
-	}
-
-	@Override
-	public List<VideoContent> recommendVideoContent(User user) {
-		return null;
-	}
-
-	@Override
-	public List<Activity> recommendActivity(User user) {
-		return null;
 	}
 
 	@Override
@@ -86,7 +76,7 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 	public void classify() {
 		// print out cluster centers
 		Vector[] clusterCenters = model.clusterCenters();
-		
+				
 		for(Contact contact : dataStore) {
 			// get the feature vector for these contacts
 			double[] point = ContactPoint.computePoint(contact, dimensions);
@@ -96,12 +86,14 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 			Vector centroid = clusterCenters[idx];
 			
 			String groupId = String.valueOf(centroid.hashCode());
-			log.info("groupId {}", groupId); // use hashcode for now
+			log.debug("groupId {}", groupId); // use hashcode for now
+			
 			
 			// get the user for this contact and add the group to it's group member ship array
 			User user = contact.getOwner();
 			if(user != null) {
-				user.getGroups().add(groupId);
+				//user.getGroups().add(groupId);
+				membershipListener.didAssignGlobalMembership(user, groupId);
 			}
 		}
 		

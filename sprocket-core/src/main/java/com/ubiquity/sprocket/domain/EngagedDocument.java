@@ -19,7 +19,7 @@ public class EngagedDocument extends EngagedItem {
 	private String searchTerm;
 	
 	@Column(name = "document_data_type")
-	private String dataType;
+	private String documentDataType;
 	
 	@ManyToOne
 	@JoinColumn(name = "activity_id")
@@ -38,7 +38,7 @@ public class EngagedDocument extends EngagedItem {
 			Activity activity) {
 		super(user);
 		this.searchTerm = searchTerm;
-		this.dataType = activity.getClass().getSimpleName();
+		this.documentDataType = activity.getClass().getSimpleName();
 		this.activity = activity;
 	}
 
@@ -46,7 +46,7 @@ public class EngagedDocument extends EngagedItem {
 			VideoContent videoContent) {
 		super(user);
 		this.searchTerm = searchTerm;
-		this.dataType = videoContent.getClass().getSimpleName();
+		this.documentDataType = videoContent.getClass().getSimpleName();
 		this.videoContent = videoContent;
 	}
 
@@ -54,7 +54,7 @@ public class EngagedDocument extends EngagedItem {
 			Message message) {
 		super(user);
 		this.searchTerm = searchTerm;
-		this.dataType = message.getClass().getSimpleName();
+		this.documentDataType = message.getClass().getSimpleName();
 		this.message = message;
 	}
 
@@ -62,8 +62,8 @@ public class EngagedDocument extends EngagedItem {
 		return searchTerm;
 	}
 
-	public String getDataType() {
-		return dataType;
+	public String getDocumentDataType() {
+		return documentDataType;
 	}
 
 	public Activity getActivity() {
