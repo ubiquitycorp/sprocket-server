@@ -41,11 +41,13 @@ import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.ExchangeTokenDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
+import com.ubiquity.sprocket.api.dto.model.ResetPasswordDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.AuthorizationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
+import com.ubiquity.sprocket.api.validation.ResetValidation;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 //import com.ubiquity.sprocket.messaging.definition.EventTracked;
@@ -246,7 +248,7 @@ public class UsersEndpoint {
 				.getClientPlatformId());
 		User user = ServiceFactory.getAuthenticationService().register(
 				identityDto.getUsername(), identityDto.getPassword(), "", "",
-				identityDto.getDisplayName(), clientPlatform, Boolean.TRUE);
+				identityDto.getDisplayName(), identityDto.getEmail(), clientPlatform, Boolean.TRUE);
 
 		// user now has a single, native identity
 		String apiKey = authenticationService.generateApiKey();
@@ -429,6 +431,33 @@ public class UsersEndpoint {
 				.entity("{\"accessToken\":\"" + token.getAccessToken() + "\"}")
 				.build();
 	}
+	
+	/***
+	 * 
+	 * @param email
+	 * @return
+	 * @throws IOException
+	 */
+	@POST
+	@Path("/authenticated/reset/requests")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	//@ValidateRequest
+	public Response sendResetEmail(InputStream payload) throws IOException {
+		IdentityDto identityDto = jsonConverter.convertFromPayload(payload, IdentityDto.class, ResetValidation.class);
+		ServiceFactory.getUserService().sendResetPasswordEmail(identityDto.getUsername());
+		return Response.ok().build();
+	 }
+	
+	@POST
+	@Path("/authenticated/reset/responses")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response resetPassword(InputStream payload) throws IOException {
+		ResetPasswordDto resetPasswordDto = jsonConverter.convertFromPayload(payload, ResetPasswordDto.class);
+		ServiceFactory.getUserService().resetPassword(resetPasswordDto.getToken(), resetPasswordDto.getPassword());
+		return Response.ok().build();
+	 }
 
 	private void sendActivatedMessage(User user, ExternalIdentity identity,
 			IdentityDto identityDto) throws IOException {
