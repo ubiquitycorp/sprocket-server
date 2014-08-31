@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.content.repository.VideoContentRepository;
 import com.ubiquity.content.repository.VideoContentRepositoryJpaImpl;
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.repository.ActivityRepository;
@@ -55,6 +56,28 @@ public class AnalyticsService {
 	 */
 	public List<VideoContent> getRecommendedVideos(Long userId) {
 		return videoContentRepository.findAllWithoutOwner(2);
+	}
+	
+	
+
+	/***
+	 * Stub recommendation recommends top 20 public activities in this provider
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public List<Activity> getRecommendedActivities(Long userId, ExternalNetwork externalNetwork) {
+		return activityRepository.findAllWithoutOwnerBySocialNetwork(20, externalNetwork);
+	}
+	
+	/***
+	 * Stub recommendation recommends top 20 public videos in this provider
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public List<VideoContent> getRecommendedVideos(Long userId, ExternalNetwork externalNetwork) {
+		return videoContentRepository.findAllWithoutOwnerByContentNetwork(20, externalNetwork);
 	}
 	
 	
