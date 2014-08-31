@@ -9,10 +9,14 @@ import com.ubiquity.sprocket.domain.EngagedVideo;
 public interface EngagedVideoRepository extends Repository <Long, EngagedVideo>  {
 	
 	/**
-	 * 
+	 * Finds the average engaged video by group name
 	 * @param group
-	 * @return
+	 * 
+	 * @return Averaged engaged videos
 	 */
-	List<EngagedVideo> findMeanByGroup(String group);
+	List<EngagedVideo> findMeanByGroup(String group, Integer limit);
+
+	
+	
 
 }

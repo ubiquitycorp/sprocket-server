@@ -13,6 +13,6 @@ public interface EngagedDocumentRepository extends Repository <Long, EngagedDocu
 	 * @param group
 	 * @return
 	 */
-	List<EngagedDocument> findMeanByGroup(String group);
+	List<EngagedDocument> findMeanByGroup(String group, Integer limit);
 
 }

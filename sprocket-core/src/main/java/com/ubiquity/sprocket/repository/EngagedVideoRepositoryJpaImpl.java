@@ -21,9 +21,10 @@ EngagedVideoRepository {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<EngagedVideo> findMeanByGroup(String group) {
+	public List<EngagedVideo> findMeanByGroup(String group, Integer limit) {
 		Query query = getEntityManager().createQuery("select ei from EngagedItem ei where ei.user in (select gm.user from GroupMembership gm where gm.groupIdentifier = :group) group by ei.videoContent.videoContentId order by count(*) desc");
 		query.setParameter("group", group);
+		query.setMaxResults(limit);
 		return (List<EngagedVideo>)query.getResultList();
 	}
 }

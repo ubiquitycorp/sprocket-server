@@ -125,21 +125,17 @@ public class RecommendationEngineTest implements UserMembershipListener {
 
 
 	@Override
-	public void didAssignMembershipForExternalNetwork(User user,
+	public void didAssignMembership(User user,
 			ExternalNetwork network, String group) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void didAssignGlobalMembership(User user, String group) {
 		log.info("user {}", user);
 		
 		EntityManagerSupport.beginTransaction();
-		membershipRepository.create(new GroupMembership(null, user, group));
+		membershipRepository.create(new GroupMembership(network, user, group));
 		EntityManagerSupport.commit();
-
+		
 	}
+
+
+	
 
 }

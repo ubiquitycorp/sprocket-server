@@ -92,12 +92,13 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 			// get the user for this contact and add the group to it's group member ship array
 			User user = contact.getOwner();
 			if(user != null) {
-				//user.getGroups().add(groupId);
-				membershipListener.didAssignGlobalMembership(user, groupId);
+				membershipListener.didAssignMembership(user, null, groupId);
 			}
 		}
 		
 	}
+	
+	
 
 
 

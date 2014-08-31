@@ -129,7 +129,7 @@ public class EngagedItemRepositoryTest {
 		// beber clicks
 		EngagedActivity beberActivity = createAndPersistEngagedActivity(beber);
 
-		List<EngagedActivity> meanActivities = engagedActivityRepository.findMeanByGroup(soccerMoms);
+		List<EngagedActivity> meanActivities = engagedActivityRepository.findMeanByGroup(soccerMoms, 10);
 		Assert.assertFalse(meanActivities.isEmpty());
 
 		// make sure beber video is not in this return list to test basic filtering by group
@@ -149,7 +149,7 @@ public class EngagedItemRepositoryTest {
 		createAndPersistEngagedActivity(jayz, beberActivity.getActivity());
 
 
-		meanActivities = engagedActivityRepository.findMeanByGroup(millenials);
+		meanActivities = engagedActivityRepository.findMeanByGroup(millenials, 10);
 		Assert.assertFalse(meanActivities.isEmpty());
 
 		// the first video should be the video watched by both
@@ -168,7 +168,7 @@ public class EngagedItemRepositoryTest {
 		// beber watches a video
 		EngagedVideo beberVideo = createAndPersistEngagedVideo(beber);
 
-		List<EngagedVideo> meanVideos = engagedVideoRepository.findMeanByGroup(soccerMoms);
+		List<EngagedVideo> meanVideos = engagedVideoRepository.findMeanByGroup(soccerMoms, 10);
 		Assert.assertFalse(meanVideos.isEmpty());
 
 		// make sure beber video is not in this return list to test basic filtering by group
@@ -188,7 +188,7 @@ public class EngagedItemRepositoryTest {
 		createAndPersistEngagedVideo(jayz, beberVideo.getVideoContent());
 
 
-		meanVideos = engagedVideoRepository.findMeanByGroup(millenials);
+		meanVideos = engagedVideoRepository.findMeanByGroup(millenials, 10);
 		Assert.assertFalse(meanVideos.isEmpty());
 
 		// the first video should be the video watched by both
@@ -206,7 +206,7 @@ public class EngagedItemRepositoryTest {
 		// beber clicks on a video search result
 		EngagedDocument beberDoc = createAndPersistEngagedVideoDocument(beber);
 
-		List<EngagedDocument> meanDocs = engagedDocumentRepository.findMeanByGroup(soccerMoms);
+		List<EngagedDocument> meanDocs = engagedDocumentRepository.findMeanByGroup(soccerMoms, 10);
 		Assert.assertFalse(meanDocs.isEmpty());
 
 		// make sure beber video is not in this return list to test basic filtering by group
@@ -226,7 +226,7 @@ public class EngagedItemRepositoryTest {
 		createAndPersistEngagedDocument(jayz, beberDoc.getVideoContent());
 
 
-		meanDocs = engagedDocumentRepository.findMeanByGroup(millenials);
+		meanDocs = engagedDocumentRepository.findMeanByGroup(millenials, 10);
 		Assert.assertFalse(meanDocs.isEmpty());
 
 		// the first video should be the video watched by both
@@ -244,7 +244,7 @@ public class EngagedItemRepositoryTest {
 		createAndPersistEngagedDocument(beber, beberDoc.getActivity());
 		createAndPersistEngagedDocument(beber, beberDoc.getActivity());
 		
-		meanDocs = engagedDocumentRepository.findMeanByGroup(millenials);
+		meanDocs = engagedDocumentRepository.findMeanByGroup(millenials, 10);
 		Assert.assertFalse(meanDocs.isEmpty());
 
 		// the first video should be the video watched by both
