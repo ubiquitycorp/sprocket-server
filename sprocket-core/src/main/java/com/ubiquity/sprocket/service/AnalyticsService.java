@@ -1,6 +1,5 @@
 package com.ubiquity.sprocket.service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -243,10 +242,34 @@ public class AnalyticsService implements UserMembershipListener {
 		return getRecommendationEngine(network);
 	}
 	
+
 	private RecommendationEngine getRecommendationEngine(ExternalNetwork network) {
 		RecommendationEngine engine = networkEngineMap.get(network);
 		if(engine == null)
 			throw new UnsupportedOperationException("Recommendations are not supported for this network: " + network);
 		return engine;
+	}	
+
+	/***
+	 * Stub recommendation recommends top 20 public activities in this provider
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public List<Activity> getRecommendedActivities(Long userId, ExternalNetwork externalNetwork) {
+		return activityRepository.findAllWithoutOwnerBySocialNetwork(20, externalNetwork);
 	}
+	
+	/***
+	 * Stub recommendation recommends top 20 public videos in this provider
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public List<VideoContent> getRecommendedVideos(Long userId, ExternalNetwork externalNetwork) {
+		return videoContentRepository.findAllWithoutOwnerByContentNetwork(20, externalNetwork);
+	}
+	
+	
+	
 }

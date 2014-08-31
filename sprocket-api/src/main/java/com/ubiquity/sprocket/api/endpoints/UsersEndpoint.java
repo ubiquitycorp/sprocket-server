@@ -450,7 +450,13 @@ public class UsersEndpoint {
 				identityDto.getUsername());
 		return Response.ok().build();
 	}
-
+	
+	/***
+	 * 
+	 * @param payload
+	 * @return
+	 * @throws IOException
+	 */
 	@POST
 	@Path("/authenticated/reset/responses")
 	@Consumes(MediaType.APPLICATION_JSON)

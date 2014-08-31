@@ -11,6 +11,8 @@ import javax.ws.rs.core.Response;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.content.domain.VideoContent;
+import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.external.domain.Network;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.RecommendationsDto;
@@ -40,6 +42,28 @@ public class AnalyticsEndpoint {
 		for(VideoContent videoContent : videos)
 			recommendationsDto.getVideos().add(DtoAssembler.assemble(videoContent));
 		
+		return Response.ok().entity(jsonConverter.convertToPayload(recommendationsDto)).build();
+	}
+	
+	@GET
+	@Path("users/{userId}/providers/{externalNetworkId}/recommendations")
+	@Produces(MediaType.APPLICATION_JSON)
+	//@Secure
+	public Response recommendationsByProvider(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId) {
+
+		RecommendationsDto recommendationsDto = new RecommendationsDto();
+		AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
+		
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
+		if(externalNetwork.network.equals(Network.Social)){
+			List<Activity> activities = analyticsService.getRecommendedActivities(userId, externalNetwork);
+			for(Activity activity : activities)
+				recommendationsDto.getActivities().add(DtoAssembler.assemble(activity));
+		}else if(externalNetwork.network.equals(Network.Content)){
+			List<VideoContent> videos = analyticsService.getRecommendedVideos(userId, externalNetwork);
+			for(VideoContent videoContent : videos)
+				recommendationsDto.getVideos().add(DtoAssembler.assemble(videoContent));
+		}
 
 		return Response.ok().entity(jsonConverter.convertToPayload(recommendationsDto)).build();
 	}
