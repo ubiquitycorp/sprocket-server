@@ -27,7 +27,7 @@ public class GroupMembership {
 	@Column(name = "group_membership_id")
 	private Long groupMembershipId;
 	
-	@Column(name = "external_network_id", nullable = true)
+	@Column(name = "external_network", nullable = true)
 	private ExternalNetwork externalNetwork;
 
 	@ManyToOne

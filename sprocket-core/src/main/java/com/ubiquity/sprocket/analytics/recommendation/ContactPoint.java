@@ -51,11 +51,15 @@ public class ContactPoint implements Function<Contact, Vector> {
 		// age range
 		AgeRange ageRange = contact.getAgeRange();
 		dimension = Dimension.findDimensionByAttribute("ageRange", dimensions);
-		Integer min = ageRange.getMin() == null ? 0 : ageRange.getMin();
-		Integer max = ageRange.getMax() == null ? Integer.MAX_VALUE : ageRange.getMax();
-		point[1] = (ageRange == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(Range.between(min, max), dimension);
+		point[1] = (ageRange == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(fill(ageRange), dimension);
 		log.info("age range {} weight applied {}", point[1], dimension.getWeight());
 
 		return point;
+	}
+	
+	private static Range<Integer> fill(AgeRange ageRange) {
+		Integer min = ageRange.getMin() == null ? 0 : ageRange.getMin();
+		Integer max = ageRange.getMax() == null ? Integer.MAX_VALUE : ageRange.getMax();
+		return Range.between(min, max);
 	}
 }

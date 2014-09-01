@@ -59,7 +59,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>com.ubiquity.sprocket.tracker.worker.TrackerWorker</mainClass>
+							<mainClass>com.ubiquity.sprocket.analytics.worker.AnalyticsWorker</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -71,7 +71,7 @@
 						</goals>
 						<configuration>
 							<appendAssemblyId>false</appendAssemblyId>
-							<finalName>sprocket-tracker-worker</finalName>
+							<finalName>sprocket-analytics-worker</finalName>
 							<attach>true</attach>
 							<outputDirectory>target/jar</outputDirectory>
 						</configuration>
@@ -94,12 +94,12 @@
 				</executions>
 				<configuration>
 					<copyright>2014, Ubiquity</copyright>
-					<distribution>Sprocket Tracker Woker</distribution>
+					<distribution>Sprocket Analytics Woker</distribution>
 					<group>Application/Mobile</group>
 					<packager>Ubiquity</packager>
 					<prefix>/var/lib/tomcat7</prefix>
 					<defineStatements>
-						<defineStatement>Sprocket Tracker Worker</defineStatement>
+						<defineStatement>Sprocket Analytics Worker</defineStatement>
 					</defineStatements>
 					<mappings>
 						<mapping>

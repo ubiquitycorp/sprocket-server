@@ -1,11 +1,11 @@
 #!/bin/sh
 #
-# sprocket-tracker-worker        Init file for starting up Gift Sender Cron Service
+# sprocket-datasync-worker        Init file for starting up Gift Sender Cron Service
 # 
 # chkconfig: 345 20 20  
 #
 ### BEGIN INIT INFO
-# Provides: sprocket-tracker-worker
+# Provides: sprocket-datasync-worker
 # Required-Start: $network $syslog
 # Required-Stop: $network $syslog
 # Description: Sprocket Datasync Worker 
@@ -14,8 +14,8 @@
 
 . /etc/rc.d/init.d/functions
 
-exec="/usr/local/bin/sprocket-tracker-worker"
-name="sprocket-tracker-worker"
+exec="/usr/local/bin/sprocket-datasync-worker"
+name="sprocket-datasync-worker"
 lockfile=/var/lock/subsys/$name
 
 start() {
@@ -51,7 +51,7 @@ stop() {
     echo
     [ $retval -eq 0 ] && rm -f $lockfile
 
-    kill `ps -ef | grep $name | awk '{ print $2 }'` > /dev/null 2>&1
+    kill `/usr/bin/pgrep -f ${name}.jar | xargs` > /dev/null 2>&1
 
     return $retval
 }
@@ -76,7 +76,7 @@ case "$1" in
         $1
         ;;
     status)
-        status sprocket-tracker-worker 
+        status sprocket-datasync-worker 
         ;;
     *)
         echo $"Usage: $0 {start|stop|status|restart}"

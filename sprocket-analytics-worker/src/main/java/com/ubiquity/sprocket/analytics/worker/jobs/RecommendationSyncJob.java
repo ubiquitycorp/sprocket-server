@@ -14,11 +14,11 @@ public class RecommendationSyncJob implements Job {
 	
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-		log.debug("Executing event sync");
+		log.info("Executing recommendation sync");
 		try {
-			ServiceFactory.getAnalyticsService().recommend();
+			ServiceFactory.getAnalyticsService().assignGroupsAndCreateRecommendedContent();
 		} catch (Exception e) {
-			log.error("Could not process message: {}", e);
+			log.error("Could not process sync job: {}", e);
 		}
 	}
 	

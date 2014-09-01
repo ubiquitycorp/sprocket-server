@@ -26,6 +26,20 @@ public class RecommendedVideo {
 	@Column(name = "group_identifier")
 	private String groupIdentifier;
 
+	/***
+	 * Default constructor required by JPA
+	 */
+	protected RecommendedVideo() {}
+	/***
+	 * Creates a recommended video for the group identifier
+	 * @param videoContent
+	 * @param groupIdentifier
+	 */
+	public RecommendedVideo(VideoContent videoContent, String groupIdentifier) {
+		this.videoContent = videoContent;
+		this.groupIdentifier = groupIdentifier;
+	}
+
 	protected Long getRecommendedActivityId() {
 		return recommendedActivityId;
 	}

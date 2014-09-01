@@ -159,8 +159,10 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 				// get the centroid idx this point is closest to
 				int idx = model.predict(vector);
 				String groupIdentifier = String.valueOf(idx);
-				// add membership to list
-				membership.add(new GroupMembership(externalNetwork, contact.getOwner(), groupIdentifier));
+				
+				// only create a membership assignment for a registered user
+				if(contact.getOwner() != null)
+					membership.add(new GroupMembership(externalNetwork, contact.getOwner(), groupIdentifier));
 			}
 			return membership;
 

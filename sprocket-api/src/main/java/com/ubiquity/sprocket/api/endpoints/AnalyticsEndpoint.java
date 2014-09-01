@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
+import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.sprocket.api.DtoAssembler;
@@ -34,10 +35,10 @@ public class AnalyticsEndpoint {
 	}
 	
 	@GET
-	@Path("users/{userId}/providers/{externalNetworkId}/recommendations")
+	@Path("users/{userId}/providers/{externalNetworkId}/activities/recommended")
 	@Produces(MediaType.APPLICATION_JSON)
-	//@Secure
-	public Response recommendationsByProvider(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+	@Secure
+	public Response recommendedActivitiesByProvider(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		RecommendationsDto recommendationsDto = new RecommendationsDto();
 		AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
@@ -62,4 +63,35 @@ public class AnalyticsEndpoint {
 				.entity(jsonConverter.convertToPayload(recommendationsDto))
 				.build();
 	}
+	
+	@GET
+	@Path("users/{userId}/providers/{externalNetworkId}/videos/recommended")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response recommendedVideosByProvider(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+
+		RecommendationsDto recommendationsDto = new RecommendationsDto();
+		AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
+		
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
+		
+		CollectionVariant<VideoContent> variant = analyticsService.findAllRecommendedVideos(userId, externalNetwork, ifModifiedSince);
+		
+		
+		// Throw a 304 if if there is no variant (no change)
+		if (variant == null)
+			return Response.notModified().build();
+		
+		
+		Collection<VideoContent> videos = variant.getCollection();
+		for(VideoContent videoContent : videos) {
+			recommendationsDto.getVideos().add(DtoAssembler.assemble(videoContent));
+		}
+	
+		return Response.ok()
+				.header("Last-Modified", variant.getLastModified())
+				.entity(jsonConverter.convertToPayload(recommendationsDto))
+				.build();
+	}
+	
 }
