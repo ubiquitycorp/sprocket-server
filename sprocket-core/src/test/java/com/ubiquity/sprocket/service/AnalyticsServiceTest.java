@@ -22,7 +22,8 @@ public class AnalyticsServiceTest {
 	}
 	
 	@Test
-	public void test() {
+	public void testRecommendActivities() {
+		
 	}
 
 

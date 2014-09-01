@@ -47,4 +47,13 @@ GroupMembershipRepository {
 		query.setParameter("userId", userId);
 		return (List<GroupMembership>)query.getResultList();
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<String> findGroupIdentifiersByExternalNetwork(
+			ExternalNetwork externalNetwork) {
+		Query query = getEntityManager().createQuery("select distinct gm.groupIdentifier from GroupMembership gm where gm.externalNetwork = :externalNetwork");
+		query.setParameter("externalNetwork", externalNetwork);
+		return (List<String>)query.getResultList();
+	}
 }

@@ -1,43 +1,50 @@
 package com.ubiquity.sprocket.service;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang3.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.common.serialize.JsonConverter;
+import com.niobium.repository.Cache;
+import com.niobium.repository.CacheRedisHashImpl;
+import com.niobium.repository.CollectionVariant;
+import com.niobium.repository.cache.DataCacheKeys;
+import com.niobium.repository.cache.UserDataModificationCache;
+import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.content.repository.VideoContentRepository;
 import com.ubiquity.content.repository.VideoContentRepositoryJpaImpl;
 import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.identity.domain.User;
+import com.ubiquity.external.repository.cache.CacheKeys;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Gender;
 import com.ubiquity.social.repository.ActivityRepository;
 import com.ubiquity.social.repository.ActivityRepositoryJpaImpl;
+import com.ubiquity.social.repository.ContactRepository;
 import com.ubiquity.sprocket.analytics.recommendation.Dimension;
 import com.ubiquity.sprocket.analytics.recommendation.RecommendationEngine;
 import com.ubiquity.sprocket.analytics.recommendation.RecommendationEngineSparkImpl;
-import com.ubiquity.sprocket.analytics.recommendation.UserMembershipListener;
 import com.ubiquity.sprocket.domain.EngagedActivity;
+import com.ubiquity.sprocket.domain.EngagedDocument;
 import com.ubiquity.sprocket.domain.EngagedItem;
-import com.ubiquity.sprocket.domain.EngagedVideo;
 import com.ubiquity.sprocket.domain.GroupMembership;
 import com.ubiquity.sprocket.repository.EngagedActivityRepository;
 import com.ubiquity.sprocket.repository.EngagedActivityRepositoryJpaImpl;
+import com.ubiquity.sprocket.repository.EngagedDocumentRepository;
 import com.ubiquity.sprocket.repository.EngagedItemRepository;
 import com.ubiquity.sprocket.repository.EngagedItemRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.EngagedVideoRepository;
 import com.ubiquity.sprocket.repository.EngagedVideoRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.GroupMembershipRepository;
 
-public class AnalyticsService implements UserMembershipListener {
+public class AnalyticsService {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 
@@ -45,16 +52,20 @@ public class AnalyticsService implements UserMembershipListener {
 	private VideoContentRepository videoContentRepository;
 	private EngagedItemRepository engagedItemRepository;
 	private EngagedActivityRepository engagedActivityRepository;
+	private EngagedDocumentRepository engagedDocumentRepository;
 	private EngagedVideoRepository engagedVideoRepository;
-	private RecommendationEngine globalRecommendationEngine;
 	private GroupMembershipRepository groupMembershipRepository;
+	private ContactRepository contactRepository;
 	
-	// cache should be in Redis ..?
-	private Map<String, List<Activity>> groupActivityRecommendationMap = new HashMap<String, List<Activity>>();
-	private Map<String, List<VideoContent>> groupVideoRecommendationMap = new HashMap<String, List<VideoContent>>();
+	private UserDataModificationCache dataModificationCache;
+	private Cache recommendedActivitiesCache;
 
-	// creates an enginer (and a search space for each network
-	private Map<ExternalNetwork, RecommendationEngine> networkEngineMap = new HashMap<ExternalNetwork, RecommendationEngine>();
+
+	// in-memory cache will keep this 
+	private Map<String, List<Activity>> groupActivityRecommendationMap = new HashMap<String, List<Activity>>();
+
+	private RecommendationEngine recommendationEngine;
+
 
 	/***
 	 * Sets up redis cache interfaces for each event type
@@ -64,12 +75,19 @@ public class AnalyticsService implements UserMembershipListener {
 	public AnalyticsService(Configuration configuration) {
 		setUpRecommendationEngine(configuration);
 
-		
+
 		activityRepository = new ActivityRepositoryJpaImpl();
 		videoContentRepository = new VideoContentRepositoryJpaImpl();
 		engagedItemRepository = new EngagedItemRepositoryJpaImpl();
 		engagedActivityRepository = new EngagedActivityRepositoryJpaImpl();
 		engagedVideoRepository = new EngagedVideoRepositoryJpaImpl();
+		
+		dataModificationCache = new UserDataModificationCacheRedisImpl(
+				configuration
+				.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GROUP));
+			
+		recommendedActivitiesCache = new CacheRedisHashImpl(CacheKeys.GroupProperties.RECOMMENDED_ACTIVITIES, 15); // TODO: changeme
+		
 
 	}
 
@@ -89,67 +107,21 @@ public class AnalyticsService implements UserMembershipListener {
 	 * Updates a profile record in the data cluster to be used in the recommendation / clustering across social networks
 	 */
 	public void updateGlobalProfileRecord(Contact contact) {
-		globalRecommendationEngine.updateProfileRecord(contact);
+		//globalRecommendationEngine.updateProfileRecord(contact);
 	}
 
 	/***
 	 * Updates a profile record in the data cluster to be used in the recommendation / clustering
 	 */
 	public void updateProfileRecordForExternalNetwork(Contact contact) {
-		// get network specific engine and update the profile
-		RecommendationEngine engine = getRecommendationEngine(contact);
-		engine.updateProfileRecord(contact);
+		//		// get network specific engine and update the profile
+		//		RecommendationEngine engine = getRecommendationEngine(contact);
+		//		engine.updateProfileRecord(contact);
 	}
 
 
 
-	/***
-	 * Stub recommendation recommends 1 activity that is public
-	 * 
-	 * @param userId
-	 * @return
-	 */
-	public List<Activity> findRecommendedActivities(Long userId) {
-		return activityRepository.findAllWithoutOwner(2);
-	}
-
-	/**
-	 * Find the median engaged activities for the specified network
-	 * 
-	 * @param contact
-	 * 
-	 * @return List of activity average engaged entities sorted by most viewed
-	 */
-	public List<Activity> findRecommendedActivities(ExternalNetwork network, Long userId) {
-		
-		GroupMembership membership = getGroupMembershipByExternalNetwork(network, userId);
-		if(membership == null)
-			return new LinkedList<Activity>();
-
-		
-		return groupActivityRecommendationMap.get(membership.getGroupIdentifier());
-		
-	}
 	
-	/**
-	 * Gets group membership for this network
-	 * 
-	 * @param network
-	 * @param userId
-	 * @return
-	 */
-	private GroupMembership getGroupMembershipByExternalNetwork(ExternalNetwork network, Long userId) {
-		List<GroupMembership> memberships = groupMembershipRepository.findAllByUserId(userId);
-		for(GroupMembership membership : memberships) {
-			if(membership.getExternalNetwork() == null)
-				continue; // skip global
-			if(membership.getExternalNetwork() == network) {
-				return membership;
-			}
-		}
-		return null;
-	}
-
 	/***
 	 * Stub recommendation recommends 1 video that is public
 	 * 
@@ -159,96 +131,101 @@ public class AnalyticsService implements UserMembershipListener {
 	public List<VideoContent> getRecommendedVideos(Long userId) {
 		return videoContentRepository.findAllWithoutOwner(2);
 	}
-
-
+	
+	
 	/***
-	 * Entry point for running the entire cycle of recommendations: Add cases to the search space, classify, and group
+	 * Returns video content or null if there is no entry for this user in the cache
+	 * 
+	 * @param ownerId
+	 * @param ifModifiedSince
+	 * @return
+	 */
+	public CollectionVariant<Activity> findAllRecommendedActivities(Long ownerId, ExternalNetwork network, Long ifModifiedSince) {
+		
+		// get the group map for this user
+		List<GroupMembership> groupMembershipList = groupMembershipRepository.findAllByUserId(ownerId);
+		
+		GroupMembership groupMembership = null;
+		for(GroupMembership assigned : groupMembershipList) {
+			if(assigned.getExternalNetwork() == network) {
+				groupMembership = assigned;
+				break;
+			}
+		}
+		// if nothing is assigned, then return nothing
+		if(groupMembership == null) {
+			return null;
+		}
+		String key = CacheKeys.generateCacheKeyForExternalNetwork(CacheKeys.GroupProperties.RECOMMENDED_ACTIVITIES, network);
+		Long lastModified = dataModificationCache.getLastModified((long)network.ordinal(), key, ifModifiedSince);
+
+		// If there is no cache entry, there is no data
+		if(lastModified == null) {
+			return null;
+		}
+		
+		String cached = recommendedActivitiesCache.get(groupMembership.getGroupIdentifier());
+		List<Activity> activities = JsonConverter.getInstance().convertToListFromPayload(cached, Activity.class);
+
+		return new CollectionVariant<Activity>(activities, lastModified);
+	}
+	/***
+	 * Entry point for running the entire cycle of recommendations: add cases to the search space, classify, and group
 	 * 
 	 **/
-	public void recommend() {
-
-		// for all contacts in the system, add
-//		globalRecommendationEngine.train();
+	public void startRecommendationCycle() {
 		
-		Set<ExternalNetwork> supportedNetworks = networkEngineMap.keySet();
-		for(ExternalNetwork network : supportedNetworks) {
-			// clear all membership
-			groupMembershipRepository.deleteByExternalNetwork(network);
-			
-			RecommendationEngine engine = getRecommendationEngine(network);
-			engine.train(); // this will trigger callbacks and complete all membership assignments	
+		recommendationEngine.clear();
 		
-			
-			// now for all groups, get the average angaged activities
-			Set<String> groups = groupActivityRecommendationMap.keySet();
-			for(String group : groups) {
-				
-				List<EngagedActivity> engagedActivities = engagedActivityRepository.findMeanByGroup(group, 10);
-				for(EngagedActivity engagedActivity : engagedActivities) {
-					groupActivityRecommendationMap.get(group).add(engagedActivity.getActivity());
-				}
-				
-				// now videos
-				List<EngagedVideo> engagedVideos = engagedVideoRepository.findMeanByGroup(group, 10);
-				for(EngagedVideo engagedVideo : engagedVideos) {
-					groupVideoRecommendationMap.get(group).add(engagedVideo.getVideoContent());
-				}
-				
+		// remove all FB assignments
+		groupMembershipRepository.deleteByExternalNetwork(ExternalNetwork.Facebook);
 
+		// query all FB contacts
+		List<Contact> fbContacts = contactRepository.findByExternalNetwork(ExternalNetwork.Facebook);
+		// update instance space
+		recommendationEngine.updateProfileRecords(fbContacts);
+		
+		// train model
+		recommendationEngine.train();
+		
+		// cluster FB users
+		recommendationEngine.assign(fbContacts, ExternalNetwork.Facebook.toString());
+		
+		// now get the unique set of group names (they are also the clusters) for FB
+		List<String> groups = groupMembershipRepository.findGroupIdentifiersByExternalNetwork(ExternalNetwork.Facebook);
+		
+		
+		for(String group : groups) {
+			List<EngagedActivity> engagedActivities = engagedActivityRepository.findMeanByGroup(group, 10);
+			List<EngagedDocument> engagedDocuments = engagedDocumentRepository.findMeanByGroup(group, 10);
+			for(EngagedActivity engagedActivity : engagedActivities) {
+				recommendedActivitiesCache.put(group, JsonConverter.getInstance().convertToPayload(engagedActivity.getActivity()));
 			}
-
+			// these will be activities clicked on from search results
+			for(EngagedDocument engagedDocument : engagedDocuments) {
+				Activity activity = engagedDocument.getActivity();
+				if(activity != null)
+					recommendedActivitiesCache.put(group, JsonConverter.getInstance().convertToPayload(engagedDocument.getActivity()));
+			}
 		}
 
 	}
 
 
 	private void setUpRecommendationEngine(Configuration configuration) {
-		globalRecommendationEngine = new RecommendationEngineSparkImpl(configuration, this);
-		globalRecommendationEngine.addDimension(Dimension.createFromEnum("gender", Gender.class));
+		recommendationEngine = new RecommendationEngineSparkImpl(configuration);
 
-		// now do this for each network with what we've learned about our weighting
-		RecommendationEngine engine = new RecommendationEngineSparkImpl(configuration, this);
-		engine.addDimension(Dimension.createFromEnum("gender", Gender.class));
-		networkEngineMap.put(ExternalNetwork.Facebook, engine);
+		// add dimension to global context with all weight values at 1
+		recommendationEngine.addDimension(Dimension.createFromEnum("gender", Gender.class));
+		recommendationEngine.addDimension(new Dimension("ageRange", Range.between(0.0, 120.0), 1.0));
 
-		engine = new RecommendationEngineSparkImpl(configuration, this);
-		engine.addDimension(Dimension.createFromEnum("gender", Gender.class));
-		networkEngineMap.put(ExternalNetwork.YouTube, engine);
+		// create fb specific context, with dimensions where
+		String fbContext = ExternalNetwork.Facebook.toString();
+		recommendationEngine.addContext(fbContext, configuration);
+		recommendationEngine.addDimension(Dimension.createFromEnum("gender", Gender.class, 0.1), fbContext);
+		recommendationEngine.addDimension(new Dimension("ageRange", Range.between(0.0, 120.0), 1.0), fbContext);
+
 	}
-
-
-	@Override
-	public void didAssignMembership(User user,
-			ExternalNetwork network, String group) {
-		log.debug("User {} assigned network membership to {}", user, group);
-		groupMembershipRepository.create(new GroupMembership(network, user, group));
-		
-		// if there is no array for this group identifier, create one
-		if(!groupActivityRecommendationMap.containsKey(group))
-				groupActivityRecommendationMap.put(group, new LinkedList<Activity>());
-	}
-
-	/**
-	 * Get recommendation engine by network 
-	 * @param contact
-	 * @return Recommendation engine for this network
-	 * 
-	 * @throws UnsupportedOperationException if there is no engine for this network
-	 */
-	private RecommendationEngine getRecommendationEngine(Contact contact) {
-		
-		// TODO: wishlist have ref to enum and not int
-		ExternalNetwork network = ExternalNetwork.getNetworkById(contact.getExternalIdentity().getExternalNetwork());
-		return getRecommendationEngine(network);
-	}
-	
-
-	private RecommendationEngine getRecommendationEngine(ExternalNetwork network) {
-		RecommendationEngine engine = networkEngineMap.get(network);
-		if(engine == null)
-			throw new UnsupportedOperationException("Recommendations are not supported for this network: " + network);
-		return engine;
-	}	
 
 	/***
 	 * Stub recommendation recommends top 20 public activities in this provider
@@ -259,7 +236,7 @@ public class AnalyticsService implements UserMembershipListener {
 	public List<Activity> getRecommendedActivities(Long userId, ExternalNetwork externalNetwork) {
 		return activityRepository.findAllWithoutOwnerBySocialNetwork(20, externalNetwork);
 	}
-	
+
 	/***
 	 * Stub recommendation recommends top 20 public videos in this provider
 	 * 
@@ -269,7 +246,7 @@ public class AnalyticsService implements UserMembershipListener {
 	public List<VideoContent> getRecommendedVideos(Long userId, ExternalNetwork externalNetwork) {
 		return videoContentRepository.findAllWithoutOwnerByContentNetwork(20, externalNetwork);
 	}
-	
-	
-	
+
+
+
 }

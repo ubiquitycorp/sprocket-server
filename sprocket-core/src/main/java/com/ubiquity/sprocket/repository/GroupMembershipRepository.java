@@ -31,4 +31,13 @@ public interface GroupMembershipRepository extends Repository <Long, GroupMember
 	 * 
 	 **/
 	List<GroupMembership> findAllByUserId(Long userId);
+	
+	/***
+	 * Returns unique set of group identifiers for this network
+	 * 
+	 * @param externalNetwork
+	 * @return
+	 */
+	List<String> findGroupIdentifiersByExternalNetwork(ExternalNetwork externalNetwork);
+	
 }

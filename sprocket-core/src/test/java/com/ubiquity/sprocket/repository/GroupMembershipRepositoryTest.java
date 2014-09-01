@@ -70,6 +70,12 @@ public class GroupMembershipRepositoryTest {
 
 
 	}
+	
+	@Test
+	public void testFindUniqueGroups() throws Exception {
+		List<String> identifiers = membershipRepository.findGroupIdentifiersByExternalNetwork(ExternalNetwork.Facebook);
+		Assert.assertEquals(identifiers.get(0), fbMomMembership.getGroupIdentifier());
+	}
 
 	@Test
 	public void testCreate() throws Exception {
