@@ -1,17 +1,14 @@
 package com.ubiquity.sprocket.service;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.niobium.common.serialize.JsonConverter;
-import com.niobium.repository.Cache;
-import com.niobium.repository.CacheRedisHashImpl;
 import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.cache.DataCacheKeys;
 import com.niobium.repository.cache.UserDataModificationCache;
@@ -28,6 +25,7 @@ import com.ubiquity.social.domain.Gender;
 import com.ubiquity.social.repository.ActivityRepository;
 import com.ubiquity.social.repository.ActivityRepositoryJpaImpl;
 import com.ubiquity.social.repository.ContactRepository;
+import com.ubiquity.social.repository.ContactRepositoryJpaImpl;
 import com.ubiquity.sprocket.analytics.recommendation.Dimension;
 import com.ubiquity.sprocket.analytics.recommendation.RecommendationEngine;
 import com.ubiquity.sprocket.analytics.recommendation.RecommendationEngineSparkImpl;
@@ -35,14 +33,19 @@ import com.ubiquity.sprocket.domain.EngagedActivity;
 import com.ubiquity.sprocket.domain.EngagedDocument;
 import com.ubiquity.sprocket.domain.EngagedItem;
 import com.ubiquity.sprocket.domain.GroupMembership;
+import com.ubiquity.sprocket.domain.RecommendedActivity;
 import com.ubiquity.sprocket.repository.EngagedActivityRepository;
 import com.ubiquity.sprocket.repository.EngagedActivityRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.EngagedDocumentRepository;
+import com.ubiquity.sprocket.repository.EngagedDocumentRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.EngagedItemRepository;
 import com.ubiquity.sprocket.repository.EngagedItemRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.EngagedVideoRepository;
 import com.ubiquity.sprocket.repository.EngagedVideoRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.GroupMembershipRepository;
+import com.ubiquity.sprocket.repository.GroupMembershipRepositoryJpaImpl;
+import com.ubiquity.sprocket.repository.RecommendedActivityRepository;
+import com.ubiquity.sprocket.repository.RecommendedActivityRepositoryJpaImpl;
 
 public class AnalyticsService {
 
@@ -56,14 +59,10 @@ public class AnalyticsService {
 	private EngagedVideoRepository engagedVideoRepository;
 	private GroupMembershipRepository groupMembershipRepository;
 	private ContactRepository contactRepository;
+	private RecommendedActivityRepository recommendedActivityRepository;
 	
 	private UserDataModificationCache dataModificationCache;
-	private Cache recommendedActivitiesCache;
-
-
-	// in-memory cache will keep this 
-	private Map<String, List<Activity>> groupActivityRecommendationMap = new HashMap<String, List<Activity>>();
-
+	
 	private RecommendationEngine recommendationEngine;
 
 
@@ -80,14 +79,15 @@ public class AnalyticsService {
 		videoContentRepository = new VideoContentRepositoryJpaImpl();
 		engagedItemRepository = new EngagedItemRepositoryJpaImpl();
 		engagedActivityRepository = new EngagedActivityRepositoryJpaImpl();
+		engagedDocumentRepository = new EngagedDocumentRepositoryJpaImpl();
 		engagedVideoRepository = new EngagedVideoRepositoryJpaImpl();
+		groupMembershipRepository = new GroupMembershipRepositoryJpaImpl();
+		contactRepository = new ContactRepositoryJpaImpl();
+		recommendedActivityRepository = new RecommendedActivityRepositoryJpaImpl();
 		
 		dataModificationCache = new UserDataModificationCacheRedisImpl(
 				configuration
-				.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GROUP));
-			
-		recommendedActivitiesCache = new CacheRedisHashImpl(CacheKeys.GroupProperties.RECOMMENDED_ACTIVITIES, 15); // TODO: changeme
-		
+				.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GROUP));		
 
 	}
 
@@ -101,22 +101,6 @@ public class AnalyticsService {
 		EntityManagerSupport.beginTransaction();
 		engagedItemRepository.create(engagedItem);
 		EntityManagerSupport.commit();
-	}
-
-	/***
-	 * Updates a profile record in the data cluster to be used in the recommendation / clustering across social networks
-	 */
-	public void updateGlobalProfileRecord(Contact contact) {
-		//globalRecommendationEngine.updateProfileRecord(contact);
-	}
-
-	/***
-	 * Updates a profile record in the data cluster to be used in the recommendation / clustering
-	 */
-	public void updateProfileRecordForExternalNetwork(Contact contact) {
-		//		// get network specific engine and update the profile
-		//		RecommendationEngine engine = getRecommendationEngine(contact);
-		//		engine.updateProfileRecord(contact);
 	}
 
 
@@ -164,16 +148,15 @@ public class AnalyticsService {
 			return null;
 		}
 		
-		String cached = recommendedActivitiesCache.get(groupMembership.getGroupIdentifier());
-		List<Activity> activities = JsonConverter.getInstance().convertToListFromPayload(cached, Activity.class);
-
+		List<Activity> activities = recommendedActivityRepository.findRecommendedActivitiesByGroup(groupMembership.getGroupIdentifier());
+		
 		return new CollectionVariant<Activity>(activities, lastModified);
 	}
 	/***
 	 * Entry point for running the entire cycle of recommendations: add cases to the search space, classify, and group
 	 * 
 	 **/
-	public void startRecommendationCycle() {
+	public void recommend() {
 		
 		recommendationEngine.clear();
 		
@@ -185,29 +168,48 @@ public class AnalyticsService {
 		// update instance space
 		recommendationEngine.updateProfileRecords(fbContacts);
 		
+		String fbContext = ExternalNetwork.Facebook.toString();
 		// train model
-		recommendationEngine.train();
+		recommendationEngine.train(fbContext);
 		
 		// cluster FB users
-		recommendationEngine.assign(fbContacts, ExternalNetwork.Facebook.toString());
-		
-		// now get the unique set of group names (they are also the clusters) for FB
-		List<String> groups = groupMembershipRepository.findGroupIdentifiersByExternalNetwork(ExternalNetwork.Facebook);
-		
-		
+		List<GroupMembership> membershipList = recommendationEngine.assign(fbContacts, fbContext);
+		// track the unique set of group names
+		Set<String> groups = new HashSet<String>();
+		// persist assignments
+		for(GroupMembership membership : membershipList) {
+			EntityManagerSupport.beginTransaction();
+			groupMembershipRepository.create(membership);
+			EntityManagerSupport.commit();
+			
+			// add to groups
+			groups.add(membership.getGroupIdentifier());
+		}
+				
 		for(String group : groups) {
 			List<EngagedActivity> engagedActivities = engagedActivityRepository.findMeanByGroup(group, 10);
 			List<EngagedDocument> engagedDocuments = engagedDocumentRepository.findMeanByGroup(group, 10);
 			for(EngagedActivity engagedActivity : engagedActivities) {
-				recommendedActivitiesCache.put(group, JsonConverter.getInstance().convertToPayload(engagedActivity.getActivity()));
+				EntityManagerSupport.beginTransaction();
+				recommendedActivityRepository.create(new RecommendedActivity(engagedActivity.getActivity(), group));
+				EntityManagerSupport.commit();
+
 			}
 			// these will be activities clicked on from search results
 			for(EngagedDocument engagedDocument : engagedDocuments) {
 				Activity activity = engagedDocument.getActivity();
-				if(activity != null)
-					recommendedActivitiesCache.put(group, JsonConverter.getInstance().convertToPayload(engagedDocument.getActivity()));
+				if(activity != null) {
+					EntityManagerSupport.beginTransaction();
+					recommendedActivityRepository.create(new RecommendedActivity(engagedDocument.getActivity(), group));
+					EntityManagerSupport.commit();
+				}
 			}
+			
+			String key = CacheKeys.generateCacheKeyForExternalNetwork(CacheKeys.GroupProperties.RECOMMENDED_ACTIVITIES, ExternalNetwork.Facebook);
+			dataModificationCache.put(Long.parseLong(group), key, System.currentTimeMillis());
 		}
+		
+		
 
 	}
 

@@ -1,49 +1,47 @@
-package com.ubiquity.sprocket.tracker.worker;
+package com.ubiquity.sprocket.analytics.worker;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.quartz.DateBuilder.IntervalUnit;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.niobium.common.thread.ThreadPool;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.sprocket.analytics.worker.jobs.RecommendationSyncJob;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
-import com.ubiquity.sprocket.tracker.worker.mq.consumer.TrackConsumer;
 
-public class TrackerWorker {
+import static org.quartz.DateBuilder.futureDate;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.TriggerKey.triggerKey;
 
-	private static final int DEFAULT_NUM_CONSUMERS = 10;
-	protected static Logger log = LoggerFactory.getLogger(TrackerWorker.class);
+
+public class AnalyticsWorker {
+
+	protected static Logger log = LoggerFactory.getLogger(AnalyticsWorker.class);
 
 	public void destroy() {
 		stopServices();
 	}
+	
 	public void initialize(Configuration configuration, Configuration errorsConfiguration) throws SchedulerException, IOException {
 
 		startServices(configuration, errorsConfiguration);
 
 		log.info("Service initialized.");
 
-		List<TrackConsumer> consumers = new LinkedList<TrackConsumer>();
-		try {			
-			for(int i = 0; i < DEFAULT_NUM_CONSUMERS; i++)
-				consumers.add(new TrackConsumer(MessageQueueFactory.createTrackQueueConsumerChannel()));
-		} catch (IOException e) {
-			log.error("Unable to start service", e);
-			System.exit(0);
-		}
-
-		// start the thread pool, 10 consumer threads
-		ThreadPool<TrackConsumer> threadPool = new ThreadPool<TrackConsumer>();
-		threadPool.start(consumers);
+		startScheduler();
 		
 		while (true) {
 			try {
@@ -56,9 +54,9 @@ public class TrackerWorker {
 	}
 
 	public static void main(String[] args) {
-		final TrackerWorker worker = new TrackerWorker();
+		final AnalyticsWorker worker = new AnalyticsWorker();
 		try {
-			worker.initialize(new PropertiesConfiguration("trackerworker.properties"),
+			worker.initialize(new PropertiesConfiguration("analyticsworker.properties"),
 					new PropertiesConfiguration("messages.properties"));
 		} catch (ConfigurationException e) {
 			log.error("Unable to configure service", e);
@@ -91,6 +89,25 @@ public class TrackerWorker {
 		JedisConnectionFactory.destroyPool();
 		EntityManagerSupport.closeEntityManagerFactory();
 		// TODO: we need an mq disconnect
+	}
+	
+	private void startScheduler() throws SchedulerException {
+		Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+		scheduler.start();
+
+		JobDetail job = newJob(RecommendationSyncJob.class)
+				.withIdentity("recommendationSync", "sync")
+				.build();
+
+		Trigger trigger = newTrigger() 
+				.withIdentity(triggerKey("recommendationTrigger", "trigger"))
+				.withSchedule(simpleSchedule()
+						.withIntervalInMinutes(13)
+						.repeatForever())
+						.startAt(futureDate(1, IntervalUnit.MINUTE))
+						.build();
+	
+		scheduler.scheduleJob(job, trigger);
 	}
 
 }
