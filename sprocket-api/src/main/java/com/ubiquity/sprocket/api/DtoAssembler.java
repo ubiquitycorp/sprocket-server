@@ -233,17 +233,18 @@ public class DtoAssembler {
 
 	public static VideoDto assemble(VideoContent videoContent) {
 		VideoDto.Builder videoBuilder = new VideoDto.Builder()
-				.externalNetworkId(videoContent.getExternalNetwork().ordinal());
+				.externalNetworkId(videoContent.getExternalNetwork().ordinal())
+				.category(videoContent.getCategory().getCategoryName());
 		
-				if(videoContent.getVideo() != null)
-					videoBuilder.itemKey(videoContent.getVideo().getItemKey());
-				
-				if(videoContent.getThumb() != null)
-					videoBuilder.thumb(new ImageDto(videoContent.getThumb().getUrl()));
-				
-				videoBuilder.title(videoContent.getTitle()).description(videoContent.getDescription());
+		if(videoContent.getVideo() != null)
+			videoBuilder.itemKey(videoContent.getVideo().getItemKey());
 		
-				return videoBuilder.build();
+		if(videoContent.getThumb() != null)
+			videoBuilder.thumb(new ImageDto(videoContent.getThumb().getUrl()));
+		
+		videoBuilder.title(videoContent.getTitle()).description(videoContent.getDescription());
+
+		return videoBuilder.build();
 	}
 
 	/***
@@ -379,7 +380,7 @@ public class DtoAssembler {
 		VideoContent content = new VideoContent.Builder()
 				.video(video)
 				.title(videoDto.getTitle())
-				.category(videoDto.getCategory())
+				.categoryExternalIdentifier(videoDto.getCategory())
 				.description(videoDto.getDescription())
 				.externalNetwork(
 						ExternalNetwork.getNetworkById(videoDto
