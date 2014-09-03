@@ -158,8 +158,12 @@ public class AnalyticsService {
 		ExternalNetwork network = ExternalNetwork.getNetworkById(contact.getExternalIdentity().getExternalNetwork());
 		String context = network.toString();
 		List<GroupMembership> membershipList = recommendationEngine.assign(Arrays.asList(new Contact[] { contact }), context);
+		
+		// persist this...?
 		for(GroupMembership membership : membershipList) {
+			EntityManagerSupport.beginTransaction();
 			groupMembershipRepository.create(membership);
+			EntityManagerSupport.commit();
 		}
 
 	}

@@ -38,13 +38,17 @@ public class GroupMembership {
 	@Column(name = "group_identifier", nullable = false)
 	private String groupIdentifier;
 	
+	@Column(name = "group_assignment_filter", nullable = false)
+	private GroupAssignmentFilter assignmentFilter;
+	
+	
 	/**
 	 * Required by JPA
 	 */
 	protected GroupMembership() {}
 	
 	/***
-	 * Creates a membership object with all properties
+	 * Creates a membership object for an external profile
 	 * 
 	 * @param externalNetwork
 	 * @param user
@@ -55,8 +59,8 @@ public class GroupMembership {
 		this.externalNetwork = externalNetwork;
 		this.user = user;
 		this.groupIdentifier = groupIdentifier;
+		this.assignmentFilter = GroupAssignmentFilter.ExternalProfile;
 	}
-	
 	
 	public Long getGroupMembershipId() {
 		return groupMembershipId;

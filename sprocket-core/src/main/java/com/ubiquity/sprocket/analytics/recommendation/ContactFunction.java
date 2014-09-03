@@ -13,14 +13,14 @@ import com.ubiquity.social.domain.AgeRange;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Gender;
 
-public class ContactPoint implements Function<Contact, Vector> {
+public class ContactFunction implements Function<Contact, Vector> {
 
-	private static Logger log = LoggerFactory.getLogger(ContactPoint.class);
+	private static Logger log = LoggerFactory.getLogger(ContactFunction.class);
 
 	private static final long serialVersionUID = 1L;
 	private List<Dimension> dimensions;
 
-	protected ContactPoint(List<Dimension> dimensions) {
+	protected ContactFunction(List<Dimension> dimensions) {
 		this.dimensions = dimensions;
 	}
 
@@ -46,13 +46,13 @@ public class ContactPoint implements Function<Contact, Vector> {
 		Gender gender = contact.getGender();
 		Dimension dimension = Dimension.findDimensionByAttribute("gender", dimensions);
 		point[0] = (gender == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(gender, dimension);
-		log.info("gender {} weight applied {}", point[0], dimension.getWeight());
+		log.debug("gender {} weight applied {}", point[0], dimension.getWeight());
 
 		// age range
 		AgeRange ageRange = contact.getAgeRange();
 		dimension = Dimension.findDimensionByAttribute("ageRange", dimensions);
 		point[1] = (ageRange == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(fill(ageRange), dimension);
-		log.info("age range {} weight applied {}", point[1], dimension.getWeight());
+		log.debug("age range {} weight applied {}", point[1], dimension.getWeight());
 
 		return point;
 	}

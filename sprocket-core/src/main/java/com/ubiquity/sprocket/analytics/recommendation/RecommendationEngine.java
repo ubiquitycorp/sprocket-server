@@ -23,7 +23,6 @@ public interface RecommendationEngine {
 	 * @param contact
 	 */
 	void updateProfileRecords(List<Contact> contacts);
-
 	
 	/***
 	 * Clears data in memory

@@ -154,7 +154,7 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 			// TODO Auto-generated method stub
 			for(Contact contact : contacts) {
 				// get the feature vector for these contacts
-				double[] point = ContactPoint.computePoint(contact, dimensions);
+				double[] point = ContactFunction.computePoint(contact, dimensions);
 				Vector vector = Vectors.dense(point);
 				// get the centroid idx this point is closest to
 				int idx = model.predict(vector);
@@ -170,7 +170,7 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 		
 		protected void train() {
 			// map all the points
-			points = distData.map(new ContactPoint(dimensions));
+			points = distData.map(new ContactFunction(dimensions));
 			
 			// build model based on what's in the instance space now, with k determined as the rule of thumb
 			long k = Math.round(Math.sqrt(points.count() / (double)2));

@@ -94,12 +94,12 @@
 				</executions>
 				<configuration>
 					<copyright>2014, Ubiquity</copyright>
-					<distribution>Sprocket Datasync Woker</distribution>
+					<distribution>Sprocket Location Woker</distribution>
 					<group>Application/Mobile</group>
 					<packager>Ubiquity</packager>
 					<prefix>/var/lib/tomcat7</prefix>
 					<defineStatements>
-						<defineStatement>Sprocket Datasync Worker</defineStatement>
+						<defineStatement>Sprocket Location Worker</defineStatement>
 					</defineStatements>
 					<mappings>
 						<mapping>
