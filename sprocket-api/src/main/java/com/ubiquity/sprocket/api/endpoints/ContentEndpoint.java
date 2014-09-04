@@ -76,7 +76,7 @@ public class ContentEndpoint {
 			if (identity.getEmail().toLowerCase().contains("@gmail"))
 				results.setHistoryEmptyMessage("you have no videos in history");
 			else
-				results.setHistoryEmptyMessage("Please note that YouTube doesn't allow retrieving  history for service account");
+				results.setHistoryEmptyMessage("Please note that YouTube doesn't allow retrieving history if you log in with a service account");
 		}
 		return Response.ok().header("Last-Modified", variant.getLastModified()).entity(jsonConverter.convertToPayload(results)).build();
 	}
