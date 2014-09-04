@@ -24,6 +24,7 @@ import com.ubiquity.social.domain.AgeRange;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Gender;
 import com.ubiquity.sprocket.domain.GroupMembership;
+import com.ubiquity.sprocket.domain.Location;
 
 public class RecommendationEngineTest{
 
@@ -31,26 +32,28 @@ public class RecommendationEngineTest{
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 
-	private GroupMembership johnMembership, jackMembership, joeMembership, jillMembership, janeMembership, jennyMembership;
-	private GroupMembership johnFbMembership, jackFbMembership, joeFbMembership, jillFbMembership, janeFbMembership, jennyFbMembership;
 	private UserRepository userRepository;
 
 	private Configuration config;
 
-	private String fbContext = ExternalNetwork.Facebook.toString();
 	@Before
 	public void setUp() throws Exception {
 		config = new PropertiesConfiguration("test.properties");
 		engine = new RecommendationEngineSparkImpl(config);		
 
 		// add dimension to global context with all weight values at 1
-		engine.addDimension(Dimension.createFromEnum("gender", Gender.class));
-		engine.addDimension(new Dimension("ageRange", Range.between(0.0, 100.0), 1.0));
+		engine.addDimension(Dimension.createFromEnum("gender", Gender.class, 0.0));
+		engine.addDimension(new Dimension("ageRange", Range.between(0.0, 100.0), 0.0));
+		engine.addDimension(new Dimension("lat", Range.between(-90.0, 90.0), 1.0)); // only location important
+		engine.addDimension(new Dimension("lon", Range.between(-180.0, 180.0), 1.0));
 
 		// create fb specific context, with dimensions where
-		engine.addContext(fbContext, config);
-		engine.addDimension(Dimension.createFromEnum("gender", Gender.class, 0.1), fbContext);
-		engine.addDimension(new Dimension("ageRange", Range.between(0.0, 100.0), 1.0), fbContext);
+		engine.addContext(ExternalNetwork.Facebook, config);
+		engine.addDimension(Dimension.createFromEnum("gender", Gender.class, 0.1), ExternalNetwork.Facebook);
+		engine.addDimension(new Dimension("ageRange", Range.between(0.0, 100.0), 1.0), ExternalNetwork.Facebook);
+		engine.addDimension(new Dimension("lat", Range.between(-90.0, 90.0), 0.0)); // location we don't care about
+		engine.addDimension(new Dimension("lon", Range.between(-180.0, 180.0), 0.0)); 
+		
 
 		userRepository = new UserRepositoryJpaImpl();
 	}
@@ -59,134 +62,162 @@ public class RecommendationEngineTest{
 	@Test
 	public void testKMeansFindsNearestKClosestPoints() {
 
-		List<Contact> contacts = new LinkedList<Contact>();
+		List<Profile> profiles = new LinkedList<Profile>();
 
-		User jack = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-		Contact.Builder contactBuilder = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(jack, ExternalNetwork.Facebook);
+		User user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		Contact.Builder contactBuilder = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(user, ExternalNetwork.Facebook);
 		contactBuilder.gender(Gender.Male);
 		contactBuilder.ageRange(new AgeRange(21, 35));
-		persistUser(jack);
-		contacts.add(contactBuilder.build());
+		persistUser(user);
+		
+		// build the profile with location
+		Profile jack = new Profile(user, new Location.Builder().latitude(34.0522300).longitude(-118.2436800).user(user).build());
+		jack.getContacts().add(contactBuilder.build());
+		profiles.add(jack);
 
-		User john = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-		contactBuilder = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(john, ExternalNetwork.Facebook);
+		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		contactBuilder = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(user, ExternalNetwork.Facebook);
 		contactBuilder.gender(Gender.Male);
 		contactBuilder.ageRange(new AgeRange(21, 35));
-		persistUser(john);
-		contacts.add(contactBuilder.build());
+		persistUser(user);
+		
+		// build the profile with location
+		Profile john = new Profile(user, new Location.Builder().latitude(34.1234567).longitude(-118.2412345).user(user).build());
+		john.getContacts().add(contactBuilder.build());
+		profiles.add(john);
 
-		User joe = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-		contactBuilder = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(joe, ExternalNetwork.Facebook);
+		
+		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		contactBuilder = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(user, ExternalNetwork.Facebook);
 		contactBuilder.gender(Gender.Male);
 		contactBuilder.ageRange(new AgeRange(55, 65));
+		persistUser(user);
+		
+		// build the profile with location
+		Profile joe = new Profile(user, new Location.Builder().latitude(34.1334567).longitude(-118.2499999).user(user).build());
+		joe.getContacts().add(contactBuilder.build());
+		profiles.add(joe);
 
-		persistUser(joe);
-		contacts.add(contactBuilder.build());
-
-		User jill = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-		contactBuilder = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(jill, ExternalNetwork.Facebook);
+		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		contactBuilder = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(user, ExternalNetwork.Facebook);
 		contactBuilder.gender(Gender.Female);
 		contactBuilder.ageRange(new AgeRange(55, 65));
-		persistUser(jill);
-		contacts.add(contactBuilder.build());
+		persistUser(user);
+		
+		Profile jill = new Profile(user, new Location.Builder().latitude(-34.6131500).longitude(-58.3772300).user(user).build());
+		jill.getContacts().add(contactBuilder.build());
+		profiles.add(jill);
 
-		User jane = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-		contactBuilder = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(jane, ExternalNetwork.Facebook);
+		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		contactBuilder = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(user, ExternalNetwork.Facebook);
 		contactBuilder.gender(Gender.Female);
 		contactBuilder.ageRange(new AgeRange(55, 65));
-		persistUser(jane);
-		contacts.add(contactBuilder.build());
-
-		engine.updateProfileRecords(contacts);
-		// running train will train the model (create the clusters and centroids) and also classify the existing Contacts used in the
-		// computation
+		persistUser(user);
+		
+		Profile jane = new Profile(user, new Location.Builder().latitude(-34.6231500).longitude(-58.3872300).user(user).build());
+		jane.getContacts().add(contactBuilder.build());
+		profiles.add(jane);			
+		
+		engine.updateProfileRecords(profiles);
+		
+		
+		
 		engine.train(); // train global context
 		
 		// assign and persist
-		List<GroupMembership> membershipList = engine.assign(contacts);
-		for(GroupMembership membership : membershipList) {
-			// only evaluate global
-			if(membership.getExternalNetwork() != null)
-				continue;
-			if(membership.getUser().getUserId().equals(john.getUserId())) {
-				johnMembership = membership;
-			} else if(membership.getUser().getUserId().equals(jack.getUserId())) {
-				jackMembership = membership;
-			} else if(membership.getUser().getUserId().equals(joe.getUserId())) {
-				joeMembership = membership;
-			} else if(membership.getUser().getUserId().equals(jane.getUserId())) {
-				janeMembership = membership;
-			} else if(membership.getUser().getUserId().equals(jill.getUserId())) {
-				jillMembership = membership;
-			} else {
-				Assert.assertTrue("Membership not mapped to a valid test user", Boolean.FALSE);
-			}
-		}
+		GroupMembership johnMembership = engine.assign(john).get(0);
+		GroupMembership joeMembership = engine.assign(joe).get(0);
+		GroupMembership jackMembership = engine.assign(jack).get(0);
+		GroupMembership jillMembership = engine.assign(jill).get(0);
+		GroupMembership janeMembership = engine.assign(jane).get(0);
 
-		// now test that the group classifications worked properly by gender
+		
+		// now test that the group classifications worked properly by location
 		Assert.assertEquals(johnMembership.getGroupIdentifier(), jackMembership.getGroupIdentifier());
 		Assert.assertEquals(joeMembership.getGroupIdentifier(), jackMembership.getGroupIdentifier());
 		Assert.assertEquals(jillMembership.getGroupIdentifier(), janeMembership.getGroupIdentifier());
-
 		
-		// now classify a new user / contact without after training the model
-		User jenny = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-		contactBuilder = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(jenny, ExternalNetwork.Facebook);
+		// assert in the negative
+		Assert.assertNotEquals(jillMembership.getGroupIdentifier(), jackMembership.getGroupIdentifier());
+	
+		
+		// now classify a new user / contact without after training the model, from San Diego
+		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		contactBuilder = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(user, ExternalNetwork.Facebook);
 		contactBuilder.gender(Gender.Female);
 		contactBuilder.ageRange(new AgeRange(21, 35));
-		persistUser(jenny);
-
-		// adding new contacts also tests the union of the 2 data sets 
-		List<Contact> newContacts = Arrays.asList(new Contact[] { contactBuilder.build() });
-		engine.updateProfileRecords(newContacts);
-
-		// assign in the global context, where gender matters most
-		List<GroupMembership> membership = engine.assign(newContacts);
-
-		// verify that the model is working...jenny should clustered with the girls
-		jennyMembership = membership.get(0);
-		Assert.assertEquals(jennyMembership.getGroupIdentifier(), jillMembership.getGroupIdentifier());
-
-
-		engine.train(fbContext); // now train fb context
+		persistUser(user);
 		
-		// now add new contacts (Jenny) into a single array and let's classify them
-		contacts.addAll(newContacts);
+		Profile jenny = new Profile(user, new Location.Builder().latitude(32.715786).longitude(-117.158340).user(user).build());
+		jenny.getContacts().add(contactBuilder.build());
+		profiles.add(jenny);
 		
-		log.info("Assigning FB groups...");
-		// assign in the FB context, where 
-		membershipList = engine.assign(contacts, fbContext);
-		for(GroupMembership fbMembership : membershipList) {
-			// only evaluate fb
-			if(fbMembership.getExternalNetwork() != ExternalNetwork.Facebook)
-				continue;
+		GroupMembership jennyMembership = engine.assign(jenny).get(0);
+		
+		// ensure that Jenny is grouped with jack, in LA not Argentina
+		Assert.assertEquals(jennyMembership.getGroupIdentifier(), jackMembership.getGroupIdentifier());
 
-			if(fbMembership.getUser().getUserId().equals(john.getUserId())) {
-				johnFbMembership = fbMembership;
-			} else if(fbMembership.getUser().getUserId().equals(jack.getUserId())) {
-				jackFbMembership = fbMembership;
-			} else if(fbMembership.getUser().getUserId().equals(joe.getUserId())) {
-				joeFbMembership = fbMembership;
-			} else if(fbMembership.getUser().getUserId().equals(jane.getUserId())) {
-				janeFbMembership = fbMembership;
-			} else if(fbMembership.getUser().getUserId().equals(jill.getUserId())) {
-				jillFbMembership = fbMembership;
-			} else if(fbMembership.getUser().getUserId().equals(jenny.getUserId())) {
-				jennyFbMembership = fbMembership;
-			} else {
-				Assert.assertTrue("Membership not mapped to a valid test user", Boolean.FALSE);
-			}
-		}
+		engine.train(ExternalNetwork.Facebook); // now train FB context
+
+		// now their membership should be by age range
+		johnMembership = engine.assign(john, ExternalNetwork.Facebook).get(0);
+		joeMembership = engine.assign(joe, ExternalNetwork.Facebook).get(0);
+		jackMembership = engine.assign(jack, ExternalNetwork.Facebook).get(0);
+		jillMembership = engine.assign(jill, ExternalNetwork.Facebook).get(0);
+		janeMembership = engine.assign(jane, ExternalNetwork.Facebook).get(0);
+		jennyMembership = engine.assign(jenny, ExternalNetwork.Facebook).get(0);
 
 		// now test that the group classifications worked properly by age range
-		Assert.assertEquals(joeFbMembership.getGroupIdentifier(), jillFbMembership.getGroupIdentifier());
-		Assert.assertEquals(joeFbMembership.getGroupIdentifier(), janeFbMembership.getGroupIdentifier());
+		Assert.assertEquals(joeMembership.getGroupIdentifier(), jillMembership.getGroupIdentifier());
+		Assert.assertEquals(joeMembership.getGroupIdentifier(), janeMembership.getGroupIdentifier());
 
-		Assert.assertEquals(jennyFbMembership.getGroupIdentifier(), johnFbMembership.getGroupIdentifier());
-		Assert.assertEquals(jennyFbMembership.getGroupIdentifier(), jackFbMembership.getGroupIdentifier());
-
+		Assert.assertEquals(jennyMembership.getGroupIdentifier(), johnMembership.getGroupIdentifier());
+		Assert.assertEquals(jennyMembership.getGroupIdentifier(), jackMembership.getGroupIdentifier());
+		
+		// test a negative assertion (ensuring the is more than 1 cluster)
+		Assert.assertNotEquals(joeMembership.getGroupIdentifier(), jennyMembership.getGroupIdentifier());
+		
+		// test an assignment back to global context is not the same as from fb, and that the models are in tact
+		GroupMembership jennyGlobal = engine.assign(jenny).get(0);
+		Assert.assertNotEquals(jennyGlobal.getExternalNetwork(), jennyMembership.getExternalNetwork());
 
 		
+
+		
+
+	}
+	
+
+	
+	
+	@Test
+	public void testMapGroupsUsersIntoCorrectRegion() {
+		
+//		jack = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+//		john = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+//		joe = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+//		jose = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+//		juan = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+//		till = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+//
+//		// add everyone but the sand diego user; this should create 2 clusters, such that the San Diego user will be classified 
+//		List<Location> loci = Arrays.asList(new Location[] {
+//				new Location.Builder().latitude(34.0522300).longitude(-118.2436800).user(jack).build(),
+//				new Location.Builder().latitude(34.1234567).longitude(-118.2412345).user(john).build(),
+//				new Location.Builder().latitude(34.1334567).longitude(-118.2499999).user(joe).build(),
+//				new Location.Builder().latitude(-34.6131500 ).longitude(-58.3772300).user(jose).build(),
+//				new Location.Builder().latitude(-34.7131500 ).longitude(-58.3872300).user(juan).build(),
+//		});
+//		engine.updateLocationRecords(loci);
+//		
+//		
+//		// redraws the world
+//		engine.map();
+//		
+//		// Till, from San Diego
+//		GroupMembership tillMembership = engine.assign(new Location.Builder().latitude(32.715786).longitude(-117.158340).user(till).build());
+//		GroupMembership jackMembership = engine.assign(new Location.Builder().latitude(34.0522300).longitude(-118.2436800).user(jack).build());
+//		Assert.assertEquals(tillMembership.getGroupIdentifier(), jackMembership.getGroupIdentifier());
 
 	}
 

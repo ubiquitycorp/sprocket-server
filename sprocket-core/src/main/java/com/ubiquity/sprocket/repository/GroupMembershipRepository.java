@@ -31,13 +31,29 @@ public interface GroupMembershipRepository extends Repository <Long, GroupMember
 	 * 
 	 **/
 	List<GroupMembership> findAllByUserId(Long userId);
+
+
 	
 	/***
-	 * Returns unique set of group identifiers for this network
+	 * Deletes any assignments for this user and network
 	 * 
+	 * @param userId
 	 * @param externalNetwork
+	 * 
 	 * @return
 	 */
-	List<String> findGroupIdentifiersByExternalNetwork(ExternalNetwork externalNetwork);
+	boolean deleteByExternalNetworkAndUserId(ExternalNetwork network, Long userId);
+	
+	/***
+	 * Deletes any assignments for this user and network
+	 * 
+	 * @param userId
+	 * 
+	 * @return
+	 */
+	boolean deleteByUserId(Long userId);
+	
+	
+	
 	
 }

@@ -126,4 +126,14 @@ public class Location implements Serializable {
 		this.altitude = builder.altitude;
 		this.accuracy = builder.accuracy;
 	}
+
+	@Override
+	public String toString() {
+		return "Location [locationId=" + locationId + ", user=" + user
+				+ ", lastUpdated=" + lastUpdated + ", latitude=" + latitude
+				+ ", longitude=" + longitude + ", altitude=" + altitude
+				+ ", accuracy=" + accuracy + "]";
+	}
+	
+	
 }

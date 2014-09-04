@@ -122,6 +122,13 @@ public class Dimension implements Serializable {
 		return (scaleRatio * (double)fieldValue.ordinal()) * dimension.getWeight();
 	}
 	
+	public static Double computeCoordinates(Double fieldValue, Dimension dimension) {
+		Range<Double> range = dimension.getRange();
+		Double scaleRatio = 1 / (range.getMaximum() - range.getMinimum());
+		
+		return (scaleRatio * fieldValue) * dimension.getWeight();
+	}
+	
 	
 
 	/**

@@ -1,7 +1,7 @@
 package com.ubiquity.sprocket.service;
 
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -20,12 +20,15 @@ import com.ubiquity.content.repository.VideoContentRepository;
 import com.ubiquity.content.repository.VideoContentRepositoryJpaImpl;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.external.repository.cache.CacheKeys;
+import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Gender;
 import com.ubiquity.social.repository.ContactRepository;
 import com.ubiquity.social.repository.ContactRepositoryJpaImpl;
 import com.ubiquity.sprocket.analytics.recommendation.Dimension;
+import com.ubiquity.sprocket.analytics.recommendation.Profile;
 import com.ubiquity.sprocket.analytics.recommendation.RecommendationEngine;
 import com.ubiquity.sprocket.analytics.recommendation.RecommendationEngineSparkImpl;
 import com.ubiquity.sprocket.domain.EngagedActivity;
@@ -33,6 +36,7 @@ import com.ubiquity.sprocket.domain.EngagedDocument;
 import com.ubiquity.sprocket.domain.EngagedItem;
 import com.ubiquity.sprocket.domain.EngagedVideo;
 import com.ubiquity.sprocket.domain.GroupMembership;
+import com.ubiquity.sprocket.domain.Location;
 import com.ubiquity.sprocket.domain.RecommendedActivity;
 import com.ubiquity.sprocket.domain.RecommendedVideo;
 import com.ubiquity.sprocket.repository.EngagedActivityRepository;
@@ -45,6 +49,8 @@ import com.ubiquity.sprocket.repository.EngagedVideoRepository;
 import com.ubiquity.sprocket.repository.EngagedVideoRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.GroupMembershipRepository;
 import com.ubiquity.sprocket.repository.GroupMembershipRepositoryJpaImpl;
+import com.ubiquity.sprocket.repository.LocationRepository;
+import com.ubiquity.sprocket.repository.LocationRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepository;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedVideoRepository;
@@ -68,6 +74,8 @@ public class AnalyticsService {
 	private ContactRepository contactRepository;
 	private RecommendedActivityRepository recommendedActivityRepository;
 	private RecommendedVideoRepository recommendedVideoRepository;
+	private UserRepository userRepository;
+	private LocationRepository locationRepository;
 
 	private UserDataModificationCache dataModificationCache;
 
@@ -91,6 +99,7 @@ public class AnalyticsService {
 		groupMembershipRepository = new GroupMembershipRepositoryJpaImpl();
 		contactRepository = new ContactRepositoryJpaImpl();
 		recommendedActivityRepository = new RecommendedActivityRepositoryJpaImpl();
+		locationRepository = new LocationRepositoryJpaImpl();
 
 		dataModificationCache = new UserDataModificationCacheRedisImpl(
 				configuration
@@ -148,18 +157,18 @@ public class AnalyticsService {
 	}
 
 	/***
-	 * Recommends content for a new contact, utilizing the existing model
+	 * Recommends assigns the profile to a group for all networks
 	 * 
-	 * @param contact
-	 * @throws IllegalArgumentException if there is no context set up for this social network
+	 * @param profile
 	 * 
 	 */
-	public void assign(Contact contact) {
-		ExternalNetwork network = ExternalNetwork.getNetworkById(contact.getExternalIdentity().getExternalNetwork());
-		String context = network.toString();
-		List<GroupMembership> membershipList = recommendationEngine.assign(Arrays.asList(new Contact[] { contact }), context);
-		
-		// persist this...?
+	public void assign(Profile profile) {
+
+		List<GroupMembership> membershipList = recommendationEngine.assign(profile);
+
+		// delete membership for this profile
+
+		// persisting this for now but we may not need to in the future
 		for(GroupMembership membership : membershipList) {
 			EntityManagerSupport.beginTransaction();
 			groupMembershipRepository.create(membership);
@@ -167,7 +176,7 @@ public class AnalyticsService {
 		}
 
 	}
-	
+
 	/***
 	 * Entry point for running the entire cycle of recommendations: add cases to the search space, classify, and group
 	 * 
@@ -179,14 +188,14 @@ public class AnalyticsService {
 
 		Set<String> groups = assignGroups(ExternalNetwork.Facebook);
 		createRecommendedActivities(groups, ExternalNetwork.Facebook);
-		
+
 		groups = assignGroups(ExternalNetwork.Google);
 		createRecommendedVideos(groups, ExternalNetwork.YouTube);
 
-		
+
 	}
 
-	
+
 	private void createRecommendedVideos(Set<String> groups, ExternalNetwork network) {
 		for(String group : groups) {
 			List<EngagedVideo> engagedVideos = engagedVideoRepository.findMeanByGroup(group, 10);
@@ -212,7 +221,7 @@ public class AnalyticsService {
 
 		}
 	}
-	
+
 	private void createRecommendedActivities(Set<String> groups, ExternalNetwork network) {
 		for(String group : groups) {
 			List<EngagedActivity> engagedActivities = engagedActivityRepository.findMeanByGroup(group, 10);
@@ -238,7 +247,7 @@ public class AnalyticsService {
 
 		}
 	}
-	
+
 	/***
 	 * Returns video content or null if there is no entry for this user in the cache
 	 * 
@@ -274,6 +283,32 @@ public class AnalyticsService {
 
 		return new CollectionVariant<VideoContent>(videos, lastModified);
 	}
+
+
+	private void updateDataStoreWithLatestProfileData() {
+//		// track the unique set of group names
+//		Set<String> groups = new HashSet<String>();
+
+		// remove all assignments in db by this network
+		List<User> users = userRepository.findAll();
+		List<Profile> profiles = new LinkedList<Profile>();
+
+		for(User user : users) {
+			List<Contact> contacts = contactRepository.findByOwnerId(user.getUserId(), Boolean.TRUE);
+			Location location = locationRepository.findByUserId(user.getUserId());
+			Profile profile = new Profile(user, location);
+			profile.getContacts().addAll(contacts);
+			profiles.add(profile);
+		}
+
+		// update instance space
+		recommendationEngine.updateProfileRecords(profiles);
+		
+		// now train global and FB
+		recommendationEngine.train();
+		recommendationEngine.train(ExternalNetwork.Facebook);
+	}
+	
 	
 	private Set<String> assignGroups(ExternalNetwork network) {
 		// track the unique set of group names
@@ -284,29 +319,28 @@ public class AnalyticsService {
 
 		// query all contacts
 		List<Contact> contacts = contactRepository.findByExternalNetwork(network);
-		// update instance space
-		recommendationEngine.updateProfileRecords(contacts);
+		for(Contact contact : contacts) {
+			User owner = contact.getOwner();
+			Location location = locationRepository.findByUserId(owner.getUserId());
+			Profile profile = new Profile(owner, location);
+			// only add this contact for the assignment
+			profile.getContacts().add(contact);
+					
+			List<GroupMembership> membershipList = recommendationEngine.assign(profile, network);
+			// persist assignments
+			for(GroupMembership membership : membershipList) {
+				EntityManagerSupport.beginTransaction();
+				groupMembershipRepository.create(membership);
+				EntityManagerSupport.commit();
 
-		String context = network.toString();
-		// train model
-		recommendationEngine.train(context);
-
-		// cluster FB users
-		List<GroupMembership> membershipList = recommendationEngine.assign(contacts, context);
-
-		// persist assignments
-		for(GroupMembership membership : membershipList) {
-			EntityManagerSupport.beginTransaction();
-			groupMembershipRepository.create(membership);
-			EntityManagerSupport.commit();
-
-			// add to groups
-			groups.add(membership.getGroupIdentifier());
+				// add to groups
+				groups.add(membership.getGroupIdentifier());
+			}
 		}
-
 		return groups;
 
 	}
+
 
 
 	private void setUpRecommendationEngine(Configuration configuration) {
@@ -317,16 +351,14 @@ public class AnalyticsService {
 		recommendationEngine.addDimension(new Dimension("ageRange", Range.between(0.0, 120.0), 1.0));
 
 		// create FB specific context, with dimensions where gender does not matter much but age range does
-		String context = ExternalNetwork.Facebook.toString();
-		recommendationEngine.addContext(context, configuration);
-		recommendationEngine.addDimension(Dimension.createFromEnum("gender", Gender.class, 0.1), context);
-		recommendationEngine.addDimension(new Dimension("ageRange", Range.between(0.0, 120.0), 1.0), context);
-		
+		recommendationEngine.addContext(ExternalNetwork.Facebook, configuration);
+		recommendationEngine.addDimension(Dimension.createFromEnum("gender", Gender.class, 0.1), ExternalNetwork.Facebook);
+		recommendationEngine.addDimension(new Dimension("ageRange", Range.between(0.0, 120.0), 1.0), ExternalNetwork.Facebook);
+
 		// create Google specific context with equal weights to recommend YouTube videos
-		context = ExternalNetwork.Google.toString();
-		recommendationEngine.addContext(context, configuration);
-		recommendationEngine.addDimension(Dimension.createFromEnum("gender", Gender.class, 1.0), context);
-		recommendationEngine.addDimension(new Dimension("ageRange", Range.between(0.0, 120.0), 1.0), context);
+		recommendationEngine.addContext(ExternalNetwork.Google, configuration);
+		recommendationEngine.addDimension(Dimension.createFromEnum("gender", Gender.class, 1.0), ExternalNetwork.Google);
+		recommendationEngine.addDimension(new Dimension("ageRange", Range.between(0.0, 120.0), 1.0), ExternalNetwork.Google);
 
 	}
 

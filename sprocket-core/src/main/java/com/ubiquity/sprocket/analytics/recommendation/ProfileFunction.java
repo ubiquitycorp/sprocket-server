@@ -9,34 +9,28 @@ import org.apache.spark.mllib.linalg.Vectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.social.domain.AgeRange;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Gender;
 import com.ubiquity.sprocket.domain.Location;
 
-public class ContactFunction implements Function<Profile, Vector> {
+public class ProfileFunction implements Function<Profile, Vector> {
 
 	private static Logger log = LoggerFactory.getLogger(ProfileFunction.class);
 
 	private static final long serialVersionUID = 1L;
 	private List<Dimension> dimensions;
-	private ExternalNetwork network;
 
-	protected ContactFunction(ExternalNetwork network, List<Dimension> dimensions) {
+	protected ProfileFunction(List<Dimension> dimensions) {
 		this.dimensions = dimensions;
-		this.network = network;
 	}
 
 	@Override
 	public Vector call(Profile profile) {
-		for(Contact contact : profile.getContacts()) {
-			if(contact.getExternalIdentity().getExternalNetwork() == network.ordinal()) {
-				double[] point = computePoint(contact, profile.getLocation(), dimensions);
-				return Vectors.dense(point);
-			}
-		}
-		return null;
+
+		double[] point = computePoint(profile, dimensions);
+		
+		return Vectors.dense(point);
 	}
 
 	/**
@@ -73,6 +67,22 @@ public class ContactFunction implements Function<Profile, Vector> {
 
 		return point;
 	}
+	
+	public static double[] computePoint(Profile profile, List<Dimension> dimensions) {		
+		
+		
+		double[] points = new double[2];
+		Location location = profile.getLocation();
+		Dimension dimension = Dimension.findDimensionByAttribute("lat", dimensions);
+		points[0] = (location.getLatitude() == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(location.getLatitude(), dimension);
+		
+		dimension = Dimension.findDimensionByAttribute("lon", dimensions);
+		points[1] = (location.getLongitude() == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(location.getLongitude(), dimension);
+
+		log.info("points {}", points);
+		return points;				
+	}
+	
 	
 	
 

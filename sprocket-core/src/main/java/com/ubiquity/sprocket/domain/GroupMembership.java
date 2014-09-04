@@ -38,9 +38,6 @@ public class GroupMembership {
 	@Column(name = "group_identifier", nullable = false)
 	private String groupIdentifier;
 	
-	@Column(name = "group_assignment_filter", nullable = false)
-	private GroupAssignmentFilter assignmentFilter;
-	
 	
 	/**
 	 * Required by JPA
@@ -59,7 +56,6 @@ public class GroupMembership {
 		this.externalNetwork = externalNetwork;
 		this.user = user;
 		this.groupIdentifier = groupIdentifier;
-		this.assignmentFilter = GroupAssignmentFilter.ExternalProfile;
 	}
 	
 	public Long getGroupMembershipId() {

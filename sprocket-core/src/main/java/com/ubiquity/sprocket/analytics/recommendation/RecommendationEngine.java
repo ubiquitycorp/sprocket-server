@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 
-import com.ubiquity.social.domain.Contact;
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.domain.GroupMembership;
 
 public interface RecommendationEngine {
@@ -15,14 +15,14 @@ public interface RecommendationEngine {
 	 * @param context
 	 * @param configuration
 	 */
-	void addContext(String context, Configuration configuration);
+	void addContext(ExternalNetwork context, Configuration configuration);
 	
 	/***
-	 * Update the search space with a contact record for the global 
+	 * Update the search space with a profile record
 	 * 
 	 * @param contact
 	 */
-	void updateProfileRecords(List<Contact> contacts);
+	void updateProfileRecords(List<Profile> profiles);
 	
 	/***
 	 * Clears data in memory
@@ -30,6 +30,13 @@ public interface RecommendationEngine {
 	 * @param context
 	 */
 	void clear();
+	
+	/**
+	 * Size of records used in computation
+	 *  
+	 * @return number of records
+	 */
+	long size();
 	
 	/***
 	 * Adds a dimension to the global context
@@ -44,7 +51,7 @@ public interface RecommendationEngine {
 	 * @param dimension
 	 * @param context
 	 */
-	void addDimension(Dimension dimension, String context);
+	void addDimension(Dimension dimension, ExternalNetwork context);
 	
 	/***
 	 * Updates a dimension for the global context
@@ -58,7 +65,7 @@ public interface RecommendationEngine {
 	 * 
 	 * @param dimension
 	 */
-	void updateDimension(Dimension dimension, String context);
+	void updateDimension(Dimension dimension, ExternalNetwork context);
 	
 	
 	/**
@@ -72,25 +79,25 @@ public interface RecommendationEngine {
      *
 	 * @return
 	 */
-	void train(String context);
+	void train(ExternalNetwork context);
 	
 	/***
-	 * Assigns a list of contacts to their group
+	 * Assigns a profile to the global context
 	 * 
 	 * @param contacts
 	 * 
 	 * @return List of group membership entities ready to persist
 	 */
-	List<GroupMembership> assign(List<Contact> contacts);
-	
-	/***
-	 * Assigns a list of contacts to their group
-	 * 
-	 * @param contacts
-	 * 
-	 * @return List of group membership entities ready to persist
-	 */
-	List<GroupMembership> assign(List<Contact> contacts, String context);
-	
+	List<GroupMembership> assign(Profile profile);	
 
+	/***
+	 * Assigns a profile to a specific context
+	 * 
+	 * @param context
+	 * @param profile
+	 * 
+	 * @return List of group membership entities ready to persist
+	 */
+	List<GroupMembership> assign(Profile profile, ExternalNetwork context);	
+	
 }

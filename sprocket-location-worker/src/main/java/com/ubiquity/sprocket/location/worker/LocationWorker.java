@@ -1,11 +1,5 @@
 package com.ubiquity.sprocket.location.worker;
 
-import static org.quartz.DateBuilder.futureDate;
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
-import static org.quartz.TriggerBuilder.newTrigger;
-import static org.quartz.TriggerKey.triggerKey;
-
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,18 +7,12 @@ import java.util.List;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.quartz.DateBuilder.IntervalUnit;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.thread.ThreadPool;
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.sprocket.location.worker.jobs.GeoClusterMapJob;
 import com.ubiquity.sprocket.location.worker.mq.consumer.LocationUpdateConsumer;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -104,24 +92,6 @@ public class LocationWorker {
 	private void stopServices() {
 		EntityManagerSupport.closeEntityManagerFactory();
 	}
-	
-	private void startScheduler() throws SchedulerException {
-		Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-		scheduler.start();
 
-		JobDetail job = newJob(GeoClusterMapJob.class)
-				.withIdentity("geoClusterMap", "geo")
-				.build();
-
-		Trigger trigger = newTrigger() 
-				.withIdentity(triggerKey("geoClusterMapTrigger", "trigger"))
-				.withSchedule(simpleSchedule()
-						.withIntervalInMinutes(5)
-						.repeatForever())
-						.startAt(futureDate(1, IntervalUnit.MINUTE))
-						.build();
-	
-		scheduler.scheduleJob(job, trigger);
-	}
 
 }

@@ -53,7 +53,7 @@ public class GroupMembershipRepositoryTest {
 		EntityManagerSupport.beginTransaction();
 		userRepository.create(judy);
 		userRepository.create(jack);
-
+		EntityManagerSupport.commit();
 
 		fbMomMembership = new GroupMembership(ExternalNetwork.Facebook, judy, UUID.randomUUID().toString());
 		youTubeMomMembership = new GroupMembership(ExternalNetwork.YouTube, judy, UUID.randomUUID().toString());
@@ -61,21 +61,18 @@ public class GroupMembershipRepositoryTest {
 		globalMembership = new GroupMembership(null, jack, UUID.randomUUID().toString());
 
 
+		EntityManagerSupport.beginTransaction();
 		membershipRepository.create(fbMomMembership);
 		membershipRepository.create(youTubeMomMembership);
 		membershipRepository.create(youTubeSportsFanaticMembership);
 		membershipRepository.create(globalMembership);
-
 		EntityManagerSupport.commit();
+
 
 
 	}
 	
-	@Test
-	public void testFindUniqueGroups() throws Exception {
-		List<String> identifiers = membershipRepository.findGroupIdentifiersByExternalNetwork(ExternalNetwork.Facebook);
-		Assert.assertEquals(identifiers.get(0), fbMomMembership.getGroupIdentifier());
-	}
+	
 
 	@Test
 	public void testCreate() throws Exception {
@@ -87,7 +84,9 @@ public class GroupMembershipRepositoryTest {
 
 	@Test
 	public void testDeleteGlobalMembershipDoesNotDeleteAllRecords() {
+		EntityManagerSupport.beginTransaction();
 		membershipRepository.deleteWithNoNetwork();
+		EntityManagerSupport.commit();
 		// fb should still be around
 		boolean accidentallyDeleted = Boolean.FALSE;
 		try {
@@ -100,10 +99,31 @@ public class GroupMembershipRepositoryTest {
 		}
 		Assert.assertFalse(accidentallyDeleted);
 	}
+	
+	@Test
+	public void testDeleteByUserAndNetwork() {
+		EntityManagerSupport.beginTransaction();
+		boolean deleted = membershipRepository.deleteByExternalNetworkAndUserId(ExternalNetwork.Facebook, judy.getUserId());
+		EntityManagerSupport.commit();
+		Assert.assertTrue(deleted);
+	}
+	
+	@Test
+	public void testDeleteByUser() {
+		EntityManagerSupport.beginTransaction();
+		boolean deleted = membershipRepository.deleteByUserId(judy.getUserId());
+		EntityManagerSupport.commit();
+		Assert.assertTrue(deleted);
+	}
+	
+	
 
 	@Test
 	public void testDeleteMembeship() {
+		EntityManagerSupport.beginTransaction();
 		membershipRepository.deleteByExternalNetwork(ExternalNetwork.Facebook);
+		EntityManagerSupport.commit();
+		
 		// fb should still be around
 		boolean accidentallyDeleted = Boolean.FALSE;
 		try {
