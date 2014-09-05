@@ -102,7 +102,7 @@ public class AnalyticsWorker {
 		Trigger trigger = newTrigger() 
 				.withIdentity(triggerKey("recommendationTrigger", "trigger"))
 				.withSchedule(simpleSchedule()
-						.withIntervalInMinutes(13)
+						.withIntervalInMinutes(60)
 						.repeatForever())
 						.startAt(futureDate(1, IntervalUnit.MINUTE))
 						.build();

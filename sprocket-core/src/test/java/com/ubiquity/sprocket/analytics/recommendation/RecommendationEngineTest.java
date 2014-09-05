@@ -1,6 +1,5 @@
 package com.ubiquity.sprocket.analytics.recommendation;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,6 +29,7 @@ public class RecommendationEngineTest{
 
 	private RecommendationEngine engine;
 
+	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private UserRepository userRepository;
@@ -181,45 +181,9 @@ public class RecommendationEngineTest{
 		GroupMembership jennyGlobal = engine.assign(jenny).get(0);
 		Assert.assertNotEquals(jennyGlobal.getExternalNetwork(), jennyMembership.getExternalNetwork());
 
-		
-
-		
 
 	}
-	
 
-	
-	
-	@Test
-	public void testMapGroupsUsersIntoCorrectRegion() {
-		
-//		jack = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-//		john = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-//		joe = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-//		jose = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-//		juan = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-//		till = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-//
-//		// add everyone but the sand diego user; this should create 2 clusters, such that the San Diego user will be classified 
-//		List<Location> loci = Arrays.asList(new Location[] {
-//				new Location.Builder().latitude(34.0522300).longitude(-118.2436800).user(jack).build(),
-//				new Location.Builder().latitude(34.1234567).longitude(-118.2412345).user(john).build(),
-//				new Location.Builder().latitude(34.1334567).longitude(-118.2499999).user(joe).build(),
-//				new Location.Builder().latitude(-34.6131500 ).longitude(-58.3772300).user(jose).build(),
-//				new Location.Builder().latitude(-34.7131500 ).longitude(-58.3872300).user(juan).build(),
-//		});
-//		engine.updateLocationRecords(loci);
-//		
-//		
-//		// redraws the world
-//		engine.map();
-//		
-//		// Till, from San Diego
-//		GroupMembership tillMembership = engine.assign(new Location.Builder().latitude(32.715786).longitude(-117.158340).user(till).build());
-//		GroupMembership jackMembership = engine.assign(new Location.Builder().latitude(34.0522300).longitude(-118.2436800).user(jack).build());
-//		Assert.assertEquals(tillMembership.getGroupIdentifier(), jackMembership.getGroupIdentifier());
-
-	}
 
 
 	private void persistUser(User user) {
