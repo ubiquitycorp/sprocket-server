@@ -11,7 +11,6 @@ import java.util.UUID;
 import org.apache.commons.configuration.Configuration;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function;
 import org.apache.spark.mllib.clustering.KMeans;
 import org.apache.spark.mllib.clustering.KMeansModel;
 import org.apache.spark.mllib.linalg.Vector;
@@ -22,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.sprocket.domain.GroupMembership;
-import com.ubiquity.sprocket.domain.Location;
+import com.ubiquity.sprocket.domain.UserLocation;
 
 public class RecommendationEngineSparkImpl implements RecommendationEngine {
 
@@ -165,7 +164,7 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 
 		
 		protected GroupMembership assign(Contact contact,
-				Location location) {
+				UserLocation location) {
 
 			log.info("cluster centers: {} ", model.clusterCenters());
 

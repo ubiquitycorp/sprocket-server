@@ -2,9 +2,9 @@ package com.ubiquity.sprocket.service;
 
 import org.apache.commons.configuration.Configuration;
 
-import com.ubiquity.sprocket.domain.Location;
-import com.ubiquity.sprocket.repository.LocationRepository;
-import com.ubiquity.sprocket.repository.LocationRepositoryJpaImpl;
+import com.ubiquity.sprocket.domain.UserLocation;
+import com.ubiquity.sprocket.repository.UserLocationRepository;
+import com.ubiquity.sprocket.repository.UserLocationRepositoryJpaImpl;
 
 /***
  * Service for managing location indexing, retrieval, and geo cluster assignments
@@ -14,10 +14,10 @@ import com.ubiquity.sprocket.repository.LocationRepositoryJpaImpl;
  */
 public class LocationService {
 	
-	private LocationRepository locationRepository;
+	private UserLocationRepository locationRepository;
 	
 	public LocationService(Configuration configuration) {
-		locationRepository = new LocationRepositoryJpaImpl();
+		locationRepository = new UserLocationRepositoryJpaImpl();
 	}
 	
 	/**
@@ -25,8 +25,8 @@ public class LocationService {
 	 * 
 	 * @param location
 	 */
-	public void updateLocation(Location location) {
-		Location persisted = locationRepository.findByUserId(location.getUser().getUserId());
+	public void updateLocation(UserLocation location) {
+		UserLocation persisted = locationRepository.findByUserId(location.getUser().getUserId());
 		if(persisted == null)
 			locationRepository.create(location);
 		else
@@ -41,7 +41,7 @@ public class LocationService {
 	 * 
 	 * @return location or null if it can't be determined
 	 ***/
-	public Location getLocation(Long userId) {
+	public UserLocation getLocation(Long userId) {
 		return locationRepository.findByUserId(userId);
 	}
 

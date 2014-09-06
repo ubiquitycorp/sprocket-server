@@ -1,5 +1,7 @@
 package com.ubiquity.sprocket.repository;
 
+import java.math.BigDecimal;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +15,7 @@ import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
 import com.ubiquity.sprocket.domain.Location;
+import com.ubiquity.sprocket.domain.UserLocation;
 
 /***
  * Tests testing basic CRUD operations for a location repository
@@ -20,14 +23,14 @@ import com.ubiquity.sprocket.domain.Location;
  * @author chris
  *
  */
-public class LocationRepositoryTest {
+public class UserLocationRepositoryTest {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private UserRepository userRepository;
-	private LocationRepository locationRepository;
+	private UserLocationRepository locationRepository;
 	
-	private Location location;
+	private UserLocation location;
 	private User user;
 	
 	@After
@@ -39,7 +42,7 @@ public class LocationRepositoryTest {
 	public void setUp() throws Exception {
 
 		userRepository = new UserRepositoryJpaImpl();
-		locationRepository = new LocationRepositoryJpaImpl();
+		locationRepository = new UserLocationRepositoryJpaImpl();
 		
 		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 		
@@ -47,7 +50,8 @@ public class LocationRepositoryTest {
 		userRepository.create(user);		
 		EntityManagerSupport.commit();
 
-		location = new Location.Builder().latitude(59.93939393).longitude(-34.3030303).lastUpdated(System.currentTimeMillis()).user(user).build();
+		location = new UserLocation.Builder().location(
+				new Location.Builder().latitude(new BigDecimal(59.93939393)).longitude(new BigDecimal(-34.3030303)).build()).lastUpdated(System.currentTimeMillis()).user(user).build();
 
 		EntityManagerSupport.beginTransaction();
 		locationRepository.create(location);		
@@ -58,7 +62,7 @@ public class LocationRepositoryTest {
 
 	@Test
 	public void testFindByUser() throws Exception {
-		Location persisted = locationRepository.findByUserId(user.getUserId());
+		UserLocation persisted = locationRepository.findByUserId(user.getUserId());
 		Assert.assertNotNull(persisted);
 	}
 

@@ -9,7 +9,9 @@
 
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 
-		<class>com.ubiquity.sprocket.domain.Location</class>
+		<class>com.ubiquity.sprocket.domain.Place</class>
+
+		<class>com.ubiquity.sprocket.domain.UserLocation</class>
 		<class>com.ubiquity.sprocket.domain.GroupMembership</class>
 		<class>com.ubiquity.sprocket.domain.EngagedVideo</class>
 		<class>com.ubiquity.sprocket.domain.EngagedActivity</class>
@@ -37,7 +39,7 @@
 			<property name="hibernate.format_sql" value="${hibernate.debug}" />
 			<property name="hibernate.transaction.flush_before_completion"
 				value="true" />
-			<property name="hibernate.hbm2ddl.auto" value="create" />
+			<property name="hibernate.hbm2ddl.auto" value="create-drop" />
 		</properties>
 	</persistence-unit>
 

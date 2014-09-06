@@ -36,7 +36,7 @@ import com.ubiquity.sprocket.domain.EngagedDocument;
 import com.ubiquity.sprocket.domain.EngagedItem;
 import com.ubiquity.sprocket.domain.EngagedVideo;
 import com.ubiquity.sprocket.domain.GroupMembership;
-import com.ubiquity.sprocket.domain.Location;
+import com.ubiquity.sprocket.domain.UserLocation;
 import com.ubiquity.sprocket.domain.RecommendedActivity;
 import com.ubiquity.sprocket.domain.RecommendedVideo;
 import com.ubiquity.sprocket.repository.EngagedActivityRepository;
@@ -49,8 +49,8 @@ import com.ubiquity.sprocket.repository.EngagedVideoRepository;
 import com.ubiquity.sprocket.repository.EngagedVideoRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.GroupMembershipRepository;
 import com.ubiquity.sprocket.repository.GroupMembershipRepositoryJpaImpl;
-import com.ubiquity.sprocket.repository.LocationRepository;
-import com.ubiquity.sprocket.repository.LocationRepositoryJpaImpl;
+import com.ubiquity.sprocket.repository.UserLocationRepository;
+import com.ubiquity.sprocket.repository.UserLocationRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepository;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedVideoRepository;
@@ -75,7 +75,7 @@ public class AnalyticsService {
 	private RecommendedActivityRepository recommendedActivityRepository;
 	private RecommendedVideoRepository recommendedVideoRepository;
 	private UserRepository userRepository;
-	private LocationRepository locationRepository;
+	private UserLocationRepository locationRepository;
 
 	private UserDataModificationCache dataModificationCache;
 
@@ -99,7 +99,7 @@ public class AnalyticsService {
 		groupMembershipRepository = new GroupMembershipRepositoryJpaImpl();
 		contactRepository = new ContactRepositoryJpaImpl();
 		recommendedActivityRepository = new RecommendedActivityRepositoryJpaImpl();
-		locationRepository = new LocationRepositoryJpaImpl();
+		locationRepository = new UserLocationRepositoryJpaImpl();
 
 		dataModificationCache = new UserDataModificationCacheRedisImpl(
 				configuration
@@ -156,6 +156,10 @@ public class AnalyticsService {
 		return new CollectionVariant<Activity>(activities, lastModified);
 	}
 
+	
+	public void assign(User user) {
+		
+	}
 	/***
 	 * Recommends assigns the profile to a group for all networks
 	 * 
@@ -295,7 +299,7 @@ public class AnalyticsService {
 
 		for(User user : users) {
 			List<Contact> contacts = contactRepository.findByOwnerId(user.getUserId(), Boolean.TRUE);
-			Location location = locationRepository.findByUserId(user.getUserId());
+			UserLocation location = locationRepository.findByUserId(user.getUserId());
 			Profile profile = new Profile(user, location);
 			profile.getContacts().addAll(contacts);
 			profiles.add(profile);
@@ -321,7 +325,7 @@ public class AnalyticsService {
 		List<Contact> contacts = contactRepository.findByExternalNetwork(network);
 		for(Contact contact : contacts) {
 			User owner = contact.getOwner();
-			Location location = locationRepository.findByUserId(owner.getUserId());
+			UserLocation location = locationRepository.findByUserId(owner.getUserId());
 			Profile profile = new Profile(owner, location);
 			// only add this contact for the assignment
 			profile.getContacts().add(contact);

@@ -1,5 +1,6 @@
 package com.ubiquity.sprocket.analytics.recommendation;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,6 +25,7 @@ import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Gender;
 import com.ubiquity.sprocket.domain.GroupMembership;
 import com.ubiquity.sprocket.domain.Location;
+import com.ubiquity.sprocket.domain.UserLocation;
 
 public class RecommendationEngineTest{
 
@@ -71,7 +73,8 @@ public class RecommendationEngineTest{
 		persistUser(user);
 		
 		// build the profile with location
-		Profile jack = new Profile(user, new Location.Builder().latitude(34.0522300).longitude(-118.2436800).user(user).build());
+		Profile jack = new Profile(user, new UserLocation.Builder().location(
+				new Location.Builder().latitude(new BigDecimal(34.0522300)).longitude(new BigDecimal(-118.2436800)).build()).user(user).build());
 		jack.getContacts().add(contactBuilder.build());
 		profiles.add(jack);
 
@@ -82,7 +85,8 @@ public class RecommendationEngineTest{
 		persistUser(user);
 		
 		// build the profile with location
-		Profile john = new Profile(user, new Location.Builder().latitude(34.1234567).longitude(-118.2412345).user(user).build());
+		Profile john = new Profile(user, new UserLocation.Builder().location(
+				new Location.Builder().latitude(new BigDecimal(34.1234567)).longitude(new BigDecimal(-118.2412345)).build()).user(user).build());
 		john.getContacts().add(contactBuilder.build());
 		profiles.add(john);
 
@@ -94,7 +98,8 @@ public class RecommendationEngineTest{
 		persistUser(user);
 		
 		// build the profile with location
-		Profile joe = new Profile(user, new Location.Builder().latitude(34.1334567).longitude(-118.2499999).user(user).build());
+		Profile joe = new Profile(user, new UserLocation.Builder().location(
+				new Location.Builder().latitude(new BigDecimal(34.1334567)).longitude(new BigDecimal(-118.2499999)).build()).user(user).build());
 		joe.getContacts().add(contactBuilder.build());
 		profiles.add(joe);
 
@@ -104,7 +109,8 @@ public class RecommendationEngineTest{
 		contactBuilder.ageRange(new AgeRange(55, 65));
 		persistUser(user);
 		
-		Profile jill = new Profile(user, new Location.Builder().latitude(-34.6131500).longitude(-58.3772300).user(user).build());
+		Profile jill = new Profile(user, new UserLocation.Builder().location(
+				new Location.Builder().latitude(new BigDecimal(-34.6131500)).longitude(new BigDecimal(-58.3772300)).build()).user(user).build());
 		jill.getContacts().add(contactBuilder.build());
 		profiles.add(jill);
 
@@ -114,7 +120,8 @@ public class RecommendationEngineTest{
 		contactBuilder.ageRange(new AgeRange(55, 65));
 		persistUser(user);
 		
-		Profile jane = new Profile(user, new Location.Builder().latitude(-34.6231500).longitude(-58.3872300).user(user).build());
+		Profile jane = new Profile(user, new UserLocation.Builder().location(
+				new Location.Builder().latitude(new BigDecimal(-34.6231500)).longitude(new BigDecimal(-58.3872300)).build()).user(user).build());
 		jane.getContacts().add(contactBuilder.build());
 		profiles.add(jane);			
 		
@@ -148,7 +155,8 @@ public class RecommendationEngineTest{
 		contactBuilder.ageRange(new AgeRange(21, 35));
 		persistUser(user);
 		
-		Profile jenny = new Profile(user, new Location.Builder().latitude(32.715786).longitude(-117.158340).user(user).build());
+		Profile jenny = new Profile(user, new UserLocation.Builder().location(
+				new Location.Builder().latitude(new BigDecimal(32.715786)).longitude(new BigDecimal(-117.158340)).build()).user(user).build());
 		jenny.getContacts().add(contactBuilder.build());
 		profiles.add(jenny);
 		

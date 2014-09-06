@@ -1,114 +1,55 @@
 package com.ubiquity.sprocket.domain;
 
-import java.io.Serializable;
+import java.math.BigDecimal;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.Embeddable;
 
-import com.ubiquity.identity.domain.User;
-
-@Entity
-@Table(name = "location")
-public class Location implements Serializable {
-
-	private static final long serialVersionUID = 1L;
-
-	@Id
-	@GeneratedValue
-	@Column(name = "location_id")
-	private Long locationId;
-
-	@ManyToOne
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
-
-	@Column(name = "last_updated", nullable = false)
-	private Long lastUpdated;
+@Embeddable
+public class Location {
 
 	@Column(name = "latitude", nullable = false)
-	private Double latitude;
+	private BigDecimal latitude;
 
 	@Column(name = "longitude", nullable = false)
-	private Double longitude;
+	private BigDecimal longitude;
 
-	private Double altitude;
+	private BigDecimal altitude;
 
-	private Integer accuracy;
-
-	public User getUser() {
-		return user;
-	}
-
-	public Double getLatitude() {
+	/**
+	 * Required by JPA
+	 */
+	protected Location() {}
+	
+	public BigDecimal getLatitude() {
 		return latitude;
 	}
 
-	public Double getLongitude() {
+	public BigDecimal getLongitude() {
 		return longitude;
 	}
 
-	public Double getAltitude() {
+	public BigDecimal getAltitude() {
 		return altitude;
 	}
 
-	public Integer getAccuracy() {
-		return accuracy;
-	}
-
-	public Long getLocationId() {
-		return locationId;
-	}
-
-	public Long getLastUpdated() {
-		return lastUpdated;
-	}
-
 	public static class Builder {
-		private Long locationId;
-		private User user;
-		private Long lastUpdated;
-		private Double latitude;
-		private Double longitude;
-		private Double altitude;
-		private Integer accuracy;
+		private BigDecimal latitude;
+		private BigDecimal longitude;
+		private BigDecimal altitude;
 
-		public Builder locationId(Long locationId) {
-			this.locationId = locationId;
-			return this;
-		}
-
-		public Builder user(User user) {
-			this.user = user;
-			return this;
-		}
-
-		public Builder lastUpdated(Long lastUpdated) {
-			this.lastUpdated = lastUpdated;
-			return this;
-		}
-
-		public Builder latitude(Double latitude) {
+		public Builder latitude(BigDecimal latitude) {
 			this.latitude = latitude;
 			return this;
 		}
 
-		public Builder longitude(Double longitude) {
+		public Builder longitude(BigDecimal longitude) {
 			this.longitude = longitude;
 			return this;
 		}
 
-		public Builder altitude(Double altitude) {
+		public Builder altitude(BigDecimal altitude) {
 			this.altitude = altitude;
-			return this;
-		}
-
-		public Builder accuracy(Integer accuracy) {
-			this.accuracy = accuracy;
 			return this;
 		}
 
@@ -118,22 +59,8 @@ public class Location implements Serializable {
 	}
 
 	private Location(Builder builder) {
-		this.locationId = builder.locationId;
-		this.user = builder.user;
-		this.lastUpdated = builder.lastUpdated;
 		this.latitude = builder.latitude;
 		this.longitude = builder.longitude;
 		this.altitude = builder.altitude;
-		this.accuracy = builder.accuracy;
 	}
-
-	@Override
-	public String toString() {
-		return "Location [locationId=" + locationId + ", user=" + user
-				+ ", lastUpdated=" + lastUpdated + ", latitude=" + latitude
-				+ ", longitude=" + longitude + ", altitude=" + altitude
-				+ ", accuracy=" + accuracy + "]";
-	}
-	
-	
 }

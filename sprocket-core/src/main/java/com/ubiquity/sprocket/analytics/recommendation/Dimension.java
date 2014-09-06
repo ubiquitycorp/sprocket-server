@@ -1,6 +1,7 @@
 package com.ubiquity.sprocket.analytics.recommendation;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.commons.lang3.Range;
@@ -122,11 +123,11 @@ public class Dimension implements Serializable {
 		return (scaleRatio * (double)fieldValue.ordinal()) * dimension.getWeight();
 	}
 	
-	public static Double computeCoordinates(Double fieldValue, Dimension dimension) {
+	public static Double computeCoordinates(BigDecimal fieldValue, Dimension dimension) {
 		Range<Double> range = dimension.getRange();
 		Double scaleRatio = 1 / (range.getMaximum() - range.getMinimum());
 		
-		return (scaleRatio * fieldValue) * dimension.getWeight();
+		return (scaleRatio * fieldValue.doubleValue()) * dimension.getWeight();
 	}
 	
 	

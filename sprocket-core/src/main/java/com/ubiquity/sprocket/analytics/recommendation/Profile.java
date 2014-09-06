@@ -7,7 +7,7 @@ import java.util.List;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.domain.Contact;
-import com.ubiquity.sprocket.domain.Location;
+import com.ubiquity.sprocket.domain.UserLocation;
 
 public class Profile implements Serializable {
 
@@ -15,9 +15,9 @@ public class Profile implements Serializable {
 	
 	private User user;
 	private List<Contact> contacts = new LinkedList<Contact>();
-	private Location location;
+	private UserLocation location;
 	
-	public Profile(User user, Location location) {
+	public Profile(User user, UserLocation location) {
 		this.user = user;
 		this.location = location;
 	}
@@ -26,7 +26,7 @@ public class Profile implements Serializable {
 		return user;
 	}
 
-	public Location getLocation() {
+	public UserLocation getLocation() {
 		return location;
 	}
 	

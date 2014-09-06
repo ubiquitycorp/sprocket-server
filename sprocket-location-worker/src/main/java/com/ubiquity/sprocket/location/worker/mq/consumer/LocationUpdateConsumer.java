@@ -1,34 +1,18 @@
 package com.ubiquity.sprocket.location.worker.mq.consumer;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
-import com.ubiquity.content.domain.VideoContent;
-import com.ubiquity.content.service.ContentService;
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.external.domain.Network;
-import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
-import com.ubiquity.social.domain.Activity;
-import com.ubiquity.social.service.SocialService;
-import com.ubiquity.sprocket.domain.EngagedActivity;
-import com.ubiquity.sprocket.domain.EngagedDocument;
-import com.ubiquity.sprocket.domain.EngagedItem;
-import com.ubiquity.sprocket.domain.EngagedVideo;
 import com.ubiquity.sprocket.domain.Location;
+import com.ubiquity.sprocket.domain.UserLocation;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
-import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.messaging.definition.LocationUpdated;
-import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
-import com.ubiquity.sprocket.messaging.definition.UserEngagedVideo;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 public class LocationUpdateConsumer extends AbstractConsumerThread {
@@ -61,13 +45,14 @@ public class LocationUpdateConsumer extends AbstractConsumerThread {
 
 		// get user entity and then store this in the db (for now)
 		User user = ServiceFactory.getUserService().getUserById(locationUpdated.getUserId());
-		Location location = new Location.Builder()
+		UserLocation location = new UserLocation.Builder()
 			.user(user)
-			.latitude(locationUpdated.getLatitude())
-			.longitude(locationUpdated.getLongitude())
-			.accuracy(locationUpdated.getAccuracy())
+			.location(new Location.Builder()
+				.latitude(locationUpdated.getLatitude())
+				.longitude(locationUpdated.getLongitude())
+				.altitude(locationUpdated.getAltitude()).build())
 			.lastUpdated(locationUpdated.getLastUpdated())
-			.altitude(locationUpdated.getAltitude())
+			.accuracy(locationUpdated.getAccuracy())
 			.build();
 		
 		// this will update the user's location in the SQL data store

@@ -13,7 +13,7 @@ import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.social.domain.AgeRange;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Gender;
-import com.ubiquity.sprocket.domain.Location;
+import com.ubiquity.sprocket.domain.UserLocation;
 
 public class ContactFunction implements Function<Profile, Vector> {
 
@@ -47,7 +47,7 @@ public class ContactFunction implements Function<Profile, Vector> {
 	 * 
 	 * @return
 	 */
-	public static double[] computePoint(Contact contact, Location location, List<Dimension> dimensions) {
+	public static double[] computePoint(Contact contact, UserLocation userLocation, List<Dimension> dimensions) {
 
 		double[] point = new double[4];
 
@@ -64,10 +64,10 @@ public class ContactFunction implements Function<Profile, Vector> {
 		log.debug("age range {} weight applied {}", point[1], dimension.getWeight());
 
 		dimension = Dimension.findDimensionByAttribute("lat", dimensions);
-		point[2] = (location.getLatitude() == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(location.getLatitude(), dimension);
+		point[2] = (userLocation.getLocation().getLatitude() == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(userLocation.getLocation().getLatitude(), dimension);
 		
 		dimension = Dimension.findDimensionByAttribute("lon", dimensions);
-		point[3] = (location.getLongitude() == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(location.getLongitude(), dimension);
+		point[3] = (userLocation.getLocation().getLongitude() == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(userLocation.getLocation().getLongitude(), dimension);
 
 		log.info("points {}", point);
 

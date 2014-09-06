@@ -1,5 +1,7 @@
 package com.ubiquity.sprocket.messaging.definition;
 
+import java.math.BigDecimal;
+
 /**
  * A message indicating an authentication event
  * @author chris
@@ -11,11 +13,11 @@ public class LocationUpdated {
 
 	private Long lastUpdated;
 
-	private Double latitude;
+	private BigDecimal latitude;
 
-	private Double longitude;
+	private BigDecimal longitude;
 
-	private Double altitude;
+	private BigDecimal altitude;
 
 	private Integer accuracy;
 
@@ -27,15 +29,15 @@ public class LocationUpdated {
 		return lastUpdated;
 	}
 
-	public Double getLatitude() {
+	public BigDecimal getLatitude() {
 		return latitude;
 	}
 
-	public Double getLongitude() {
+	public BigDecimal getLongitude() {
 		return longitude;
 	}
 
-	public Double getAltitude() {
+	public BigDecimal getAltitude() {
 		return altitude;
 	}
 
@@ -46,9 +48,9 @@ public class LocationUpdated {
 	public static class Builder {
 		private Long userId;
 		private Long lastUpdated;
-		private Double latitude;
-		private Double longitude;
-		private Double altitude;
+		private BigDecimal latitude;
+		private BigDecimal longitude;
+		private BigDecimal altitude;
 		private Integer accuracy;
 
 		public Builder userId(Long userId) {
@@ -61,17 +63,17 @@ public class LocationUpdated {
 			return this;
 		}
 
-		public Builder latitude(Double latitude) {
+		public Builder latitude(BigDecimal latitude) {
 			this.latitude = latitude;
 			return this;
 		}
 
-		public Builder longitude(Double longitude) {
+		public Builder longitude(BigDecimal longitude) {
 			this.longitude = longitude;
 			return this;
 		}
 
-		public Builder altitude(Double altitude) {
+		public Builder altitude(BigDecimal altitude) {
 			this.altitude = altitude;
 			return this;
 		}
