@@ -53,7 +53,7 @@
 			<!-- Connection Pooling settings -->
 
 			<property name="hibernate.connection.provider_class"
-				value="com.jolbox.bonecp.provider.BoneCPConnectionProvider" />
+				value="com.niobium.repository.jpa.provider.BoneCPConnectionProvider" />
 			<property name="bonecp.idleConnectionTestPeriodInMinutes"
 				value="2" />
 			<property name="bonecp.maxConnectionAgeInSeconds" value="25000" />

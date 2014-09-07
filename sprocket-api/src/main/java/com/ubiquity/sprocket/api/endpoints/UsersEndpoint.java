@@ -482,9 +482,7 @@ public class UsersEndpoint {
 		
 		LocationDto locationDto = jsonConverter.convertFromPayload(payload,LocationDto.class);
 		
-		sendLocationMessage(locationDto);
-		
-		
+		sendLocationMessage(userId, locationDto);
 		
 		return Response.ok().build();
 	}
@@ -503,8 +501,12 @@ public class UsersEndpoint {
 				message.getBytes());
 	}
 	
-	private void sendLocationMessage(LocationDto locationDto) throws IOException {
+	private void sendLocationMessage(Long userId, LocationDto locationDto) throws IOException {
 		LocationUpdated content = new LocationUpdated.Builder()
+			.userId(userId)
+			.horizontalAccuracy(locationDto.getHorizontalAccuracy())
+			.verticalAccuracy(locationDto.getVerticalAccuracy())
+			.timestamp(locationDto.getTimestamp())
 			.latitude(locationDto.getLatitude())
 			.longitude(locationDto.getLongitude())
 			.altitude(locationDto.getAltitude())

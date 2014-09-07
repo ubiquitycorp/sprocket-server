@@ -51,8 +51,10 @@ public class LocationUpdateConsumer extends AbstractConsumerThread {
 				.latitude(locationUpdated.getLatitude())
 				.longitude(locationUpdated.getLongitude())
 				.altitude(locationUpdated.getAltitude()).build())
-			.lastUpdated(locationUpdated.getLastUpdated())
-			.accuracy(locationUpdated.getAccuracy())
+			.timestamp(locationUpdated.getTimestamp())
+			.lastUpdated(System.currentTimeMillis())
+			.horizontalAccuracy(locationUpdated.getHorizontalAccuracy())
+			.verticalAccuracy(locationUpdated.getVerticalAccuracy())
 			.build();
 		
 		// this will update the user's location in the SQL data store

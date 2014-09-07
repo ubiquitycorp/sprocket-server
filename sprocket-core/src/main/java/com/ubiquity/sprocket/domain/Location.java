@@ -8,12 +8,13 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class Location {
 
-	@Column(name = "latitude", nullable = false)
+	@Column(name = "latitude", precision = 19, scale = 12, nullable = false)
 	private BigDecimal latitude;
 
-	@Column(name = "longitude", nullable = false)
+	@Column(name = "longitude", precision = 19, scale = 12, nullable = false)
 	private BigDecimal longitude;
 
+	@Column(name = "altitude", precision = 19, scale = 12)
 	private BigDecimal altitude;
 
 	/**

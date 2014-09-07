@@ -30,12 +30,27 @@ public class UserLocation implements Serializable {
 
 	@Column(name = "last_updated", nullable = false)
 	private Long lastUpdated;
-	
-	@Column(name = "accuracy", nullable = true)
-	private Integer accuracy;
-	
+
+	@Column(name = "horizontal_accuracy", nullable = true, scale = 12, precision = 8)
+	private Double horizontalAccuracy;
+
+	@Column(name = "vertical_accuracy", nullable = true, scale = 12, precision = 8)
+	private Double verticalAccuracy;
+
+	@Column(name = "timestamp", nullable = false)
+	private Long timestamp;
+
 	@Embedded
 	private Location location;
+
+	protected UserLocation() {
+	}
+
+	
+	public void setLocationId(Long locationId) {
+		this.locationId = locationId;
+	}
+
 
 	public User getUser() {
 		return user;
@@ -53,11 +68,25 @@ public class UserLocation implements Serializable {
 		return location;
 	}
 
+	public Double getHorizontalAccuracy() {
+		return horizontalAccuracy;
+	}
+
+	public Double getVerticalAccuracy() {
+		return verticalAccuracy;
+	}
+
+	public Long getTimestamp() {
+		return timestamp;
+	}
+
 	public static class Builder {
 		private User user;
 		private Long lastUpdated;
+		private Double horizontalAccuracy;
+		private Double verticalAccuracy;
+		private Long timestamp;
 		private Location location;
-		private Integer accuracy;
 
 		public Builder user(User user) {
 			this.user = user;
@@ -69,11 +98,21 @@ public class UserLocation implements Serializable {
 			return this;
 		}
 
-		public Builder accuracy(Integer accuracy) {
-			this.accuracy = accuracy;
+		public Builder horizontalAccuracy(Double horizontalAccuracy) {
+			this.horizontalAccuracy = horizontalAccuracy;
 			return this;
 		}
-		
+
+		public Builder verticalAccuracy(Double verticalAccuracy) {
+			this.verticalAccuracy = verticalAccuracy;
+			return this;
+		}
+
+		public Builder timestamp(Long timestamp) {
+			this.timestamp = timestamp;
+			return this;
+		}
+
 		public Builder location(Location location) {
 			this.location = location;
 			return this;
@@ -87,7 +126,9 @@ public class UserLocation implements Serializable {
 	private UserLocation(Builder builder) {
 		this.user = builder.user;
 		this.lastUpdated = builder.lastUpdated;
+		this.horizontalAccuracy = builder.horizontalAccuracy;
+		this.verticalAccuracy = builder.verticalAccuracy;
+		this.timestamp = builder.timestamp;
 		this.location = builder.location;
-		this.accuracy = builder.accuracy;
 	}
 }

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.configuration.Configuration;
@@ -27,28 +28,38 @@ import com.ubiquity.sprocket.repository.UserLocationRepositoryJpaImpl;
  *
  */
 public class LocationService {
-	
+
 	private UserLocationRepository locationRepository;
 	private PlaceRepository placeRepository;
-	
+
 	public LocationService(Configuration configuration) {
 		locationRepository = new UserLocationRepositoryJpaImpl();
 		placeRepository = new PlaceRepositoryJpaImpl();
 	}
-	
+
 	/**
-	 * Saves location into underlying data store
+	 * Saves location into underlying data store (or updates it)
 	 * 
 	 * @param location
 	 */
 	public void updateLocation(UserLocation location) {
-		UserLocation persisted = locationRepository.findByUserId(location.getUser().getUserId());
-		if(persisted == null)
+		boolean create = Boolean.FALSE;
+		try {
+			UserLocation persisted = locationRepository.findByUserId(location.getUser().getUserId());
+			if(persisted != null)
+				location.setLocationId(persisted.getLocationId());
+				
+		} catch (NoResultException e) {
+			create = Boolean.TRUE;
+		}
+		EntityManagerSupport.beginTransaction();
+		if(create)
 			locationRepository.create(location);
 		else
 			locationRepository.update(location);
+		EntityManagerSupport.commit();
 	}
-	
+
 	/***
 	 * Returns a place from local db or else attempts to create one from a geocoder service; note the geocoder 
 	 * service can return multiple locations for a name (for example Glendale) so currently this should only be used for major cities
@@ -70,7 +81,7 @@ public class LocationService {
 					return null;
 				if(geobox.size() > 1)
 					throw new IllegalArgumentException("Unable to disambiguate input: " + name);
-				
+
 				Geobox box = geobox.get(0);
 				Place place = new Place.Builder().name(name).boundingBox(box).locale(Locale.US).build();
 				EntityManagerSupport.beginTransaction();
@@ -82,7 +93,7 @@ public class LocationService {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Returns place with the center point closest to this location
 	 *  
@@ -92,7 +103,7 @@ public class LocationService {
 	public Place getClosestPlaceLocationIsWithin(Location location) {
 		return null;
 	}
-	
+
 	/***
 	 * 
 	 * Returns the location if inserted, else it will

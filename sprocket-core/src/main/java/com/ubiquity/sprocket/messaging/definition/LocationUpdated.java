@@ -11,7 +11,7 @@ public class LocationUpdated {
 
 	private Long userId;
 
-	private Long lastUpdated;
+	private Long timestamp;
 
 	private BigDecimal latitude;
 
@@ -19,14 +19,16 @@ public class LocationUpdated {
 
 	private BigDecimal altitude;
 
-	private Integer accuracy;
+	private Double horizontalAccuracy;
+
+	private Double verticalAccuracy;
 
 	public Long getUserId() {
 		return userId;
 	}
 
-	public Long getLastUpdated() {
-		return lastUpdated;
+	public Long getTimestamp() {
+		return timestamp;
 	}
 
 	public BigDecimal getLatitude() {
@@ -41,25 +43,30 @@ public class LocationUpdated {
 		return altitude;
 	}
 
-	public Integer getAccuracy() {
-		return accuracy;
+	public Double getHorizontalAccuracy() {
+		return horizontalAccuracy;
+	}
+
+	public Double getVerticalAccuracy() {
+		return verticalAccuracy;
 	}
 
 	public static class Builder {
 		private Long userId;
-		private Long lastUpdated;
+		private Long timestamp;
 		private BigDecimal latitude;
 		private BigDecimal longitude;
 		private BigDecimal altitude;
-		private Integer accuracy;
+		private Double horizontalAccuracy;
+		private Double verticalAccuracy;
 
 		public Builder userId(Long userId) {
 			this.userId = userId;
 			return this;
 		}
 
-		public Builder lastUpdated(Long lastUpdated) {
-			this.lastUpdated = lastUpdated;
+		public Builder timestamp(Long timestamp) {
+			this.timestamp = timestamp;
 			return this;
 		}
 
@@ -78,8 +85,13 @@ public class LocationUpdated {
 			return this;
 		}
 
-		public Builder accuracy(Integer accuracy) {
-			this.accuracy = accuracy;
+		public Builder horizontalAccuracy(Double horizontalAccuracy) {
+			this.horizontalAccuracy = horizontalAccuracy;
+			return this;
+		}
+
+		public Builder verticalAccuracy(Double verticalAccuracy) {
+			this.verticalAccuracy = verticalAccuracy;
 			return this;
 		}
 
@@ -90,10 +102,11 @@ public class LocationUpdated {
 
 	private LocationUpdated(Builder builder) {
 		this.userId = builder.userId;
-		this.lastUpdated = builder.lastUpdated;
+		this.timestamp = builder.timestamp;
 		this.latitude = builder.latitude;
 		this.longitude = builder.longitude;
 		this.altitude = builder.altitude;
-		this.accuracy = builder.accuracy;
+		this.horizontalAccuracy = builder.horizontalAccuracy;
+		this.verticalAccuracy = builder.verticalAccuracy;
 	}
 }

@@ -12,16 +12,18 @@ public class LocationDto {
 
 	@NotNull
 	private Long timestamp;
+	
 	@NotNull
 	private BigDecimal latitude;
+	
 	@NotNull
 	private BigDecimal longitude;
 	
 	private BigDecimal altitude;
 	
-	private BigDecimal verticalAccuracy;
+	private Double verticalAccuracy;
 	
-	private BigDecimal horizontalAccuracy;
+	private Double horizontalAccuracy;
 
 	public Long getTimestamp() {
 		return timestamp;
@@ -39,11 +41,11 @@ public class LocationDto {
 		return altitude;
 	}
 
-	public BigDecimal getVerticalAccuracy() {
+	public Double getVerticalAccuracy() {
 		return verticalAccuracy;
 	}
 
-	public BigDecimal getHorizontalAccuracy() {
+	public Double getHorizontalAccuracy() {
 		return horizontalAccuracy;
 	}
 }
