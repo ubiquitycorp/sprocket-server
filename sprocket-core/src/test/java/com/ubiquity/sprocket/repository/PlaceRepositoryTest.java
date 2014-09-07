@@ -70,31 +70,6 @@ public class PlaceRepositoryTest {
 		Assert.assertNotNull(place);
 	}
 	
-	@Test
-	public void testFindClosest() throws Exception {
-		Place sf = new Place.Builder().locale(Locale.US).name("San Francisco, CA").boundingBox(
-				new Geobox.Builder()
-						.center(
-								new Location.Builder().latitude(new BigDecimal(37.77492950)).longitude(new BigDecimal(-122.4194155)).build())
-						.lowerLeft(
-								new Location.Builder().latitude(new BigDecimal(37.77492950)).longitude(new BigDecimal(-122.4194155)).build())
-						.lowerRight(
-								new Location.Builder().latitude(new BigDecimal(37.77492950)).longitude(new BigDecimal(-122.4194155)).build())
-						.upperLeft(
-								new Location.Builder().latitude(new BigDecimal(37.77492950)).longitude(new BigDecimal(-122.4194155)).build())
-						.upperRight(
-								new Location.Builder().latitude(new BigDecimal(37.77492950)).longitude(new BigDecimal(-122.4194155)).build())
-								.build())
-							.build();
-		EntityManagerSupport.beginTransaction();
-		placeRepository.create(sf);
-		EntityManagerSupport.commit();
-		
-		
-		Location pasadena = new Location.Builder().latitude(new BigDecimal(34.1561)).longitude(new BigDecimal(118.1319)).build();
-		Place closest = placeRepository.findClosest(pasadena);
-		
-	}
 	
 	@Test(expected = PersistenceException.class)
 	public void testCompositeIndex() throws Exception {
