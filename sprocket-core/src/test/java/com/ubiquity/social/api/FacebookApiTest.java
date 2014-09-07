@@ -38,8 +38,8 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 			.user(user)
 			.accessToken("CAACEdEose0cBAK42ZAjdnZBNPNeV8vJwnLcWtEaWmBiBuYYuMQynsszZBdwVQgGu6wOyD56ZAapNdbZB5afsPCOCpHJw2rzTe7pglL7KtUODTwgLwgfp4yq8gahc6K8QSmDJru6h2ckLHZCUMLeaj5PCuonqYBLQsHYeNwz3trwI8Sa3rVIDDyNpwJkeSeyEgZBBJZBszR3MGe8NuvyC7ipQLU0zN8cjQYwZD").build();
 		log.debug("authenticated Facebook with identity {} ", identity);
-		Configuration configuration = new PropertiesConfiguration(
-				"test.properties");
+		
+		Configuration configuration = new PropertiesConfiguration("test.properties");
 		
 		JedisConnectionFactory.initialize(configuration);
 		
