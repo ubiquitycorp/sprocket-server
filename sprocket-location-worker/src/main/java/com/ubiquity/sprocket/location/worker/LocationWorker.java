@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,14 +26,14 @@ public class LocationWorker {
 	}
 	
 	
-	public void initialize(Configuration configuration) throws SchedulerException, IOException {
+	public void initialize(Configuration configuration) throws IOException {
 
 		startServices(configuration);
 		
 		List<LocationUpdateConsumer> consumers = new LinkedList<LocationUpdateConsumer>();
 		try {			
 			for(int i = 0; i < DEFAULT_NUM_CONSUMERS; i++)
-				consumers.add(new LocationUpdateConsumer(MessageQueueFactory.createCacheInvalidateConsumerChannel()));
+				consumers.add(new LocationUpdateConsumer(MessageQueueFactory.createLocationQueueConsumerChannel()));
 		} catch (IOException e) {
 			log.error("Unable to start service", e);
 			System.exit(0);
@@ -65,9 +64,6 @@ public class LocationWorker {
 			worker.initialize(new PropertiesConfiguration("locationworker.properties"));
 		} catch (ConfigurationException e) {
 			log.error("Unable to configure service", e);
-			System.exit(-1);
-		} catch (SchedulerException e) {
-			log.error("Unable to schedule service", e);
 			System.exit(-1);
 		} catch (IOException e) {
 			log.error("Unable to connect to dependent service", e);
