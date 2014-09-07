@@ -1,5 +1,6 @@
 package com.ubiquity.sprocket.repository;
 
+import java.util.List;
 import java.util.Locale;
 
 import com.niobium.repository.Repository;
@@ -17,4 +18,10 @@ public interface PlaceRepository extends Repository <Long, Place> {
 	 * @return a place or null if it doesn't exist
 	 */
 	Place findByName(String name, Locale locale);
+	
+	/***
+	 * Returns all places
+	 * @return
+	 */
+	List<Place> findAll();
 }

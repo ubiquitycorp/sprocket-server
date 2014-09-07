@@ -51,6 +51,12 @@ public class UserLocation implements Serializable {
 		this.locationId = locationId;
 	}
 
+	
+
+	public void setLastUpdated(Long lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}
+
 
 	public User getUser() {
 		return user;

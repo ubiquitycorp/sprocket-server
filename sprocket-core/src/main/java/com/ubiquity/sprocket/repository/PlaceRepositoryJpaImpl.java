@@ -1,5 +1,6 @@
 package com.ubiquity.sprocket.repository;
 
+import java.util.List;
 import java.util.Locale;
 
 import javax.persistence.EntityManager;
@@ -25,6 +26,13 @@ PlaceRepository {
 		query.setParameter("name", name);
 		query.setParameter("locale", locale);
 		return (Place)query.getSingleResult();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Place> findAll() {
+		Query query = getEntityManager().createQuery("select p from Place p");
+		return (List<Place>)query.getResultList();
 	}
 	
 	

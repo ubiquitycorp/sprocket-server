@@ -1,7 +1,6 @@
 package com.ubiquity.sprocket.service;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -9,6 +8,9 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.configuration.Configuration;
+import org.gavaghan.geodesy.Ellipsoid;
+import org.gavaghan.geodesy.GeodeticCalculator;
+import org.gavaghan.geodesy.GlobalPosition;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.sprocket.domain.Geobox;
@@ -29,12 +31,14 @@ import com.ubiquity.sprocket.repository.UserLocationRepositoryJpaImpl;
  */
 public class LocationService {
 
+	private GeodeticCalculator geoCalculator;
 	private UserLocationRepository locationRepository;
 	private PlaceRepository placeRepository;
 
 	public LocationService(Configuration configuration) {
 		locationRepository = new UserLocationRepositoryJpaImpl();
 		placeRepository = new PlaceRepositoryJpaImpl();
+		geoCalculator = new GeodeticCalculator();
 	}
 
 	/**
@@ -52,6 +56,7 @@ public class LocationService {
 		} catch (NoResultException e) {
 			create = Boolean.TRUE;
 		}
+		location.setLastUpdated(System.currentTimeMillis());
 		EntityManagerSupport.beginTransaction();
 		if(create)
 			locationRepository.create(location);
@@ -98,10 +103,32 @@ public class LocationService {
 	 * Returns place with the center point closest to this location
 	 *  
 	 * @param location
-	 * @return
+	 * 
+	 * @return place or null if there are no places nearby
 	 */
 	public Place getClosestPlaceLocationIsWithin(Location location) {
-		return null;
+		// TODO: set query results caching for this; we don't want to geocode in mysql
+		List<Place> places = placeRepository.findAll();
+		
+		if(places.isEmpty())
+			return null;
+		
+		Place closest = null;
+		Double closestDistance = Double.MAX_VALUE;
+		for(Place place : places) {
+			// convert to model the geo lib uses
+			GlobalPosition locationPoint = new GlobalPosition(location.getLatitude().doubleValue(), location.getLongitude().doubleValue(), 0.0); 
+			Location center = place.getBoundingBox().getCenter();
+			GlobalPosition placePoint = new GlobalPosition(center.getLatitude().doubleValue(), center.getLongitude().doubleValue(), 0.0);
+
+			Ellipsoid reference = Ellipsoid.WGS84;  
+			double distance = geoCalculator.calculateGeodeticCurve(reference, locationPoint, placePoint).getEllipsoidalDistance(); // Distance between Point A and Point B
+			if(distance < closestDistance) {
+				closestDistance = distance;
+				closest = place;
+			}
+		}
+		return closest;
 	}
 
 	/***

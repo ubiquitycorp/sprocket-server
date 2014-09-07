@@ -51,6 +51,9 @@
 				<mq.queue.track.host>localhost</mq.queue.track.host>
 				<mq.queue.track.username>netappusr</mq.queue.track.username>
 				<mq.queue.track.password>blackdeer</mq.queue.track.password>
+				<mq.host>localhost</mq.host>
+				<mq.username>netappusr</mq.username>
+				<mq.password>blackdeer</mq.password>
 			</properties>
 			<activation>
 				<property>
@@ -109,6 +112,9 @@
 				<mq.queue.track.host>localhost</mq.queue.track.host>
 				<mq.queue.track.username>netappusr</mq.queue.track.username>
 				<mq.queue.track.password>blackdeer</mq.queue.track.password>
+				<mq.host>localhost</mq.host>
+				<mq.username>netappusr</mq.username>
+				<mq.password>blackdeer</mq.password>
 			</properties>
 			<activation>
 				<property>
@@ -161,6 +167,9 @@
 				<mq.queue.track.host>54.215.203.15</mq.queue.track.host>
 				<mq.queue.track.username>netappusr</mq.queue.track.username>
 				<mq.queue.track.password>blackdeer</mq.queue.track.password>
+				<mq.host>54.215.203.15</mq.host>
+				<mq.username>netappusr</mq.username>
+				<mq.password>blackdeer</mq.password>
 			</properties>
 			<activation>
 				<property>

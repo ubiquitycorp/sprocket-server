@@ -1,8 +1,12 @@
 package com.ubiquity.sprocket.domain;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
+
+import org.apache.commons.lang3.Range;
 
 @Embeddable
 public class Geobox {
@@ -47,6 +51,12 @@ public class Geobox {
 
 	public Location getLowerLeft() {
 		return lowerLeft;
+	}
+	
+	public boolean isWithin(Location location) {
+		Range<BigDecimal> latRange = Range.between(lowerLeft.getLatitude(), upperRight.getLatitude());
+		Range<BigDecimal> lonRange = Range.between(lowerLeft.getLongitude(), upperRight.getLongitude());
+		return latRange.contains(location.getLatitude()) && lonRange.contains(location.getLongitude());
 	}
 
 	public static class Builder {
