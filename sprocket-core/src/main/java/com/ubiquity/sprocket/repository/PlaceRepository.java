@@ -3,6 +3,7 @@ package com.ubiquity.sprocket.repository;
 import java.util.Locale;
 
 import com.niobium.repository.Repository;
+import com.ubiquity.sprocket.domain.Location;
 import com.ubiquity.sprocket.domain.Place;
 
 

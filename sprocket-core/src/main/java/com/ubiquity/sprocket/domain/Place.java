@@ -34,12 +34,10 @@ import javax.persistence.Index;
 	@AttributeOverride(name = "boundingBox.lowerRight.altitude", column = @Column(name = "box_lower_right_altitude")),
 	@AttributeOverride(name = "boundingBox.upperLeft.altitude", column = @Column(name = "box_upper_left_altitude")),
 	@AttributeOverride(name = "boundingBox.upperRight.altitude", column = @Column(name = "box_upper_right_altitude")),
-	
-	
-	
 })
 @Table(name = "place", indexes = {
-		@Index(name="idx_place_name_locale", columnList = "name, locale", unique = true)
+		@Index(name="idx_place_name_locale", columnList = "name, locale", unique = true),
+		@Index(name="idx_center_point", columnList = "box_center_latitude, box_center_longitude")
 })
 public class Place {
 
