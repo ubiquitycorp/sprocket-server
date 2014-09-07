@@ -134,6 +134,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		}  else if ( externalNetwork.equals(ExternalNetwork.Facebook)||externalNetwork.equals(ExternalNetwork.Twitter)) {
 			processMessages(identity, externalNetwork);
 			processActivities(identity, externalNetwork);
+			processLocalActivities(identity, externalNetwork);
 		}
 		else if(externalNetwork.equals(ExternalNetwork.LinkedIn))
 		{
@@ -148,6 +149,13 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 
 		// index for searching
 		ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), synced);
+		
+		}
+	
+	private void processLocalActivities(ExternalIdentity identity, ExternalNetwork socialNetwork){
+		List<Activity> localActivities = ServiceFactory.getSocialService().syncLocalNewsFeed(identity, socialNetwork);
+		// index for searching
+		//ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), localActivities);
 	}
 
 	/***
