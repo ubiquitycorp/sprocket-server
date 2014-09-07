@@ -12,7 +12,6 @@
 		<class>com.ubiquity.sprocket.domain.Place</class>
 
 		<class>com.ubiquity.sprocket.domain.UserLocation</class>
-		<class>com.ubiquity.sprocket.domain.GroupMembership</class>
 		
 		<class>com.ubiquity.sprocket.domain.RecommendedActivity</class>
 		<class>com.ubiquity.sprocket.domain.RecommendedVideo</class>
