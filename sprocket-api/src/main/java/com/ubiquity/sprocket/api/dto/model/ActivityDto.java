@@ -86,7 +86,8 @@ public class ActivityDto {
 	public String getExternalIdentifier() {
 		return externalIdentifier;
 	}
-
+	
+	
 
 	public static class Builder {
 		private String title;
@@ -134,7 +135,7 @@ public class ActivityDto {
 			this.externalNetworkId = externalNetworkId;
 			return this;
 		}
-
+		
 		public Builder type(String type) {
 			this.type = type;
 			return this;

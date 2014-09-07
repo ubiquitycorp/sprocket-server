@@ -41,6 +41,7 @@ import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.ExchangeTokenDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
+import com.ubiquity.sprocket.api.dto.model.LocationDto;
 import com.ubiquity.sprocket.api.dto.model.ResetPasswordDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
@@ -304,7 +305,6 @@ public class UsersEndpoint {
 
 			Contact contact = ServiceFactory.getContactService()
 					.getBySocialIdentityId(identity.getIdentityId());
-
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
@@ -358,16 +358,18 @@ public class UsersEndpoint {
 							identityDto.getRefreshToken(), clientPlatform,
 							externalNetwork, null);
 		} else if (externalNetwork.network == Network.Social) {
-			SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
+			SocialAPI socialApi = SocialAPIFactory.createProvider(
+					externalNetwork, clientPlatform);
 			String redirectUri = null;
-			if((externalNetwork.equals(ExternalNetwork.Google) || externalNetwork.equals(ExternalNetwork.YouTube)) && clientPlatform.equals(ClientPlatform.WEB))
-			{
+			if ((externalNetwork.equals(ExternalNetwork.Google) || externalNetwork
+					.equals(ExternalNetwork.YouTube))
+					&& clientPlatform.equals(ClientPlatform.WEB)) {
 				redirectUri = "postmessage";
 			}
-			// the expiredAt value in externalIdentity object returned from getAccessToken() is equal to expiresIn value
+			// the expiredAt value in externalIdentity object returned from
+			// getAccessToken() is equal to expiresIn value
 			ExternalIdentity externalidentity = socialApi.getAccessToken(
-					identityDto.getCode(),
-					identityDto.getOauthToken(),
+					identityDto.getCode(), identityDto.getOauthToken(),
 					identityDto.getOauthTokenSecret(), redirectUri);
 
 			identity = ServiceFactory.getExternalIdentityService()
@@ -382,11 +384,13 @@ public class UsersEndpoint {
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto);
 
+		// send off to analytics tracker
+		// sendEventTrackedMessage(user, identity);
+
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
 					.getBySocialIdentityId(identity.getIdentityId());
-
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
@@ -450,7 +454,7 @@ public class UsersEndpoint {
 				identityDto.getUsername());
 		return Response.ok().build();
 	}
-	
+
 	/***
 	 * 
 	 * @param payload
@@ -466,6 +470,29 @@ public class UsersEndpoint {
 				payload, ResetPasswordDto.class);
 		ServiceFactory.getUserService().resetPassword(
 				resetPasswordDto.getToken(), resetPasswordDto.getPassword());
+		return Response.ok().build();
+	}
+
+	/***
+	 * This method receives user's location and saves it into database
+	 * 
+	 * @param payload
+	 * @return
+	 * @throws IOException
+	 */
+	@POST
+	@Path("/{userId}/location")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response setLocation(@PathParam("userId") Long userId,
+			InputStream payload) throws IOException {
+		LocationDto locationDto = jsonConverter.convertFromPayload(payload,
+				LocationDto.class);
+		ServiceFactory.getUserService().saveUserLocation(userId,
+				locationDto.getTimestamp(), locationDto.getLongitude(),
+				locationDto.getLatitude(), locationDto.getAltitude(),
+				locationDto.getVerticalAccuracy(),
+				locationDto.getHorizontalAccuracy());
 		return Response.ok().build();
 	}
 
