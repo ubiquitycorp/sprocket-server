@@ -21,7 +21,7 @@
 
 	<!-- turns on resource filtering -->
 	<build>
-		<finalName>sprocket-recommendation-worker</finalName>
+		<finalName>sprocket-analytics-worker</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
