@@ -54,6 +54,9 @@ public class Place {
 	@Embedded
 	private Geobox boundingBox;
 
+	protected Place(){
+		
+	}
 	
 	public Geobox getBoundingBox() {
 		return boundingBox;

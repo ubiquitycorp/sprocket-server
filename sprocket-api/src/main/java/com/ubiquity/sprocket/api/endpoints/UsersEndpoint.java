@@ -67,6 +67,7 @@ public class UsersEndpoint {
 	@Path("/ping")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response ping() {
+		//ServiceFactory.getLocationService().getOrCreatePlaceByName("Los Angeles");
 		return Response.ok().entity("{\"message\":\"pong\"}").build();
 	}
 

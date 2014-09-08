@@ -42,6 +42,10 @@ public class UserLocation implements Serializable {
 
 	@Embedded
 	private Location location;
+	
+	@ManyToOne
+	@JoinColumn(name = "nearest_place_id", nullable = true)
+	private Place nearestPlace;
 
 	protected UserLocation() {
 	}
@@ -51,10 +55,12 @@ public class UserLocation implements Serializable {
 		this.locationId = locationId;
 	}
 
-	
-
 	public void setLastUpdated(Long lastUpdated) {
 		this.lastUpdated = lastUpdated;
+	}
+
+	public void setNearestPlace(Place nearestPlace) {
+		this.nearestPlace = nearestPlace;
 	}
 
 
@@ -86,6 +92,10 @@ public class UserLocation implements Serializable {
 		return timestamp;
 	}
 
+	public Place getNearestPlace() {
+		return nearestPlace;
+	}
+
 	public static class Builder {
 		private User user;
 		private Long lastUpdated;
@@ -93,6 +103,7 @@ public class UserLocation implements Serializable {
 		private Double verticalAccuracy;
 		private Long timestamp;
 		private Location location;
+		private Place nearestPlace;
 
 		public Builder user(User user) {
 			this.user = user;
@@ -123,6 +134,11 @@ public class UserLocation implements Serializable {
 			this.location = location;
 			return this;
 		}
+		
+		public Builder place(Place place) {
+			this.nearestPlace = place;
+			return this;
+		}
 
 		public UserLocation build() {
 			return new UserLocation(this);
@@ -136,5 +152,6 @@ public class UserLocation implements Serializable {
 		this.verticalAccuracy = builder.verticalAccuracy;
 		this.timestamp = builder.timestamp;
 		this.location = builder.location;
+		this.nearestPlace = builder.nearestPlace;
 	}
 }
