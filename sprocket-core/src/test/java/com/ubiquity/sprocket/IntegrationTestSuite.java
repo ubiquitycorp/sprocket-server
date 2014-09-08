@@ -13,6 +13,7 @@ import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.social.repository.ActivityRepositoryTest;
 import com.ubiquity.social.repository.MessageRepositoryTest;
+import com.ubiquity.sprocket.repository.EngagedItemRepositoryTest;
 import com.ubiquity.sprocket.repository.SocialRepositoryTest;
 import com.ubiquity.sprocket.repository.UserRepositoryTest;
 import com.ubiquity.sprocket.repository.VideoContentRepositoryTest;
@@ -34,6 +35,8 @@ import com.ubiquity.sprocket.service.AuthenticationServiceTest;
 	UserRepositoryTest.class, 
 	ActivityRepositoryTest.class, 
 	MessageRepositoryTest.class,
+	VideoContentRepositoryTest.class,
+	EngagedItemRepositoryTest.class,
 	VideoContentRepositoryTest.class
 	})
 public class IntegrationTestSuite {

@@ -67,10 +67,11 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		String message = dateFormat.format(date);
 		Contact c = new Contact.Builder()
 						.externalIdentity(new ExternalIdentity.Builder()
-										.externalNetwork(ExternalNetwork.Twitter.ordinal()).identifier("2607216073").build()).build(); 
+										.externalNetwork(ExternalNetwork.Twitter.ordinal()).identifier("2576165924").build()).build(); 
 		Boolean sent = twitterAPI.sendMessage(identity, c, null , message, "");
 		Assert.assertTrue(sent);
 	}
+	
 	@Test
 	public void listMessages() {
 		

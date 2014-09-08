@@ -29,6 +29,8 @@ public class ServiceFactory {
 	private static ExternalIdentityService externalIdentityService;
 	private static ErrorsConfigurationService errorsConfigurationService;
 	private static EmailService emailService;
+	private static LocationService locationService;
+	
 	/***
 	 * Initializes all services with the specified configuration
 	 * 
@@ -49,6 +51,17 @@ public class ServiceFactory {
 		if(analyticsService == null)
 			analyticsService = new AnalyticsService(configuration);
 		return analyticsService;
+	}
+	
+	/***
+	 * Returns location service
+	 * 
+	 * @return
+	 */
+	public static LocationService getLocationService() {
+		if(locationService == null)
+			locationService = new LocationService(configuration);
+		return locationService;
 	}
 	
 	/***

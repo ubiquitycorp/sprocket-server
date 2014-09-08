@@ -2,7 +2,6 @@ package com.ubiquity.sprocket.api.dto.model;
 
 import javax.validation.constraints.NotNull;
 
-import com.ubiquity.external.domain.Category;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
 
 /***

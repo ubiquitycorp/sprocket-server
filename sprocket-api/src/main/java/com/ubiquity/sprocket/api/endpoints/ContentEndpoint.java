@@ -15,7 +15,9 @@ import javax.ws.rs.core.Response;
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
 import com.ubiquity.content.domain.VideoContent;
+import com.ubiquity.external.domain.Category;
 import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.VideosDto;
 import com.ubiquity.sprocket.api.dto.model.VideoDto;
@@ -52,17 +54,30 @@ public class ContentEndpoint {
 	public Response videos(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		VideosDto results = new VideosDto();
-
+		
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		CollectionVariant<VideoContent> variant = ServiceFactory.getContentService().findAllVideosByOwnerIdAndContentNetwork(userId, externalNetwork, ifModifiedSince);
 
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
 			return Response.notModified().build();
-
+		
+		boolean history = false;
 		for(VideoContent videoContent : variant.getCollection())
-			results.getVideos().add(DtoAssembler.assemble(videoContent));
-
+		{
+			VideoDto videoDto = DtoAssembler.assemble(videoContent);
+			if(videoDto.getCategory()== Category.MyHistory.getCategoryName())
+				history = true;
+			results.getVideos().add(videoDto);
+		}
+		if(!history && externalNetwork == ExternalNetwork.YouTube)
+		{
+			ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, externalNetwork);
+			if (identity.getEmail().toLowerCase().contains("@gmail"))
+				results.setHistoryEmptyMessage("you have no videos in history");
+			else
+				results.setHistoryEmptyMessage("Please note that YouTube doesn't allow retrieving history if you log in with a service account");
+		}
 		return Response.ok().header("Last-Modified", variant.getLastModified()).entity(jsonConverter.convertToPayload(results)).build();
 	}
 	
@@ -83,9 +98,6 @@ public class ContentEndpoint {
 		// convert to raw bytes and send it off
 		String message = MessageConverterFactory.getMessageConverter().serialize(new com.ubiquity.messaging.format.Message(messageContent));
 		byte[] bytes = message.getBytes();
-		
-		// send to data warehouse / analytics tracker
-		MessageQueueFactory.getTrackQueueProducer().write(bytes);
 		
 		// will ensure the domain entity gets saved to the store if it does not exist and indexed for faster search
 		MessageQueueFactory.getCacheInvalidationQueueProducer().write(bytes);

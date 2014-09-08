@@ -11,28 +11,32 @@ public class UserEngagedDocument {
 	private VideoContent videoContent;
 	private Message message;
 	private String dataType;
+	private String searchTerm;
 	
 	public UserEngagedDocument(Long userId, Activity activity,
-			String dataType) {
+			String searchTerm) {
 		super();
 		this.userId = userId;
 		this.activity = activity;
-		this.dataType = dataType;
+		this.dataType = activity.getClass().getSimpleName();
+		this.searchTerm = searchTerm;
 	}
 	
 	public UserEngagedDocument(Long userId, VideoContent videoContent,
-			String dataType) {
+			String searchTerm) {
 		super();
 		this.userId = userId;
 		this.videoContent = videoContent;
-		this.dataType = dataType;
+		this.dataType = videoContent.getClass().getSimpleName();
+		this.searchTerm = searchTerm;
 	}
 	
-	public UserEngagedDocument(Long userId, Message message, String dataType) {
+	public UserEngagedDocument(Long userId, Message message, String searchTerm) {
 		super();
 		this.userId = userId;
 		this.message = message;
-		this.dataType = dataType;
+		this.dataType = message.getClass().getSimpleName();
+		this.searchTerm = searchTerm;
 	}
 
 
@@ -50,6 +54,10 @@ public class UserEngagedDocument {
 	}
 	public String getDataType() {
 		return dataType;
+	}
+
+	public String getSearchTerm() {
+		return searchTerm;
 	}
 
 	

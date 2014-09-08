@@ -1,5 +1,7 @@
 package com.ubiquity.sprocket.api.dto.model;
 
+import java.math.BigDecimal;
+
 import javax.validation.constraints.NotNull;
 /***
  * 
@@ -10,12 +12,14 @@ public class LocationDto {
 
 	@NotNull
 	private Long timestamp;
-	@NotNull
-	private Double latitude;
-	@NotNull
-	private Double longitude;
 	
-	private Double altitude;
+	@NotNull
+	private BigDecimal latitude;
+	
+	@NotNull
+	private BigDecimal longitude;
+	
+	private BigDecimal altitude;
 	
 	private Double verticalAccuracy;
 	
@@ -25,15 +29,15 @@ public class LocationDto {
 		return timestamp;
 	}
 
-	public Double getLatitude() {
+	public BigDecimal getLatitude() {
 		return latitude;
 	}
 
-	public Double getLongitude() {
+	public BigDecimal getLongitude() {
 		return longitude;
 	}
 
-	public Double getAltitude() {
+	public BigDecimal getAltitude() {
 		return altitude;
 	}
 
