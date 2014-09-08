@@ -2,6 +2,7 @@ package com.ubiquity.sprocket.messaging;
 
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
+import com.ubiquity.sprocket.messaging.definition.LocationUpdated;
 import com.ubiquity.sprocket.messaging.definition.UserAuthenticated;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedDocument;
@@ -21,6 +22,7 @@ public class MessageConverterFactory {
 				.registerMessageType(UserEngagedActivity.class)
 				.registerMessageType(UserEngagedDocument.class)
 				.registerMessageType(UserEngagedVideo.class)
+				.registerMessageType(LocationUpdated.class)
 				.build();
 		}
 		return converter;

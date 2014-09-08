@@ -53,6 +53,7 @@ import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 //import com.ubiquity.sprocket.messaging.definition.EventTracked;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
+import com.ubiquity.sprocket.messaging.definition.LocationUpdated;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/users")
@@ -66,8 +67,6 @@ public class UsersEndpoint {
 	@Path("/ping")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response ping() {
-		// throw new
-		// UnsupportedOperationException("LinkedIn get Access Token is not supported at this time.");
 		return Response.ok().entity("{\"message\":\"pong\"}").build();
 	}
 
@@ -197,7 +196,7 @@ public class UsersEndpoint {
 
 		// create api key and pass back associated identities for this user (in
 		// case of a login from a different device)
-		String apiKey = authenticationService.generateApiKey();
+		String apiKey = AuthenticationService.generateApiKey();
 		AccountDto accountDto = new AccountDto.Builder().apiKey(apiKey)
 				.userId(user.getUserId()).build();
 
@@ -216,12 +215,6 @@ public class UsersEndpoint {
 		authenticationService.saveAuthkey(user.getUserId(), apiKey);
 
 		log.debug("Authenticated user {}", user);
-
-		// send notification interested consumers
-		// String message =
-		// MessageConverterFactory.getMessageConverter().serialize(new
-		// Message(new UserAuthenticated(user.getUserId())));
-		// MessageQueueFactory.getCacheInvalidationQueueProducer().write(message.getBytes());
 
 		return Response.ok().entity(jsonConverter.convertToPayload(accountDto))
 				.build();
@@ -253,7 +246,7 @@ public class UsersEndpoint {
 				clientPlatform, Boolean.TRUE);
 
 		// user now has a single, native identity
-		String apiKey = authenticationService.generateApiKey();
+		String apiKey = AuthenticationService.generateApiKey();
 
 		// set the account DTO with an api key and new user id and send it back
 		AccountDto accountDto = new AccountDto.Builder().apiKey(apiKey)
@@ -486,13 +479,11 @@ public class UsersEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response setLocation(@PathParam("userId") Long userId,
 			InputStream payload) throws IOException {
-		LocationDto locationDto = jsonConverter.convertFromPayload(payload,
-				LocationDto.class);
-		ServiceFactory.getUserService().saveUserLocation(userId,
-				locationDto.getTimestamp(), locationDto.getLongitude(),
-				locationDto.getLatitude(), locationDto.getAltitude(),
-				locationDto.getVerticalAccuracy(),
-				locationDto.getHorizontalAccuracy());
+		
+		LocationDto locationDto = jsonConverter.convertFromPayload(payload,LocationDto.class);
+		
+		sendLocationMessage(userId, locationDto);
+		
 		return Response.ok().build();
 	}
 
@@ -509,5 +500,24 @@ public class UsersEndpoint {
 		MessageQueueFactory.getCacheInvalidationQueueProducer().write(
 				message.getBytes());
 	}
+	
+	private void sendLocationMessage(Long userId, LocationDto locationDto) throws IOException {
+		LocationUpdated content = new LocationUpdated.Builder()
+			.userId(userId)
+			.horizontalAccuracy(locationDto.getHorizontalAccuracy())
+			.verticalAccuracy(locationDto.getVerticalAccuracy())
+			.timestamp(locationDto.getTimestamp())
+			.latitude(locationDto.getLatitude())
+			.longitude(locationDto.getLongitude())
+			.altitude(locationDto.getAltitude())
+		.build();
+
+		// serialize and send it
+		String message = MessageConverterFactory.getMessageConverter()
+				.serialize(new Message(content));
+		MessageQueueFactory.getLocationQueueProducer().write(
+				message.getBytes());
+	}
+	
 
 }

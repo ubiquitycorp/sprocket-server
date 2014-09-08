@@ -9,8 +9,12 @@
 	</parent>
 	<artifactId>sprocket-core</artifactId>
 	<name>Sprocket Core</name>
-	<version>0.1.6</version>
+
+	<version>0.1.9</version>
+
 	<build>
+
+
 
 		<finalName>sprocket-core</finalName>
 		<resources>
@@ -61,10 +65,10 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-integration</artifactId>
-			<version>0.1.64</version>
+			<version>0.1.7</version>
 		</dependency>
 
-	
+
 
 		<dependency>
 			<groupId>com.ubiquity</groupId>
@@ -77,6 +81,14 @@
 			<artifactId>niobium-amqp</artifactId>
 			<version>0.2</version>
 		</dependency>
+
+
+		<dependency>
+			<groupId>com.google.code.geocoder-java</groupId>
+			<artifactId>geocoder-java</artifactId>
+			<version>0.16</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.apache.solr</groupId>
@@ -102,6 +114,22 @@
 			<version>17.0</version>
 		</dependency>
 
+		<!-- analytics -->
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-core_2.10</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-mllib_2.10</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+
+	
+
+
 
 
 		<!-- testing -->
@@ -111,7 +139,7 @@
 			<version>5.1.6</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 
 
 		<dependency>
@@ -122,9 +150,9 @@
 			<scope>test</scope>
 			<optional>false</optional>
 		</dependency>
-		
-		
-		
+
+
+
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-integration-test</artifactId>

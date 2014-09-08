@@ -1,0 +1,20 @@
+package com.ubiquity.sprocket.repository;
+
+import java.util.List;
+
+import com.niobium.repository.Repository;
+import com.ubiquity.social.domain.Activity;
+import com.ubiquity.sprocket.domain.RecommendedActivity;
+
+
+public interface RecommendedActivityRepository extends Repository <Long, RecommendedActivity>  {
+	
+	/**
+	 * Returns recommended activities
+	 * 
+	 * @param group
+	 * @return List of average engaged activities
+	 */
+	List<Activity> findRecommendedActivitiesByGroup(String group);
+
+}

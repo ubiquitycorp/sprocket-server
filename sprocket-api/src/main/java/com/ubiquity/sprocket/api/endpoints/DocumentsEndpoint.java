@@ -51,7 +51,7 @@ public class DocumentsEndpoint {
 		DocumentsDto documentsDto = jsonConverter.convertFromPayload(payload, DocumentsDto.class, EngagementValidation.class);
 		log.debug("documents engaged {}", documentsDto);
 		for(DocumentDto documentDto : documentsDto.getDocuments()) {
-			sendTrackAndSyncMessage(userId, documentDto);
+			sendTrackAndSyncMessage(userId, documentsDto.getSearchTerm(), documentDto);
 		}
 		
 		return Response.ok().build();
@@ -61,7 +61,7 @@ public class DocumentsEndpoint {
 	@Path("providers/{externalNetworkId}/indexed")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response searchIndexed(@PathParam("externalNetworkId") Integer externalNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
-		DocumentsDto result = new DocumentsDto();
+		DocumentsDto result = new DocumentsDto(q);
 
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		
@@ -78,7 +78,7 @@ public class DocumentsEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response searchIndexed(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
-		DocumentsDto result = new DocumentsDto();
+		DocumentsDto result = new DocumentsDto(q);
 
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		
@@ -96,7 +96,7 @@ public class DocumentsEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response searchLive(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
-		DocumentsDto result = new DocumentsDto();
+		DocumentsDto result = new DocumentsDto(q);
 
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		User user = ServiceFactory.getUserService().getUserById(userId);
@@ -122,7 +122,7 @@ public class DocumentsEndpoint {
 	 * @param activityDto
 	 * @throws IOException
 	 */
-	private void sendTrackAndSyncMessage(Long userId, DocumentDto documentDto) throws IOException {
+	private void sendTrackAndSyncMessage(Long userId, String searchTerm, DocumentDto documentDto) throws IOException {
 		
 		// convert to domain entity and prepare to send to MQ
 		Document document = DtoAssembler.assemble(documentDto, EngagementValidation.class);
@@ -131,20 +131,17 @@ public class DocumentsEndpoint {
 		// create message content with strongly typed references to the actual domain entity (for easier de-serialization on the consumer end)
 		UserEngagedDocument messageContent;
 		if(dataType.equalsIgnoreCase(Activity.class.getSimpleName()))
-			messageContent = new UserEngagedDocument(userId, (Activity)document.getData(), dataType);
+			messageContent = new UserEngagedDocument(userId, (Activity)document.getData(), searchTerm);
 		else if(dataType.equalsIgnoreCase(VideoContent.class.getSimpleName()))
-			messageContent = new UserEngagedDocument(userId, (VideoContent)document.getData(), dataType);
+			messageContent = new UserEngagedDocument(userId, (VideoContent)document.getData(), searchTerm);
 		else if(dataType.equalsIgnoreCase(Message.class.getSimpleName()))
-			messageContent = new UserEngagedDocument(userId, (Message)document.getData(), dataType);
+			messageContent = new UserEngagedDocument(userId, (Message)document.getData(), searchTerm);
 		else
 			throw new IllegalArgumentException("Unknown data type for document: " + dataType);
 		
 		// convert to raw bytes and send it off
 		String message = MessageConverterFactory.getMessageConverter().serialize(new com.ubiquity.messaging.format.Message(messageContent));
 		byte[] bytes = message.getBytes();
-		
-		// send to data warehouse / analytics tracker
-		MessageQueueFactory.getTrackQueueProducer().write(bytes);
 		
 		// will ensure the domain entity gets saved to the store if it does not exist and indexed for faster search
 		MessageQueueFactory.getCacheInvalidationQueueProducer().write(bytes);

@@ -99,9 +99,6 @@ public class ContentEndpoint {
 		String message = MessageConverterFactory.getMessageConverter().serialize(new com.ubiquity.messaging.format.Message(messageContent));
 		byte[] bytes = message.getBytes();
 		
-		// send to data warehouse / analytics tracker
-		MessageQueueFactory.getTrackQueueProducer().write(bytes);
-		
 		// will ensure the domain entity gets saved to the store if it does not exist and indexed for faster search
 		MessageQueueFactory.getCacheInvalidationQueueProducer().write(bytes);
 
