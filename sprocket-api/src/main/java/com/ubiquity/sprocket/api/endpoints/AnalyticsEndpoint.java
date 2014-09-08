@@ -31,7 +31,9 @@ public class AnalyticsEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response recommendations(@PathParam("userId") Long userId) {
-		throw new UnsupportedOperationException("This endpoint is currently not supported");
+		//throw new UnsupportedOperationException("This endpoint is currently not supported");
+		RecommendationsDto recommendationsDto = new RecommendationsDto();
+		return Response.ok().entity(jsonConverter.convertToPayload(recommendationsDto)).build();
 	}
 	
 	@GET
@@ -41,7 +43,7 @@ public class AnalyticsEndpoint {
 	public Response recommendedActivitiesByProvider(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		RecommendationsDto recommendationsDto = new RecommendationsDto();
-		AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
+		/*AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
 		
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		
@@ -57,9 +59,9 @@ public class AnalyticsEndpoint {
 		for(Activity activity : activities) {
 			recommendationsDto.getActivities().add(DtoAssembler.assemble(activity));
 		}
-	
+	*/
 		return Response.ok()
-				.header("Last-Modified", variant.getLastModified())
+			//	.header("Last-Modified", variant.getLastModified())
 				.entity(jsonConverter.convertToPayload(recommendationsDto))
 				.build();
 	}
@@ -71,7 +73,7 @@ public class AnalyticsEndpoint {
 	public Response recommendedVideosByProvider(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		RecommendationsDto recommendationsDto = new RecommendationsDto();
-		AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
+		/*AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
 		
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		
@@ -87,9 +89,9 @@ public class AnalyticsEndpoint {
 		for(VideoContent videoContent : videos) {
 			recommendationsDto.getVideos().add(DtoAssembler.assemble(videoContent));
 		}
-	
+	*/
 		return Response.ok()
-				.header("Last-Modified", variant.getLastModified())
+				//.header("Last-Modified", variant.getLastModified())
 				.entity(jsonConverter.convertToPayload(recommendationsDto))
 				.build();
 	}

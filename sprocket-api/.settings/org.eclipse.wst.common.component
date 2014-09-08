@@ -4,10 +4,10 @@
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
-        <dependent-module archiveName="sprocket-core-0.1.6.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/sprocket-core/sprocket-core">
+        <dependent-module archiveName="sprocket-core-0.1.9.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/sprocket-core/sprocket-core">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="ubc-integration-0.1.57.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ubc-integration/ubc-integration">
+        <dependent-module archiveName="ubc-integration-0.1.7.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ubc-integration/ubc-integration">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="ubc-media-0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ubc-media/ubc-media">
@@ -22,10 +22,10 @@
         <dependent-module archiveName="ubc-api-0.3.4.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ubc-api/ubc-api">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="niobium-common-0.3.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/niobium-common/niobium-common">
+        <dependent-module archiveName="niobium-common-0.3.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/niobium-common/niobium-common">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="niobium-data-access-0.7.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/niobium-data-access/niobium-data-access">
+        <dependent-module archiveName="niobium-data-access-0.9.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/niobium-data-access/niobium-data-access">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="ubc-identity-0.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ubc-identity/ubc-identity">

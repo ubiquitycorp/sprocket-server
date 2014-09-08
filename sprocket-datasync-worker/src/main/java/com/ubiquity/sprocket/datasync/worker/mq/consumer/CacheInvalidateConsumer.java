@@ -9,26 +9,15 @@ import org.slf4j.LoggerFactory;
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
 import com.ubiquity.content.domain.VideoContent;
-<<<<<<< HEAD
-import com.ubiquity.messaging.MessageConverter;
-import com.ubiquity.messaging.format.Message;
-import com.ubiquity.social.domain.Activity;
-import com.ubiquity.sprocket.datasync.worker.manager.DataSyncManager;
-=======
-import com.ubiquity.content.service.ContentService;
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.external.domain.Network;
-import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.social.domain.Activity;
-import com.ubiquity.social.service.SocialService;
+import com.ubiquity.sprocket.datasync.worker.manager.DataSyncManager;
 import com.ubiquity.sprocket.domain.EngagedActivity;
 import com.ubiquity.sprocket.domain.EngagedDocument;
 import com.ubiquity.sprocket.domain.EngagedItem;
 import com.ubiquity.sprocket.domain.EngagedVideo;
->>>>>>> develop
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;

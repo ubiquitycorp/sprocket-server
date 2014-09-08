@@ -9,9 +9,6 @@ target/*
 *.bin
 /sprocket-api\.settings/*.component
 sprocket-api/.settings/org.eclipse.wst.common.component
-<<<<<<< HEAD
 /sprocket-tracker-worker/.classpath
-=======
 
 /sprocket-datasync-worker/.classpath
->>>>>>> develop
