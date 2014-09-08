@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.content.domain.VideoContent;
+import com.ubiquity.external.domain.Category;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.media.domain.Image;
@@ -232,18 +233,20 @@ public class DtoAssembler {
 	}
 
 	public static VideoDto assemble(VideoContent videoContent) {
+		String tempCategory = videoContent.getCategory()==null ?null:videoContent.getCategory().getCategoryName();
 		VideoDto.Builder videoBuilder = new VideoDto.Builder()
-				.externalNetworkId(videoContent.getExternalNetwork().ordinal());
+				.externalNetworkId(videoContent.getExternalNetwork().ordinal())
+				.category(tempCategory);
 		
-				if(videoContent.getVideo() != null)
-					videoBuilder.itemKey(videoContent.getVideo().getItemKey());
-				
-				if(videoContent.getThumb() != null)
-					videoBuilder.thumb(new ImageDto(videoContent.getThumb().getUrl()));
-				
-				videoBuilder.title(videoContent.getTitle()).description(videoContent.getDescription());
+		if(videoContent.getVideo() != null)
+			videoBuilder.itemKey(videoContent.getVideo().getItemKey());
 		
-				return videoBuilder.build();
+		if(videoContent.getThumb() != null)
+			videoBuilder.thumb(new ImageDto(videoContent.getThumb().getUrl()));
+		
+		videoBuilder.title(videoContent.getTitle()).description(videoContent.getDescription());
+
+		return videoBuilder.build();
 	}
 
 	/***
@@ -379,7 +382,7 @@ public class DtoAssembler {
 		VideoContent content = new VideoContent.Builder()
 				.video(video)
 				.title(videoDto.getTitle())
-				.category(videoDto.getCategory())
+				.category(Category.getCategoryByCategoryName(videoDto.getCategory()))
 				.description(videoDto.getDescription())
 				.externalNetwork(
 						ExternalNetwork.getNetworkById(videoDto

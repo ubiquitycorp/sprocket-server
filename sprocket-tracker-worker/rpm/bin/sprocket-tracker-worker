@@ -1,1 +1,0 @@
-java -Xmx1024m -jar /var/lib/java-services/sprocket-tracker-worker.jar

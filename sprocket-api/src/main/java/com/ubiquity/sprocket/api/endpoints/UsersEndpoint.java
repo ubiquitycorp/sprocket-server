@@ -41,6 +41,7 @@ import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.ExchangeTokenDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
+import com.ubiquity.sprocket.api.dto.model.LocationDto;
 import com.ubiquity.sprocket.api.dto.model.ResetPasswordDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
@@ -52,6 +53,7 @@ import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 //import com.ubiquity.sprocket.messaging.definition.EventTracked;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
+import com.ubiquity.sprocket.messaging.definition.LocationUpdated;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/users")
@@ -94,9 +96,9 @@ public class UsersEndpoint {
 		ExchangeService exchangservice = new ExchangeService();
 		String[] accesstokens = exchangservice.exchangeToken(cookieString);
 
-		
 		if (accesstokens[0] == null || accesstokens[0].equalsIgnoreCase(""))
-			throw new HttpException("Autontication Failed no oAuth_token_returned", 401);
+			throw new HttpException(
+					"Autontication Failed no oAuth_token_returned", 401);
 
 		// create the identity if it does not exist; or use the existing one
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
@@ -159,7 +161,8 @@ public class UsersEndpoint {
 			else
 				return Response
 						.ok()
-						.entity("{\"oauthToken\":\"" + requestToken.getAccessToken()
+						.entity("{\"oauthToken\":\""
+								+ requestToken.getAccessToken()
 								+ "\",\"oauthTokenSecret\":\""
 								+ requestToken.getSecretToken() + "\"}")
 						// .entity(jsonConverter.convertToPayload(requestToken))
@@ -196,7 +199,7 @@ public class UsersEndpoint {
 		ServiceFactory.getUserService().update(user);
 		// create api key and pass back associated identities for this user (in
 		// case of a login from a different device)
-		String apiKey = authenticationService.generateApiKey();
+		String apiKey = AuthenticationService.generateApiKey();
 		AccountDto accountDto = new AccountDto.Builder().apiKey(apiKey)
 				.userId(user.getUserId()).build();
 
@@ -215,12 +218,6 @@ public class UsersEndpoint {
 		authenticationService.saveAuthkey(user.getUserId(), apiKey);
 
 		log.debug("Authenticated user {}", user);
-
-		// send notification interested consumers
-		// String message =
-		// MessageConverterFactory.getMessageConverter().serialize(new
-		// Message(new UserAuthenticated(user.getUserId())));
-		// MessageQueueFactory.getCacheInvalidationQueueProducer().write(message.getBytes());
 
 		return Response.ok().entity(jsonConverter.convertToPayload(accountDto))
 				.build();
@@ -248,10 +245,11 @@ public class UsersEndpoint {
 				.getClientPlatformId());
 		User user = ServiceFactory.getAuthenticationService().register(
 				identityDto.getUsername(), identityDto.getPassword(), "", "",
-				identityDto.getDisplayName(), identityDto.getEmail(), clientPlatform, Boolean.TRUE);
+				identityDto.getDisplayName(), identityDto.getEmail(),
+				clientPlatform, Boolean.TRUE);
 
 		// user now has a single, native identity
-		String apiKey = authenticationService.generateApiKey();
+		String apiKey = AuthenticationService.generateApiKey();
 
 		// set the account DTO with an api key and new user id and send it back
 		AccountDto accountDto = new AccountDto.Builder().apiKey(apiKey)
@@ -356,16 +354,18 @@ public class UsersEndpoint {
 							identityDto.getRefreshToken(), clientPlatform,
 							externalNetwork, null);
 		} else if (externalNetwork.network == Network.Social) {
-			SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork, clientPlatform);
+			SocialAPI socialApi = SocialAPIFactory.createProvider(
+					externalNetwork, clientPlatform);
 			String redirectUri = null;
-			if((externalNetwork.equals(ExternalNetwork.Google) || externalNetwork.equals(ExternalNetwork.YouTube)) && clientPlatform.equals(ClientPlatform.WEB))
-			{
+			if ((externalNetwork.equals(ExternalNetwork.Google) || externalNetwork
+					.equals(ExternalNetwork.YouTube))
+					&& clientPlatform.equals(ClientPlatform.WEB)) {
 				redirectUri = "postmessage";
 			}
-			// the expiredAt value in externalIdentity object returned from getAccessToken() is equal to expiresIn value
+			// the expiredAt value in externalIdentity object returned from
+			// getAccessToken() is equal to expiresIn value
 			ExternalIdentity externalidentity = socialApi.getAccessToken(
-					identityDto.getCode(),
-					identityDto.getOauthToken(),
+					identityDto.getCode(), identityDto.getOauthToken(),
 					identityDto.getOauthTokenSecret(), redirectUri);
 
 			identity = ServiceFactory.getExternalIdentityService()
@@ -424,14 +424,14 @@ public class UsersEndpoint {
 		// User user = ServiceFactory.getUserService().getUserById(userId);
 		SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork,
 				ClientPlatform.WEB);
-		SocialToken token = socialApi
-				.exchangeAccessToken(exchangeTokenDto.getAccessToken());
+		SocialToken token = socialApi.exchangeAccessToken(exchangeTokenDto
+				.getAccessToken());
 
 		return Response.ok()
 				.entity("{\"accessToken\":\"" + token.getAccessToken() + "\"}")
 				.build();
 	}
-	
+
 	/***
 	 * 
 	 * @param email
@@ -442,22 +442,53 @@ public class UsersEndpoint {
 	@Path("/authenticated/reset/requests")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	//@ValidateRequest
+	// @ValidateRequest
 	public Response sendResetEmail(InputStream payload) throws IOException {
-		IdentityDto identityDto = jsonConverter.convertFromPayload(payload, IdentityDto.class, ResetValidation.class);
-		ServiceFactory.getUserService().sendResetPasswordEmail(identityDto.getUsername());
+		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
+				IdentityDto.class, ResetValidation.class);
+		ServiceFactory.getUserService().sendResetPasswordEmail(
+				identityDto.getUsername());
 		return Response.ok().build();
-	 }
-	
+	}
+
+	/***
+	 * 
+	 * @param payload
+	 * @return
+	 * @throws IOException
+	 */
 	@POST
 	@Path("/authenticated/reset/responses")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response resetPassword(InputStream payload) throws IOException {
-		ResetPasswordDto resetPasswordDto = jsonConverter.convertFromPayload(payload, ResetPasswordDto.class);
-		ServiceFactory.getUserService().resetPassword(resetPasswordDto.getToken(), resetPasswordDto.getPassword());
+		ResetPasswordDto resetPasswordDto = jsonConverter.convertFromPayload(
+				payload, ResetPasswordDto.class);
+		ServiceFactory.getUserService().resetPassword(
+				resetPasswordDto.getToken(), resetPasswordDto.getPassword());
 		return Response.ok().build();
-	 }
+	}
+
+	/***
+	 * This method receives user's location and saves it into database
+	 * 
+	 * @param payload
+	 * @return
+	 * @throws IOException
+	 */
+	@POST
+	@Path("/{userId}/location")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response setLocation(@PathParam("userId") Long userId,
+			InputStream payload) throws IOException {
+		
+		LocationDto locationDto = jsonConverter.convertFromPayload(payload,LocationDto.class);
+		
+		sendLocationMessage(userId, locationDto);
+		
+		return Response.ok().build();
+	}
 
 	private void sendActivatedMessage(User user, ExternalIdentity identity,
 			IdentityDto identityDto) throws IOException {
@@ -472,5 +503,24 @@ public class UsersEndpoint {
 		MessageQueueFactory.getCacheInvalidationQueueProducer().write(
 				message.getBytes());
 	}
+	
+	private void sendLocationMessage(Long userId, LocationDto locationDto) throws IOException {
+		LocationUpdated content = new LocationUpdated.Builder()
+			.userId(userId)
+			.horizontalAccuracy(locationDto.getHorizontalAccuracy())
+			.verticalAccuracy(locationDto.getVerticalAccuracy())
+			.timestamp(locationDto.getTimestamp())
+			.latitude(locationDto.getLatitude())
+			.longitude(locationDto.getLongitude())
+			.altitude(locationDto.getAltitude())
+		.build();
+
+		// serialize and send it
+		String message = MessageConverterFactory.getMessageConverter()
+				.serialize(new Message(content));
+		MessageQueueFactory.getLocationQueueProducer().write(
+				message.getBytes());
+	}
+	
 
 }

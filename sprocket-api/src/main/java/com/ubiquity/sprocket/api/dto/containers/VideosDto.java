@@ -13,5 +13,16 @@ public class VideosDto {
 		return videos;
 	}
 
+	private String historyEmptyMessage;
+	
+	public void setHistoryEmptyMessage(String historyEmptyMessage)
+	{
+		this.historyEmptyMessage = historyEmptyMessage;
+	}
+
+	public String getHistoryEmptyMessage() {
+		return historyEmptyMessage;
+	}
+	
 	
 }

@@ -2,6 +2,8 @@ package com.ubiquity.sprocket.api.dto.model;
 
 import javax.validation.constraints.NotNull;
 
+import com.ubiquity.external.domain.Category;
+
 public class VideoDto {
 
 	private String url;
@@ -22,6 +24,7 @@ public class VideoDto {
 	
 	private String category;
 	
+	
 	private Long lastUpdated;
 	private ImageDto thumb;
 
@@ -40,7 +43,7 @@ public class VideoDto {
 	public Integer getExternalNetworkId() {
 		return externalNetworkId;
 	}
-
+	
 	public Long getLastUpdated() {
 		return lastUpdated;
 	}
@@ -81,7 +84,7 @@ public class VideoDto {
 			this.externalNetworkId = externalNetworkId;
 			return this;
 		}
-
+		
 		public Builder lastUpdated(Long lastUpdated) {
 			this.lastUpdated = lastUpdated;
 			return this;
