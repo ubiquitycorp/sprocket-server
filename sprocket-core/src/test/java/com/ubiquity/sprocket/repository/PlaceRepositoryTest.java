@@ -11,10 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
+
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.sprocket.domain.Geobox;
-import com.ubiquity.sprocket.domain.Location;
-import com.ubiquity.sprocket.domain.Place;
+import com.ubiquity.location.domain.Geobox;
+import com.ubiquity.location.domain.Location;
+import com.ubiquity.location.domain.Place;
+import com.ubiquity.location.repository.PlaceRepository;
+import com.ubiquity.location.repository.PlaceRepositoryJpaImpl;
 
 /***
  * Tests testing basic CRUD operations for a location repository

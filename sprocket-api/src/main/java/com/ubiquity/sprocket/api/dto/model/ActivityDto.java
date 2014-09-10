@@ -38,6 +38,8 @@ public class ActivityDto {
 	private VideoDto video;
 	
 	private String link;
+	
+	private String category;
 
 	public Long getActivityId() {
 		return activityId;
@@ -85,9 +87,11 @@ public class ActivityDto {
 
 	public String getExternalIdentifier() {
 		return externalIdentifier;
+	}	
+
+	public String getCategory() {
+		return category;
 	}
-	
-	
 
 	public static class Builder {
 		private String title;
@@ -100,6 +104,7 @@ public class ActivityDto {
 		private String type;
 		private String link;
 		private String externalIdentifier;
+		private String category;
 		
 		public Builder title(String title) {
 			this.title = title;
@@ -150,6 +155,11 @@ public class ActivityDto {
 			this.externalIdentifier = externalIdentifier;
 			return this;
 		}
+		
+		public Builder category(String category) {
+			this.category = category;
+			return this;
+		}
 
 		public ActivityDto build() {
 			return new ActivityDto(this);
@@ -167,6 +177,7 @@ public class ActivityDto {
 		this.type = builder.type;
 		this.link = builder.link;
 		this.externalIdentifier = builder.externalIdentifier;
+		this.category = builder.category;
 	}
 
 	@Override

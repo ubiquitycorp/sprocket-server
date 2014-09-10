@@ -177,16 +177,13 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		SocialService socialService = ServiceFactory.getSocialService();
 		List<Activity> synced = socialService.syncActivities(identity,
 				socialNetwork);
-
-		List<Activity> synced1 = ServiceFactory.getLocationService().syncLocalNewsFeed(identity,
-				socialNetwork);
 		// index for searching
 		ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), synced);
 		
 		}
 	
 	private void processLocalActivities(ExternalIdentity identity, ExternalNetwork socialNetwork){
-		List<Activity> localActivities = ServiceFactory.getLocationService().syncLocalNewsFeed(identity, socialNetwork);
+		List<Activity> localActivities = ServiceFactory.getSocialService().syncLocalNewsFeed(identity, socialNetwork);
 		// index for searching
 		//ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), localActivities);
 	}
