@@ -477,6 +477,7 @@ public class UsersEndpoint {
 	@Path("/{userId}/location")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response setLocation(@PathParam("userId") Long userId,
 			InputStream payload) throws IOException {
 		

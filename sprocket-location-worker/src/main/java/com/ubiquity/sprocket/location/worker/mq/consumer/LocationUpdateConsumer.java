@@ -7,10 +7,11 @@ import org.slf4j.LoggerFactory;
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.location.domain.Location;
+import com.ubiquity.location.domain.Place;
+import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
-import com.ubiquity.sprocket.domain.Location;
-import com.ubiquity.sprocket.domain.UserLocation;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.definition.LocationUpdated;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -45,7 +46,7 @@ public class LocationUpdateConsumer extends AbstractConsumerThread {
 
 		// get user entity and then store this in the db (for now)
 		User user = ServiceFactory.getUserService().getUserById(locationUpdated.getUserId());
-		UserLocation location = new UserLocation.Builder()
+		UserLocation userLocation = new UserLocation.Builder()
 			.user(user)
 			.location(new Location.Builder()
 				.latitude(locationUpdated.getLatitude())
@@ -57,8 +58,12 @@ public class LocationUpdateConsumer extends AbstractConsumerThread {
 			.verticalAccuracy(locationUpdated.getVerticalAccuracy())
 			.build();
 		
+		// Get nearest place to the new user's location
+		Place nearestPlace = ServiceFactory.getLocationService().getClosestPlaceLocationIsWithin(userLocation.getLocation());
+		userLocation.setNearestPlace(nearestPlace);
+		
 		// this will update the user's location in the SQL data store
-		ServiceFactory.getLocationService().updateLocation(location);
+		ServiceFactory.getLocationService().updateLocation(userLocation);
 	
 	}
 

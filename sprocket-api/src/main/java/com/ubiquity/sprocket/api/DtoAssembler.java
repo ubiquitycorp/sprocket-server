@@ -318,6 +318,8 @@ public class DtoAssembler {
 				.externalIdentifier(activity.getExternalIdentifier())
 				.postedBy(DtoAssembler.assemble(activity.getPostedBy()));
 
+		if(activity.getCategory() != null)
+			activityDtoBuilder.category(activity.getCategory().getCategoryName());
 		if (activity.getImage() != null)
 			activityDtoBuilder
 					.photo(new ImageDto(activity.getImage().getUrl()));

@@ -14,8 +14,10 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
-import com.ubiquity.sprocket.domain.Location;
-import com.ubiquity.sprocket.domain.UserLocation;
+import com.ubiquity.location.domain.Location;
+import com.ubiquity.location.domain.UserLocation;
+import com.ubiquity.location.repository.UserLocationRepository;
+import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
 
 /***
  * Tests testing basic CRUD operations for a location repository

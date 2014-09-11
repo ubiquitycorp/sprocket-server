@@ -18,7 +18,5 @@ public class ActivitiesDto {
 	public List<ActivityDto> getActivities() {
 		return activities;
 	}
-	
-	
 
 }

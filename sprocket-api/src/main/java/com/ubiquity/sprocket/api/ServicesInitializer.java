@@ -55,8 +55,6 @@ public class ServicesInitializer implements ServletContextListener {
 			// start cache services
 			JedisConnectionFactory.initialize(configuration);
 			
-			
-			
 			// start MQ services
 			MessageQueueFactory.initialize(configuration);
 			
@@ -65,10 +63,31 @@ public class ServicesInitializer implements ServletContextListener {
 			SocialAPIFactory.initialize(configuration);
 			ContentAPIFactory.initialize(configuration);
 
-
+			//bootstrap();
 		} catch (Exception e) {
 			log.error("Unable to initialize dependent services, exiting...", e);
 			System.exit(1);
 		}
+	}
+
+	private void bootstrap() {
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("Eureka, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("Chico, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("Sacramento, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("San Francisco, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("Oakland, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("San Jose, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("Santa Cruz, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("Monterey, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("Fresno, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("Bakersfield, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("San Luis Obispo, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("Santa Barbara, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("San Bernardino, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("Los Angeles, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("Long Beach, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("Palm Springs, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("Irvine, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("San Diego, CA");
 	}
 }

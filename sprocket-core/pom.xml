@@ -68,8 +68,6 @@
 			<version>0.1.7</version>
 		</dependency>
 
-
-
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-messaging</artifactId>
