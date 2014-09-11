@@ -39,7 +39,7 @@ public class VimeoAPITest {
 	@Test
 	public void testFindVideosByExternalIdentity() {
 		ContentAPI contentApi = ContentAPIFactory.createProvider(ExternalNetwork.Vimeo, ClientPlatform.WEB);
-		List<VideoContent> videos = contentApi.findVideosByExternalIdentity(identity);
+		List<VideoContent> videos = contentApi.listVideos(identity);
 		for(VideoContent video : videos) 
 			log.debug("video: {}", video);
 	}

@@ -1,7 +1,5 @@
 package com.ubiquity.sprocket.api.endpoints;
 
-import java.util.Collection;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
@@ -11,15 +9,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.niobium.common.serialize.JsonConverter;
-import com.niobium.repository.CollectionVariant;
-import com.ubiquity.content.domain.VideoContent;
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.social.domain.Activity;
-import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.RecommendationsDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
-import com.ubiquity.sprocket.service.AnalyticsService;
-import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/analytics")
 public class AnalyticsEndpoint {
