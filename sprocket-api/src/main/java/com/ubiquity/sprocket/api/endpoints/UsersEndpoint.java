@@ -193,7 +193,10 @@ public class UsersEndpoint {
 				identityDto.getUsername(), identityDto.getPassword());
 		if (user == null)
 			throw new HttpException("Username / password incorrect", 401);
-
+		
+		// update user last login 
+		user.setLastLogin(System.currentTimeMillis());
+		ServiceFactory.getUserService().update(user);
 		// create api key and pass back associated identities for this user (in
 		// case of a login from a different device)
 		String apiKey = AuthenticationService.generateApiKey();

@@ -51,12 +51,12 @@ public class ContentEndpoint {
 	@Path("/users/{userId}/providers/{externalNetworkId}/videos")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response videos(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+	public Response videos(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("delta") Boolean delta, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		VideosDto results = new VideosDto();
 		
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
-		CollectionVariant<VideoContent> variant = ServiceFactory.getContentService().findAllVideosByOwnerIdAndContentNetwork(userId, externalNetwork, ifModifiedSince);
+		CollectionVariant<VideoContent> variant = ServiceFactory.getContentService().findAllVideosByOwnerIdAndContentNetwork(userId, externalNetwork, ifModifiedSince,delta);
 
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
@@ -70,12 +70,14 @@ public class ContentEndpoint {
 				history = true;
 			results.getVideos().add(videoDto);
 		}
+		if(!delta)
+		{
+			history =true;
+		}
 		if(!history && externalNetwork == ExternalNetwork.YouTube)
 		{
 			ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, externalNetwork);
-			if (identity.getEmail().toLowerCase().contains("@gmail"))
-				results.setHistoryEmptyMessage("you have no videos in history");
-			else
+			if (!identity.getEmail().toLowerCase().contains("@gmail"))
 				results.setHistoryEmptyMessage("Please note that YouTube doesn't allow retrieving history if you log in with a service account");
 		}
 		return Response.ok().header("Last-Modified", variant.getLastModified()).entity(jsonConverter.convertToPayload(results)).build();

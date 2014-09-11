@@ -1,7 +1,6 @@
 package com.ubiquity.sprocket.datasync.worker.mq.consumer;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -10,15 +9,11 @@ import org.slf4j.LoggerFactory;
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
 import com.ubiquity.content.domain.VideoContent;
-import com.ubiquity.content.service.ContentService;
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.external.domain.Network;
-import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.social.domain.Activity;
-import com.ubiquity.social.service.SocialService;
+import com.ubiquity.sprocket.datasync.worker.manager.DataSyncManager;
 import com.ubiquity.sprocket.domain.EngagedActivity;
 import com.ubiquity.sprocket.domain.EngagedDocument;
 import com.ubiquity.sprocket.domain.EngagedItem;
@@ -49,7 +44,10 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			log.info("message received: {}", message);
 			if(message.getType().equals(
 					ExternalIdentityActivated.class.getSimpleName()))
-				process((ExternalIdentityActivated) message.getContent());
+			{
+				DataSyncManager dataSyncManager = new DataSyncManager();
+				dataSyncManager.processSync((ExternalIdentityActivated) message.getContent());
+			}
 			else if(message.getType().equals(UserEngagedDocument.class.getSimpleName()))
 				process((UserEngagedDocument)message.getContent());
 			else if(message.getType().equals(UserEngagedVideo.class.getSimpleName()))
@@ -140,13 +138,6 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 
 
 	}
-	/**
-	 * If an identity has been activated, process all available content;
-	 * 
-	 * @param content
-	 */
-	private void process(ExternalIdentityActivated activated) {
-		log.debug("found: {}", activated);
 
 		// get identity from message
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
