@@ -6,3 +6,4 @@ ALTER TABLE video_content ADD COLUMN category int(11);
 ALTER TABLE user ADD COLUMN latitude double; 
 ALTER TABLE user ADD COLUMN longitude double; 
 ALTER TABLE user ADD COLUMN location_timestamp bigint(20); 
+ALTER TABLE video_content ADD COLUMN published_at bigint(20);

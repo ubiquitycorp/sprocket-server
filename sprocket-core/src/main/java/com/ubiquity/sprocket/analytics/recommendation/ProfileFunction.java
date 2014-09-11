@@ -58,10 +58,10 @@ public class ProfileFunction implements Function<Profile, Vector> {
 		log.debug("age range {} weight applied {}", point[1], dimension.getWeight());
 
 		dimension = Dimension.findDimensionByAttribute("lat", dimensions);
-		point[2] = (userLocation.getLocation().getLatitude() == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(userLocation.getLocation().getLatitude(), dimension);
+		point[2] = (userLocation == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(userLocation.getLocation().getLatitude(), dimension);
 		
 		dimension = Dimension.findDimensionByAttribute("lon", dimensions);
-		point[3] = (userLocation.getLocation().getLongitude() == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(userLocation.getLocation().getLongitude(), dimension);
+		point[3] = (userLocation == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(userLocation.getLocation().getLongitude(), dimension);
 
 		log.info("points {}", point);
 
@@ -74,10 +74,10 @@ public class ProfileFunction implements Function<Profile, Vector> {
 		double[] points = new double[2];
 		UserLocation location = profile.getLocation();
 		Dimension dimension = Dimension.findDimensionByAttribute("lat", dimensions);
-		points[0] = (location.getLocation().getLatitude() == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(location.getLocation().getLatitude(), dimension);
+		points[0] = (location == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(location.getLocation().getLatitude(), dimension);
 		
 		dimension = Dimension.findDimensionByAttribute("lon", dimensions);
-		points[1] = (location.getLocation().getLongitude() == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(location.getLocation().getLongitude(), dimension);
+		points[1] = (location == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(location.getLocation().getLongitude(), dimension);
 
 		log.info("points {}", points);
 		return points;				

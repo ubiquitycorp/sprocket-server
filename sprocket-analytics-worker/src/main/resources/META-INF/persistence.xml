@@ -7,11 +7,12 @@
 	<persistence-unit name="manager" transaction-type="RESOURCE_LOCAL">
 
 
-		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
 
 
 		<class>com.ubiquity.sprocket.domain.RecommendedActivity</class>
+				<class>com.ubiquity.sprocket.domain.UserLocation</class>
 		
 		<class>com.ubiquity.sprocket.domain.GroupMembership</class>
 		<class>com.ubiquity.sprocket.domain.EngagedVideo</class>

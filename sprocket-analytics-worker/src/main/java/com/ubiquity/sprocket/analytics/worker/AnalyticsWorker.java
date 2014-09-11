@@ -1,5 +1,11 @@
 package com.ubiquity.sprocket.analytics.worker;
 
+import static org.quartz.DateBuilder.futureDate;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.TriggerKey.triggerKey;
+
 import java.io.IOException;
 
 import org.apache.commons.configuration.Configuration;
@@ -16,15 +22,10 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.sprocket.analytics.worker.jobs.AssignmentSyncJob;
 import com.ubiquity.sprocket.analytics.worker.jobs.RecommendationSyncJob;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
-
-import static org.quartz.DateBuilder.futureDate;
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
-import static org.quartz.TriggerBuilder.newTrigger;
-import static org.quartz.TriggerKey.triggerKey;
 
 
 public class AnalyticsWorker {
@@ -42,6 +43,7 @@ public class AnalyticsWorker {
 		log.info("Service initialized.");
 
 		startScheduler();
+
 		
 		while (true) {
 			try {
@@ -102,12 +104,29 @@ public class AnalyticsWorker {
 		Trigger trigger = newTrigger() 
 				.withIdentity(triggerKey("recommendationTrigger", "trigger"))
 				.withSchedule(simpleSchedule()
-						.withIntervalInMinutes(60)
+						.withIntervalInHours(15)
 						.repeatForever())
 						.startAt(futureDate(1, IntervalUnit.MINUTE))
 						.build();
 	
 		scheduler.scheduleJob(job, trigger);
+		
+		job = newJob(AssignmentSyncJob.class)
+				.withIdentity("assignmentSync", "sync")
+				.build();
+
+		trigger = newTrigger() 
+				.withIdentity(triggerKey("assignmentTrigger", "trigger"))
+				.withSchedule(simpleSchedule()
+						.withIntervalInMinutes(5)
+						.repeatForever())
+						.startAt(futureDate(3, IntervalUnit.MINUTE))
+						.build();
+		
+		scheduler.scheduleJob(job, trigger);
+
+	
+		
 	}
 
 }
