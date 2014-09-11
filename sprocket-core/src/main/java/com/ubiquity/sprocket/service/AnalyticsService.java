@@ -16,8 +16,6 @@ import com.niobium.repository.cache.UserDataModificationCache;
 import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.content.domain.VideoContent;
-import com.ubiquity.content.repository.VideoContentRepository;
-import com.ubiquity.content.repository.VideoContentRepositoryJpaImpl;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.external.repository.cache.CacheKeys;
 import com.ubiquity.identity.domain.User;
@@ -39,7 +37,7 @@ import com.ubiquity.sprocket.domain.EngagedVideo;
 import com.ubiquity.sprocket.domain.GroupMembership;
 import com.ubiquity.sprocket.domain.RecommendedActivity;
 import com.ubiquity.sprocket.domain.RecommendedVideo;
-import com.ubiquity.sprocket.domain.UserLocation;
+import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.sprocket.repository.EngagedActivityRepository;
 import com.ubiquity.sprocket.repository.EngagedActivityRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.EngagedDocumentRepository;
@@ -53,8 +51,8 @@ import com.ubiquity.sprocket.repository.GroupMembershipRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepository;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedVideoRepository;
-import com.ubiquity.sprocket.repository.UserLocationRepository;
-import com.ubiquity.sprocket.repository.UserLocationRepositoryJpaImpl;
+import com.ubiquity.location.repository.UserLocationRepository;
+import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
 
 /***
  * Service for executing tracking engagement, assigning contacts to groups, and recommending content
