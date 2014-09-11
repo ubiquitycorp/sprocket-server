@@ -50,6 +50,8 @@ public class DataSyncManager {
 		}  else if ( externalNetwork.equals(ExternalNetwork.Facebook)||externalNetwork.equals(ExternalNetwork.Twitter)) {
 			processMessages(identity, externalNetwork, null);
 			processActivities(identity, externalNetwork);
+			if ( externalNetwork.equals(ExternalNetwork.Facebook))
+					processLocalActivities(identity, externalNetwork);
 		}
 		else if(externalNetwork.equals(ExternalNetwork.LinkedIn))
 		{
@@ -65,6 +67,12 @@ public class DataSyncManager {
 
 		// index for searching
 		ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), synced);
+	}
+	
+	private void processLocalActivities(ExternalIdentity identity, ExternalNetwork socialNetwork){
+		List<Activity> localActivities = ServiceFactory.getSocialService().syncLocalNewsFeed(identity, socialNetwork);
+		// index for searching
+		//ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), localActivities);
 	}
 
 	/***
