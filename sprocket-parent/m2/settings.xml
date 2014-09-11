@@ -54,6 +54,14 @@
 				<mq.host>localhost</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
+				
+					<!-- recommendation engine -->
+				<recommendation.engine.appname>Sprocket</recommendation.engine.appname>
+				<recommendation.engine.hadoop.master>local</recommendation.engine.hadoop.master>
+				
+				<recommendation.engine.alg.kmeans.iterations>5</recommendation.engine.alg.kmeans.iterations>
+			
+			
 			</properties>
 			<activation>
 				<property>
@@ -115,6 +123,15 @@
 				<mq.host>localhost</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
+				
+					<!-- recommendation engine -->
+				<recommendation.engine.appname>Sprocket</recommendation.engine.appname>
+				<recommendation.engine.hadoop.master>local</recommendation.engine.hadoop.master>
+				
+				<recommendation.engine.alg.kmeans.iterations>5</recommendation.engine.alg.kmeans.iterations>
+			
+				
+				
 			</properties>
 			<activation>
 				<property>
@@ -170,6 +187,13 @@
 				<mq.host>54.215.203.15</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
+				
+					<!-- recommendation engine -->
+				<recommendation.engine.appname>Sprocket</recommendation.engine.appname>
+				<recommendation.engine.hadoop.master>local</recommendation.engine.hadoop.master>
+				
+				<recommendation.engine.alg.kmeans.iterations>5</recommendation.engine.alg.kmeans.iterations>
+			
 			</properties>
 			<activation>
 				<property>
