@@ -73,27 +73,42 @@ public class SocialEndpoint {
 
 		CollectionVariant<Activity> variant = ServiceFactory.getSocialService().findActivityByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince);
 
+		// Throw a 304 if if there is no variant (no change)
+		if (variant == null)
+			return Response.notModified().build();
+		
+		for(Activity activity : variant.getCollection()) {
+			results.getActivities().add(DtoAssembler.assemble(activity));
+		}
+
+		return Response.ok()
+				.header("Last-Modified", variant.lastModified)
+				.entity(jsonConverter.convertToPayload(results))
+				.build();
+	}
+	
+	@GET
+	@Path("users/{userId}/providers/{socialNetworkId}/localfeed")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response getLocalFeed(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+		ActivitiesDto results = new ActivitiesDto();
+
+		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
+
 		UserLocation userLocation = ServiceFactory.getLocationService().getLocation(userId);
-		CollectionVariant<Activity> placeVariant = ServiceFactory.getSocialService().findActivityByPlaceIdAndSocialNetwork(userLocation.getNearestPlace().getPlaceId(), socialNetwork, ifModifiedSince);
+		CollectionVariant<Activity> variant = ServiceFactory.getSocialService().findActivityByPlaceIdAndSocialNetwork(userLocation.getNearestPlace().getPlaceId(), socialNetwork, ifModifiedSince);
 
 		// Throw a 304 if if there is no variant (no change)
-		if (variant == null && placeVariant == null)
+		if (variant == null)
 			return Response.notModified().build();
-		else if(variant == null)
-			results.setNewsFeedIsModified(Boolean.FALSE);
-		else if(placeVariant == null)
-			results.setLocalNewsFeedIsModified(Boolean.FALSE);
 		
 		for(Activity activity : variant.getCollection()) {
 			results.getActivities().add(DtoAssembler.assemble(activity));
 		}
 		
-		for(Activity activity : placeVariant.getCollection()) {
-			results.getActivities().add(DtoAssembler.assemble(activity));
-		}
-
 		return Response.ok()
-				.header("Last-Modified", Math.min(variant.lastModified, placeVariant.lastModified))
+				.header("Last-Modified", variant.lastModified)
 				.entity(jsonConverter.convertToPayload(results))
 				.build();
 	}

@@ -67,7 +67,6 @@ public class UsersEndpoint {
 	@Path("/ping")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response ping() {
-		//ServiceFactory.getLocationService().getOrCreatePlaceByName("Los Angeles");
 		return Response.ok().entity("{\"message\":\"pong\"}").build();
 	}
 
@@ -478,6 +477,7 @@ public class UsersEndpoint {
 	@Path("/{userId}/location")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response setLocation(@PathParam("userId") Long userId,
 			InputStream payload) throws IOException {
 		
