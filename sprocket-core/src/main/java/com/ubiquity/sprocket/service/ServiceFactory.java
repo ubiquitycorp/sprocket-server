@@ -53,6 +53,8 @@ public class ServiceFactory {
 		return analyticsService;
 	}
 	
+	
+	
 	/***
 	 * Returns location service
 	 * 

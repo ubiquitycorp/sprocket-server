@@ -33,6 +33,7 @@ import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 import com.ubiquity.sprocket.api.dto.model.SendMessageDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
+import com.ubiquity.sprocket.api.validation.EngagementValidation;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
@@ -52,7 +53,7 @@ public class SocialEndpoint {
 	public Response engaged(@PathParam("userId") Long userId, InputStream payload) throws IOException {
 
 		// convert payload
-		ActivitiesDto activitiesDto = jsonConverter.convertFromPayload(payload, ActivitiesDto.class);
+		ActivitiesDto activitiesDto = jsonConverter.convertFromPayload(payload, ActivitiesDto.class, EngagementValidation.class);
 		
 		for(ActivityDto activityDto : activitiesDto.getActivities()) {
 			log.debug("tracking activity {}", activityDto);

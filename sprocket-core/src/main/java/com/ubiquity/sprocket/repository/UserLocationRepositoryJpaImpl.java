@@ -3,6 +3,7 @@ package com.ubiquity.sprocket.repository;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 import com.niobium.repository.BaseRepositoryJpaImpl;
@@ -23,7 +24,11 @@ UserLocationRepository {
 	public UserLocation findByUserId(Long userId) {
 		Query query = getEntityManager().createQuery("select ul from UserLocation ul where ul.user.userId = :userId");
 		query.setParameter("userId", userId);
-		return (UserLocation)query.getSingleResult();
+		try {
+			return (UserLocation)query.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
 	}
 
 	@SuppressWarnings("unchecked")

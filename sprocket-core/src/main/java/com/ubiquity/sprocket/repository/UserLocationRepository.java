@@ -7,6 +7,13 @@ import com.ubiquity.sprocket.domain.UserLocation;
 
 
 public interface UserLocationRepository extends Repository <Long, UserLocation> {
+	
+	/***
+	 * Returns user location record or null if one does not exist
+	 * 
+	 * @param userId
+	 * @return
+	 */
 	UserLocation findByUserId(Long userId);
 	
 	List<UserLocation> findAll();

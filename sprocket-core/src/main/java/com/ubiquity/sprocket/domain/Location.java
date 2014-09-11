@@ -1,12 +1,15 @@
 package com.ubiquity.sprocket.domain;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class Location {
+public class Location implements Serializable {
+
+	private static final long serialVersionUID = 7099843752703575760L;
 
 	@Column(name = "latitude", precision = 19, scale = 12, nullable = false)
 	private BigDecimal latitude;

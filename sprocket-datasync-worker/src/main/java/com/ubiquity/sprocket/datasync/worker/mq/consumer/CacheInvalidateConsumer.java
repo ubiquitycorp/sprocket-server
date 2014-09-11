@@ -46,7 +46,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		// Currently just automatically fan these out to all parties
 		try {
 			Message message = messageConverter.deserialize(msg, Message.class);
-			log.debug("message received: {}", message);
+			log.info("message received: {}", message);
 			if(message.getType().equals(
 					ExternalIdentityActivated.class.getSimpleName()))
 				process((ExternalIdentityActivated) message.getContent());
@@ -58,6 +58,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 				process((UserEngagedActivity)message.getContent());
 		} catch (Exception e) {
 			log.error("Could not process, message: {}, root cause message: {}",ExceptionUtils.getMessage(e), ExceptionUtils.getRootCauseMessage(e));
+			e.printStackTrace();
 		}
 	}
 
@@ -118,7 +119,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 	}
 
 	private void process(UserEngagedActivity engagedActivity) {
-		log.debug("found: {}", engagedActivity);
+		log.info("found: {}", engagedActivity);
 
 		// build it
 		Activity activity = engagedActivity.getActivity();
@@ -170,6 +171,9 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		{
 			processActivities(identity, ExternalNetwork.LinkedIn);
 		}
+		
+		
+		
 	} 
 
 	private void processActivities(ExternalIdentity identity, ExternalNetwork socialNetwork) {

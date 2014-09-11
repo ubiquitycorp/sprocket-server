@@ -34,19 +34,12 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 
 	private JavaSparkContext sparkContext;
 
-	/***
-	 * The distributed dataset for holding global profile data
-	 */
-	private JavaRDD<Profile> distData;
 
 	public RecommendationEngineSparkImpl(Configuration configuration) {
 
 		sparkContext = new JavaSparkContext(
 				configuration.getString("recommendation.engine.hadoop.master"),
 				configuration.getString("recommendation.engine.appname"));
-
-		// create a distributed dataset based on an empty array
-		distData = sparkContext.parallelize(new LinkedList<Profile>());
 
 		// create the global context
 		contextMap.put(GLOBAL_CONTEXT_IDENTIFIER, new ExecutionContext(null,
@@ -67,10 +60,32 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 
 	@Override
 	public void updateProfileRecords(List<Profile> profiles) {
-		distData = distData.union(sparkContext.parallelize(profiles));
-		distData.cache(); // cache it
 
-		log.info("dist data {}", distData.count());
+		// divide up the profiles by context; this will serve as the sharding strategy moving forward;
+		// each context will have easy access to the main profile data
+		for(Profile profile : profiles) {
+			for(Contact contact : profile.getContacts()) {
+				ExternalNetwork network = ExternalNetwork.getNetworkById(contact.getExternalIdentity().getExternalNetwork());
+				ExecutionContext context = contextMap.get(network.toString());
+				if(context == null)
+					continue;
+				context.bufferProfileRecord(profile);
+				
+				// now duplicate for global context (we'll be changing this soon)
+				context = contextMap.get(GLOBAL_CONTEXT_IDENTIFIER);
+				context.bufferProfileRecord(profile);
+				
+			}
+		}
+		
+		// now commit all buffers
+		for(String key : contextMap.keySet()) {
+			ExecutionContext context = contextMap.get(key);
+			context.commitProfileBufferToDataStore();
+		}
+		// now duplicate for root
+		ExecutionContext context = contextMap.get(GLOBAL_CONTEXT_IDENTIFIER);
+		context.commitProfileBufferToDataStore();
 	}
 
 	@Override
@@ -123,6 +138,11 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 		 * instance space
 		 */
 		private JavaRDD<Vector> points;
+		
+		/***
+		 * The distributed dataset for holding context sensitive profile data
+		 */
+		private JavaRDD<Profile> distData;
 
 		private List<Dimension> dimensions = new ArrayList<Dimension>();
 
@@ -133,12 +153,32 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 		 */
 		private KMeansModel model;
 		private int kMeansMaxIterations;
+		
+		private List<Profile> buffer = new LinkedList<Profile>();
 
 		protected ExecutionContext(ExternalNetwork context, Configuration configuration) {
 			this.context = context;
 
 			kMeansMaxIterations = configuration
 					.getInt("recommendation.engine.alg.kmeans.iterations");
+			
+			// create a distributed dataset based on an empty array
+			distData = sparkContext.parallelize(new LinkedList<Profile>());
+			
+		}
+		
+		protected void bufferProfileRecord(Profile profile) {
+			buffer.add(profile);
+		}
+		
+		protected void commitProfileBufferToDataStore() {
+			distData = distData.union(sparkContext.parallelize(buffer));
+			distData.cache(); // cache it
+
+			log.info("dist data count {} for context {}", distData.count(), context);
+			
+			// now clear buffer
+			buffer.clear();
 		}
 
 		protected void addDimension(Dimension dimension) {
@@ -154,6 +194,8 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 			double[] point = ProfileFunction.computePoint(profile, dimensions);
 			Vector vector = Vectors.dense(point);
 
+			if(model == null)
+				throw new IllegalArgumentException("no model has been traind for this context: "+ context);
 			// get the centroid idx this point is closest to
 			int idx = model.predict(vector);
 			String groupIdentifier = String.valueOf(idx);
@@ -166,6 +208,9 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 		protected GroupMembership assign(Contact contact,
 				UserLocation location) {
 
+			if(model == null)
+				throw new IllegalArgumentException("No model has been generated for this context:" + context);
+				
 			log.info("cluster centers: {} ", model.clusterCenters());
 
 			// get the feature vector for these contacts
@@ -197,9 +242,21 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 			// determined as the rule of thumb
 			long k = Math.round(Math.sqrt(points.count() / (double) 2));
 
+			if(points.count() < k)
+				throw new IllegalArgumentException("Cannot train a model with less points in the instance space than the number of mininum cluster");
 			model = KMeans.train(points.rdd(), (int) k, kMeansMaxIterations, 1,
 					KMeans.K_MEANS_PARALLEL());
 
+			
+
+		}
+		
+		protected void clear() {
+			distData.unpersist();
+		}
+
+		protected long size() {
+			return distData.count();
 		}
 	}
 
@@ -216,12 +273,20 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 
 	@Override
 	public void clear() {
-		distData.unpersist();
+		for(String key : contextMap.keySet()) {
+			ExecutionContext context = contextMap.get(key);
+			context.clear();
+		}
 	}
 
 	@Override
 	public long size() {
-		return distData.count();
+		int size = 0;
+		for(String key : contextMap.keySet()) {
+			ExecutionContext context = contextMap.get(key);
+			size += context.size();
+		}
+		return size;
 	}
 
 	@Override
