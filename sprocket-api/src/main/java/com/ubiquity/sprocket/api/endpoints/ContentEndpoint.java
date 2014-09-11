@@ -70,7 +70,7 @@ public class ContentEndpoint {
 				history = true;
 			results.getVideos().add(videoDto);
 		}
-		if(!delta)
+		if(delta == null || !delta)
 		{
 			history =true;
 		}

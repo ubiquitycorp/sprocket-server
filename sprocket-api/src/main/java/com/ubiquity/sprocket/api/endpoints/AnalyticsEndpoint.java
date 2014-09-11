@@ -37,6 +37,7 @@ public class AnalyticsEndpoint {
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/activities/recommended")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response recommendedActivitiesByProvider(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		RecommendationsDto recommendationsDto = new RecommendationsDto();
@@ -46,11 +47,9 @@ public class AnalyticsEndpoint {
 		
 		CollectionVariant<Activity> variant = analyticsService.findAllRecommendedActivities(userId, externalNetwork, ifModifiedSince);
 		
-		
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
 			return Response.notModified().build();
-		
 		
 		Collection<Activity> activities = variant.getCollection();
 		for(Activity activity : activities) {
@@ -66,6 +65,7 @@ public class AnalyticsEndpoint {
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/videos/recommended")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
 	public Response recommendedVideosByProvider(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		RecommendationsDto recommendationsDto = new RecommendationsDto();
