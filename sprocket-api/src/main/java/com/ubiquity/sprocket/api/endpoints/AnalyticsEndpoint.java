@@ -37,7 +37,6 @@ public class AnalyticsEndpoint {
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/activities/recommended")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Secure
 	public Response recommendedActivitiesByProvider(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		RecommendationsDto recommendationsDto = new RecommendationsDto();
@@ -67,7 +66,6 @@ public class AnalyticsEndpoint {
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/videos/recommended")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Secure
 	public Response recommendedVideosByProvider(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		RecommendationsDto recommendationsDto = new RecommendationsDto();

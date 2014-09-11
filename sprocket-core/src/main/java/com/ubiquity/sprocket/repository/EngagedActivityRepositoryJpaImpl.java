@@ -22,7 +22,7 @@ EngagedActivityRepository {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<EngagedActivity> findMeanByGroup(String group, Integer limit) {
-		Query query = getEntityManager().createQuery("select ei from EngagedItem ei where ei.user in (select gm.user from GroupMembership gm where gm.groupIdentifier = :group) group by ei.activity.activityId order by count(*) desc");
+		Query query = getEntityManager().createQuery("select ei from EngagedItem ei where ei.activity is not null and ei.user in (select gm.user from GroupMembership gm where gm.groupIdentifier = :group) group by ei.activity.activityId order by count(*) desc");
 		query.setParameter("group", group);
 		query.setMaxResults(limit);
 		return (List<EngagedActivity>)query.getResultList();

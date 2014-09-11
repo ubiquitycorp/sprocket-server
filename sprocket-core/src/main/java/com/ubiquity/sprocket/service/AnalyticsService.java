@@ -21,6 +21,9 @@ import com.ubiquity.external.repository.cache.CacheKeys;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
+import com.ubiquity.location.domain.UserLocation;
+import com.ubiquity.location.repository.UserLocationRepository;
+import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Gender;
@@ -37,7 +40,6 @@ import com.ubiquity.sprocket.domain.EngagedVideo;
 import com.ubiquity.sprocket.domain.GroupMembership;
 import com.ubiquity.sprocket.domain.RecommendedActivity;
 import com.ubiquity.sprocket.domain.RecommendedVideo;
-import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.sprocket.repository.EngagedActivityRepository;
 import com.ubiquity.sprocket.repository.EngagedActivityRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.EngagedDocumentRepository;
@@ -51,8 +53,6 @@ import com.ubiquity.sprocket.repository.GroupMembershipRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepository;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedVideoRepository;
-import com.ubiquity.location.repository.UserLocationRepository;
-import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
 
 /***
  * Service for executing tracking engagement, assigning contacts to groups, and recommending content
@@ -162,7 +162,12 @@ public class AnalyticsService {
 		for(User user : allUsers) {
 			Profile profile = new Profile(user, locationRepository.findByUserId(user.getUserId()));
 			profile.getContacts().addAll(contactRepository.findByOwnerId(user.getUserId(), Boolean.TRUE));
-			assign(profile);
+			// just assign contexts we have built so far
+			for(Contact contact : profile.getContacts()) {
+				ExternalNetwork network = ExternalNetwork.getNetworkById(contact.getExternalIdentity().getExternalNetwork());
+				if(network == ExternalNetwork.Facebook || network == ExternalNetwork.Google)
+					recommendationEngine.assign(profile, network);
+			}
 		}
 	}
 	
