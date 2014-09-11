@@ -7,7 +7,7 @@ import java.util.List;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.domain.Contact;
-import com.ubiquity.sprocket.domain.UserLocation;
+import com.ubiquity.location.domain.UserLocation;
 
 public class Profile implements Serializable {
 

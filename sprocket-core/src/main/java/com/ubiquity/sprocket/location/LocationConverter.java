@@ -12,8 +12,8 @@ import com.google.code.geocoder.model.GeocoderRequest;
 import com.google.code.geocoder.model.GeocoderResult;
 import com.google.code.geocoder.model.LatLng;
 import com.google.code.geocoder.model.LatLngBounds;
-import com.ubiquity.sprocket.domain.Geobox;
-import com.ubiquity.sprocket.domain.Location;
+import com.ubiquity.location.domain.Geobox;
+import com.ubiquity.location.domain.Location;
 
 public class LocationConverter {
 	

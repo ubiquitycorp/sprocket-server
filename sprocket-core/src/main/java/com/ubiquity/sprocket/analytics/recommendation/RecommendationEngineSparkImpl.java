@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.sprocket.domain.GroupMembership;
-import com.ubiquity.sprocket.domain.UserLocation;
+import com.ubiquity.location.domain.UserLocation;
 
 public class RecommendationEngineSparkImpl implements RecommendationEngine {
 

@@ -24,8 +24,8 @@ import com.ubiquity.social.domain.AgeRange;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Gender;
 import com.ubiquity.sprocket.domain.GroupMembership;
-import com.ubiquity.sprocket.domain.Location;
-import com.ubiquity.sprocket.domain.UserLocation;
+import com.ubiquity.location.domain.Location;
+import com.ubiquity.location.domain.UserLocation;
 
 public class RecommendationEngineTest{
 

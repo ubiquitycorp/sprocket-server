@@ -22,6 +22,7 @@ import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
@@ -76,14 +77,39 @@ public class SocialEndpoint {
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
 			return Response.notModified().build();
-
 		
 		for(Activity activity : variant.getCollection()) {
 			results.getActivities().add(DtoAssembler.assemble(activity));
 		}
 
 		return Response.ok()
-				.header("Last-Modified", variant.getLastModified())
+				.header("Last-Modified", variant.lastModified)
+				.entity(jsonConverter.convertToPayload(results))
+				.build();
+	}
+	
+	@GET
+	@Path("users/{userId}/providers/{socialNetworkId}/localfeed")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response getLocalFeed(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+		ActivitiesDto results = new ActivitiesDto();
+
+		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
+
+		UserLocation userLocation = ServiceFactory.getLocationService().getLocation(userId);
+		CollectionVariant<Activity> variant = ServiceFactory.getSocialService().findActivityByPlaceIdAndSocialNetwork(userLocation.getNearestPlace().getPlaceId(), socialNetwork, ifModifiedSince);
+
+		// Throw a 304 if if there is no variant (no change)
+		if (variant == null)
+			return Response.notModified().build();
+		
+		for(Activity activity : variant.getCollection()) {
+			results.getActivities().add(DtoAssembler.assemble(activity));
+		}
+		
+		return Response.ok()
+				.header("Last-Modified", variant.lastModified)
 				.entity(jsonConverter.convertToPayload(results))
 				.build();
 	}
