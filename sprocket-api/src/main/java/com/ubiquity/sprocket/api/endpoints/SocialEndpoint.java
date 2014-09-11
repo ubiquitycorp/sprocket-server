@@ -65,12 +65,12 @@ public class SocialEndpoint {
 	@Path("users/{userId}/providers/{socialNetworkId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response activities(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+	public Response activities(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("delta") Boolean delta, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		ActivitiesDto results = new ActivitiesDto();
 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
 
-		CollectionVariant<Activity> variant = ServiceFactory.getSocialService().findActivityByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince);
+		CollectionVariant<Activity> variant = ServiceFactory.getSocialService().findActivityByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince,delta);
 
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
@@ -97,13 +97,13 @@ public class SocialEndpoint {
 	@Path("users/{userId}/providers/{socialNetworkId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response messages(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+	public Response messages(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("delta") Boolean delta, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		MessagesDto result = new MessagesDto();
 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
 					 
-		CollectionVariant<Message> variant = ServiceFactory.getSocialService().findMessagesByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince);
+		CollectionVariant<Message> variant = ServiceFactory.getSocialService().findMessagesByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince, delta);
 		
 		
 		// Throw a 304 if if there is no variant (no change)

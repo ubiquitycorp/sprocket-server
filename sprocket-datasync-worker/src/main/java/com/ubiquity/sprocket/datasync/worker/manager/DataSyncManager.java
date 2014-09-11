@@ -15,7 +15,6 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.social.domain.Activity;
-import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -33,10 +32,11 @@ public class DataSyncManager {
 		// get identity from message
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.getExternalIdentityById(activated.getIdentityId());
-		processSync(identity,null);
+		processSync(identity);
 	} 
-	private void processSync(ExternalIdentity identity,String lastMessageIdentifier)
+	private void processSync(ExternalIdentity identity )
 	{
+		
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identity.getExternalNetwork());
 
@@ -46,9 +46,9 @@ public class DataSyncManager {
 			processVideos(identity, ExternalNetwork.YouTube);
 
 		if(externalNetwork.equals(ExternalNetwork.Google) ) {
-			processMessages(identity, externalNetwork, lastMessageIdentifier);
+			processMessages(identity, externalNetwork, null);
 		}  else if ( externalNetwork.equals(ExternalNetwork.Facebook)||externalNetwork.equals(ExternalNetwork.Twitter)) {
-			processMessages(identity, externalNetwork, lastMessageIdentifier);
+			processMessages(identity, externalNetwork, null);
 			processActivities(identity, externalNetwork);
 		}
 		else if(externalNetwork.equals(ExternalNetwork.LinkedIn))
@@ -132,8 +132,11 @@ public class DataSyncManager {
 			try
 			{
 				ExternalIdentity externalIdentity =(ExternalIdentity)identity;
-				Message message  = ServiceFactory.getSocialService().getLastSyncedMessage(user.getUserId(),ExternalNetwork.getNetworkById(externalIdentity.getExternalNetwork()));
-				processSync(externalIdentity ,message.getExternalIdentifier());
+				if(externalIdentity.getExternalNetwork() == ExternalNetwork.Facebook.ordinal() ||externalIdentity.getExternalNetwork() == ExternalNetwork.YouTube.ordinal() )
+				{
+					ServiceFactory.getSocialService().checkValidityOfExternalIdentity(externalIdentity);
+					processSync(externalIdentity );
+				}
 			}catch(Exception ex)
 			{
 				log.debug(ex.getMessage());

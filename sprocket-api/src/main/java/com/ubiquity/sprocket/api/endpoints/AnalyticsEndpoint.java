@@ -96,4 +96,34 @@ public class AnalyticsEndpoint {
 				.build();
 	}
 	
+	@GET
+	@Path("users/{userId}/providers/{externalNetworkId}/recommendations")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response recommendedByProvider(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+
+		RecommendationsDto recommendationsDto = new RecommendationsDto();
+		/*AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
+		
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
+		
+		CollectionVariant<VideoContent> variant = analyticsService.findAllRecommendedVideos(userId, externalNetwork, ifModifiedSince);
+		
+		
+		// Throw a 304 if if there is no variant (no change)
+		if (variant == null)
+			return Response.notModified().build();
+		
+		
+		Collection<VideoContent> videos = variant.getCollection();
+		for(VideoContent videoContent : videos) {
+			recommendationsDto.getVideos().add(DtoAssembler.assemble(videoContent));
+		}
+	*/
+		return Response.ok()
+				//.header("Last-Modified", variant.getLastModified())
+				.entity(jsonConverter.convertToPayload(recommendationsDto))
+				.build();
+	}
+	
 }
