@@ -63,10 +63,19 @@ public class ServicesInitializer implements ServletContextListener {
 			SocialAPIFactory.initialize(configuration);
 			ContentAPIFactory.initialize(configuration);
 
-
+			bootstrap();
 		} catch (Exception e) {
 			log.error("Unable to initialize dependent services, exiting...", e);
 			System.exit(1);
 		}
+	}
+
+	private void bootstrap() {
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("Los Angeles, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("San Diego, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("San Jose, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("San Francisco, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("Sacramento, CA");
+		ServiceFactory.getLocationService().getOrCreatePlaceByName("Irvine, CA");
 	}
 }

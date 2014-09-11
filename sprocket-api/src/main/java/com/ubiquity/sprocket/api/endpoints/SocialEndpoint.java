@@ -22,6 +22,7 @@ import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
@@ -72,17 +73,27 @@ public class SocialEndpoint {
 
 		CollectionVariant<Activity> variant = ServiceFactory.getSocialService().findActivityByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince);
 
-		// Throw a 304 if if there is no variant (no change)
-		if (variant == null)
-			return Response.notModified().build();
+		UserLocation userLocation = ServiceFactory.getLocationService().getLocation(userId);
+		CollectionVariant<Activity> placeVariant = ServiceFactory.getSocialService().findActivityByPlaceIdAndSocialNetwork(userLocation.getNearestPlace().getPlaceId(), socialNetwork, ifModifiedSince);
 
+		// Throw a 304 if if there is no variant (no change)
+		if (variant == null && placeVariant == null)
+			return Response.notModified().build();
+		else if(variant == null)
+			results.setNewsFeedIsModified(Boolean.FALSE);
+		else if(placeVariant == null)
+			results.setLocalNewsFeedIsModified(Boolean.FALSE);
 		
 		for(Activity activity : variant.getCollection()) {
 			results.getActivities().add(DtoAssembler.assemble(activity));
 		}
+		
+		for(Activity activity : placeVariant.getCollection()) {
+			results.getActivities().add(DtoAssembler.assemble(activity));
+		}
 
 		return Response.ok()
-				.header("Last-Modified", variant.getLastModified())
+				.header("Last-Modified", Math.min(variant.lastModified, placeVariant.lastModified))
 				.entity(jsonConverter.convertToPayload(results))
 				.build();
 	}
