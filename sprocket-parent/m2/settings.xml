@@ -54,8 +54,7 @@
 				<mq.host>localhost</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
-				
-					<!-- recommendation engine -->
+				<!-- recommendation engine -->
 				<recommendation.engine.appname>Sprocket</recommendation.engine.appname>
 				<recommendation.engine.hadoop.master>local</recommendation.engine.hadoop.master>
 				
