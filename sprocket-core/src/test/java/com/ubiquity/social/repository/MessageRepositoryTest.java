@@ -54,7 +54,7 @@ public class MessageRepositoryTest {
 		userRepository.create(owner);
 		EntityManagerSupport.commit();
 					
-		sender = TestContactFactory.createContactWithMininumRequiredFieldsAndSocialNetwork(owner, ExternalNetwork.Facebook);
+		sender = TestContactFactory.createContactWithMininumRequiredFieldsAndExternalNetwork(owner, ExternalNetwork.Facebook);
 		
 		EntityManagerSupport.beginTransaction();
 		contactRepository.create(sender);
@@ -71,6 +71,7 @@ public class MessageRepositoryTest {
 			.body(UUID.randomUUID().toString())
 			.sentDate(System.currentTimeMillis())
 			.sender(sender)
+			.lastUpdated(System.currentTimeMillis())
 			.conversation(conversation)
 			.externalNetwork(ExternalNetwork.Facebook)
 			.externalIdentifier(UUID.randomUUID().toString())
@@ -111,6 +112,7 @@ public class MessageRepositoryTest {
 								.build();
 		message.setConversation(conversation);
 		
+		
 		// add 2 messages with a conversation identifier
 		Message first  = new Message.Builder()
 			.title(UUID.randomUUID().toString())
@@ -118,6 +120,7 @@ public class MessageRepositoryTest {
 			.conversation(conversation)
 			.sentDate(System.currentTimeMillis())
 			.sender(sender)
+			.lastUpdated(System.currentTimeMillis())
 			.externalNetwork(ExternalNetwork.Facebook)
 			.externalIdentifier(UUID.randomUUID().toString())
 			.owner(owner)
@@ -134,6 +137,7 @@ public class MessageRepositoryTest {
 			.externalNetwork(ExternalNetwork.Facebook)
 			.externalIdentifier(UUID.randomUUID().toString())
 			.owner(owner)
+			.lastUpdated(System.currentTimeMillis())
 			.externalNetwork(ExternalNetwork.Facebook)
 			.build();
 		saveMessage(next);

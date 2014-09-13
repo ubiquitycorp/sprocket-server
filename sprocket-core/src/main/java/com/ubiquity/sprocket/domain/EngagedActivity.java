@@ -1,5 +1,6 @@
 package com.ubiquity.sprocket.domain;
 
+import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -12,7 +13,7 @@ import com.ubiquity.social.domain.Activity;
 @DiscriminatorValue("activity")
 public class EngagedActivity extends EngagedItem {
 
-	@ManyToOne
+	@ManyToOne(cascade = { CascadeType.PERSIST })
 	@JoinColumn(name = "activity_id")
 	private Activity activity;
 	

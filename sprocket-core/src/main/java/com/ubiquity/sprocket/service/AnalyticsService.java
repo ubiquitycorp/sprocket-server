@@ -18,6 +18,8 @@ import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.external.repository.cache.CacheKeys;
+import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
@@ -149,8 +151,7 @@ public class AnalyticsService {
 			return null;
 		}
 
-		List<Activity> activities = recommendedActivityRepository.findRecommendedActivitiesByGroup(groupMembership.getGroupIdentifier());
-
+		List<Activity> activities = recommendedActivityRepository.findRecommendedActivitiesByGroup(groupMembership.getGroupIdentifier(), network);
 		return new CollectionVariant<Activity>(activities, lastModified);
 	}
 
@@ -199,6 +200,11 @@ public class AnalyticsService {
 	 * @param context
 	 */
 	private void train(ExternalNetwork context) {
+		// check to see if there is any data for this context; if not, return
+		if(contactRepository.countAllByExternalNetwork(context) == 0) {
+			log.warn("Skipping train on context: {} because no users have signed in yet for it");
+			return;
+		}
 		recommendationEngine.train(context);
 	}
 	
@@ -224,7 +230,15 @@ public class AnalyticsService {
 			// create profile with all contacts and the last known location
 			
 			Profile profile = new Profile(user, locationRepository.findByUserId(user.getUserId()));
-			profile.getContacts().addAll(contactRepository.findByOwnerId(user.getUserId(), Boolean.TRUE));
+			Set<Identity> identities = user.getIdentities();
+			for(Identity identity : identities) {
+				if(identity instanceof ExternalIdentity) {
+					// get own contact by the identity id
+					Contact contact = contactRepository.getByExternalIdentityId(identity.getIdentityId());
+					if(contact != null) // TODO: find underlying reason why this can happen
+						profile.getContacts().add(contact);
+				}
+			}
 			profiles.add(profile);
 		}
 		recommendationEngine.updateProfileRecords(profiles);
@@ -309,6 +323,13 @@ public class AnalyticsService {
 	}
 
 	private void createRecommendedActivities(Set<String> groups, ExternalNetwork network) {
+		
+		EntityManagerSupport.beginTransaction();
+		List<RecommendedActivity> recommended = recommendedActivityRepository.findAllByExternalNetwork(network);
+		for(RecommendedActivity ra : recommended)
+			recommendedActivityRepository.delete(ra);
+		EntityManagerSupport.commit();
+		
 		for(String group : groups) {
 			List<EngagedActivity> engagedActivities = engagedActivityRepository.findMeanByGroup(group, 10);
 			List<EngagedDocument> engagedDocuments = engagedDocumentRepository.findMeanByGroup(group, 10);
@@ -417,18 +438,25 @@ public class AnalyticsService {
 		recommendationEngine = new RecommendationEngineSparkImpl(configuration);
 
 		// add dimension to global context with all weight values at 1
-		recommendationEngine.addDimension(Dimension.createFromEnum("gender", Gender.class));
-		recommendationEngine.addDimension(new Dimension("ageRange", Range.between(0.0, 120.0), 1.0));
+		recommendationEngine.addDimension(Dimension.createFromEnum("gender", Gender.class, 0.0));
+		recommendationEngine.addDimension(new Dimension("ageRange", Range.between(0.0, 100.0), 0.0));
+		recommendationEngine.addDimension(new Dimension("lat", Range.between(-90.0, 90.0), 1.0)); // only location important
+		recommendationEngine.addDimension(new Dimension("lon", Range.between(-180.0, 180.0), 1.0));
 
-		// create FB specific context, with dimensions where gender does not matter much but age range does
+		// create fb specific context, with dimensions where
 		recommendationEngine.addContext(ExternalNetwork.Facebook, configuration);
 		recommendationEngine.addDimension(Dimension.createFromEnum("gender", Gender.class, 0.1), ExternalNetwork.Facebook);
-		recommendationEngine.addDimension(new Dimension("ageRange", Range.between(0.0, 120.0), 1.0), ExternalNetwork.Facebook);
-
-		// create Google specific context with equal weights to recommend YouTube videos
+		recommendationEngine.addDimension(new Dimension("ageRange", Range.between(0.0, 100.0), 1.0), ExternalNetwork.Facebook);
+		recommendationEngine.addDimension(new Dimension("lat", Range.between(-90.0, 90.0), 0.0)); // location we don't care about
+		recommendationEngine.addDimension(new Dimension("lon", Range.between(-180.0, 180.0), 0.0)); 
+		
+		// create google specific context, with dimensions where
 		recommendationEngine.addContext(ExternalNetwork.Google, configuration);
 		recommendationEngine.addDimension(Dimension.createFromEnum("gender", Gender.class, 1.0), ExternalNetwork.Google);
-		recommendationEngine.addDimension(new Dimension("ageRange", Range.between(0.0, 120.0), 1.0), ExternalNetwork.Google);
+		recommendationEngine.addDimension(new Dimension("ageRange", Range.between(0.0, 100.0), 1.0), ExternalNetwork.Google);
+		recommendationEngine.addDimension(new Dimension("lat", Range.between(-90.0, 90.0), 0.5)); // location so / so
+		recommendationEngine.addDimension(new Dimension("lon", Range.between(-180.0, 180.0), 0.5)); 
+		
 
 	}
 

@@ -50,6 +50,11 @@ public class EngagedDocument extends EngagedItem {
 		this.videoContent = videoContent;
 	}
 
+	/***
+	 * Required by JPA
+	 */
+	protected EngagedDocument() {}
+	
 	public EngagedDocument(User user, String searchTerm,
 			Message message) {
 		super(user);

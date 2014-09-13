@@ -63,7 +63,7 @@ public class ProfileFunction implements Function<Profile, Vector> {
 		dimension = Dimension.findDimensionByAttribute("lon", dimensions);
 		point[3] = (userLocation == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(userLocation.getLocation().getLongitude(), dimension);
 
-		log.info("points {}", point);
+		log.debug("points {}", point);
 
 		return point;
 	}
@@ -79,7 +79,7 @@ public class ProfileFunction implements Function<Profile, Vector> {
 		dimension = Dimension.findDimensionByAttribute("lon", dimensions);
 		points[1] = (location == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(location.getLocation().getLongitude(), dimension);
 
-		log.info("points {}", points);
+		log.debug("points {}", points);
 		return points;				
 	}
 	

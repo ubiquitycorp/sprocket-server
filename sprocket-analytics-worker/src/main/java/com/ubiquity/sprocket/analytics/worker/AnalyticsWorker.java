@@ -42,9 +42,9 @@ public class AnalyticsWorker {
 
 		log.info("Service initialized.");
 
-		startScheduler();
+		//startScheduler();
 
-		
+		new RecommendationSyncJob().execute(null);
 		while (true) {
 			try {
 				Thread.sleep(1000);

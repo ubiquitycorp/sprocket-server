@@ -102,6 +102,8 @@ public class DocumentsEndpoint {
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, externalNetwork);
+		if(identity == null)
+			throw new IllegalArgumentException("User does not have an identity for this provider");
 		
 		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
 		

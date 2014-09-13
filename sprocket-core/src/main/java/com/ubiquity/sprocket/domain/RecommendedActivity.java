@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -11,12 +12,14 @@ import javax.persistence.Table;
 import com.ubiquity.social.domain.Activity;
 
 @Entity
-@Table(name = "recommended_activity")
+@Table(name = "recommended_activity", indexes = {
+		@Index(name="idx_activity_group_identifier", columnList = "activity_id, group_identifier", unique = true)
+		})
 public class RecommendedActivity {
 	
 	@Id
 	@GeneratedValue
-	@Column(name = "recommended_activity")
+	@Column(name = "recommended_activity_id")
 	private Long recommendedActivityId;
 	
 	@ManyToOne

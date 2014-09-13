@@ -64,10 +64,10 @@ public class ContactFunction implements Function<Profile, Vector> {
 		log.debug("age range {} weight applied {}", point[1], dimension.getWeight());
 
 		dimension = Dimension.findDimensionByAttribute("lat", dimensions);
-		point[2] = (userLocation.getLocation().getLatitude() == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(userLocation.getLocation().getLatitude(), dimension);
+		point[2] = (userLocation == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(userLocation.getLocation().getLatitude(), dimension);
 		
 		dimension = Dimension.findDimensionByAttribute("lon", dimensions);
-		point[3] = (userLocation.getLocation().getLongitude() == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(userLocation.getLocation().getLongitude(), dimension);
+		point[3] = (userLocation == null || dimension == null) ? 0.0 : Dimension.computeCoordinates(userLocation.getLocation().getLongitude(), dimension);
 
 		log.info("points {}", point);
 

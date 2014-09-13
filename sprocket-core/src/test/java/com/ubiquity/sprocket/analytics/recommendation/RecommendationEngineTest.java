@@ -20,12 +20,12 @@ import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
 import com.ubiquity.integration.factory.TestContactFactory;
+import com.ubiquity.location.domain.Location;
+import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.social.domain.AgeRange;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Gender;
 import com.ubiquity.sprocket.domain.GroupMembership;
-import com.ubiquity.location.domain.Location;
-import com.ubiquity.location.domain.UserLocation;
 
 public class RecommendationEngineTest{
 

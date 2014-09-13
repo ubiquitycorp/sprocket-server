@@ -26,6 +26,7 @@ public class RecommendationSyncJob implements Job {
 			log.info("Finished recommendation cluster job {}, duration: {}", finish, new Duration(finish));
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.error("Could not process sync job: {}", e);
 		}
 	}

@@ -13,6 +13,7 @@ import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
 import com.ubiquity.external.domain.ExternalNetwork;
@@ -47,14 +48,7 @@ public class SocialRepositoryTest {
 		userRepository = new UserRepositoryJpaImpl();
 		
 		// create user and identity as we normally would
-		user = new User.Builder()
-				.lastUpdated(System.currentTimeMillis())
-				.firstName(UUID.randomUUID().toString())
-				.lastName(UUID.randomUUID().toString())
-				.email(UUID.randomUUID().toString())
-				.clientPlatform(ClientPlatform.Android)
-				.displayName(UUID.randomUUID().toString())
-				.build();
+		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 		
 		identity = new ExternalIdentity.Builder()
 			.isActive(Boolean.TRUE)
@@ -77,7 +71,7 @@ public class SocialRepositoryTest {
 
 	@Test
 	public void testFindSocialIdentityByUserIdAndProvider() throws Exception {
-		ExternalIdentity persisted = socialRepository.findOne(user.getUserId(), ExternalNetwork.Facebook);
+		ExternalIdentity persisted = socialRepository.getExternalIdentityByUserAndNetwork(user.getUserId(), ExternalNetwork.Facebook);
 		Assert.assertNotNull(persisted);
 		Assert.assertEquals(persisted.getIdentityId(), identity.getIdentityId());
 	
@@ -85,7 +79,7 @@ public class SocialRepositoryTest {
 	
 	@Test
 	public void testUpdateSocialIdentity() throws Exception {
-		ExternalIdentity persisted = socialRepository.findOne(user.getUserId(), ExternalNetwork.Facebook);
+		ExternalIdentity persisted = socialRepository.getExternalIdentityByUserAndNetwork(user.getUserId(), ExternalNetwork.Facebook);
 		String newToken = UUID.randomUUID().toString();
 		persisted.setAccessToken(newToken);
 		
@@ -93,7 +87,7 @@ public class SocialRepositoryTest {
 		userRepository.update(user);
 		EntityManagerSupport.commit();
 		
-		persisted = socialRepository.findOne(user.getUserId(), ExternalNetwork.Facebook);
+		persisted = socialRepository.getExternalIdentityByUserAndNetwork(user.getUserId(), ExternalNetwork.Facebook);
 		Assert.assertEquals(persisted.getAccessToken(), newToken);
 
 		

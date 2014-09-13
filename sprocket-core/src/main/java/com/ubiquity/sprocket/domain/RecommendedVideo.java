@@ -11,13 +11,13 @@ import javax.persistence.Table;
 import com.ubiquity.content.domain.VideoContent;
 
 @Entity
-@Table(name = "recommended_activity")
+@Table(name = "recommended_video")
 public class RecommendedVideo {
 	
 	@Id
 	@GeneratedValue
-	@Column(name = "recommended_activity")
-	private Long recommendedActivityId;
+	@Column(name = "recommended_video_id")
+	private Long recommendedVideoId;
 	
 	@ManyToOne
 	@JoinColumn(name = "video_content_id")
@@ -40,8 +40,8 @@ public class RecommendedVideo {
 		this.groupIdentifier = groupIdentifier;
 	}
 
-	protected Long getRecommendedActivityId() {
-		return recommendedActivityId;
+	protected Long getRecommendedVideoId() {
+		return recommendedVideoId;
 	}
 
 	protected VideoContent getVideoContent() {

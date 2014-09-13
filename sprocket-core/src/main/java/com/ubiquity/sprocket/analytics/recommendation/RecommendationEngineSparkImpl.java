@@ -36,7 +36,7 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 
 
 	public RecommendationEngineSparkImpl(Configuration configuration) {
-
+		
 		sparkContext = new JavaSparkContext(
 				configuration.getString("recommendation.engine.hadoop.master"),
 				configuration.getString("recommendation.engine.appname"));
@@ -175,7 +175,7 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 			distData = distData.union(sparkContext.parallelize(buffer));
 			distData.cache(); // cache it
 
-			log.info("dist data count {} for context {}", distData.count(), context);
+			log.debug("dist data count {} for context {}", distData.count(), context);
 			
 			// now clear buffer
 			buffer.clear();
@@ -211,7 +211,7 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 			if(model == null)
 				throw new IllegalArgumentException("No model has been generated for this context:" + context);
 				
-			log.info("cluster centers: {} ", model.clusterCenters());
+			log.debug("cluster centers: {} ", model.clusterCenters());
 
 			// get the feature vector for these contacts
 			double[] point = ProfileFunction.computePoint(contact,
@@ -238,14 +238,20 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 			else 
 				points = distData.map(new ProfileFunction(dimensions));
 
+			log.info("points {} for context {},", points.count(), context);
+			
 			// build model based on what's in the instance space now, with k
 			// determined as the rule of thumb
 			long k = Math.round(Math.sqrt(points.count() / (double) 2));
 
-			if(points.count() < k)
-				throw new IllegalArgumentException("Cannot train a model with less points in the instance space than the number of mininum cluster");
+			if(points.count() <= k)
+				throw new IllegalArgumentException("Cannot train a model with number of points less than or equal to value k, context: " + context);
+			
 			model = KMeans.train(points.rdd(), (int) k, kMeansMaxIterations, 1,
 					KMeans.K_MEANS_PARALLEL());
+			
+			log.info("cluster centers {},", model.clusterCenters());
+
 
 			
 

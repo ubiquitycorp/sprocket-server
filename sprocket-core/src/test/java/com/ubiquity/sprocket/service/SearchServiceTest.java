@@ -104,7 +104,7 @@ public class SearchServiceTest {
 	@Test
 	public void testAddMessagesReturnsInBasicSearch() {
 		// build partial doc with the fields being indexed
-		Contact sender = TestContactFactory.createContactWithMininumRequiredFieldsAndSocialNetwork(owner, ExternalNetwork.Facebook);
+		Contact sender = TestContactFactory.createContactWithMininumRequiredFieldsAndExternalNetwork(owner, ExternalNetwork.Facebook);
 		Message message = TestMessageFactory.createMessageWithMininumRequiredFields(owner, sender, ExternalNetwork.Facebook, UUID.randomUUID().toString());
 
 		ServiceFactory.getSocialService().create(message);
@@ -158,7 +158,7 @@ public class SearchServiceTest {
 	@Test
 	public void testAddPublicActivityUserFilter() {
 		Activity activity = TestActivityFactory.createActivityWithMininumRequirements(null, ExternalNetwork.Facebook);
-		Contact postedBy = TestContactFactory.createContactWithMininumRequiredFieldsAndSocialNetwork(owner, ExternalNetwork.Facebook);
+		Contact postedBy = TestContactFactory.createContactWithMininumRequiredFieldsAndExternalNetwork(owner, ExternalNetwork.Facebook);
 		activity.setPostedBy(postedBy);
 		
 		searchService.indexActivities(null,
@@ -199,7 +199,7 @@ public class SearchServiceTest {
 		// build partial doc with the fields being indexed
 		
 		Activity activity = TestActivityFactory.createActivityWithMininumRequirements(owner, ExternalNetwork.LinkedIn);
-		Contact postedBy = TestContactFactory.createContactWithMininumRequiredFieldsAndSocialNetwork(owner, ExternalNetwork.LinkedIn);
+		Contact postedBy = TestContactFactory.createContactWithMininumRequiredFieldsAndExternalNetwork(owner, ExternalNetwork.LinkedIn);
 		activity.setPostedBy(postedBy);
 		
 		searchService.indexActivities(owner.getUserId(),
