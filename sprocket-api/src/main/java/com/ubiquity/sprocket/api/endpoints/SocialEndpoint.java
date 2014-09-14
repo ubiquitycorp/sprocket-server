@@ -98,6 +98,9 @@ public class SocialEndpoint {
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
 
 		UserLocation userLocation = ServiceFactory.getLocationService().getLocation(userId);
+		if(userLocation == null)
+			return Response.ok().entity(jsonConverter.convertToPayload(results)).build();
+		
 		CollectionVariant<Activity> variant = ServiceFactory.getSocialService().findActivityByPlaceIdAndSocialNetwork(userLocation.getNearestPlace().getPlaceId(), socialNetwork, ifModifiedSince);
 
 		// Throw a 304 if if there is no variant (no change)
