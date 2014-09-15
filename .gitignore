@@ -7,8 +7,8 @@ target/*
 *.war
 *.ear
 *.bin
-/sprocket-api\.settings/*.component
+sprocket-api/\.settings/
 sprocket-api/.settings/org.eclipse.wst.common.component
 /sprocket-tracker-worker/.classpath
-
+sprocket-api/bin
 /sprocket-datasync-worker/.classpath
