@@ -447,7 +447,11 @@ public class AnalyticsService {
 
 
 	private void setUpRecommendationEngine(Configuration configuration) {
-		
+		if(configuration.getString("recommendation.engine.hadoop.master") == null)
+		{
+			 log.info("Skipping recommendation engine");
+			 return;
+		}
 		recommendationEngine = new RecommendationEngineSparkImpl(configuration);
 
 		// add dimension to global context with all weight values at 1
