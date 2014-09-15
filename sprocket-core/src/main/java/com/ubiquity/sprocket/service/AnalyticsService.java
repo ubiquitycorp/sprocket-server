@@ -447,6 +447,7 @@ public class AnalyticsService {
 
 
 	private void setUpRecommendationEngine(Configuration configuration) {
+		
 		recommendationEngine = new RecommendationEngineSparkImpl(configuration);
 
 		// add dimension to global context with all weight values at 1
