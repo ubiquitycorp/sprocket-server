@@ -42,9 +42,8 @@ public class AnalyticsWorker {
 
 		log.info("Service initialized.");
 
-		//startScheduler();
+		startScheduler();
 
-		new RecommendationSyncJob().execute(null);
 		while (true) {
 			try {
 				Thread.sleep(1000);
@@ -104,7 +103,7 @@ public class AnalyticsWorker {
 		Trigger trigger = newTrigger() 
 				.withIdentity(triggerKey("recommendationTrigger", "trigger"))
 				.withSchedule(simpleSchedule()
-						.withIntervalInHours(15)
+						.withIntervalInHours(1)
 						.repeatForever())
 						.startAt(futureDate(1, IntervalUnit.MINUTE))
 						.build();
@@ -118,7 +117,7 @@ public class AnalyticsWorker {
 		trigger = newTrigger() 
 				.withIdentity(triggerKey("assignmentTrigger", "trigger"))
 				.withSchedule(simpleSchedule()
-						.withIntervalInMinutes(5)
+						.withIntervalInMinutes(10)
 						.repeatForever())
 						.startAt(futureDate(3, IntervalUnit.MINUTE))
 						.build();

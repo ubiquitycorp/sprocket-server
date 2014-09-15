@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.sprocket.domain.GroupMembership;
+import com.ubiquity.identity.domain.User;
 import com.ubiquity.location.domain.UserLocation;
 
 public class RecommendationEngineSparkImpl implements RecommendationEngine {
@@ -201,11 +202,11 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 			String groupIdentifier = String.valueOf(idx);
 
 			// only create a membership assignment for a registered user
-			return new GroupMembership(context, profile.getUser(), groupIdentifier);
+			return new GroupMembership(profile.getUser(), groupIdentifier);
 		}
 
 		
-		protected GroupMembership assign(Contact contact,
+		protected GroupMembership assign(Contact contact, User user,
 				UserLocation location) {
 
 			if(model == null)
@@ -223,11 +224,9 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 			String groupIdentifier = String.valueOf(idx);
 
 			// only create a membership assignment for a registered user
-			if (contact.getOwner() != null)
-				return new GroupMembership(context, contact
-						.getOwner(), groupIdentifier);
+			return new GroupMembership(contact.getExternalIdentity(), user, groupIdentifier);
 			
-			return null;
+			
 
 		}
 
@@ -244,7 +243,7 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 			// determined as the rule of thumb
 			long k = Math.round(Math.sqrt(points.count() / (double) 2));
 
-			if(points.count() <= k)
+			if(points.count() < k)
 				throw new IllegalArgumentException("Cannot train a model with number of points less than or equal to value k, context: " + context);
 			
 			model = KMeans.train(points.rdd(), (int) k, kMeansMaxIterations, 1,
@@ -305,7 +304,7 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 		if(contact == null)
 			return new LinkedList<GroupMembership>();
 		return Arrays.asList(new GroupMembership[] { executionContext.assign(contact,
-				profile.getLocation()) });
+				profile.getUser(), profile.getLocation()) });
 	}
 
 }
