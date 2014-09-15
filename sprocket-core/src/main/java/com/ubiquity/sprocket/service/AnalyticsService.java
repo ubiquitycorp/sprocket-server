@@ -457,9 +457,9 @@ public class AnalyticsService {
 
 		// create fb specific context, with dimensions where
 		recommendationEngine.addContext(ExternalNetwork.Facebook, configuration);
-		recommendationEngine.addDimension(Dimension.createFromEnum("gender", Gender.class, 0.1), ExternalNetwork.Facebook);
+		recommendationEngine.addDimension(Dimension.createFromEnum("gender", Gender.class, 1.0), ExternalNetwork.Facebook);
 		recommendationEngine.addDimension(new Dimension("ageRange", Range.between(0.0, 100.0), 1.0), ExternalNetwork.Facebook);
-		recommendationEngine.addDimension(new Dimension("lat", Range.between(-90.0, 90.0), 0.0)); // location we don't care about
+		recommendationEngine.addDimension(new Dimension("lat", Range.between(-90.0, 90.0), 0.0)); // location we don't care about because we have location filter
 		recommendationEngine.addDimension(new Dimension("lon", Range.between(-180.0, 180.0), 0.0)); 
 		
 		// create google specific context, with dimensions where
