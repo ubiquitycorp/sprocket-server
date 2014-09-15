@@ -88,16 +88,25 @@ public class SocialEndpoint {
 				.build();
 	}
 	
+	/***
+	 * Returns list of activities which represents local news feed in specific provider 
+	 * based on last updated user's location in the system
+	 * @param userId
+	 * @param socialProviderId
+	 * @param ifModifiedSince
+	 * @return
+	 */
 	@GET
 	@Path("users/{userId}/providers/{socialNetworkId}/localfeed")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Secure
+	//@Secure
 	public Response getLocalFeed(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		ActivitiesDto results = new ActivitiesDto();
 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
 
 		UserLocation userLocation = ServiceFactory.getLocationService().getLocation(userId);
+		// returns empty list if user has not set his location yet
 		if(userLocation == null)
 			return Response.ok().entity(jsonConverter.convertToPayload(results)).build();
 		

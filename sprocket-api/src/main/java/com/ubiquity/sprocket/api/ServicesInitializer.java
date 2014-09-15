@@ -70,7 +70,9 @@ public class ServicesInitializer implements ServletContextListener {
 		}
 	}
 
+	
 	private void bootstrap() {
+		// Added popular cities of California to Place table with longitude/latitude pair 
 		ServiceFactory.getLocationService().getOrCreatePlaceByName("Eureka, CA");
 		ServiceFactory.getLocationService().getOrCreatePlaceByName("Chico, CA");
 		ServiceFactory.getLocationService().getOrCreatePlaceByName("Sacramento, CA");
