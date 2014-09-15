@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
@@ -39,17 +40,17 @@ public class VimeoAPITest {
 	@Test
 	public void testFindVideosByExternalIdentity() {
 		ContentAPI contentApi = ContentAPIFactory.createProvider(ExternalNetwork.Vimeo, ClientPlatform.WEB);
-		List<VideoContent> videos = contentApi.listVideos(identity);
-		for(VideoContent video : videos) 
+		CollectionVariant<VideoContent> videos = contentApi.listMostPopularVideos(identity,null);
+		for(VideoContent video : videos.getCollection()) 
 			log.debug("video: {}", video);
 	}
 	
 	@Test
 	public void testSearchVideos() {
 		ContentAPI contentApi = ContentAPIFactory.createProvider(ExternalNetwork.Vimeo, ClientPlatform.WEB);
-		List<VideoContent> videos = contentApi.searchVideos("karate", 1, 25, identity);
-		Assert.assertTrue(videos.size() == 25); // just test the size returns for now
-		for(VideoContent video : videos) 
+		CollectionVariant<VideoContent> videos = contentApi.searchVideos("karate", 1, 25,null, identity);
+		Assert.assertTrue(videos.collection.size() == 25); // just test the size returns for now
+		for(VideoContent video : videos.collection) 
 			log.debug("video: {}", video); 
 	}
 

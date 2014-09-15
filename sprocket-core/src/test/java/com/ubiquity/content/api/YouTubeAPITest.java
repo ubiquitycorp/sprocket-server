@@ -16,6 +16,8 @@ import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.sprocket.service.SearchService;
+import com.ubiquity.sprocket.service.ServiceFactory;
 
 public class YouTubeAPITest {
 	
@@ -26,39 +28,41 @@ public class YouTubeAPITest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 		identity = new ExternalIdentity.Builder().identifier(UUID.randomUUID().toString())
-				.accessToken("ya29.YADq4neRcxr8kiIAAABXuPKmNyMLWRUfEOtm3zfio0Ua5xIuW9sho7Mbms1nCTs96nsseog3eWo7vq2sdLw").build();
+				.accessToken("ya29.gABsJPzir1n64pM3V2afo7TfbVUl-3V6zW_B5k9xlcStyAV_vl6Mlqdp")
+				.clientPlatform(ClientPlatform.WEB).build();
 		log.debug("authenticated YouTube with identity {} ", identity);
 		
 		// intialize services
 		Configuration config = new PropertiesConfiguration("test.properties");
+		Configuration errorsConfig = new PropertiesConfiguration("messages.properties");
 		JedisConnectionFactory.initialize(config);
 		ContentAPIFactory.initialize(config);
-		
+		ServiceFactory.initialize(config, errorsConfig);
 	}
 
 	
 	@Test
 	public void testFindVideosByExternalIdentityAndPagination() {
-		ContentAPI contentApi = ContentAPIFactory.createProvider(ExternalNetwork.YouTube, ClientPlatform.Android);
-		List<VideoContent> videos = contentApi.searchVideos("Karate", 1, 25, identity);
+		SearchService searchService=ServiceFactory.getSearchService(); 
+		List<VideoContent> videos = searchService.searchLiveVedios("Karate",identity , ExternalNetwork.YouTube, 1);
 		Assert.assertTrue(videos.size() == 25);
 		
 		VideoContent firstFromPageOne = videos.get(0);
 		
 		// should be completeley different set
-		videos = contentApi.searchVideos("Karate", 2, 25, identity);
+		videos = searchService.searchLiveVedios("Karate",identity , ExternalNetwork.YouTube, 2);
 		// compare the first of each
 		VideoContent firstFromPageTwo = videos.get(0);
 		Assert.assertFalse(firstFromPageOne.getVideo().getItemKey().equals(firstFromPageTwo.getVideo().getItemKey()));
 		
 		// get first page again, make sure it's the same as the reference to the first item when we first retrieved the first page
-		videos = contentApi.searchVideos("Karate", 1, 25, identity);
+		videos = searchService.searchLiveVedios("Karate",identity , ExternalNetwork.YouTube, 1);
 		Assert.assertTrue(firstFromPageOne.getVideo().getItemKey().equals(videos.get(0).getVideo().getItemKey()));
 		
 		// try reading ahead 2 pages, which is not supported
 		boolean exceptionThrown = Boolean.FALSE;
 		try {
-			videos = contentApi.searchVideos("Karate", 3, 25, identity);
+			videos = searchService.searchLiveVedios("Karate",identity , ExternalNetwork.YouTube, 3);
 		} catch (IllegalArgumentException e) {
 			exceptionThrown = Boolean.TRUE;
 		}

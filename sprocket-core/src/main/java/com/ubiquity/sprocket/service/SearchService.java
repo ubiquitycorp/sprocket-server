@@ -9,17 +9,22 @@ import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.repository.CollectionVariant;
+import com.niobium.repository.cache.NestedMapCache;
+import com.niobium.repository.cache.UserCacheRedisImpl;
 import com.ubiquity.content.api.ContentAPI;
 import com.ubiquity.content.api.ContentAPIFactory;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.external.domain.Network;
+import com.ubiquity.external.repository.cache.CacheKeys;
 import com.ubiquity.external.service.ExternalIdentityService;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
+import com.ubiquity.social.api.util.Pagination;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.ActivityType;
 import com.ubiquity.social.domain.Message;
@@ -41,9 +46,10 @@ public class SearchService {
 	private SearchEngine searchEngine;
 	
 	private Integer resultsLimit, pageLimit;
-	
+	private NestedMapCache requestStateCache;
 	public SearchService(Configuration config) {
 		log.debug("Using solr api path: {}", config.getProperty("solr.api.path"));
+		requestStateCache = new UserCacheRedisImpl(config.getInt("redis.external.uri.request.state"));
 		resultsLimit = config.getInt("rules.search.results.limit");
 		pageLimit = config.getInt("rules.search.page.limit");
 		searchEngine = new SearchEngineSolrjImpl(config);
@@ -233,15 +239,32 @@ public class SearchService {
 			documents = wrapEntitiesInDocuments(activities);
 			
 		} else {
-			// if content, search videos
-			ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, identity.getClientPlatform());
-			List<VideoContent> videoContent = contentAPI.searchVideos(searchTerm, page, resultsLimit, identity);
-			
+			List<VideoContent> videoContent = searchLiveVedios(searchTerm, identity, externalNetwork, page);
 			documents = wrapEntitiesInDocuments(videoContent);
 		}
 
 		return documents;
 		
+	}
+	public List<VideoContent>  searchLiveVedios(String searchTerm, ExternalIdentity identity, ExternalNetwork externalNetwork, Integer page )
+	{
+		String pageToken = null;
+		String cacheKey = null;
+		if(externalNetwork == ExternalNetwork.YouTube)
+		{
+			// if content, search videos
+			cacheKey = CacheKeys.generateCacheKeyForYouTubeSearchPagination(searchTerm, identity);
+			// get the saved token state from the cache to determine the page token to send to YouTube
+			pageToken = Pagination.getPageToken(requestStateCache, cacheKey, page);
+		}
+		ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, identity.getClientPlatform());
+		CollectionVariant<VideoContent> videoContent = contentAPI.searchVideos(searchTerm, page, resultsLimit,pageToken, identity);
+		if(externalNetwork == ExternalNetwork.YouTube)
+		{
+			// set the cache state
+			Pagination.setPageToken(requestStateCache, cacheKey, page, videoContent.getPrevPageToken(), videoContent.getPageToken(), videoContent.getNextPageToken());
+		}
+		return (List<VideoContent>) videoContent.collection;
 	}
 	
 	/***
