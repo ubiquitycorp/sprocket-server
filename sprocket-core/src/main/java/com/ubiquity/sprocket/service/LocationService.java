@@ -52,6 +52,7 @@ public class LocationService {
 	 * @param location
 	 */
 	public void updateLocation(UserLocation location) {
+		EntityManagerSupport.beginTransaction();
 		boolean create = Boolean.FALSE;
 		try {
 			UserLocation persisted = locationRepository.findByUserId(location
@@ -63,7 +64,7 @@ public class LocationService {
 			create = Boolean.TRUE;
 		}
 		location.setLastUpdated(System.currentTimeMillis());
-		EntityManagerSupport.beginTransaction();
+		
 		if (create)
 			locationRepository.create(location);
 		else
