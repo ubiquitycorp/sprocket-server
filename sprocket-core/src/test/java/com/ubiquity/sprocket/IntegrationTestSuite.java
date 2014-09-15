@@ -26,7 +26,7 @@ import com.ubiquity.sprocket.service.AuthenticationServiceTest;
  * @author chris
  *
  */
-
+@Ignore
 @RunWith(Suite.class)
 @SuiteClasses({ 
 	AuthenticationServiceTest.class, 
