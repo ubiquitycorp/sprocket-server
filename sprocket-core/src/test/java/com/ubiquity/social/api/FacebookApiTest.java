@@ -36,7 +36,7 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		
 		identity = new ExternalIdentity.Builder()
 			.user(user)
-			.accessToken("CAACEdEose0cBAK42ZAjdnZBNPNeV8vJwnLcWtEaWmBiBuYYuMQynsszZBdwVQgGu6wOyD56ZAapNdbZB5afsPCOCpHJw2rzTe7pglL7KtUODTwgLwgfp4yq8gahc6K8QSmDJru6h2ckLHZCUMLeaj5PCuonqYBLQsHYeNwz3trwI8Sa3rVIDDyNpwJkeSeyEgZBBJZBszR3MGe8NuvyC7ipQLU0zN8cjQYwZD").build();
+			.accessToken("CAACEdEose0cBADwKBAaDVntezhdSvYJ8IM1EJX822o2UDvLlPBybcRlPI8s80FohfcaaFvFey3C42zlboHop55TNRhqysu5hPZCZAvV7gUnxsXPDbds0sIxWOecgFvXW2ZCFDDnG52im55OjcZC3L59WW5sfGZAPHZA4yGyzhgd8zwiqHpEDCd6niBOUR7lThw1wrGvIQI1KCs3KuKob24BwI5weAcd28ZD").build();
 		log.debug("authenticated Facebook with identity {} ", identity);
 		
 		Configuration configuration = new PropertiesConfiguration("test.properties");
@@ -65,6 +65,7 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 		Contact contact = facebookAPI.authenticateUser(identity);
 		Assert.assertTrue(contact.getGender() != null);	
 		Assert.assertTrue(contact.getAgeRange() != null);
+		Assert.assertTrue(contact.getAgeRange().getMin() == 35); // 21 would be the default, this token has an age greater than 21
 		Assert.assertTrue(contact.getLocation() != null);
 	}
 
