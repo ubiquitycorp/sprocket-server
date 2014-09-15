@@ -325,7 +325,7 @@ public class AnalyticsService {
 				}
 			}
 
-			String key = CacheKeys.generateCacheKeyForExternalNetwork(CacheKeys.GroupProperties.RECOMMENDED_ACTIVITIES, network);
+			String key = CacheKeys.generateCacheKeyForExternalNetwork(CacheKeys.GroupProperties.RECOMMENDED_VIDEOS, network);
 			dataModificationCache.put(Long.parseLong(group), key, System.currentTimeMillis());
 
 

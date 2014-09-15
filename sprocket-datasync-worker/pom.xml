@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>sprocket-datasync-worker</artifactId>
 	<name>Sprocket Data Sync Worker</name>
-	<version>0.4.4</version>
+	<version>0.4.5</version>
 	<parent>
 		<groupId>com.ubiquity</groupId>
 		<artifactId>sprocket-parent</artifactId>
@@ -173,7 +173,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>sprocket-core</artifactId>
-			<version>0.1.11</version>
+			<version>0.1.12</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.jboss.resteasy</groupId>
