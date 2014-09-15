@@ -10,6 +10,7 @@
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
 
+		<class>com.ubiquity.sprocket.domain.RecommendedVideo</class>
 
 		<class>com.ubiquity.sprocket.domain.RecommendedActivity</class>
 		<class>com.ubiquity.location.domain.UserLocation</class>

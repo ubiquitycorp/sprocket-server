@@ -16,6 +16,10 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
+import com.ubiquity.integration.factory.TestContactFactory;
+import com.ubiquity.social.domain.Contact;
+import com.ubiquity.social.repository.ContactRepository;
+import com.ubiquity.social.repository.ContactRepositoryJpaImpl;
 import com.ubiquity.sprocket.domain.GroupMembership;
 
 /***
@@ -31,6 +35,7 @@ public class GroupMembershipRepositoryTest {
 
 	private GroupMembershipRepository membershipRepository;
 	private UserRepository userRepository;
+	private ContactRepository contactRepository;
 
 	private User judy, jack;
 	private GroupMembership fbMomMembership, youTubeMomMembership, youTubeSportsFanaticMembership, globalMembership;
@@ -45,20 +50,30 @@ public class GroupMembershipRepositoryTest {
 
 		membershipRepository = new GroupMembershipRepositoryJpaImpl();
 		userRepository = new UserRepositoryJpaImpl();
+		contactRepository = new ContactRepositoryJpaImpl();
 
 		// create user and identity as we normally would
 		judy = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 		jack = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 
+		Contact judyFbContact = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(judy, ExternalNetwork.Facebook).build();
+		Contact judyYouTubeContact = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(judy, ExternalNetwork.YouTube).build();
+		Contact jackYouTubeContact = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(jack, ExternalNetwork.YouTube).build();
+
 		EntityManagerSupport.beginTransaction();
 		userRepository.create(judy);
 		userRepository.create(jack);
-		EntityManagerSupport.commit();
+		contactRepository.create(judyFbContact);
+		contactRepository.create(judyYouTubeContact);
+		contactRepository.create(jackYouTubeContact);
 
-		fbMomMembership = new GroupMembership(ExternalNetwork.Facebook, judy, UUID.randomUUID().toString());
-		youTubeMomMembership = new GroupMembership(ExternalNetwork.YouTube, judy, UUID.randomUUID().toString());
-		youTubeSportsFanaticMembership = new GroupMembership(ExternalNetwork.YouTube, jack, UUID.randomUUID().toString());
-		globalMembership = new GroupMembership(null, jack, UUID.randomUUID().toString());
+		EntityManagerSupport.commit();
+		
+	
+		fbMomMembership = new GroupMembership(judyFbContact.getExternalIdentity(), judy, UUID.randomUUID().toString());
+		youTubeMomMembership = new GroupMembership(judyYouTubeContact.getExternalIdentity(), judy, UUID.randomUUID().toString());
+		youTubeSportsFanaticMembership = new GroupMembership(jackYouTubeContact.getExternalIdentity(), jack, UUID.randomUUID().toString());
+		globalMembership = new GroupMembership(jack, UUID.randomUUID().toString());
 
 
 		EntityManagerSupport.beginTransaction();

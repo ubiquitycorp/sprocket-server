@@ -4,11 +4,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 
 /***
@@ -19,7 +21,10 @@ import com.ubiquity.identity.domain.User;
  *
  */
 @Entity
-@Table(name = "group_membership")
+@Table(name = "group_membership", indexes = {
+		@Index(name="idx_external_network_group_identifier_identity", columnList = "external_network, group_identifier, external_identity_id", unique = true),
+		@Index(name="idx_external_network_group_identifier_user", columnList = "external_network, group_identifier, user_id", unique = true)
+		})
 public class GroupMembership {
 	
 	@Id
@@ -29,9 +34,13 @@ public class GroupMembership {
 	
 	@Column(name = "external_network", nullable = true)
 	private ExternalNetwork externalNetwork;
+	
+	@ManyToOne
+	@JoinColumn(name = "external_identity_id", nullable = true)
+	private ExternalIdentity externalIdentity;
 
 	@ManyToOne
-	@JoinColumn(name = "user_id", nullable = false)
+	@JoinColumn(name = "user_id", nullable = true)
 	private User user;
 	
 	
@@ -44,6 +53,17 @@ public class GroupMembership {
 	 */
 	protected GroupMembership() {}
 	
+	
+	/***
+	 * Creates a membership record for the global profile
+	 * 
+	 * @param user
+	 * @param groupIdentifier
+	 */
+	public GroupMembership(User user, String groupIdentifier) {
+		this.user = user;
+		this.groupIdentifier = groupIdentifier;
+	}
 	/***
 	 * Creates a membership object for an external profile
 	 * 
@@ -51,9 +71,10 @@ public class GroupMembership {
 	 * @param user
 	 * @param groupIdentifier
 	 */
-	public GroupMembership(ExternalNetwork externalNetwork, User user,
+	public GroupMembership(ExternalIdentity identity, User user,
 			String groupIdentifier) {
-		this.externalNetwork = externalNetwork;
+		this.externalNetwork = ExternalNetwork.getNetworkById(identity.getExternalNetwork());
+		this.externalIdentity = identity;
 		this.user = user;
 		this.groupIdentifier = groupIdentifier;
 	}

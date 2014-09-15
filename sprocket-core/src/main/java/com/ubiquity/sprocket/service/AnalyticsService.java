@@ -55,6 +55,7 @@ import com.ubiquity.sprocket.repository.GroupMembershipRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepository;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedVideoRepository;
+import com.ubiquity.sprocket.repository.RecommendedVideoRepositoryJpaImpl;
 
 /***
  * Service for executing tracking engagement, assigning contacts to groups, and recommending content
@@ -90,6 +91,7 @@ public class AnalyticsService {
 	public AnalyticsService(Configuration configuration) {
 		setUpRecommendationEngine(configuration);
 
+		recommendedVideoRepository = new RecommendedVideoRepositoryJpaImpl();
 		engagedItemRepository = new EngagedItemRepositoryJpaImpl();
 		engagedActivityRepository = new EngagedActivityRepositoryJpaImpl();
 		engagedDocumentRepository = new EngagedDocumentRepositoryJpaImpl();
@@ -144,7 +146,7 @@ public class AnalyticsService {
 			return null;
 		}
 		String key = CacheKeys.generateCacheKeyForExternalNetwork(CacheKeys.GroupProperties.RECOMMENDED_ACTIVITIES, network);
-		Long lastModified = dataModificationCache.getLastModified((long)network.ordinal(), key, ifModifiedSince);
+		Long lastModified = dataModificationCache.getLastModified(Long.valueOf(groupMembership.getGroupIdentifier()), key, ifModifiedSince);
 
 		// If there is no cache entry, there is no data
 		if(lastModified == null) {
@@ -297,6 +299,14 @@ public class AnalyticsService {
 
 
 	private void createRecommendedVideos(Set<String> groups, ExternalNetwork network) {
+		
+		EntityManagerSupport.beginTransaction();
+		List<RecommendedVideo> recommended = recommendedVideoRepository.findAllByExternalNetwork(network);
+		for(RecommendedVideo video : recommended)
+			recommendedVideoRepository.delete(video);
+		EntityManagerSupport.commit();
+		
+		
 		for(String group : groups) {
 			List<EngagedVideo> engagedVideos = engagedVideoRepository.findMeanByGroup(group, 10);
 			List<EngagedDocument> engagedDocuments = engagedDocumentRepository.findMeanByGroup(group, 10);
@@ -320,6 +330,9 @@ public class AnalyticsService {
 
 
 		}
+		
+		
+		
 	}
 
 	private void createRecommendedActivities(Set<String> groups, ExternalNetwork network) {
@@ -343,7 +356,7 @@ public class AnalyticsService {
 				Activity activity = engagedDocument.getActivity();
 				if(activity != null) {
 					EntityManagerSupport.beginTransaction();
-					recommendedActivityRepository.create(new RecommendedActivity(engagedDocument.getActivity(), group));
+					recommendedActivityRepository.create(new RecommendedActivity(activity, group));
 					EntityManagerSupport.commit();
 				}
 			}
@@ -379,7 +392,7 @@ public class AnalyticsService {
 			return null;
 		}
 		String key = CacheKeys.generateCacheKeyForExternalNetwork(CacheKeys.GroupProperties.RECOMMENDED_VIDEOS, network);
-		Long lastModified = dataModificationCache.getLastModified((long)network.ordinal(), key, ifModifiedSince);
+		Long lastModified = dataModificationCache.getLastModified(Long.valueOf(groupMembership.getGroupIdentifier()), key, ifModifiedSince);
 
 		// If there is no cache entry, there is no data
 		if(lastModified == null) {
@@ -404,16 +417,15 @@ public class AnalyticsService {
 		// query all contacts
 		List<Contact> contacts = contactRepository.findByExternalNetwork(network);
 		for(Contact contact : contacts) {
-			User owner = contact.getOwner();
-			if(owner == null) // only users in the system
-				continue;
+
+			// load in user we have one
+			User user = userRepository.getByIdentityId(contact.getExternalIdentity().getIdentityId());
+			UserLocation location = null;
+			if(user != null)
+				location = locationRepository.findByUserId(user.getUserId());
 			
-			UserLocation location = locationRepository.findByUserId(owner.getUserId());
-			// if location is null, then use the location of the contact if possible
-			
-			
-			
-			Profile profile = new Profile(owner, location);
+			// this profile may have both values as null; that's ok for now
+			Profile profile = new Profile(user, location);
 			// only add this contact for the assignment
 			profile.getContacts().add(contact);
 					
