@@ -13,9 +13,7 @@ import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.esotericsoftware.minlog.Log;
 import com.ubiquity.api.exception.ErrorKeys;
-import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.social.api.exception.AuthorizationException;
 import com.ubiquity.sprocket.service.ServiceFactory;
