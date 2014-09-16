@@ -99,7 +99,7 @@ public class SocialEndpoint {
 	@GET
 	@Path("users/{userId}/providers/{socialNetworkId}/localfeed")
 	@Produces(MediaType.APPLICATION_JSON)
-	//@Secure
+	@Secure
 	public Response getLocalFeed(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		ActivitiesDto results = new ActivitiesDto();
 
