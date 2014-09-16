@@ -12,3 +12,4 @@ sprocket-api/.settings/org.eclipse.wst.common.component
 /sprocket-tracker-worker/.classpath
 sprocket-api/bin
 /sprocket-datasync-worker/.classpath
+/sprocket-api/*.classpath
