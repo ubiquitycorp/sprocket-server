@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.CollectionVariant;
 import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.external.service.ExternalIdentityService;
 import com.ubiquity.identity.service.UserService;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.AgeRange;
