@@ -8,6 +8,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +29,6 @@ import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
-import com.ubiquity.social.repository.ConversationRepository;
-import com.ubiquity.social.repository.ConversationRepositoryJpaImpl;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchKeys;
 
@@ -101,8 +100,7 @@ public class SearchServiceTest {
 		
 	}
 	
-	
-
+	@Ignore
 	@Test
 	public void testAddMessagesReturnsInBasicSearch() {
 		// build partial doc with the fields being indexed
