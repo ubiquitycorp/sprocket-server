@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.EntityManager;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.Range;
 import org.slf4j.Logger;
@@ -67,16 +69,16 @@ public class AnalyticsService {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 
-	private EngagedItemRepository engagedItemRepository;
-	private EngagedActivityRepository engagedActivityRepository;
-	private EngagedDocumentRepository engagedDocumentRepository;
-	private EngagedVideoRepository engagedVideoRepository;
-	private GroupMembershipRepository groupMembershipRepository;
-	private ContactRepository contactRepository;
-	private RecommendedActivityRepository recommendedActivityRepository;
-	private RecommendedVideoRepository recommendedVideoRepository;
-	private UserRepository userRepository;
-	private UserLocationRepository locationRepository;
+	//	private EngagedItemRepository engagedItemRepository;
+	//	private EngagedActivityRepository engagedActivityRepository;
+	//	private EngagedDocumentRepository engagedDocumentRepository;
+	//	private EngagedVideoRepository engagedVideoRepository;
+	//	private GroupMembershipRepository groupMembershipRepository;
+	//	private ContactRepository contactRepository;
+	//	private RecommendedActivityRepository recommendedActivityRepository;
+	//	private RecommendedVideoRepository recommendedVideoRepository;
+	//	private UserRepository userRepository;
+	//	private UserLocationRepository locationRepository;
 
 	private UserDataModificationCache dataModificationCache;
 
@@ -91,18 +93,18 @@ public class AnalyticsService {
 	public AnalyticsService(Configuration configuration) {
 		setUpRecommendationEngine(configuration);
 
-		recommendedVideoRepository = new RecommendedVideoRepositoryJpaImpl();
-		engagedItemRepository = new EngagedItemRepositoryJpaImpl();
-		engagedActivityRepository = new EngagedActivityRepositoryJpaImpl();
-		engagedDocumentRepository = new EngagedDocumentRepositoryJpaImpl();
-		engagedVideoRepository = new EngagedVideoRepositoryJpaImpl();
-		groupMembershipRepository = new GroupMembershipRepositoryJpaImpl();
-		contactRepository = new ContactRepositoryJpaImpl();
-		recommendedActivityRepository = new RecommendedActivityRepositoryJpaImpl();
-		locationRepository = new UserLocationRepositoryJpaImpl();
-		userRepository = new UserRepositoryJpaImpl();
+		//		recommendedVideoRepository = new RecommendedVideoRepositoryJpaImpl();
+		//		engagedItemRepository = new EngagedItemRepositoryJpaImpl();
+		//		engagedActivityRepository = new EngagedActivityRepositoryJpaImpl();
+		//		engagedDocumentRepository = new EngagedDocumentRepositoryJpaImpl();
+		//		engagedVideoRepository = new EngagedVideoRepositoryJpaImpl();
+		//		groupMembershipRepository = new GroupMembershipRepositoryJpaImpl();
+		//		contactRepository = new ContactRepositoryJpaImpl();
+		//		recommendedActivityRepository = new RecommendedActivityRepositoryJpaImpl();
+		//		locationRepository = new UserLocationRepositoryJpaImpl();
+		//		userRepository = new UserRepositoryJpaImpl();
 
-		
+
 		dataModificationCache = new UserDataModificationCacheRedisImpl(
 				configuration
 				.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GROUP));		
@@ -116,9 +118,13 @@ public class AnalyticsService {
 	 */
 	public void track(EngagedItem engagedItem) {
 		log.debug("tracking activity {}", engagedItem);
-		EntityManagerSupport.beginTransaction();
-		engagedItemRepository.create(engagedItem);
-		EntityManagerSupport.commit();
+		try {
+			EntityManagerSupport.beginTransaction();
+			new EngagedItemRepositoryJpaImpl().create(engagedItem);
+			EntityManagerSupport.commit();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
 	}
 
 
@@ -131,49 +137,66 @@ public class AnalyticsService {
 	 */
 	public CollectionVariant<Activity> findAllRecommendedActivities(Long ownerId, ExternalNetwork network, Long ifModifiedSince) {
 
-		// get the group map for this user
-		List<GroupMembership> groupMembershipList = groupMembershipRepository.findAllByUserId(ownerId);
 
-		GroupMembership groupMembership = null;
-		for(GroupMembership assigned : groupMembershipList) {
-			if(assigned.getExternalNetwork() == network) {
-				groupMembership = assigned;
-				break;
+		try {
+
+			RecommendedActivityRepository recommendedActivityRepository = new RecommendedActivityRepositoryJpaImpl();
+			GroupMembershipRepository groupMembershipRepository = new GroupMembershipRepositoryJpaImpl();
+			// get the group map for this user
+			List<GroupMembership> groupMembershipList = groupMembershipRepository.findAllByUserId(ownerId);
+
+			GroupMembership groupMembership = null;
+			for(GroupMembership assigned : groupMembershipList) {
+				if(assigned.getExternalNetwork() == network) {
+					groupMembership = assigned;
+					break;
+				}
 			}
-		}
-		// if nothing is assigned, then return nothing
-		if(groupMembership == null) {
-			return null;
-		}
-		String key = CacheKeys.generateCacheKeyForExternalNetwork(CacheKeys.GroupProperties.RECOMMENDED_ACTIVITIES, network);
-		Long lastModified = dataModificationCache.getLastModified(Long.valueOf(groupMembership.getGroupIdentifier()), key, ifModifiedSince);
+			// if nothing is assigned, then return nothing
+			if(groupMembership == null) {
+				return null;
+			}
+			String key = CacheKeys.generateCacheKeyForExternalNetwork(CacheKeys.GroupProperties.RECOMMENDED_ACTIVITIES, network);
+			Long lastModified = dataModificationCache.getLastModified(Long.valueOf(groupMembership.getGroupIdentifier()), key, ifModifiedSince);
 
-		// If there is no cache entry, there is no data
-		if(lastModified == null) {
-			return null;
-		}
+			// If there is no cache entry, there is no data
+			if(lastModified == null) {
+				return null;
+			}
 
-		List<Activity> activities = recommendedActivityRepository.findRecommendedActivitiesByGroup(groupMembership.getGroupIdentifier(), network);
-		return new CollectionVariant<Activity>(activities, lastModified);
+			List<Activity> activities = recommendedActivityRepository.findRecommendedActivitiesByGroup(groupMembership.getGroupIdentifier(), network);
+			return new CollectionVariant<Activity>(activities, lastModified);
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
 	}
 
 	/***
 	 * Will create assignments for all contexts
 	 */
 	public void assignAll() {
-		List<User> allUsers = userRepository.findAll();
-		for(User user : allUsers) {
-			Profile profile = new Profile(user, locationRepository.findByUserId(user.getUserId()));
-			profile.getContacts().addAll(contactRepository.findByOwnerId(user.getUserId(), Boolean.TRUE));
-			// just assign contexts we have built so far
-			for(Contact contact : profile.getContacts()) {
-				ExternalNetwork network = ExternalNetwork.getNetworkById(contact.getExternalIdentity().getExternalNetwork());
-				if(network == ExternalNetwork.Facebook || network == ExternalNetwork.Google)
-					recommendationEngine.assign(profile, network);
+
+		try {
+			UserRepository userRepository = new UserRepositoryJpaImpl();
+			UserLocationRepository locationRepository = new UserLocationRepositoryJpaImpl();
+			ContactRepository contactRepository = new ContactRepositoryJpaImpl();
+
+			List<User> allUsers = userRepository.findAll();
+			for(User user : allUsers) {
+				Profile profile = new Profile(user, locationRepository.findByUserId(user.getUserId()));
+				profile.getContacts().addAll(contactRepository.findByOwnerId(user.getUserId(), Boolean.TRUE));
+				// just assign contexts we have built so far
+				for(Contact contact : profile.getContacts()) {
+					ExternalNetwork network = ExternalNetwork.getNetworkById(contact.getExternalIdentity().getExternalNetwork());
+					if(network == ExternalNetwork.Facebook || network == ExternalNetwork.Google)
+						recommendationEngine.assign(profile, network);
+				}
 			}
+		} finally {
+			EntityManagerSupport.closeEntityManager();
 		}
 	}
-	
+
 	/***
 	 * Recommends assigns the profile to a group for all networks
 	 * 
@@ -184,14 +207,21 @@ public class AnalyticsService {
 
 		List<GroupMembership> membershipList = recommendationEngine.assign(profile);
 
-		EntityManagerSupport.beginTransaction();
-		groupMembershipRepository.deleteByUserId(profile.getUser().getUserId());
+		try {
+			GroupMembershipRepository groupMembershipRepository = new GroupMembershipRepositoryJpaImpl();
 
-		// persisting this for now but we may not need to in the future
-		for(GroupMembership membership : membershipList) {
-			groupMembershipRepository.create(membership);
+			EntityManagerSupport.beginTransaction();
+			groupMembershipRepository.deleteByUserId(profile.getUser().getUserId());
+
+			// persisting this for now but we may not need to in the future
+			for(GroupMembership membership : membershipList) {
+				groupMembershipRepository.create(membership);
+			}
+			EntityManagerSupport.commit();
+
+		} finally {
+			EntityManagerSupport.closeEntityManager();
 		}
-		EntityManagerSupport.commit();
 
 
 	}
@@ -202,14 +232,20 @@ public class AnalyticsService {
 	 * @param context
 	 */
 	private void train(ExternalNetwork context) {
-		// check to see if there is any data for this context; if not, return
-		if(contactRepository.countAllByExternalNetwork(context) == 0) {
-			log.warn("Skipping train on context: {} because no users have signed in yet for it");
-			return;
+
+		try {
+			// check to see if there is any data for this context; if not, return
+			if(new ContactRepositoryJpaImpl().countAllByExternalNetwork(context) == 0) {
+				log.warn("Skipping train on context: {} because no users have signed in yet for it");
+				return;
+			}
+
+			recommendationEngine.train(context);
+		} finally {
+			EntityManagerSupport.closeEntityManager();
 		}
-		recommendationEngine.train(context);
 	}
-	
+
 	/**
 	 * Trains the model for the global context
 	 * 
@@ -219,34 +255,38 @@ public class AnalyticsService {
 	private void train() {
 		recommendationEngine.train();
 	}
-	
+
 	/***
 	 * Removes records from instance space and adds a new batch of users; in next version this loading will be from Hadoop
 	 */
 	public void refreshProfileRecords() {
 		// clear distributed data store for all contexts
 		recommendationEngine.clear();
-		List<User> users = userRepository.findAll();
-		List<Profile> profiles = new LinkedList<Profile>();
-		for(User user : users) {
-			// create profile with all contacts and the last known location
-			
-			Profile profile = new Profile(user, locationRepository.findByUserId(user.getUserId()));
-			Set<Identity> identities = user.getIdentities();
-			for(Identity identity : identities) {
-				if(identity instanceof ExternalIdentity) {
-					// get own contact by the identity id
-					Contact contact = contactRepository.getByExternalIdentityId(identity.getIdentityId());
-					if(contact != null) // TODO: find underlying reason why this can happen
-						profile.getContacts().add(contact);
+		try {
+			List<User> users = new UserRepositoryJpaImpl().findAll();
+			List<Profile> profiles = new LinkedList<Profile>();
+			for(User user : users) {
+				// create profile with all contacts and the last known location
+
+				Profile profile = new Profile(user, new UserLocationRepositoryJpaImpl().findByUserId(user.getUserId()));
+				Set<Identity> identities = user.getIdentities();
+				for(Identity identity : identities) {
+					if(identity instanceof ExternalIdentity) {
+						// get own contact by the identity id
+						Contact contact = new ContactRepositoryJpaImpl().getByExternalIdentityId(identity.getIdentityId());
+						if(contact != null) // TODO: find underlying reason why this can happen
+							profile.getContacts().add(contact);
+					}
 				}
+				profiles.add(profile);
 			}
-			profiles.add(profile);
+			recommendationEngine.updateProfileRecords(profiles);
+		} finally {
+			EntityManagerSupport.closeEntityManager();
 		}
-		recommendationEngine.updateProfileRecords(profiles);
 	}
-	
-	
+
+
 	/***
 	 * Trains each network and assigns all groups, then creates recommended content
 	 * 
@@ -262,17 +302,21 @@ public class AnalyticsService {
 		createRecommendedVideos(groups, ExternalNetwork.YouTube);
 
 	}
-	
+
 	/***
 	 * Creates an assignment (or re-assign) for this and external network 
 	 * 
 	 * @param contact
 	 */
 	public void assign(Long userId, ExternalNetwork network) {
-		List<Contact> contacts = contactRepository.findByOwnerIdExternalNetwork(userId, network);
-		// TODO: do we have multiple contacts? we should not allow this any more
-		for(Contact contact :  contacts) {
-			assign(contact);
+		try {
+			List<Contact> contacts = new ContactRepositoryJpaImpl().findByOwnerIdExternalNetwork(userId, network);
+			// TODO: do we have multiple contacts? we should not allow this any more
+			for(Contact contact :  contacts) {
+				assign(contact);
+			}
+		} finally {
+			EntityManagerSupport.closeEntityManager();
 		}
 	}
 	/***
@@ -281,90 +325,115 @@ public class AnalyticsService {
 	 * @param contact
 	 */
 	public void assign(Contact contact) {
-		User user = contact.getOwner();
-		Profile profile = new Profile(user, locationRepository.findByUserId(user.getUserId()));
-		profile.getContacts().add(contact);
-		ExternalNetwork network = ExternalNetwork.getNetworkById(contact.getExternalIdentity().getExternalNetwork());
-		List<GroupMembership> membershipList = recommendationEngine.assign(profile, network);
-		
-		log.info("assigning emembership: {}", membershipList);
-		// save to DB
-		EntityManagerSupport.beginTransaction();
-		groupMembershipRepository.deleteByExternalNetworkAndUserId(network, user.getUserId());
-		for(GroupMembership membership : membershipList) {
-			groupMembershipRepository.create(membership);
+
+		try {
+			User user = contact.getOwner();
+			Profile profile = new Profile(user, new UserLocationRepositoryJpaImpl().findByUserId(user.getUserId()));
+			profile.getContacts().add(contact);
+			ExternalNetwork network = ExternalNetwork.getNetworkById(contact.getExternalIdentity().getExternalNetwork());
+			List<GroupMembership> membershipList = recommendationEngine.assign(profile, network);
+
+			log.info("assigning emembership: {}", membershipList);
+			// save to DB
+
+			GroupMembershipRepository groupMembershipRepository = new GroupMembershipRepositoryJpaImpl();
+			EntityManagerSupport.beginTransaction();
+			groupMembershipRepository.deleteByExternalNetworkAndUserId(network, user.getUserId());
+			for(GroupMembership membership : membershipList) {
+				groupMembershipRepository.create(membership);
+			}
+			EntityManagerSupport.commit();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
 		}
-		EntityManagerSupport.commit();
 	}
 
 
 	private void createRecommendedVideos(Set<String> groups, ExternalNetwork network) {
-		
-		EntityManagerSupport.beginTransaction();
-		List<RecommendedVideo> recommended = recommendedVideoRepository.findAllByExternalNetwork(network);
-		for(RecommendedVideo video : recommended)
-			recommendedVideoRepository.delete(video);
-		EntityManagerSupport.commit();
-		
-		
-		for(String group : groups) {
-			List<EngagedVideo> engagedVideos = engagedVideoRepository.findMeanByGroup(group, 10);
-			List<EngagedDocument> engagedDocuments = engagedDocumentRepository.findMeanByGroup(group, 10);
-			for(EngagedVideo engagedVideo : engagedVideos) {
-				EntityManagerSupport.beginTransaction();
-				recommendedVideoRepository.create(new RecommendedVideo(engagedVideo.getVideoContent(), group));
-				EntityManagerSupport.commit();
-			}
-			// these will be activities clicked on from search results
-			for(EngagedDocument engagedDocument : engagedDocuments) {
-				VideoContent videoContent = engagedDocument.getVideoContent();
-				if(videoContent != null) {
+
+		try {
+			RecommendedVideoRepository recommendedVideoRepository = new RecommendedVideoRepositoryJpaImpl();
+			EngagedDocumentRepository engagedDocumentRepository = new EngagedDocumentRepositoryJpaImpl();
+			EngagedVideoRepository engagedVideoRepository = new EngagedVideoRepositoryJpaImpl();
+
+			EntityManagerSupport.beginTransaction();
+			List<RecommendedVideo> recommended = recommendedVideoRepository.findAllByExternalNetwork(network);
+			for(RecommendedVideo video : recommended)
+				recommendedVideoRepository.delete(video);
+			EntityManagerSupport.commit();
+
+
+			for(String group : groups) {
+				List<EngagedVideo> engagedVideos = engagedVideoRepository.findMeanByGroup(group, 10);
+				List<EngagedDocument> engagedDocuments = engagedDocumentRepository.findMeanByGroup(group, 10);
+				for(EngagedVideo engagedVideo : engagedVideos) {
 					EntityManagerSupport.beginTransaction();
-					recommendedVideoRepository.create(new RecommendedVideo(videoContent, group));
+					recommendedVideoRepository.create(new RecommendedVideo(engagedVideo.getVideoContent(), group));
 					EntityManagerSupport.commit();
 				}
+				// these will be activities clicked on from search results
+				for(EngagedDocument engagedDocument : engagedDocuments) {
+					VideoContent videoContent = engagedDocument.getVideoContent();
+					if(videoContent != null) {
+						EntityManagerSupport.beginTransaction();
+						recommendedVideoRepository.create(new RecommendedVideo(videoContent, group));
+						EntityManagerSupport.commit();
+					}
+				}
+
+				String key = CacheKeys.generateCacheKeyForExternalNetwork(CacheKeys.GroupProperties.RECOMMENDED_VIDEOS, network);
+				dataModificationCache.put(Long.parseLong(group), key, System.currentTimeMillis());
+
+
 			}
 
-			String key = CacheKeys.generateCacheKeyForExternalNetwork(CacheKeys.GroupProperties.RECOMMENDED_VIDEOS, network);
-			dataModificationCache.put(Long.parseLong(group), key, System.currentTimeMillis());
-
-
+		} finally {
+			EntityManagerSupport.closeEntityManager();
 		}
-		
-		
-		
+
+
+
 	}
 
 	private void createRecommendedActivities(Set<String> groups, ExternalNetwork network) {
-		
-		EntityManagerSupport.beginTransaction();
-		List<RecommendedActivity> recommended = recommendedActivityRepository.findAllByExternalNetwork(network);
-		for(RecommendedActivity ra : recommended)
-			recommendedActivityRepository.delete(ra);
-		EntityManagerSupport.commit();
-		
-		for(String group : groups) {
-			List<EngagedActivity> engagedActivities = engagedActivityRepository.findMeanByGroup(group, 10);
-			List<EngagedDocument> engagedDocuments = engagedDocumentRepository.findMeanByGroup(group, 10);
-			for(EngagedActivity engagedActivity : engagedActivities) {
-				EntityManagerSupport.beginTransaction();
-				recommendedActivityRepository.create(new RecommendedActivity(engagedActivity.getActivity(), group));
-				EntityManagerSupport.commit();
-			}
-			// these will be activities clicked on from search results
-			for(EngagedDocument engagedDocument : engagedDocuments) {
-				Activity activity = engagedDocument.getActivity();
-				if(activity != null) {
+
+		try {
+			RecommendedActivityRepository recommendedActivityRepository = new RecommendedActivityRepositoryJpaImpl();
+			EngagedDocumentRepository engagedDocumentRepository = new EngagedDocumentRepositoryJpaImpl();
+			EngagedActivityRepository engagedActivityRepository = new EngagedActivityRepositoryJpaImpl();
+
+
+			EntityManagerSupport.beginTransaction();
+			List<RecommendedActivity> recommended = recommendedActivityRepository.findAllByExternalNetwork(network);
+			for(RecommendedActivity ra : recommended)
+				recommendedActivityRepository.delete(ra);
+			EntityManagerSupport.commit();
+
+			for(String group : groups) {
+				List<EngagedActivity> engagedActivities = engagedActivityRepository.findMeanByGroup(group, 10);
+				List<EngagedDocument> engagedDocuments = engagedDocumentRepository.findMeanByGroup(group, 10);
+				for(EngagedActivity engagedActivity : engagedActivities) {
 					EntityManagerSupport.beginTransaction();
-					recommendedActivityRepository.create(new RecommendedActivity(activity, group));
+					recommendedActivityRepository.create(new RecommendedActivity(engagedActivity.getActivity(), group));
 					EntityManagerSupport.commit();
 				}
-			}
+				// these will be activities clicked on from search results
+				for(EngagedDocument engagedDocument : engagedDocuments) {
+					Activity activity = engagedDocument.getActivity();
+					if(activity != null) {
+						EntityManagerSupport.beginTransaction();
+						recommendedActivityRepository.create(new RecommendedActivity(activity, group));
+						EntityManagerSupport.commit();
+					}
+				}
 
-			String key = CacheKeys.generateCacheKeyForExternalNetwork(CacheKeys.GroupProperties.RECOMMENDED_ACTIVITIES, network);
-			dataModificationCache.put(Long.parseLong(group), key, System.currentTimeMillis());
+				String key = CacheKeys.generateCacheKeyForExternalNetwork(CacheKeys.GroupProperties.RECOMMENDED_ACTIVITIES, network);
+				dataModificationCache.put(Long.parseLong(group), key, System.currentTimeMillis());
 
 
+			} 
+		} finally {
+			EntityManagerSupport.closeEntityManager();
 		}
 	}
 
@@ -377,58 +446,67 @@ public class AnalyticsService {
 	 */
 	public CollectionVariant<VideoContent> findAllRecommendedVideos(Long ownerId, ExternalNetwork network, Long ifModifiedSince) {
 
-		// get the group map for this user
-		List<GroupMembership> groupMembershipList = groupMembershipRepository.findAllByUserId(ownerId);
+		try {
 
-		GroupMembership groupMembership = null;
-		for(GroupMembership assigned : groupMembershipList) {
-			if(assigned.getExternalNetwork() == network) {
-				groupMembership = assigned;
-				break;
+
+			// get the group map for this user
+			List<GroupMembership> groupMembershipList =  new GroupMembershipRepositoryJpaImpl().findAllByUserId(ownerId);
+
+			GroupMembership groupMembership = null;
+			for(GroupMembership assigned : groupMembershipList) {
+				if(assigned.getExternalNetwork() == network) {
+					groupMembership = assigned;
+					break;
+				}
 			}
-		}
-		// if nothing is assigned, then return nothing
-		if(groupMembership == null) {
-			return null;
-		}
-		String key = CacheKeys.generateCacheKeyForExternalNetwork(CacheKeys.GroupProperties.RECOMMENDED_VIDEOS, network);
-		Long lastModified = dataModificationCache.getLastModified(Long.valueOf(groupMembership.getGroupIdentifier()), key, ifModifiedSince);
+			// if nothing is assigned, then return nothing
+			if(groupMembership == null) {
+				return null;
+			}
+			String key = CacheKeys.generateCacheKeyForExternalNetwork(CacheKeys.GroupProperties.RECOMMENDED_VIDEOS, network);
+			Long lastModified = dataModificationCache.getLastModified(Long.valueOf(groupMembership.getGroupIdentifier()), key, ifModifiedSince);
 
-		// If there is no cache entry, there is no data
-		if(lastModified == null) {
-			return null;
+			// If there is no cache entry, there is no data
+			if(lastModified == null) {
+				return null;
+			}
+
+			List<VideoContent> videos = new RecommendedVideoRepositoryJpaImpl().findRecommendedVideosByGroup(groupMembership.getGroupIdentifier());
+
+			return new CollectionVariant<VideoContent>(videos, lastModified);
+
+		} finally {
+			EntityManagerSupport.closeEntityManager();
 		}
-
-		List<VideoContent> videos = recommendedVideoRepository.findRecommendedVideosByGroup(groupMembership.getGroupIdentifier());
-
-		return new CollectionVariant<VideoContent>(videos, lastModified);
 	}
-	
-	
+
+
 	private Set<String> assignGroups(ExternalNetwork network) {
 		// track the unique set of group names
 		Set<String> groups = new HashSet<String>();
+
+		GroupMembershipRepository groupMembershipRepository = new GroupMembershipRepositoryJpaImpl();
 
 		// remove all assignments in db by this network
 		EntityManagerSupport.beginTransaction();
 		groupMembershipRepository.deleteByExternalNetwork(network);
 		EntityManagerSupport.commit();
-		
+
 		// query all contacts
-		List<Contact> contacts = contactRepository.findByExternalNetwork(network);
+		List<Contact> contacts = new ContactRepositoryJpaImpl().findByExternalNetwork(network);
 		for(Contact contact : contacts) {
 
 			// load in user we have one
-			User user = userRepository.getByIdentityId(contact.getExternalIdentity().getIdentityId());
+			User user = new UserRepositoryJpaImpl().getByIdentityId(contact.getExternalIdentity().getIdentityId());
 			UserLocation location = null;
 			if(user != null)
-				location = locationRepository.findByUserId(user.getUserId());
-			
+				location = new UserLocationRepositoryJpaImpl().findByUserId(user.getUserId());
+
 			// this profile may have both values as null; that's ok for now
 			Profile profile = new Profile(user, location);
 			// only add this contact for the assignment
 			profile.getContacts().add(contact);
-					
+
 			List<GroupMembership> membershipList = recommendationEngine.assign(profile, network);
 			// persist assignments
 			for(GroupMembership membership : membershipList) {
@@ -449,8 +527,8 @@ public class AnalyticsService {
 	private void setUpRecommendationEngine(Configuration configuration) {
 		if(configuration.getString("recommendation.engine.hadoop.master") == null)
 		{
-			 log.info("Skipping recommendation engine");
-			 return;
+			log.info("Skipping recommendation engine");
+			return;
 		}
 		recommendationEngine = new RecommendationEngineSparkImpl(configuration);
 
@@ -466,14 +544,14 @@ public class AnalyticsService {
 		recommendationEngine.addDimension(new Dimension("ageRange", Range.between(0.0, 100.0), 1.0), ExternalNetwork.Facebook);
 		recommendationEngine.addDimension(new Dimension("lat", Range.between(-90.0, 90.0), 0.0)); // location we don't care about because we have location filter
 		recommendationEngine.addDimension(new Dimension("lon", Range.between(-180.0, 180.0), 0.0)); 
-		
+
 		// create google specific context, with dimensions where
 		recommendationEngine.addContext(ExternalNetwork.Google, configuration);
 		recommendationEngine.addDimension(Dimension.createFromEnum("gender", Gender.class, 1.0), ExternalNetwork.Google);
 		recommendationEngine.addDimension(new Dimension("ageRange", Range.between(0.0, 100.0), 1.0), ExternalNetwork.Google);
 		recommendationEngine.addDimension(new Dimension("lat", Range.between(-90.0, 90.0), 0.5)); // location so / so
 		recommendationEngine.addDimension(new Dimension("lon", Range.between(-180.0, 180.0), 0.5)); 
-		
+
 
 	}
 
