@@ -3,6 +3,7 @@ package com.ubiquity.sprocket.api;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import com.niobium.common.serialize.JsonConverter;
@@ -258,6 +259,7 @@ public class DtoAssembler {
 	 * @return
 	 */
 	public static List<MessageDto> assemble(List<Message> messages) {
+		
 		List<MessageDto> messageDtoList = new LinkedList<MessageDto>();
 
 		// check to see if we have a new conversation
@@ -284,9 +286,10 @@ public class DtoAssembler {
 							.build();
 				topLevelMessageDto.getConversation().add(messageDto);
 				lastConversationIdentifier = conversationIdentifier;
-				if(message.getConversation().getReceivers() != null)
+				Set<Contact> receivers =  message.getConversation().getReceivers();
+				if( receivers!= null)
 				{
-					for (Contact contact : message.getConversation().getReceivers()) {
+					for (Contact contact : receivers) {
 						topLevelMessageDto.getReceivers().add(assemble(contact));
 					}
 				}

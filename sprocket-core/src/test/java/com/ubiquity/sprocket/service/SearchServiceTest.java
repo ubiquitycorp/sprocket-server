@@ -28,6 +28,8 @@ import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
+import com.ubiquity.social.repository.ConversationRepository;
+import com.ubiquity.social.repository.ConversationRepositoryJpaImpl;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchKeys;
 
@@ -106,8 +108,8 @@ public class SearchServiceTest {
 		// build partial doc with the fields being indexed
 		Contact sender = TestContactFactory.createContactWithMininumRequiredFieldsAndExternalNetwork(owner, ExternalNetwork.Facebook);
 		Message message = TestMessageFactory.createMessageWithMininumRequiredFields(owner, sender, ExternalNetwork.Facebook, UUID.randomUUID().toString());
-
-		ServiceFactory.getSocialService().create(message);
+		
+		//ServiceFactory.getSocialService().create(message);
 		searchService.indexMessages(
 				Arrays.asList(new Message[] { message }));
 

@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
+import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.location.domain.UserLocation;
@@ -137,31 +138,36 @@ public class SocialEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response messages(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("delta") Boolean delta, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
-
-		MessagesDto result = new MessagesDto();
-
-		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
-					 
-		CollectionVariant<Message> variant = ServiceFactory.getSocialService().findMessagesByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince, delta);
-		
-		
-		// Throw a 304 if if there is no variant (no change)
-		if (variant == null)
-			return Response.notModified().build();
-		
-		
-		List<Message> messages = new LinkedList<Message>();
-		messages.addAll(variant.getCollection());
-		
-		// Assemble into message dto, constructing conversations if they are inherent in the data
-		List<MessageDto> conversations = DtoAssembler.assemble(messages);
-		Collections.sort(conversations, Collections.reverseOrder());
-		result.getMessages().addAll(conversations);
+		try
+		{
+			MessagesDto result = new MessagesDto();
 	
-		return Response.ok()
-				.header("Last-Modified", variant.getLastModified())
-				.entity(jsonConverter.convertToPayload(result))
-				.build();
+			ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
+						 
+			CollectionVariant<Message> variant = ServiceFactory.getSocialService().findMessagesByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince, delta);
+			
+			
+			// Throw a 304 if if there is no variant (no change)
+			if (variant == null)
+				return Response.notModified().build();
+			
+			
+			List<Message> messages = new LinkedList<Message>();
+			messages.addAll(variant.getCollection());
+			
+			// Assemble into message dto, constructing conversations if they are inherent in the data
+			List<MessageDto> conversations = DtoAssembler.assemble(messages);
+			Collections.sort(conversations, Collections.reverseOrder());
+			result.getMessages().addAll(conversations);
+			
+			return Response.ok()
+					.header("Last-Modified", variant.getLastModified())
+					.entity(jsonConverter.convertToPayload(result))
+					.build();
+		}finally 
+		{
+			EntityManagerSupport.closeEntityManager();
+		}
 	}
 	/***
 	 * This method send message to specific user in social network
