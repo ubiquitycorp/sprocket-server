@@ -34,15 +34,12 @@ import com.ubiquity.sprocket.location.LocationConverter;
  */
 public class LocationService {
 
+	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private GeodeticCalculator geoCalculator;
-	private UserLocationRepository locationRepository;
-	private PlaceRepository placeRepository;
 
 	public LocationService(Configuration configuration) {
-		locationRepository = new UserLocationRepositoryJpaImpl();
-		placeRepository = new PlaceRepositoryJpaImpl();
 		geoCalculator = new GeodeticCalculator();
 	}
 
@@ -52,24 +49,36 @@ public class LocationService {
 	 * @param location
 	 */
 	public void updateLocation(UserLocation location) {
-		EntityManagerSupport.beginTransaction();
 		boolean create = Boolean.FALSE;
-		try {
-			UserLocation persisted = locationRepository.findByUserId(location
-					.getUser().getUserId());
-			if (persisted != null)
-				location.setLocationId(persisted.getLocationId());
 
-		} catch (NoResultException e) {
-			create = Boolean.TRUE;
+		UserLocationRepository locationRepository = null;
+		try {
+			try {
+				locationRepository = new UserLocationRepositoryJpaImpl();
+				EntityManagerSupport.beginTransaction();
+
+				UserLocation persisted = locationRepository.findByUserId(location
+						.getUser().getUserId());
+				if (persisted != null)
+					location.setLocationId(persisted.getLocationId());
+
+			} catch (NoResultException e) {
+				create = Boolean.TRUE;
+			} 
+
+			location.setLastUpdated(System.currentTimeMillis());
+
+			if (create)
+				locationRepository.create(location);
+			else
+				locationRepository.update(location);
+
+
+			EntityManagerSupport.commit();
+
+		} finally {
+			EntityManagerSupport.closeEntityManager();
 		}
-		location.setLastUpdated(System.currentTimeMillis());
-		
-		if (create)
-			locationRepository.create(location);
-		else
-			locationRepository.update(location);
-		EntityManagerSupport.commit();
 	}
 
 	/***
@@ -89,28 +98,35 @@ public class LocationService {
 	 * 
 	 */
 	public Place getOrCreatePlaceByName(String name) {
-		try {
-			return placeRepository.findByName(name, Locale.US);
-		} catch (PersistenceException e) {
-			try {
-				List<Geobox> geobox = LocationConverter.getInstance()
-						.convertFromLocationDescription(name, "en");
-				if (geobox.isEmpty())
-					return null;
-				if (geobox.size() > 1)
-					throw new IllegalArgumentException(
-							"Unable to disambiguate input: " + name);
 
-				Geobox box = geobox.get(0);
-				Place place = new Place.Builder().name(name).boundingBox(box)
-						.locale(Locale.US).build();
-				EntityManagerSupport.beginTransaction();
-				placeRepository.create(place);
-				EntityManagerSupport.commit();
-			} catch (IOException io) {
-				throw new RuntimeException(
-						"Unable to connect to remote geocode service");
+
+		try {
+			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
+			try {
+				return placeRepository.findByName(name, Locale.US);
+			} catch (PersistenceException e) {
+				try {
+					List<Geobox> geobox = LocationConverter.getInstance()
+							.convertFromLocationDescription(name, "en");
+					if (geobox.isEmpty())
+						return null;
+					if (geobox.size() > 1)
+						throw new IllegalArgumentException(
+								"Unable to disambiguate input: " + name);
+
+					Geobox box = geobox.get(0);
+					Place place = new Place.Builder().name(name).boundingBox(box)
+							.locale(Locale.US).build();
+					EntityManagerSupport.beginTransaction();
+					placeRepository.create(place);
+					EntityManagerSupport.commit();
+				} catch (IOException io) {
+					throw new RuntimeException(
+							"Unable to connect to remote geocode service");
+				}
 			}
+		} finally {
+			EntityManagerSupport.closeEntityManager();
 		}
 		return null;
 	}
@@ -125,35 +141,46 @@ public class LocationService {
 	public Place getClosestPlaceLocationIsWithin(Location location) {
 		// TODO: set query results caching for this; we don't want to geocode in
 		// mysql
-		List<Place> places = placeRepository.findAll();
-
-		if (places.isEmpty())
-			return null;
 
 		Place closest = null;
-		Double closestDistance = Double.MAX_VALUE;
-		for (Place place : places) {
-			// convert to model the geo lib uses
-			GlobalPosition locationPoint = new GlobalPosition(location
-					.getLatitude().doubleValue(), location.getLongitude()
-					.doubleValue(), 0.0);
-			Location center = place.getBoundingBox().getCenter();
-			GlobalPosition placePoint = new GlobalPosition(center.getLatitude()
-					.doubleValue(), center.getLongitude().doubleValue(), 0.0);
+		
+		try {
 
-			Ellipsoid reference = Ellipsoid.WGS84;
-			double distance = geoCalculator.calculateGeodeticCurve(reference,
-					locationPoint, placePoint).getEllipsoidalDistance(); // Distance
-																			// between
-																			// Point
-																			// A
-																			// and
-																			// Point
-																			// B
-			if (distance < closestDistance) {
-				closestDistance = distance;
-				closest = place;
+			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
+
+			List<Place> places = placeRepository.findAll();
+
+			if (places.isEmpty())
+				return null;
+
+			
+			Double closestDistance = Double.MAX_VALUE;
+			for (Place place : places) {
+				// convert to model the geo lib uses
+				GlobalPosition locationPoint = new GlobalPosition(location
+						.getLatitude().doubleValue(), location.getLongitude()
+						.doubleValue(), 0.0);
+				Location center = place.getBoundingBox().getCenter();
+				GlobalPosition placePoint = new GlobalPosition(center.getLatitude()
+						.doubleValue(), center.getLongitude().doubleValue(), 0.0);
+
+				Ellipsoid reference = Ellipsoid.WGS84;
+				double distance = geoCalculator.calculateGeodeticCurve(reference,
+						locationPoint, placePoint).getEllipsoidalDistance(); // Distance
+				// between
+				// Point
+				// A
+				// and
+				// Point
+				// B
+				if (distance < closestDistance) {
+					closestDistance = distance;
+					closest = place;
+				}
 			}
+
+		} finally {
+			EntityManagerSupport.closeEntityManager();
 		}
 		return closest;
 	}
@@ -167,7 +194,11 @@ public class LocationService {
 	 * @return location or null if it can't be determined
 	 ***/
 	public UserLocation getLocation(Long userId) {
-		return locationRepository.findByUserId(userId);
+		try {
+			return new UserLocationRepositoryJpaImpl().findByUserId(userId);
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
 	}
 
 }
