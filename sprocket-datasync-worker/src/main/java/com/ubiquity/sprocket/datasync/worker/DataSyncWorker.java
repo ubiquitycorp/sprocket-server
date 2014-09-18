@@ -1,14 +1,14 @@
 package com.ubiquity.sprocket.datasync.worker;
 
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-
 import static org.quartz.DateBuilder.futureDate;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 import static org.quartz.TriggerKey.triggerKey;
+
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -27,7 +27,6 @@ import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.sprocket.datasync.worker.jobs.DataSyncJob;
-import com.ubiquity.sprocket.datasync.worker.manager.DataSyncManager;
 import com.ubiquity.sprocket.datasync.worker.mq.consumer.CacheInvalidateConsumer;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -42,7 +41,8 @@ public class DataSyncWorker {
 	}
 	public void initialize(Configuration configuration, Configuration errorsConfiguration) throws SchedulerException, IOException {
 
-	
+		startServices(configuration, errorsConfiguration);
+		
 		List<CacheInvalidateConsumer> consumers = new LinkedList<CacheInvalidateConsumer>();
 		try {			
 			for(int i = 0; i < DEFAULT_NUM_CONSUMERS; i++)
