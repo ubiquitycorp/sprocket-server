@@ -13,6 +13,8 @@
 		<suffixPattern>[%thread] %logger %msg</suffixPattern>
 	</appender>
 
+  <logger name="org.hibernate" level="ERROR" />
+  
 	<root level="${app.log.level}">
 		<appender-ref ref="SYSLOG" />
 		<appender-ref ref="STDOUT" />

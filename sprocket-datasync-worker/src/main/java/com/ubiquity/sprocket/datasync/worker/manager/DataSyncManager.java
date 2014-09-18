@@ -3,6 +3,10 @@ package com.ubiquity.sprocket.datasync.worker.manager;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +24,7 @@ import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 public class DataSyncManager {
-	
+
 	private  Logger log = LoggerFactory.getLogger(getClass());
 	/**
 	 * If an identity has been activated, process all available content;
@@ -34,45 +38,76 @@ public class DataSyncManager {
 				.getExternalIdentityById(activated.getIdentityId());
 		processSync(identity);
 	} 
+	
 	private void processSync(ExternalIdentity identity )
 	{
-		
+
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identity.getExternalNetwork());
 
-		if (externalNetwork.network.equals(Network.Content))
-			processVideos(identity, externalNetwork);
-		else if (externalNetwork.equals(ExternalNetwork.Google))
-			processVideos(identity, ExternalNetwork.YouTube);
+		if (externalNetwork.network.equals(Network.Content)) {
+			DateTime start = new DateTime();
+			int n = processVideos(identity, externalNetwork);
+			
+			log.info("Processed {} videos in {} seconds", n, new Period(start, new DateTime()).getSeconds());
 
-		if(externalNetwork.equals(ExternalNetwork.Google) ) {
-			processMessages(identity, externalNetwork, null);
+		} else if (externalNetwork.equals(ExternalNetwork.Google)) {
+			DateTime start = new DateTime();
+			int n = processVideos(identity, ExternalNetwork.YouTube);
+			log.info("Processed {} videos in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+		} if(externalNetwork.equals(ExternalNetwork.Google) ) {
+			DateTime start = new DateTime();
+			int n = processMessages(identity, externalNetwork, null);
+			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
 		}  else if ( externalNetwork.equals(ExternalNetwork.Facebook)||externalNetwork.equals(ExternalNetwork.Twitter)) {
-			processMessages(identity, externalNetwork, null);
-			processActivities(identity, externalNetwork);
-			if ( externalNetwork.equals(ExternalNetwork.Facebook))
-					processLocalActivities(identity, externalNetwork);
+			DateTime start = new DateTime();
+			int n = processActivities(identity, externalNetwork); 
+			log.info("Processed {} activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			if (externalNetwork.equals(ExternalNetwork.Facebook)) {
+				start = new DateTime();
+				n = processLocalActivities(identity, externalNetwork);
+				log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			}
+			start = new DateTime();
+			n = processMessages(identity, externalNetwork, null);
+			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
 		}
 		else if(externalNetwork.equals(ExternalNetwork.LinkedIn))
 		{
-			processActivities(identity, ExternalNetwork.LinkedIn);
+			DateTime start = new DateTime();
+			int n = processActivities(identity, ExternalNetwork.LinkedIn);
+			log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+		}
+	
+	}
+
+	private int processActivities(ExternalIdentity identity,
+			ExternalNetwork socialNetwork) {
+		log.info("processing identity {}", identity.getIdentityId());
+		List<Activity> synced;
+		try {
+			SocialService socialService = ServiceFactory.getSocialService();
+			synced = socialService.syncActivities(identity,
+					socialNetwork);
+
+			// index for searching
+			ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), synced);
+			return synced.size();
+		} catch (Exception e) {
+			log.error("Could not process activities for identity: {}", ExceptionUtils.getRootCauseMessage(e));
+			return -1;
 		}
 	}
 
-	private void processActivities(ExternalIdentity identity,
-			ExternalNetwork socialNetwork) {
-		SocialService socialService = ServiceFactory.getSocialService();
-		List<Activity> synced = socialService.syncActivities(identity,
-				socialNetwork);
-
-		// index for searching
-		ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), synced);
-	}
-	
-	private void processLocalActivities(ExternalIdentity identity, ExternalNetwork socialNetwork){
-		List<Activity> localActivities = ServiceFactory.getSocialService().syncLocalNewsFeed(identity, socialNetwork);
-		// index for searching
-		//ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), localActivities);
+	private int processLocalActivities(ExternalIdentity identity, ExternalNetwork socialNetwork){
+		List<Activity> localActivities;
+		try {
+			localActivities = ServiceFactory.getSocialService().syncLocalNewsFeed(identity, socialNetwork);
+			return localActivities.size();
+		} catch (Exception e) {
+			log.error("Unable to sync local activities for identity: {}", identity.getIdentityId(), ExceptionUtils.getRootCauseMessage(e));
+			return -1;
+		}
 	}
 
 	/***
@@ -81,15 +116,21 @@ public class DataSyncManager {
 	 * @param identity
 	 * @param externalNetwork
 	 */
-	private void processVideos(ExternalIdentity identity,
+	private int processVideos(ExternalIdentity identity,
 			ExternalNetwork externalNetwork) {
+		List<VideoContent> synced;
+		try {
+			ContentService contentService = ServiceFactory.getContentService();
+			synced = contentService.sync(identity,
+					externalNetwork);
 
-		ContentService contentService = ServiceFactory.getContentService();
-		List<VideoContent> synced = contentService.sync(identity,
-				externalNetwork);
-
-		// add videos to search results for this specific user
-		ServiceFactory.getSearchService().indexVideos(identity.getUser().getUserId(), synced);
+			// add videos to search results for this specific user
+			ServiceFactory.getSearchService().indexVideos(identity.getUser().getUserId(), synced);
+			return synced.size();
+		} catch (Exception e) {
+			log.error("Unable to sync for identity: {}", identity.getIdentityId(), ExceptionUtils.getRootCauseMessage(e));
+			return -1;
+		}
 	}
 
 	/***
@@ -98,15 +139,23 @@ public class DataSyncManager {
 	 * @param identity
 	 * @param network
 	 */
-	private void processMessages(ExternalIdentity identity,
+	private int processMessages(ExternalIdentity identity,
 			ExternalNetwork network,String lastMessageIdentifier) {
-		SocialService socialService = ServiceFactory.getSocialService();
 
-		List<com.ubiquity.social.domain.Message> messages = socialService
-				.syncMessages(identity, network, lastMessageIdentifier);
+		List<com.ubiquity.social.domain.Message> messages;
+		try {
+			SocialService socialService = ServiceFactory.getSocialService();
 
-		// add messages to search results
-		ServiceFactory.getSearchService().indexMessages(messages);
+			messages = socialService
+					.syncMessages(identity, network, lastMessageIdentifier);
+
+			// add messages to search results
+			ServiceFactory.getSearchService().indexMessages(messages);
+			return messages.size();
+		} catch (Exception e) {
+			log.error("Could not process messages for identity: {}", ExceptionUtils.getRootCauseMessage(e));
+			return -1;
+		}
 	}
 	/***
 	 * Refresh data of all users in all social networks
@@ -135,21 +184,33 @@ public class DataSyncManager {
 	 */
 	public int syncDataForUser(User user) {
 		Set<Identity> identities = user.getIdentities();
-		//List<ExternalIdentity> identities = ServiceFactory.getExternalIdentityService().findExternalIdentityByUserID(user.getUserId());
+		
+		DateTime start = new DateTime();
+
 		for (Identity identity : identities) {
-			try
-			{
-				ExternalIdentity externalIdentity =(ExternalIdentity)identity;
-				if(externalIdentity.getExternalNetwork() == ExternalNetwork.Facebook.ordinal() ||externalIdentity.getExternalNetwork() == ExternalNetwork.YouTube.ordinal() )
+
+
+			if(identity instanceof ExternalIdentity) {
+				try
 				{
+					ExternalIdentity externalIdentity = (ExternalIdentity)identity;
+					
 					ServiceFactory.getSocialService().checkValidityOfExternalIdentity(externalIdentity);
-					processSync(externalIdentity );
+					processSync(externalIdentity);
+										
+					
+				} catch(Exception ex) {
+					log.error(ex.getMessage());
+					ex.printStackTrace();
 				}
-			}catch(Exception ex)
-			{
-				log.debug(ex.getMessage());
 			}
+			
+
+
 		}
+		
+		log.info("Full sync for user: {} in {} seconds", user.getUserId(), new Period(start, new DateTime()).getSeconds());
+
 		return 0;
 	}
 }

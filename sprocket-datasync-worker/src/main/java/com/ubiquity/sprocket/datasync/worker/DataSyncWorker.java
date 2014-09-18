@@ -27,6 +27,7 @@ import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.sprocket.datasync.worker.jobs.DataSyncJob;
+import com.ubiquity.sprocket.datasync.worker.manager.DataSyncManager;
 import com.ubiquity.sprocket.datasync.worker.mq.consumer.CacheInvalidateConsumer;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -41,8 +42,7 @@ public class DataSyncWorker {
 	}
 	public void initialize(Configuration configuration, Configuration errorsConfiguration) throws SchedulerException, IOException {
 
-		startServices(configuration, errorsConfiguration);
-		
+	
 		List<CacheInvalidateConsumer> consumers = new LinkedList<CacheInvalidateConsumer>();
 		try {			
 			for(int i = 0; i < DEFAULT_NUM_CONSUMERS; i++)

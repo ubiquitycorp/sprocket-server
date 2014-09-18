@@ -77,9 +77,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			ServiceFactory.getSearchService().indexActivities(null,
 					Arrays.asList(new Activity[] { activity }));
 
-			// track this in db
-			EngagedItem engagedItem = new EngagedDocument(user, engagedDocument.getSearchTerm(), activity);
-			ServiceFactory.getAnalyticsService().track(engagedItem);
+			
 
 		} else if(dataType.equalsIgnoreCase(VideoContent.class.getSimpleName())) {
 			// persist it or update the activity if it exists already
@@ -90,12 +88,6 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			// index for search (this will update the index if the record exists already)
 			ServiceFactory.getSearchService().indexVideos(null,
 					Arrays.asList(new VideoContent[] { videoContent }));
-
-			// track this in db
-			EngagedItem engagedItem = new EngagedDocument(user, engagedDocument.getSearchTerm(), videoContent);
-			ServiceFactory.getAnalyticsService().track(engagedItem);
-
-
 		}
 
 	}
@@ -110,10 +102,6 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		ServiceFactory.getSearchService().indexVideos(null,
 				Arrays.asList(new VideoContent[] { videoContent }));
 
-		// get user entity and then store this in the db (for now)
-		User user = ServiceFactory.getUserService().getUserById(engagedVideo.getUserId());		
-		EngagedItem engagedItem = new EngagedVideo(user, videoContent);
-		ServiceFactory.getAnalyticsService().track(engagedItem);
 	}
 
 	private void process(UserEngagedActivity engagedActivity) {
@@ -128,11 +116,6 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		// index for search (this will update the index if the record exists already)
 		ServiceFactory.getSearchService().indexActivities(
 				engagedActivity.getUserId(), 
-				Arrays.asList(new Activity[] { activity }));
-
-		// get user entity and then store this in the db (for now)
-		User user = ServiceFactory.getUserService().getUserById(engagedActivity.getUserId());		
-		EngagedItem engagedItem = new EngagedActivity(user, activity);
-		ServiceFactory.getAnalyticsService().track(engagedItem);
+				Arrays.asList(new Activity[] { activity }));		
 	}
 }

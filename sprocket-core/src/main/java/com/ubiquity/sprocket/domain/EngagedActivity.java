@@ -13,7 +13,7 @@ import com.ubiquity.social.domain.Activity;
 @DiscriminatorValue("activity")
 public class EngagedActivity extends EngagedItem {
 
-	@ManyToOne(cascade = { CascadeType.PERSIST })
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	@JoinColumn(name = "activity_id")
 	private Activity activity;
 	

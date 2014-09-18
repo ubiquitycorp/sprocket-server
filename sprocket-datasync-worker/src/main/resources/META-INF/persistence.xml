@@ -47,6 +47,7 @@
 			<property name="hibernate.format_sql" value="${hibernate.debug}" />
 			<property name="hibernate.transaction.flush_before_completion"
 				value="true" />
+			<property name="log4j.logger.org.hibernate.validator.engine.resolver.DefaultTraversableResolver" value="warn"/>
 
 			<property name="hibernate.hbm2ddl.auto" value="${hibernate.schema.auto}" />
 
