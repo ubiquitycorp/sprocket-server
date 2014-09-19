@@ -13,11 +13,7 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.social.domain.Activity;
-import com.ubiquity.sprocket.datasync.worker.manager.DataSyncManager;
-import com.ubiquity.sprocket.domain.EngagedActivity;
-import com.ubiquity.sprocket.domain.EngagedDocument;
-import com.ubiquity.sprocket.domain.EngagedItem;
-import com.ubiquity.sprocket.domain.EngagedVideo;
+import com.ubiquity.sprocket.datasync.worker.manager.DataSyncProcessor;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
@@ -45,7 +41,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			if(message.getType().equals(
 					ExternalIdentityActivated.class.getSimpleName()))
 			{
-				DataSyncManager dataSyncManager = new DataSyncManager();
+				DataSyncProcessor dataSyncManager = new DataSyncProcessor();
 				dataSyncManager.processSync((ExternalIdentityActivated) message.getContent());
 			}
 			else if(message.getType().equals(UserEngagedDocument.class.getSimpleName()))

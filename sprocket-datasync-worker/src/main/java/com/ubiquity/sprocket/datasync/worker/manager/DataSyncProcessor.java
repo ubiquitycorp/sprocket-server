@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +22,32 @@ import com.ubiquity.social.service.SocialService;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
-public class DataSyncManager {
+/***
+ * Handles the processing of each feed type
+ * 
+ * @author mina
+ *
+ */
+public class DataSyncProcessor extends Thread {
 
+	private int from;
+	private int to;
+	private List<User> users;
+	
+	/**
+	 * Starts a processor with the underlying list 
+	 * @param block
+	 * @param from
+	 * @param to
+	 */
+	public DataSyncProcessor(List<User> users, int from, int to) {
+		this.from = from;
+		this.to = to;
+		this.users = users;
+	}
+	
+	public DataSyncProcessor() {}
+	
 	private  Logger log = LoggerFactory.getLogger(getClass());
 	/**
 	 * If an identity has been activated, process all available content;
@@ -38,6 +61,13 @@ public class DataSyncManager {
 				.getExternalIdentityById(activated.getIdentityId());
 		processSync(identity);
 	} 
+	
+	
+	
+	public void run() {
+		log.info("Synchronizing data from {} to {}", from, to);
+		syncData();
+	}
 	
 	private void processSync(ExternalIdentity identity )
 	{
@@ -55,11 +85,11 @@ public class DataSyncManager {
 			DateTime start = new DateTime();
 			int n = processVideos(identity, ExternalNetwork.YouTube);
 			log.info("Processed {} videos in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-		} if(externalNetwork.equals(ExternalNetwork.Google) ) {
+		} else if(externalNetwork.equals(ExternalNetwork.Google) ) {
 			DateTime start = new DateTime();
 			int n = processMessages(identity, externalNetwork, null);
 			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-		}  else if ( externalNetwork.equals(ExternalNetwork.Facebook)||externalNetwork.equals(ExternalNetwork.Twitter)) {
+		}  else if ( externalNetwork.equals(ExternalNetwork.Facebook) || externalNetwork.equals(ExternalNetwork.Twitter)) {
 			DateTime start = new DateTime();
 			int n = processActivities(identity, externalNetwork); 
 			log.info("Processed {} activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
@@ -166,8 +196,8 @@ public class DataSyncManager {
 		int numRefreshed = 0;
 
 		try {	
-			List<User> users = ServiceFactory.getUserService().findAllActiveUsers();
-			for(User user : users) {
+			List<User> subList = users.subList(from, to);
+			for(User user : subList) {
 				numRefreshed += syncDataForUser(user);
 			}
 		} finally {
@@ -201,7 +231,6 @@ public class DataSyncManager {
 					
 				} catch(Exception ex) {
 					log.error(ex.getMessage());
-					ex.printStackTrace();
 				}
 			}
 			
