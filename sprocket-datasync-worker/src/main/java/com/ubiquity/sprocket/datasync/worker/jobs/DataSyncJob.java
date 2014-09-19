@@ -21,10 +21,7 @@ public class DataSyncJob implements Job{
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		log.debug("Executing contact sync");
-		try {
-			// get total number of users number of users
-//			DataSyncProcessor processor = new DataSyncProcessor();
-//		    
+		try {		    
 			// get the size of a processing block
 			int blockSize = context.getJobDetail().getJobDataMap().getInt("blockSize");
 			
@@ -37,9 +34,7 @@ public class DataSyncJob implements Job{
 			
 			// create list of processors
 			List<DataSyncProcessor> processors = new LinkedList<DataSyncProcessor>();
-			
-			// get all active users
-			
+						
 			// get the start/end block identifiers
 			int i;
 			int start = 0;
@@ -67,36 +62,6 @@ public class DataSyncJob implements Job{
 		} catch (Exception e) {
 			log.error("Could not process message: {}", e);
 		}
-	}
-	
-	public static void main(String[] args) throws Exception {
-		
-		
-		// get total number of users; the number of threads is equal to users / block size
-		long users = 73l;
-		long numThreads = users / 20;
-				
-		// create list of processors
-		List<DataSyncProcessor> processors = new LinkedList<DataSyncProcessor>();
-		
-		// get the start/end block identifiers
-		int i;
-		long start = 0;
-		long end = 0;
-		for(i = 0; i < numThreads; i++) {
-			start = i == 0 ? 0 : end + 1;
-			end = end + 20;
-			System.out.println(start);
-			System.out.println(end);
-
-		}
-		
-		// get the remainder for the last thread
-		long remainder = users % 20;
-		start = end + 1;
-		end = end + remainder;
-		System.out.println(start);
-		System.out.println(end);
 	}
 
 }

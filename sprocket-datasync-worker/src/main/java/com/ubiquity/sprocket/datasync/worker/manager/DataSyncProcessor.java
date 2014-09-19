@@ -46,19 +46,22 @@ public class DataSyncProcessor extends Thread {
 		this.users = users;
 	}
 	
+	/***
+	 * Creates a data sync processor that operate
+	 */
 	public DataSyncProcessor() {}
 	
 	private  Logger log = LoggerFactory.getLogger(getClass());
+	
+	
 	/**
 	 * If an identity has been activated, process all available content;
 	 * 
 	 * @param content
 	 */
 	public void processSync(ExternalIdentityActivated activated) {
-		log.debug("found: {}", activated);
 		// get identity from message
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
-				.getExternalIdentityById(activated.getIdentityId());
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().getExternalIdentityById(activated.getIdentityId());
 		processSync(identity);
 	} 
 	
@@ -69,8 +72,12 @@ public class DataSyncProcessor extends Thread {
 		syncData();
 	}
 	
-	private void processSync(ExternalIdentity identity )
-	{
+	/**
+	 * Synchronizes an identity by network
+	 * 
+	 * @param identity
+	 */
+	private void processSync(ExternalIdentity identity){
 
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identity.getExternalNetwork());
@@ -78,9 +85,7 @@ public class DataSyncProcessor extends Thread {
 		if (externalNetwork.network.equals(Network.Content)) {
 			DateTime start = new DateTime();
 			int n = processVideos(identity, externalNetwork);
-			
 			log.info("Processed {} videos in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-
 		} else if (externalNetwork.equals(ExternalNetwork.Google)) {
 			DateTime start = new DateTime();
 			int n = processVideos(identity, ExternalNetwork.YouTube);
@@ -101,9 +106,7 @@ public class DataSyncProcessor extends Thread {
 			start = new DateTime();
 			n = processMessages(identity, externalNetwork, null);
 			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-		}
-		else if(externalNetwork.equals(ExternalNetwork.LinkedIn))
-		{
+		} else if(externalNetwork.equals(ExternalNetwork.LinkedIn)) {
 			DateTime start = new DateTime();
 			int n = processActivities(identity, ExternalNetwork.LinkedIn);
 			log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
@@ -111,9 +114,7 @@ public class DataSyncProcessor extends Thread {
 	
 	}
 
-	private int processActivities(ExternalIdentity identity,
-			ExternalNetwork socialNetwork) {
-		log.info("processing identity {}", identity.getIdentityId());
+	private int processActivities(ExternalIdentity identity, ExternalNetwork socialNetwork) {
 		List<Activity> synced;
 		try {
 			SocialService socialService = ServiceFactory.getSocialService();

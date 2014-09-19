@@ -39,10 +39,9 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			Message message = messageConverter.deserialize(msg, Message.class);
 			log.info("message received: {}", message);
 			if(message.getType().equals(
-					ExternalIdentityActivated.class.getSimpleName()))
-			{
+					ExternalIdentityActivated.class.getSimpleName())) {
 				DataSyncProcessor dataSyncManager = new DataSyncProcessor();
-				dataSyncManager.processSync((ExternalIdentityActivated) message.getContent());
+				dataSyncManager.processSync((ExternalIdentityActivated)message.getContent());
 			}
 			else if(message.getType().equals(UserEngagedDocument.class.getSimpleName()))
 				process((UserEngagedDocument)message.getContent());
@@ -58,10 +57,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 
 	private void process(UserEngagedDocument engagedDocument) {
 		log.debug("found: {}", engagedDocument);
-
-		// get user entity and then store this in the db (for now)
-		User user = ServiceFactory.getUserService().getUserById(engagedDocument.getUserId());	
-					
+			
 		String dataType = engagedDocument.getDataType();
 		if(dataType.equalsIgnoreCase(Activity.class.getSimpleName())) {
 			// persist it or update the activity if it exists already
@@ -72,9 +68,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			// index for search (this will update the index if the record exists already)
 			ServiceFactory.getSearchService().indexActivities(null,
 					Arrays.asList(new Activity[] { activity }));
-
 			
-
 		} else if(dataType.equalsIgnoreCase(VideoContent.class.getSimpleName())) {
 			// persist it or update the activity if it exists already
 			log.debug("saving the video to db...");
@@ -90,7 +84,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 
 	private void process(UserEngagedVideo engagedVideo) {
 		// persist it or update the activity if it exists already
-		log.debug("saving the video to db...");
+		log.debug("indexing this video to db...");
 		VideoContent videoContent = engagedVideo.getVideoContent();
 		videoContent = ServiceFactory.getContentService().findOrCreate(videoContent);
 
@@ -101,8 +95,6 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 	}
 
 	private void process(UserEngagedActivity engagedActivity) {
-		log.info("found: {}", engagedActivity);
-
 		// build it
 		Activity activity = engagedActivity.getActivity();
 
