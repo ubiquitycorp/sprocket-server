@@ -127,7 +127,7 @@ public class DataSyncWorker {
 				.withSchedule(simpleSchedule()
 						.withIntervalInMinutes(8)
 						.repeatForever())
-						.startAt(futureDate(1, IntervalUnit.SECOND))
+						.startAt(futureDate(1, IntervalUnit.MINUTE))
 						.build();
 
 		scheduler.scheduleJob(job, trigger);
