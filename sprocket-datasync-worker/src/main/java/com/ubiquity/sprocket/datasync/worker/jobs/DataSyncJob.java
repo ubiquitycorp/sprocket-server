@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import com.niobium.common.thread.ThreadPool;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.sprocket.datasync.worker.manager.DataSyncProcessor;
-import com.ubiquity.sprocket.datasync.worker.mq.consumer.CacheInvalidateConsumer;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 public class DataSyncJob implements Job{

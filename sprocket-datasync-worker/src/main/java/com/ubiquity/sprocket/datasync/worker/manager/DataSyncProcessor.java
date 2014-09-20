@@ -90,10 +90,12 @@ public class DataSyncProcessor extends Thread {
 			DateTime start = new DateTime();
 			int n = processVideos(identity, ExternalNetwork.YouTube);
 			log.info("Processed {} videos in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-		} else if(externalNetwork.equals(ExternalNetwork.Google) ) {
-			DateTime start = new DateTime();
-			int n = processMessages(identity, externalNetwork, null);
+			
+			start = new DateTime();
+			n = processMessages(identity, externalNetwork, null);
 			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			
+	
 		}  else if ( externalNetwork.equals(ExternalNetwork.Facebook) || externalNetwork.equals(ExternalNetwork.Twitter)) {
 			DateTime start = new DateTime();
 			int n = processActivities(identity, externalNetwork); 
