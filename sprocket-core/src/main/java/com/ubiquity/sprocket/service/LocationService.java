@@ -55,8 +55,6 @@ public class LocationService {
 		try {
 			try {
 				locationRepository = new UserLocationRepositoryJpaImpl();
-				EntityManagerSupport.beginTransaction();
-
 				UserLocation persisted = locationRepository.findByUserId(location
 						.getUser().getUserId());
 				if (persisted != null)
@@ -67,6 +65,8 @@ public class LocationService {
 			} 
 
 			location.setLastUpdated(System.currentTimeMillis());
+
+			EntityManagerSupport.beginTransaction();
 
 			if (create)
 				locationRepository.create(location);

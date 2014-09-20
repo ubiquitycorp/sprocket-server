@@ -185,6 +185,7 @@ public class DataSyncProcessor extends Thread {
 			return messages.size();
 		} catch (Exception e) {
 			log.error("Could not process messages for identity: {}", ExceptionUtils.getRootCauseMessage(e));
+			e.printStackTrace();
 			return -1;
 		}
 	}

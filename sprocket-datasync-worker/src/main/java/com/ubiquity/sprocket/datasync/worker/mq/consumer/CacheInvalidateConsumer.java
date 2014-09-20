@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
 import com.ubiquity.content.domain.VideoContent;
-import com.ubiquity.identity.domain.User;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.social.domain.Activity;
