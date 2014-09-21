@@ -1,5 +1,8 @@
 package com.ubiquity.social.repository;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.After;
@@ -9,8 +12,8 @@ import org.junit.Test;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.sprocket.domain.ExternalInterest;
-import com.ubiquity.sprocket.domain.Interest;
+import com.ubiquity.social.domain.ExternalInterest;
+import com.ubiquity.social.domain.Interest;
 import com.ubiquity.sprocket.repository.ExternalInterestRepository;
 import com.ubiquity.sprocket.repository.ExternalInterestRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.InterestRepository;
@@ -54,8 +57,6 @@ public class InterestRepositoryTest {
 		EntityManagerSupport.beginTransaction();
 		externalInterestRepository.create(external);
 		EntityManagerSupport.commit();
-		
-
 	}
 
 	@Test
@@ -70,13 +71,19 @@ public class InterestRepositoryTest {
 	}
 	
 	@Test
-	public void testCreateFindInternalByNameExternalName() {
+	public void testFindExternalByNameAndExternalNetwork() {
 		ExternalInterest persisted = externalInterestRepository.getByNameAndExternalNetwork(tagFromExternalNetwork, ExternalNetwork.Facebook);
 		Assert.assertNotNull(persisted);
 		
 		persisted = externalInterestRepository.getByNameAndExternalNetwork(tagFromExternalNetwork, ExternalNetwork.YouTube);
 		Assert.assertNull(persisted);
-		
 	}
+	
+	@Test
+	public void testFindExternalByNamesAndExternalNetwork() {
+		List<ExternalInterest> persisted = externalInterestRepository.findByNamesAndExternalNetwork(new HashSet<String>(Arrays.asList(new String[] { tagFromExternalNetwork })), ExternalNetwork.Facebook);
+		Assert.assertFalse(persisted.isEmpty());
+	}
+	
 
 }

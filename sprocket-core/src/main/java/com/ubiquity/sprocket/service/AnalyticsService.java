@@ -30,7 +30,9 @@ import com.ubiquity.location.repository.UserLocationRepository;
 import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
+import com.ubiquity.social.domain.ExternalInterest;
 import com.ubiquity.social.domain.Gender;
+import com.ubiquity.social.repository.ActivityRepositoryJpaImpl;
 import com.ubiquity.social.repository.ContactRepository;
 import com.ubiquity.social.repository.ContactRepositoryJpaImpl;
 import com.ubiquity.sprocket.analytics.recommendation.Dimension;
@@ -52,6 +54,7 @@ import com.ubiquity.sprocket.repository.EngagedItemRepository;
 import com.ubiquity.sprocket.repository.EngagedItemRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.EngagedVideoRepository;
 import com.ubiquity.sprocket.repository.EngagedVideoRepositoryJpaImpl;
+import com.ubiquity.sprocket.repository.ExternalInterestRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.GroupMembershipRepository;
 import com.ubiquity.sprocket.repository.GroupMembershipRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepository;
@@ -69,18 +72,6 @@ import com.ubiquity.sprocket.repository.RecommendedVideoRepositoryJpaImpl;
 public class AnalyticsService {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
-
-	// private EngagedItemRepository engagedItemRepository;
-	// private EngagedActivityRepository engagedActivityRepository;
-	// private EngagedDocumentRepository engagedDocumentRepository;
-	// private EngagedVideoRepository engagedVideoRepository;
-	// private GroupMembershipRepository groupMembershipRepository;
-	// private ContactRepository contactRepository;
-	// private RecommendedActivityRepository recommendedActivityRepository;
-	// private RecommendedVideoRepository recommendedVideoRepository;
-	// private UserRepository userRepository;
-	// private UserLocationRepository locationRepository;
-
 	private UserDataModificationCache dataModificationCache;
 
 	private RecommendationEngine recommendationEngine;
@@ -92,18 +83,6 @@ public class AnalyticsService {
 	 */
 	public AnalyticsService(Configuration configuration) {
 		setUpRecommendationEngine(configuration);
-
-		// recommendedVideoRepository = new RecommendedVideoRepositoryJpaImpl();
-		// engagedItemRepository = new EngagedItemRepositoryJpaImpl();
-		// engagedActivityRepository = new EngagedActivityRepositoryJpaImpl();
-		// engagedDocumentRepository = new EngagedDocumentRepositoryJpaImpl();
-		// engagedVideoRepository = new EngagedVideoRepositoryJpaImpl();
-		// groupMembershipRepository = new GroupMembershipRepositoryJpaImpl();
-		// contactRepository = new ContactRepositoryJpaImpl();
-		// recommendedActivityRepository = new
-		// RecommendedActivityRepositoryJpaImpl();
-		// locationRepository = new UserLocationRepositoryJpaImpl();
-		// userRepository = new UserRepositoryJpaImpl();
 
 		dataModificationCache = new UserDataModificationCacheRedisImpl(
 				configuration
@@ -122,6 +101,34 @@ public class AnalyticsService {
 			EntityManagerSupport.beginTransaction();
 			new EngagedItemRepositoryJpaImpl().create(engagedItem);
 			EntityManagerSupport.commit();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+	}
+	
+	/***
+	 * Will attempt to add interest by mapping the entries in the "tags" property of an activity.  If there are matches,
+	 * the interests collection will be populated in the passed-in entity after being persisted to the underlying data store.
+	 * 
+	 * @param activity
+	 */
+	public void addInterests(Activity activity) {
+		if(activity.getTags().isEmpty())
+			return;
+		
+		try {
+			List<ExternalInterest> mappings = new ExternalInterestRepositoryJpaImpl().findByNamesAndExternalNetwork(activity.getTags(), activity.getExternalNetwork());
+			for(ExternalInterest mapped : mappings) {
+				// add the internal interest
+				activity.getInterests().add(mapped.getInterest());
+			}
+			
+			// now update
+			EntityManagerSupport.beginTransaction();
+			new ActivityRepositoryJpaImpl().update(activity);
+			EntityManagerSupport.commit();
+
+			
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}

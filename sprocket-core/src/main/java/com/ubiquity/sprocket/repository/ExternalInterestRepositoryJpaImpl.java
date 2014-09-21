@@ -1,12 +1,15 @@
 package com.ubiquity.sprocket.repository;
 
+import java.util.List;
+import java.util.Set;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 import com.niobium.repository.BaseRepositoryJpaImpl;
 import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.sprocket.domain.ExternalInterest;
+import com.ubiquity.social.domain.ExternalInterest;
 
 public class ExternalInterestRepositoryJpaImpl extends BaseRepositoryJpaImpl<Long, ExternalInterest> implements
 ExternalInterestRepository {
@@ -32,6 +35,17 @@ ExternalInterestRepository {
 			return null;
 		}
 		
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<ExternalInterest> findByNamesAndExternalNetwork(
+			Set<String> names, ExternalNetwork network) {
+		Query query = getEntityManager().createQuery("select ei from ExternalInterest ei where ei.name in :names and ei.externalNetwork = :externalNetwork");
+		query.setParameter("names", names);
+		query.setParameter("externalNetwork", network);
+
+		return (List<ExternalInterest>)query.getResultList();
 	}
 
 	

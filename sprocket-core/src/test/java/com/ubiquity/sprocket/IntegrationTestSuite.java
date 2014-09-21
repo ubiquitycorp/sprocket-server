@@ -17,8 +17,6 @@ import com.ubiquity.sprocket.repository.EngagedItemRepositoryTest;
 import com.ubiquity.sprocket.repository.SocialRepositoryTest;
 import com.ubiquity.sprocket.repository.UserRepositoryTest;
 import com.ubiquity.sprocket.repository.VideoContentRepositoryTest;
-import com.ubiquity.sprocket.service.AnalyticsServiceTest;
-import com.ubiquity.sprocket.service.AuthenticationServiceTest;
 
 /***
  * Test suite will ensure that the integration tests have their dependencies met and cleaned up
