@@ -77,7 +77,7 @@
 				<app.log.level>INFO</app.log.level>
 				<syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
 				<redis.host>localhost</redis.host>
-				<hibernate.debug>true</hibernate.debug>
+				<hibernate.debug>false</hibernate.debug>
 				<solr.api.host>localhost</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
 				<social.twitter.app.consumerKey>eIxhGVt1wo8yNs7cTq0mNHsi0</social.twitter.app.consumerKey>
@@ -126,11 +126,7 @@
 					<!-- recommendation engine -->
 				<recommendation.engine.appname>Sprocket</recommendation.engine.appname>
 				<recommendation.engine.hadoop.master>local</recommendation.engine.hadoop.master>
-				
 				<recommendation.engine.alg.kmeans.iterations>5</recommendation.engine.alg.kmeans.iterations>
-			
-				
-				
 			</properties>
 			<activation>
 				<property>
