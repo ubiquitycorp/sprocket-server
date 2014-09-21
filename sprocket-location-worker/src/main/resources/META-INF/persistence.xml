@@ -27,6 +27,7 @@
 		<class>com.ubiquity.social.domain.Conversation</class>
 		<class>com.ubiquity.social.domain.Message</class>
 		<class>com.ubiquity.social.domain.Activity</class>
+		<class>com.ubiquity.social.domain.Interest</class>
 		<class>com.ubiquity.social.domain.Event</class>
 
 		<properties>
