@@ -15,7 +15,9 @@ import com.niobium.repository.CollectionVariant;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.social.domain.Activity;
+import com.ubiquity.social.domain.Interest;
 import com.ubiquity.sprocket.api.DtoAssembler;
+import com.ubiquity.sprocket.api.dto.containers.InterestsDto;
 import com.ubiquity.sprocket.api.dto.containers.RecommendationsDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.service.AnalyticsService;
@@ -33,15 +35,28 @@ public class AnalyticsEndpoint {
 	public Response recommendations(@PathParam("userId") Long userId) {
 		throw new UnsupportedOperationException("This endpoint is currently not supported");
 	}
-	
-	
+
+
 	@GET
-	@Path("interests")
+	@Path("users/{userId}/interests")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response interests(@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
+		InterestsDto interestsDto = new InterestsDto();
 		
+		CollectionVariant<Interest> variant = ServiceFactory.getAnalyticsService().findInterests(ifModifiedSince);
+		// Throw a 304 if if there is no variant (no change)
+		if (variant == null)
+			return Response.notModified().build();
+		
+		
+		interestsDto.getInterests().addAll(DtoAssembler.assemble(variant.getCollection()));
+		
+		return Response.ok()
+				.header("Last-Modified", variant.getLastModified())
+				.entity(jsonConverter.convertToPayload(interestsDto))
+				.build();
 	}
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/activities/recommended")
@@ -51,26 +66,26 @@ public class AnalyticsEndpoint {
 
 		RecommendationsDto recommendationsDto = new RecommendationsDto();
 		AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
-		
+
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
-		
+
 		CollectionVariant<Activity> variant = analyticsService.findAllRecommendedActivities(userId, externalNetwork, ifModifiedSince);
-		
+
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
 			return Response.notModified().build();
-		
+
 		Collection<Activity> activities = variant.getCollection();
 		for(Activity activity : activities) {
 			recommendationsDto.getActivities().add(DtoAssembler.assemble(activity));
 		}
-	
+
 		return Response.ok()
 				.header("Last-Modified", variant.getLastModified())
 				.entity(jsonConverter.convertToPayload(recommendationsDto))
 				.build();
 	}
-	
+
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/videos/recommended")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -79,26 +94,26 @@ public class AnalyticsEndpoint {
 
 		RecommendationsDto recommendationsDto = new RecommendationsDto();
 		AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
-		
+
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
-		
+
 		CollectionVariant<VideoContent> variant = analyticsService.findAllRecommendedVideos(userId, externalNetwork, ifModifiedSince);
-		
-		
+
+
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
 			return Response.notModified().build();
-		
-		
+
+
 		Collection<VideoContent> videos = variant.getCollection();
 		for(VideoContent videoContent : videos) {
 			recommendationsDto.getVideos().add(DtoAssembler.assemble(videoContent));
 		}
-	
+
 		return Response.ok()
 				.header("Last-Modified", variant.getLastModified())
 				.entity(jsonConverter.convertToPayload(recommendationsDto))
 				.build();
 	}
-	
+
 }

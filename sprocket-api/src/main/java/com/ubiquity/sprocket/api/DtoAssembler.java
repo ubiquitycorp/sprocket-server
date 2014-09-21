@@ -1,9 +1,11 @@
 package com.ubiquity.sprocket.api;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 import java.util.UUID;
 
 import com.niobium.common.serialize.JsonConverter;
@@ -16,6 +18,7 @@ import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.ActivityType;
 import com.ubiquity.social.domain.Contact;
+import com.ubiquity.social.domain.Interest;
 import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.factories.ActivityFactory;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
@@ -23,6 +26,7 @@ import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.dto.model.ImageDto;
+import com.ubiquity.sprocket.api.dto.model.InterestDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 import com.ubiquity.sprocket.api.dto.model.VideoDto;
 import com.ubiquity.sprocket.domain.Document;
@@ -38,6 +42,7 @@ public class DtoAssembler {
 		jsonConverter = JsonConverter.getInstance();
 	}
 
+	
 	public static Activity assemble(ActivityDto activityDto) {
 		// convert to domain entity with required fields
 		Activity.Builder activityBuilder = ActivityFactory
@@ -92,6 +97,31 @@ public class DtoAssembler {
 		return contactBuilder.build();
 	}
 
+	
+	public static List<InterestDto> assemble(Collection<Interest> interests) {
+		
+		List<InterestDto> interestsDtoList = new LinkedList<InterestDto>();
+		
+		for(Interest interest : interests) {
+			// add
+			InterestDto parentDto = new InterestDto(interest.getInterestId(), interest.getName());
+			interestsDtoList.add(parentDto);
+		
+			Set<Interest> children = interest.getChildren();
+			Stack<Interest> stack = new Stack<Interest>();
+			stack.addAll(children);
+			while(!stack.isEmpty()) {
+				Interest child = stack.pop();
+				InterestDto childDto = new InterestDto(child.getInterestId(), child.getName());
+				parentDto.getChildren().add(childDto);
+			}
+		}
+	
+		return interestsDtoList;
+		
+	}
+	
+	
 	public static DocumentDto assemble(Document document) {
 
 		Map<String, Object> fields = document.getFields();
