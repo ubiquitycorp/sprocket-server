@@ -74,7 +74,7 @@
 		<profile>
 			<id>env-qa</id>
 			<properties>
-				<app.log.level>INFO</app.log.level>
+				<app.log.level>DEBUG</app.log.level>
 				<syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
 				<redis.host>localhost</redis.host>
 				<hibernate.debug>false</hibernate.debug>
