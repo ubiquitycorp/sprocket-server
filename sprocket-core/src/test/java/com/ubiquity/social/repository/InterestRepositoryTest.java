@@ -12,12 +12,13 @@ import org.junit.Test;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.external.repository.ExternalInterestRepository;
+import com.ubiquity.external.repository.ExternalInterestRepositoryJpaImpl;
+import com.ubiquity.external.repository.InterestRepository;
+import com.ubiquity.external.repository.InterestRepositoryJpaImpl;
 import com.ubiquity.social.domain.ExternalInterest;
 import com.ubiquity.social.domain.Interest;
-import com.ubiquity.sprocket.repository.ExternalInterestRepository;
-import com.ubiquity.sprocket.repository.ExternalInterestRepositoryJpaImpl;
-import com.ubiquity.sprocket.repository.InterestRepository;
-import com.ubiquity.sprocket.repository.InterestRepositoryJpaImpl;
+
 
 /***
  * Tests testing basic CRUD operations for a user repository

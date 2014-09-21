@@ -9,6 +9,8 @@ import org.junit.Test;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.external.repository.InterestRepository;
+import com.ubiquity.external.repository.InterestRepositoryJpaImpl;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.repository.UserRepository;
@@ -19,8 +21,6 @@ import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.ActivityType;
 import com.ubiquity.social.domain.Interest;
-import com.ubiquity.sprocket.repository.InterestRepository;
-import com.ubiquity.sprocket.repository.InterestRepositoryJpaImpl;
 
 /***
  * Tests testing basic CRUD operations for a user repository
