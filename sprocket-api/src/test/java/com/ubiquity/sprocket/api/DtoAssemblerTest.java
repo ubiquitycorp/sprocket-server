@@ -6,11 +6,11 @@ import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.factory.TestMessageFactory;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Message;
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 
 /***

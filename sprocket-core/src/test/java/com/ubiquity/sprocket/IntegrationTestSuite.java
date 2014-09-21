@@ -26,11 +26,9 @@ import com.ubiquity.sprocket.service.AuthenticationServiceTest;
  * @author chris
  *
  */
-@Ignore
 @RunWith(Suite.class)
+@Ignore
 @SuiteClasses({ 
-	AuthenticationServiceTest.class, 
-	AnalyticsServiceTest.class, 
 	SocialRepositoryTest.class, 
 	UserRepositoryTest.class, 
 	ActivityRepositoryTest.class, 

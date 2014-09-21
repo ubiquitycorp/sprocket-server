@@ -1,14 +1,14 @@
 package com.ubiquity.sprocket.datasync.worker;
 
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-
 import static org.quartz.DateBuilder.futureDate;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 import static org.quartz.TriggerKey.triggerKey;
+
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -55,10 +55,13 @@ public class DataSyncWorker {
 		// start the thread pool, 10 consumer threads
 		ThreadPool<CacheInvalidateConsumer> threadPool = new ThreadPool<CacheInvalidateConsumer>();
 		threadPool.start(consumers);
-		startScheduler();
+		
+		
+		startScheduler(configuration.getInt("rules.sync.blockSize", 20));
 		log.info("Initialized {} version: {}", configuration.getProperty("application.name"),
 				configuration.getProperty("application.version"));
 		
+				
 		while (true) {
 			try {
 				Thread.sleep(1000);
@@ -110,12 +113,13 @@ public class DataSyncWorker {
 		// TODO: we need an mq disconnect
 	}
 	
-	private void startScheduler() throws SchedulerException {
+	private void startScheduler(int blockSize) throws SchedulerException {
 		Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
 		scheduler.start();
 
 		JobDetail job = newJob(DataSyncJob.class)
 				.withIdentity("dataSync", "sync")
+				.usingJobData("blockSize", blockSize)
 				.build();
 
 		Trigger trigger = newTrigger() 

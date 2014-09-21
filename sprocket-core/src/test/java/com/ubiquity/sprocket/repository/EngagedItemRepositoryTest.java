@@ -88,9 +88,9 @@ public class EngagedItemRepositoryTest {
 		userRepository.create(beber);
 		userRepository.create(jayz);
 		
-		groupMembershipRepository.create(new GroupMembership(null, mom, soccerMoms));
-		groupMembershipRepository.create(new GroupMembership(null, beber, millenials));
-		groupMembershipRepository.create(new GroupMembership(null, jayz, millenials));
+		groupMembershipRepository.create(new GroupMembership(mom, soccerMoms));
+		groupMembershipRepository.create(new GroupMembership(beber, millenials));
+		groupMembershipRepository.create(new GroupMembership(jayz, millenials));
 
 		EntityManagerSupport.commit();
 
