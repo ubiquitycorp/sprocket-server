@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.cache.DataCacheKeys;
+import com.niobium.repository.cache.DataModificationCache;
+import com.niobium.repository.cache.DataModificationCacheRedisImpl;
 import com.niobium.repository.cache.UserDataModificationCache;
 import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
@@ -32,6 +34,7 @@ import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.ExternalInterest;
 import com.ubiquity.social.domain.Gender;
+import com.ubiquity.social.domain.Interest;
 import com.ubiquity.social.repository.ActivityRepositoryJpaImpl;
 import com.ubiquity.social.repository.ContactRepository;
 import com.ubiquity.social.repository.ContactRepositoryJpaImpl;
@@ -57,6 +60,7 @@ import com.ubiquity.sprocket.repository.EngagedVideoRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.ExternalInterestRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.GroupMembershipRepository;
 import com.ubiquity.sprocket.repository.GroupMembershipRepositoryJpaImpl;
+import com.ubiquity.sprocket.repository.InterestRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepository;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedVideoRepository;
@@ -72,8 +76,8 @@ import com.ubiquity.sprocket.repository.RecommendedVideoRepositoryJpaImpl;
 public class AnalyticsService {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
-	private UserDataModificationCache dataModificationCache;
-
+	private UserDataModificationCache userDataModificationCache;
+	private DataModificationCache dataModificationCache;
 	private RecommendationEngine recommendationEngine;
 
 	/***
@@ -84,9 +88,11 @@ public class AnalyticsService {
 	public AnalyticsService(Configuration configuration) {
 		setUpRecommendationEngine(configuration);
 
-		dataModificationCache = new UserDataModificationCacheRedisImpl(
+		userDataModificationCache = new UserDataModificationCacheRedisImpl(
 				configuration
 						.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GROUP));
+		dataModificationCache = new DataModificationCacheRedisImpl(
+				configuration.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GENERAL));
 
 	}
 
@@ -104,6 +110,22 @@ public class AnalyticsService {
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
+	}
+	
+	
+	public CollectionVariant<Interest> findInterests(Long ifModifiedSince) {
+		
+	
+		Long lastModified = dataModificationCache.getLastModified(CacheKeys.GlobalProperties.INTERESTS, ifModifiedSince);
+
+		// If there is no cache entry, there is no data
+		if (lastModified == null) {
+			return null;
+		}
+		
+		
+		
+
 	}
 	
 	/***
@@ -166,7 +188,7 @@ public class AnalyticsService {
 			}
 			String key = CacheKeys.generateCacheKeyForExternalNetwork(
 					CacheKeys.GroupProperties.RECOMMENDED_ACTIVITIES, network);
-			Long lastModified = dataModificationCache.getLastModified(
+			Long lastModified = userDataModificationCache.getLastModified(
 					Long.valueOf(groupMembership.getGroupIdentifier()), key,
 					ifModifiedSince);
 
@@ -424,7 +446,7 @@ public class AnalyticsService {
 
 				String key = CacheKeys.generateCacheKeyForExternalNetwork(
 						CacheKeys.GroupProperties.RECOMMENDED_VIDEOS, network);
-				dataModificationCache.put(Long.parseLong(group), key,
+				userDataModificationCache.put(Long.parseLong(group), key,
 						System.currentTimeMillis());
 
 			}
@@ -476,7 +498,7 @@ public class AnalyticsService {
 				String key = CacheKeys.generateCacheKeyForExternalNetwork(
 						CacheKeys.GroupProperties.RECOMMENDED_ACTIVITIES,
 						network);
-				dataModificationCache.put(Long.parseLong(group), key,
+				userDataModificationCache.put(Long.parseLong(group), key,
 						System.currentTimeMillis());
 
 			}
@@ -515,7 +537,7 @@ public class AnalyticsService {
 			}
 			String key = CacheKeys.generateCacheKeyForExternalNetwork(
 					CacheKeys.GroupProperties.RECOMMENDED_VIDEOS, network);
-			Long lastModified = dataModificationCache.getLastModified(
+			Long lastModified = userDataModificationCache.getLastModified(
 					Long.valueOf(groupMembership.getGroupIdentifier()), key,
 					ifModifiedSince);
 

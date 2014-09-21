@@ -34,6 +34,15 @@ public class AnalyticsEndpoint {
 		throw new UnsupportedOperationException("This endpoint is currently not supported");
 	}
 	
+	
+	@GET
+	@Path("interests")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response interests(@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+
+		
+	}
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/activities/recommended")
 	@Produces(MediaType.APPLICATION_JSON)
