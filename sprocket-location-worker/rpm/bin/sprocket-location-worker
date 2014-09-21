@@ -6,7 +6,7 @@ JAVA=/usr/bin/java
 
 SPROCKET_WORKER_CFG=/etc/sysconfig/sprocket-worker
 
-AVAILMEM=`$FREE -m | $GREP Mem | $AWK '{print $4}'`
+AVAILMEM=`$FREE -m | $GREP Mem | $AWK '{print $2}'`
 SPROCKET_SMALL=1024
 SPROCKET_LARGE=2048
 SPROCKET_WORKER_MINFREE=4095
