@@ -28,6 +28,9 @@ public class InterestRepositoryTest {
 	private ExternalInterestRepository externalInterestRepository;
 	
 	private Interest interest;
+	private ExternalInterest external;
+	
+	private String tagFromExternalNetwork = UUID.randomUUID().toString();
 	
 	@After
 	public void tearDown() throws Exception {
@@ -46,6 +49,12 @@ public class InterestRepositoryTest {
 		EntityManagerSupport.beginTransaction();
 		interestRepository.create(interest);
 		EntityManagerSupport.commit();
+		
+		external = new ExternalInterest(tagFromExternalNetwork, interest, ExternalNetwork.Facebook);
+		EntityManagerSupport.beginTransaction();
+		externalInterestRepository.create(external);
+		EntityManagerSupport.commit();
+		
 
 	}
 
@@ -57,10 +66,17 @@ public class InterestRepositoryTest {
 	
 	@Test
 	public void testCreateExternal() {
-		ExternalInterest external = new ExternalInterest(UUID.randomUUID().toString(), interest, ExternalNetwork.Facebook);
-		EntityManagerSupport.beginTransaction();
-		externalInterestRepository.create(external);
-		EntityManagerSupport.commit();
+		Assert.assertNotNull(external.getExternalInterestId());
+	}
+	
+	@Test
+	public void testCreateFindInternalByNameExternalName() {
+		ExternalInterest persisted = externalInterestRepository.getByNameAndExternalNetwork(tagFromExternalNetwork, ExternalNetwork.Facebook);
+		Assert.assertNotNull(persisted);
+		
+		persisted = externalInterestRepository.getByNameAndExternalNetwork(tagFromExternalNetwork, ExternalNetwork.YouTube);
+		Assert.assertNull(persisted);
+		
 	}
 
 }

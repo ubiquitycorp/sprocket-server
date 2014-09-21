@@ -12,6 +12,7 @@
 		<class>com.ubiquity.location.domain.Place</class>
 		<class>com.ubiquity.location.domain.UserLocation</class>
 
+		
 		<class>com.ubiquity.sprocket.domain.RecommendedVideo</class>
 		<class>com.ubiquity.sprocket.domain.RecommendedActivity</class>
 		<class>com.ubiquity.sprocket.domain.GroupMembership</class>
@@ -19,6 +20,9 @@
 		<class>com.ubiquity.sprocket.domain.EngagedActivity</class>
 		<class>com.ubiquity.sprocket.domain.EngagedDocument</class>
 		<class>com.ubiquity.sprocket.domain.EngagedItem</class>
+		<class>com.ubiquity.sprocket.domain.Interest</class>
+		<class>com.ubiquity.sprocket.domain.ExternalInterest</class>
+		
 
 		<class>com.ubiquity.content.domain.VideoContent</class>
 		<class>com.ubiquity.identity.domain.User</class>

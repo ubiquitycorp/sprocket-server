@@ -18,7 +18,7 @@ import com.ubiquity.external.domain.ExternalNetwork;
  */
 @Entity
 @Table(name = "external_interest", indexes = {
-		@Index(name="idx_external_network_name", columnList = "name, external_network", unique = true)
+		@Index(name="idx_external_network_name", columnList = "external_network, name", unique = true)
 		})
 public class ExternalInterest {
 	
@@ -68,6 +68,10 @@ public class ExternalInterest {
 
 	public ExternalNetwork getExternalNetwork() {
 		return externalNetwork;
+	}
+
+	public Long getExternalInterestId() {
+		return externalInterestId;
 	}
 	
 	
