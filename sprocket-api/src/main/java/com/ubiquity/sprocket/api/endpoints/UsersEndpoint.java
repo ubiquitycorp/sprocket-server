@@ -2,6 +2,7 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import javax.persistence.NoResultException;
 import javax.ws.rs.Consumes;
@@ -101,15 +102,16 @@ public class UsersEndpoint {
 					"Autontication Failed no oAuth_token_returned", 401);
 
 		// create the identity if it does not exist; or use the existing one
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+		List<ExternalIdentity> identities = ServiceFactory.getExternalIdentityService()
 				.createOrUpdateExternalIdentity(user, accesstokens[0],
 						accesstokens[1], null, ClientPlatform.WEB,
 						ExternalNetwork.LinkedIn, null);
-
+		
+		ExternalIdentity identity = identities.get(0);
 		IdentityDto result = new IdentityDto.Builder().identifier(
 				identity.getIdentifier()).build();
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identity, result);
+		sendActivatedMessage(user, identities, result);
 
 		try {
 
@@ -285,7 +287,7 @@ public class UsersEndpoint {
 		User user = ServiceFactory.getUserService().getUserById(userId);
 
 		// create the identity if it does not exist; or use the existing one
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+		List<ExternalIdentity> identity = ServiceFactory.getExternalIdentityService()
 				.createOrUpdateExternalIdentity(user,
 						identityDto.getAccessToken(),
 						identityDto.getSecretToken(),
@@ -300,13 +302,13 @@ public class UsersEndpoint {
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identity.getIdentityId());
+					.getBySocialIdentityId(identity.get(0).getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
 		} catch (NoResultException ex) {
 			IdentityDto result = new IdentityDto.Builder().identifier(
-					identity.getIdentifier()).build();
+					identity.get(0).getIdentifier()).build();
 			return Response.ok().entity(jsonConverter.convertToPayload(result))
 					.build();
 		}
@@ -337,7 +339,7 @@ public class UsersEndpoint {
 				.getClientPlatformId());
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identityDto.getExternalNetworkId());
-		ExternalIdentity identity = null;
+		List<ExternalIdentity> identiies = null;
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		if (externalNetwork.network == Network.Content) {
@@ -348,7 +350,7 @@ public class UsersEndpoint {
 					identityDto.getCode(), identityDto.getRedirectUrl());
 
 			// create the identity if it does not exist; or use the existing one
-			identity = ServiceFactory.getExternalIdentityService()
+			identiies = ServiceFactory.getExternalIdentityService()
 					.createOrUpdateExternalIdentity(user, accessToken,
 							identityDto.getSecretToken(),
 							identityDto.getRefreshToken(), clientPlatform,
@@ -368,7 +370,7 @@ public class UsersEndpoint {
 					identityDto.getCode(), identityDto.getOauthToken(),
 					identityDto.getOauthTokenSecret(), redirectUri);
 
-			identity = ServiceFactory.getExternalIdentityService()
+			identiies = ServiceFactory.getExternalIdentityService()
 					.createOrUpdateExternalIdentity(user,
 							externalidentity.getAccessToken(),
 							externalidentity.getSecretToken(),
@@ -378,7 +380,7 @@ public class UsersEndpoint {
 		}
 
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identity, identityDto);
+		sendActivatedMessage(user, identiies, identityDto);
 
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
@@ -386,13 +388,13 @@ public class UsersEndpoint {
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identity.getIdentityId());
+					.getBySocialIdentityId(identiies.get(0).getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
 		} catch (NoResultException ex) {
 			IdentityDto result = new IdentityDto.Builder().identifier(
-					identity.getIdentifier()).build();
+					identiies.get(0).getIdentifier()).build();
 			return Response.ok().entity(jsonConverter.convertToPayload(result))
 					.build();
 		}
@@ -491,18 +493,21 @@ public class UsersEndpoint {
 		return Response.ok().build();
 	}
 
-	private void sendActivatedMessage(User user, ExternalIdentity identity,
+	private void sendActivatedMessage(User user, List<ExternalIdentity> identities,
 			IdentityDto identityDto) throws IOException {
-		ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
-				.clientPlatformId(identityDto.getClientPlatformId())
-				.userId(user.getUserId()).identityId(identity.getIdentityId())
-				.build();
-
-		// serialize and send it
-		String message = MessageConverterFactory.getMessageConverter()
-				.serialize(new Message(content));
-		MessageQueueFactory.getCacheInvalidationQueueProducer().write(
-				message.getBytes());
+		for(ExternalIdentity identity : identities)
+		{
+			ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
+					.clientPlatformId(identityDto.getClientPlatformId())
+					.userId(user.getUserId()).identityId(identity.getIdentityId())
+					.build();
+	
+			// serialize and send it
+			String message = MessageConverterFactory.getMessageConverter()
+					.serialize(new Message(content));
+			MessageQueueFactory.getCacheInvalidationQueueProducer().write(
+					message.getBytes());
+		}
 	}
 	
 	private void sendLocationMessage(Long userId, LocationDto locationDto) throws IOException {
