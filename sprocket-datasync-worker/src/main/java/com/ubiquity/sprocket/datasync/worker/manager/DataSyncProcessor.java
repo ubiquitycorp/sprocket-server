@@ -88,11 +88,7 @@ public class DataSyncProcessor extends Thread {
 			log.info("Processed {} videos in {} seconds", n, new Period(start, new DateTime()).getSeconds());
 		} else if (externalNetwork.equals(ExternalNetwork.Google)) {
 			DateTime start = new DateTime();
-			int n = processVideos(identity, ExternalNetwork.YouTube);
-			log.info("Processed {} videos in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-			
-			start = new DateTime();
-			n = processMessages(identity, externalNetwork, null);
+			int n = processMessages(identity, externalNetwork, null);
 			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
 			
 	
