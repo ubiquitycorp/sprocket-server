@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.Range;
@@ -20,6 +19,7 @@ import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.external.repository.ExternalInterestRepositoryJpaImpl;
 import com.ubiquity.external.repository.InterestRepositoryJpaImpl;
 import com.ubiquity.external.repository.cache.CacheKeys;
 import com.ubiquity.identity.domain.ExternalIdentity;
@@ -32,6 +32,7 @@ import com.ubiquity.location.repository.UserLocationRepository;
 import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
+import com.ubiquity.social.domain.ExternalInterest;
 import com.ubiquity.social.domain.Gender;
 import com.ubiquity.social.domain.Interest;
 import com.ubiquity.social.repository.ContactRepository;
@@ -118,12 +119,24 @@ public class AnalyticsService {
 				interest.addChild(new Interest("Cricket"));
 				interest.addChild(new Interest("Baseball"));
 				create(interest);
+				// added some external Interest 
+				create(new ExternalInterest("Football", interest, ExternalNetwork.Twitter));
+				create(new ExternalInterest("Basketball", interest, ExternalNetwork.Twitter));
+				create(new ExternalInterest("Cricket", interest, ExternalNetwork.Twitter));
+				create(new ExternalInterest("Baseball", interest, ExternalNetwork.Twitter));
 				
 				interest = new Interest("Entertainment", null);
 				interest.addChild(new Interest("Music"));
 				interest.addChild(new Interest("Movies"));
 				interest.addChild(new Interest("Theater"));
 				create(interest);
+				// added some external Interest 
+				create(new ExternalInterest("Music", interest, ExternalNetwork.Twitter));
+				create(new ExternalInterest("Movies", interest, ExternalNetwork.Twitter));
+				create(new ExternalInterest("Theater", interest, ExternalNetwork.Twitter));
+				
+				
+				
 				
 				dataModificationCache.setLastModified(CacheKeys.GlobalProperties.INTERESTS, System.currentTimeMillis());
 				
@@ -139,6 +152,15 @@ public class AnalyticsService {
 		try {
 			EntityManagerSupport.beginTransaction();
 			new InterestRepositoryJpaImpl().create(interest);
+			EntityManagerSupport.commit();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+	}
+	public void create(ExternalInterest externalInterest) {
+		try {
+			EntityManagerSupport.beginTransaction();
+			new ExternalInterestRepositoryJpaImpl().create(externalInterest);
 			EntityManagerSupport.commit();
 		} finally {
 			EntityManagerSupport.closeEntityManager();
