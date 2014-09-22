@@ -1,5 +1,7 @@
 package com.ubiquity.sprocket.api;
 
+import java.util.UUID;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -12,7 +14,9 @@ import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.content.api.ContentAPIFactory;
 import com.ubiquity.social.api.SocialAPIFactory;
+import com.ubiquity.social.domain.Interest;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
+import com.ubiquity.sprocket.service.AnalyticsService;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 /***
@@ -93,5 +97,10 @@ public class ServicesInitializer implements ServletContextListener {
 		ServiceFactory.getLocationService().getOrCreatePlaceByName("San Diego, CA");
 		
 		ServiceFactory.getLocationService().getOrCreatePlaceByName("Alexandria, Egypt");
+		
+		// now bootstrap interests
+		AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
+		analyticsService.bootstrapInterests();
+		
 	}
 }

@@ -1,6 +1,5 @@
 package com.ubiquity.social.api;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.configuration.Configuration;
@@ -12,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.redis.JedisConnectionFactory;
-import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;

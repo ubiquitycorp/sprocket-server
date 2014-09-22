@@ -4,8 +4,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import javax.persistence.EntityManager;
+import java.util.Stack;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.Range;
@@ -14,11 +13,14 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.cache.DataCacheKeys;
+import com.niobium.repository.cache.DataModificationCache;
+import com.niobium.repository.cache.DataModificationCacheRedisImpl;
 import com.niobium.repository.cache.UserDataModificationCache;
 import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.external.repository.InterestRepositoryJpaImpl;
 import com.ubiquity.external.repository.cache.CacheKeys;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
@@ -31,6 +33,7 @@ import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.Contact;
 import com.ubiquity.social.domain.Gender;
+import com.ubiquity.social.domain.Interest;
 import com.ubiquity.social.repository.ContactRepository;
 import com.ubiquity.social.repository.ContactRepositoryJpaImpl;
 import com.ubiquity.sprocket.analytics.recommendation.Dimension;
@@ -48,7 +51,6 @@ import com.ubiquity.sprocket.repository.EngagedActivityRepository;
 import com.ubiquity.sprocket.repository.EngagedActivityRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.EngagedDocumentRepository;
 import com.ubiquity.sprocket.repository.EngagedDocumentRepositoryJpaImpl;
-import com.ubiquity.sprocket.repository.EngagedItemRepository;
 import com.ubiquity.sprocket.repository.EngagedItemRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.EngagedVideoRepository;
 import com.ubiquity.sprocket.repository.EngagedVideoRepositoryJpaImpl;
@@ -69,20 +71,8 @@ import com.ubiquity.sprocket.repository.RecommendedVideoRepositoryJpaImpl;
 public class AnalyticsService {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
-
-	// private EngagedItemRepository engagedItemRepository;
-	// private EngagedActivityRepository engagedActivityRepository;
-	// private EngagedDocumentRepository engagedDocumentRepository;
-	// private EngagedVideoRepository engagedVideoRepository;
-	// private GroupMembershipRepository groupMembershipRepository;
-	// private ContactRepository contactRepository;
-	// private RecommendedActivityRepository recommendedActivityRepository;
-	// private RecommendedVideoRepository recommendedVideoRepository;
-	// private UserRepository userRepository;
-	// private UserLocationRepository locationRepository;
-
-	private UserDataModificationCache dataModificationCache;
-
+	private UserDataModificationCache userDataModificationCache;
+	private DataModificationCache dataModificationCache;
 	private RecommendationEngine recommendationEngine;
 
 	/***
@@ -93,21 +83,11 @@ public class AnalyticsService {
 	public AnalyticsService(Configuration configuration) {
 		setUpRecommendationEngine(configuration);
 
-		// recommendedVideoRepository = new RecommendedVideoRepositoryJpaImpl();
-		// engagedItemRepository = new EngagedItemRepositoryJpaImpl();
-		// engagedActivityRepository = new EngagedActivityRepositoryJpaImpl();
-		// engagedDocumentRepository = new EngagedDocumentRepositoryJpaImpl();
-		// engagedVideoRepository = new EngagedVideoRepositoryJpaImpl();
-		// groupMembershipRepository = new GroupMembershipRepositoryJpaImpl();
-		// contactRepository = new ContactRepositoryJpaImpl();
-		// recommendedActivityRepository = new
-		// RecommendedActivityRepositoryJpaImpl();
-		// locationRepository = new UserLocationRepositoryJpaImpl();
-		// userRepository = new UserRepositoryJpaImpl();
-
-		dataModificationCache = new UserDataModificationCacheRedisImpl(
+		userDataModificationCache = new UserDataModificationCacheRedisImpl(
 				configuration
-						.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GROUP));
+				.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GROUP));
+		dataModificationCache = new DataModificationCacheRedisImpl(
+				configuration.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GENERAL));
 
 	}
 
@@ -126,6 +106,62 @@ public class AnalyticsService {
 			EntityManagerSupport.closeEntityManager();
 		}
 	}
+
+
+	public void bootstrapInterests() {
+		
+		if(findInterests(null) == null) {
+			try {
+				Interest interest = new Interest("Sports", null);
+				interest.addChild(new Interest("Football"));
+				interest.addChild(new Interest("Basketball"));
+				interest.addChild(new Interest("Cricket"));
+				interest.addChild(new Interest("Baseball"));
+				create(interest);
+				
+				interest = new Interest("Entertainment", null);
+				interest.addChild(new Interest("Music"));
+				interest.addChild(new Interest("Movies"));
+				interest.addChild(new Interest("Theater"));
+				create(interest);
+				
+				dataModificationCache.setLastModified(CacheKeys.GlobalProperties.INTERESTS, System.currentTimeMillis());
+				
+			} finally {
+				EntityManagerSupport.closeEntityManager();
+			}
+		}
+		
+			
+		
+	}
+	public void create(Interest interest) {
+		try {
+			EntityManagerSupport.beginTransaction();
+			new InterestRepositoryJpaImpl().create(interest);
+			EntityManagerSupport.commit();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+	}
+	public CollectionVariant<Interest> findInterests(Long ifModifiedSince) {
+
+		Long lastModified = dataModificationCache.getLastModified(CacheKeys.GlobalProperties.INTERESTS, ifModifiedSince);
+
+		// If there is no cache entry, there is no data
+		if (lastModified == null) {
+			return null;
+		}
+
+		try {
+			return new CollectionVariant<Interest>(new InterestRepositoryJpaImpl().findTopLevel(), lastModified);
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+
+	}
+
+
 
 	/***
 	 * Returns video content or null if there is no entry for this user in the
@@ -159,7 +195,7 @@ public class AnalyticsService {
 			}
 			String key = CacheKeys.generateCacheKeyForExternalNetwork(
 					CacheKeys.GroupProperties.RECOMMENDED_ACTIVITIES, network);
-			Long lastModified = dataModificationCache.getLastModified(
+			Long lastModified = userDataModificationCache.getLastModified(
 					Long.valueOf(groupMembership.getGroupIdentifier()), key,
 					ifModifiedSince);
 
@@ -250,7 +286,7 @@ public class AnalyticsService {
 			// check to see if there is any data for this context; if not,
 			// return
 			if (new ContactRepositoryJpaImpl()
-					.countAllByExternalNetwork(context) == 0) {
+			.countAllByExternalNetwork(context) == 0) {
 				log.warn("Skipping train on context: {} because no users have signed in yet for it");
 				return;
 			}
@@ -292,10 +328,10 @@ public class AnalyticsService {
 					if (identity instanceof ExternalIdentity) {
 						// get own contact by the identity id
 						Contact contact = new ContactRepositoryJpaImpl()
-								.getByExternalIdentityId(identity
-										.getIdentityId());
+						.getByExternalIdentityId(identity
+								.getIdentityId());
 						if (contact != null) // TODO: find underlying reason why
-												// this can happen
+							// this can happen
 							profile.getContacts().add(contact);
 					}
 				}
@@ -332,7 +368,7 @@ public class AnalyticsService {
 	public void assign(Long userId, ExternalNetwork network) {
 		try {
 			List<Contact> contacts = new ContactRepositoryJpaImpl()
-					.findByOwnerIdExternalNetwork(userId, network);
+			.findByOwnerIdExternalNetwork(userId, network);
 			// TODO: do we have multiple contacts? we should not allow this any
 			// more
 			for (Contact contact : contacts) {
@@ -417,7 +453,7 @@ public class AnalyticsService {
 
 				String key = CacheKeys.generateCacheKeyForExternalNetwork(
 						CacheKeys.GroupProperties.RECOMMENDED_VIDEOS, network);
-				dataModificationCache.put(Long.parseLong(group), key,
+				userDataModificationCache.put(Long.parseLong(group), key,
 						System.currentTimeMillis());
 
 			}
@@ -451,8 +487,8 @@ public class AnalyticsService {
 				for (EngagedActivity engagedActivity : engagedActivities) {
 					EntityManagerSupport.beginTransaction();
 					recommendedActivityRepository
-							.create(new RecommendedActivity(engagedActivity
-									.getActivity(), group));
+					.create(new RecommendedActivity(engagedActivity
+							.getActivity(), group));
 					EntityManagerSupport.commit();
 				}
 				// these will be activities clicked on from search results
@@ -461,7 +497,7 @@ public class AnalyticsService {
 					if (activity != null) {
 						EntityManagerSupport.beginTransaction();
 						recommendedActivityRepository
-								.create(new RecommendedActivity(activity, group));
+						.create(new RecommendedActivity(activity, group));
 						EntityManagerSupport.commit();
 					}
 				}
@@ -469,7 +505,7 @@ public class AnalyticsService {
 				String key = CacheKeys.generateCacheKeyForExternalNetwork(
 						CacheKeys.GroupProperties.RECOMMENDED_ACTIVITIES,
 						network);
-				dataModificationCache.put(Long.parseLong(group), key,
+				userDataModificationCache.put(Long.parseLong(group), key,
 						System.currentTimeMillis());
 
 			}
@@ -493,7 +529,7 @@ public class AnalyticsService {
 
 			// get the group map for this user
 			List<GroupMembership> groupMembershipList = new GroupMembershipRepositoryJpaImpl()
-					.findAllByUserId(ownerId);
+			.findAllByUserId(ownerId);
 
 			GroupMembership groupMembership = null;
 			for (GroupMembership assigned : groupMembershipList) {
@@ -508,7 +544,7 @@ public class AnalyticsService {
 			}
 			String key = CacheKeys.generateCacheKeyForExternalNetwork(
 					CacheKeys.GroupProperties.RECOMMENDED_VIDEOS, network);
-			Long lastModified = dataModificationCache.getLastModified(
+			Long lastModified = userDataModificationCache.getLastModified(
 					Long.valueOf(groupMembership.getGroupIdentifier()), key,
 					ifModifiedSince);
 
@@ -518,8 +554,8 @@ public class AnalyticsService {
 			}
 
 			List<VideoContent> videos = new RecommendedVideoRepositoryJpaImpl()
-					.findRecommendedVideosByGroup(groupMembership
-							.getGroupIdentifier());
+			.findRecommendedVideosByGroup(groupMembership
+					.getGroupIdentifier());
 
 			return new CollectionVariant<VideoContent>(videos, lastModified);
 
@@ -541,7 +577,7 @@ public class AnalyticsService {
 
 		// query all contacts
 		List<Contact> contacts = new ContactRepositoryJpaImpl()
-				.findByExternalNetwork(network);
+		.findByExternalNetwork(network);
 		for (Contact contact : contacts) {
 
 			// load in user we have one
@@ -550,7 +586,7 @@ public class AnalyticsService {
 			UserLocation location = null;
 			if (user != null)
 				location = new UserLocationRepositoryJpaImpl()
-						.findByUserId(user.getUserId());
+			.findByUserId(user.getUserId());
 
 			// this profile may have both values as null; that's ok for now
 			Profile profile = new Profile(user, location);
@@ -592,7 +628,7 @@ public class AnalyticsService {
 
 		// create fb specific context, with dimensions where
 		recommendationEngine
-				.addContext(ExternalNetwork.Facebook, configuration);
+		.addContext(ExternalNetwork.Facebook, configuration);
 		recommendationEngine.addDimension(
 				Dimension.createFromEnum("gender", Gender.class, 1.0),
 				ExternalNetwork.Facebook);
@@ -601,7 +637,7 @@ public class AnalyticsService {
 				ExternalNetwork.Facebook);
 		recommendationEngine.addDimension(new Dimension("lat", Range.between(
 				-90.0, 90.0), 0.0)); // location we don't care about because we
-										// have location filter
+		// have location filter
 		recommendationEngine.addDimension(new Dimension("lon", Range.between(
 				-180.0, 180.0), 0.0));
 
