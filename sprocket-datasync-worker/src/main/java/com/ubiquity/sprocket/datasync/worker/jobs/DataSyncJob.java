@@ -39,7 +39,7 @@ public class DataSyncJob implements Job{
 			int start = 0;
 			int end = 0;
 			for(i = 0; i < numThreads; i++) {
-				start = i == 0 ? 0 : end + 1;
+				start = i == 0 ? 0 : end;
 				end = end + blockSize;
 				log.info("start {}, end {}", start, end);
 				processors.add(new DataSyncProcessor(users, start, end));
@@ -48,8 +48,8 @@ public class DataSyncJob implements Job{
 			
 			// get the remainder for the last thread
 			int remainder = numUsers % blockSize;
-			start = end + 1;
-			end = end + remainder;
+			start = end;
+			end = start + remainder;
 			log.info("start {}, end {}", start, end);
 			processors.add(new DataSyncProcessor(users, start, end));
 
