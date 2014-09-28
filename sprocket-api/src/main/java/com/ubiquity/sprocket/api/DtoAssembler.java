@@ -264,10 +264,12 @@ public class DtoAssembler {
 	}
 
 	public static VideoDto assemble(VideoContent videoContent) {
-		String tempCategory = videoContent.getCategory()==null ?null:videoContent.getCategory().getCategoryName();
 		VideoDto.Builder videoBuilder = new VideoDto.Builder()
-				.externalNetworkId(videoContent.getExternalNetwork().ordinal())
-				.category(tempCategory);
+				.externalNetworkId(videoContent.getExternalNetwork().ordinal());
+		
+		// add video category if exists
+		if(videoContent.getCategory() != null)
+			videoBuilder.category(videoContent.getCategory().getCategoryName());
 		
 		if(videoContent.getVideo() != null)
 			videoBuilder.itemKey(videoContent.getVideo().getItemKey());
