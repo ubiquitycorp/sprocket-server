@@ -26,7 +26,7 @@ public class PlaceRepositoryTest {
 
 	private PlaceRepository placeRepository;
 
-	private Place losAngeles, newYork, culverCity, eastVillage, culverHotel, decibel;
+	private Place losAngeles, culverCity, culverHotel;
 
 	@After
 	public void tearDown() throws Exception {

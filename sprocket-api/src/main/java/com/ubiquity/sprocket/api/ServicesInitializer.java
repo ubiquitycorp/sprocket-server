@@ -13,7 +13,6 @@ import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.content.api.ContentAPIFactory;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
-import com.ubiquity.sprocket.service.AnalyticsService;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 /***
@@ -73,10 +72,8 @@ public class ServicesInitializer implements ServletContextListener {
 
 	
 	private void bootstrap() {
+	
 		
-		// now bootstrap interests
-		AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
-		analyticsService.bootstrapInterests();
 		
 	}
 }

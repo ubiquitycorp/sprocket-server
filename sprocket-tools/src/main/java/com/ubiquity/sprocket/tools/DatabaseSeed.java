@@ -57,6 +57,7 @@ public class DatabaseSeed {
 		
 		
 		
+		
 		//		// added some external Interest 
 		//		analyticsService.create(new ExternalInterest("Music", interestMusic, ExternalNetwork.Twitter));
 		//		analyticsService.create(new ExternalInterest("Movies", interestMovies, ExternalNetwork.Twitter));
@@ -85,7 +86,7 @@ public class DatabaseSeed {
 		for(String neighborhood : neighborhoods) {
 
 			i++;
-			if(i < 596)
+			if(i < 2790)
 				continue;
 
 			try {
@@ -150,8 +151,8 @@ public class DatabaseSeed {
 		final DatabaseSeed loader = new DatabaseSeed();
 		try {
 			loader.initialize(new PropertiesConfiguration("tools.properties"));
-			//loader.seedPlacesFromNeighborhoodsFeed();
-			loader.seedInterests();
+			loader.seedPlacesFromNeighborhoodsFeed();
+			//loader.seedInterests();
 		} catch (ConfigurationException e) {
 			log.error("Unable to configure service", e);
 			System.exit(-1);

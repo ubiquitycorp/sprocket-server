@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
+import com.ubiquity.location.LocationConverter;
 import com.ubiquity.location.domain.Geobox;
 import com.ubiquity.location.domain.Location;
 import com.ubiquity.location.domain.Place;
@@ -23,7 +24,6 @@ import com.ubiquity.location.repository.PlaceRepository;
 import com.ubiquity.location.repository.PlaceRepositoryJpaImpl;
 import com.ubiquity.location.repository.UserLocationRepository;
 import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
-import com.ubiquity.sprocket.location.LocationConverter;
 
 /***
  * Service for managing location indexing, retrieval, and geo cluster

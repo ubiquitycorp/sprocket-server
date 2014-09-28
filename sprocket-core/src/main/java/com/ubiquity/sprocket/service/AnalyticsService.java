@@ -108,57 +108,7 @@ public class AnalyticsService {
 		}
 	}
 
-
-	public void bootstrapInterests() {
-		
-		if(findInterests(null) == null) {
-			try {
-				Interest interest = new Interest("Sports", null);
-				Interest interestFootball= new Interest("Football");
-				Interest interestBasketball = new Interest("Basketball");
-				Interest interestCricket = new Interest("Cricket");
-				Interest interestBaseball = new Interest("Baseball");
-				
-				interest.addChild(interestFootball);
-				interest.addChild(interestBasketball);
-				interest.addChild(interestCricket);
-				interest.addChild(interestBaseball);
-				
-				
-				create(interest);
-				// added some external Interest 
-				create(new ExternalInterest("Football", interestFootball, ExternalNetwork.Twitter));
-				create(new ExternalInterest("Basketball", interestBasketball, ExternalNetwork.Twitter));
-				create(new ExternalInterest("Cricket", interestCricket, ExternalNetwork.Twitter));
-				create(new ExternalInterest("Baseball", interestBaseball, ExternalNetwork.Twitter));
-				
-				interest = new Interest("Entertainment", null);
-				Interest interestMusic = new Interest("Music");
-				Interest interestMovies = new Interest("Movies");
-				Interest interestTheater = new Interest("Theater");
-				
-				interest.addChild(interestMusic);
-				interest.addChild(interestMovies);
-				interest.addChild(interestTheater);
-				create(interest);
-				// added some external Interest 
-				create(new ExternalInterest("Music", interestMusic, ExternalNetwork.Twitter));
-				create(new ExternalInterest("Movies", interestMovies, ExternalNetwork.Twitter));
-				create(new ExternalInterest("Theater", interestTheater, ExternalNetwork.Twitter));
-				
-				
-				
-				
-				dataModificationCache.setLastModified(CacheKeys.GlobalProperties.INTERESTS, System.currentTimeMillis());
-				
-			} finally {
-				EntityManagerSupport.closeEntityManager();
-			}
-		}
-		
-			
-		
-	}
+	
 	public void create(Interest interest) {
 		try {
 			EntityManagerSupport.beginTransaction();
