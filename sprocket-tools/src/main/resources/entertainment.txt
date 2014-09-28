@@ -1,0 +1,40 @@
+Music
+	Rock
+	Pop
+	Country
+	Rap
+	Jazz
+	Classical
+Movies
+	Crime
+	Action
+	Comedy
+	Drama
+	Cartoon
+	Science Fiction
+	Thrillers
+	War
+TV
+	Sports
+	Comedy/Sitcoms
+	Dramas
+	Cartoons
+	Movies
+	Weather
+	Video on Demand
+	Premium
+	News
+	Financial Reports
+Streaming
+	Netflix
+	Hulu
+	Amazon
+	YouTube
+	Vimeo
+	Pandora
+Fine Arts
+	Opera
+	Philharmonic
+	Ballet
+	Theater
+	Concerts

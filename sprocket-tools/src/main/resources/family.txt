@@ -1,0 +1,30 @@
+Parents
+	Birthdays
+	Anniversary
+	Favorite Thing
+	Past Gifts
+	Favorite Food
+Siblings
+	Birthdays
+	Anniversary
+	Favorite Thing
+	Past Gifts
+	Favorite Food
+Kids
+	Birthdays
+	Anniversary
+	Favorite Thing
+	Past Gifts
+	Favorite Food
+Significant Other
+	Birthdays
+	Anniversary
+	Favorite Thing
+	Past Gifts
+	Favorite Food
+Pets
+	Birthday
+	Type of Animal
+	Favorite Toy
+	Favorite Food
+	Schedule

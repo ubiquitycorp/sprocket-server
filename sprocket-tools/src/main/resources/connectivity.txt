@@ -1,0 +1,13 @@
+Productivity Apps
+	Email, Calendar and Contacts
+	Voice, Video and Text
+	Notes
+Business Apps
+	Office Productivity Suite
+	File Sharing and Collaboration
+	Enterprise (CRM, CMS)
+Stock Market
+	Favorite Stocks
+	Hot Stocks
+	Current Stock Profile
+	Inside Stock Information

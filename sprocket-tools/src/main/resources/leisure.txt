@@ -1,0 +1,25 @@
+Outdoors
+	Hiking
+	Camping
+	Water Sports
+Weekend Activities
+	Restaurants
+	Watch TV
+	Play video games
+	Dating
+	Visit Family
+	Sporting Events
+	Special Events
+Nightlife
+	Restaurants
+	Bars
+	Dating
+Hobbies
+	Fantasy Sports
+	Video Games
+	Arts/Crafts
+Cultural Events
+	Concerts
+	Sporting Events
+	Movies
+	Museums

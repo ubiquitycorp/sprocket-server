@@ -42,7 +42,7 @@ public class LocationService {
 	public LocationService(Configuration configuration) {
 		geoCalculator = new GeodeticCalculator();
 	}
-
+	
 	/**
 	 * Saves location into underlying data store (or updates it)
 	 * 
@@ -89,7 +89,11 @@ public class LocationService {
 	 * Chicago, IL
 	 * 
 	 * @param name
+	 * @param description long description of the place, passed to geolocator library to narrow down the list of returned locations
+	 * @param granularity (neighborhood, locality) needed to disambiguate input
+	 * 
 	 * @return A place with a geobox and center lat / lon
+	 * 
 	 * @throws RuntimeException
 	 *             if the geocoder service cannot be accessed
 	 * @throws IllegalArgument
@@ -97,9 +101,9 @@ public class LocationService {
 	 *             result
 	 * 
 	 */
-	public Place getOrCreatePlaceByName(String name) {
+	public Place getOrCreatePlaceByName(String name, String description, String granularity) {
 
-
+		Place place = null;
 		try {
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
 			try {
@@ -107,15 +111,16 @@ public class LocationService {
 			} catch (PersistenceException e) {
 				try {
 					List<Geobox> geobox = LocationConverter.getInstance()
-							.convertFromLocationDescription(name, "en");
+							.convertFromLocationDescription(description, "en", granularity);
 					if (geobox.isEmpty())
 						return null;
+									
 					if (geobox.size() > 1)
 						throw new IllegalArgumentException(
 								"Unable to disambiguate input: " + name);
 
 					Geobox box = geobox.get(0);
-					Place place = new Place.Builder().name(name).boundingBox(box)
+					place = new Place.Builder().name(name).boundingBox(box)
 							.locale(Locale.US).build();
 					EntityManagerSupport.beginTransaction();
 					placeRepository.create(place);
@@ -128,7 +133,7 @@ public class LocationService {
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
-		return null;
+		return place;
 	}
 
 	/**

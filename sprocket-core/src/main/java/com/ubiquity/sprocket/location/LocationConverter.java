@@ -7,9 +7,11 @@ import java.util.List;
 import com.google.code.geocoder.Geocoder;
 import com.google.code.geocoder.GeocoderRequestBuilder;
 import com.google.code.geocoder.model.GeocodeResponse;
+import com.google.code.geocoder.model.GeocoderAddressComponent;
 import com.google.code.geocoder.model.GeocoderGeometry;
 import com.google.code.geocoder.model.GeocoderRequest;
 import com.google.code.geocoder.model.GeocoderResult;
+import com.google.code.geocoder.model.GeocoderStatus;
 import com.google.code.geocoder.model.LatLng;
 import com.google.code.geocoder.model.LatLngBounds;
 import com.ubiquity.location.domain.Geobox;
@@ -34,16 +36,41 @@ public class LocationConverter {
 	 * 
 	 * @throws IOException
 	 */
-	public List<Geobox> convertFromLocationDescription(String description, String language) throws IOException {
+	public List<Geobox> convertFromLocationDescription(String description, String language, String type) throws IOException {
 		
 		List<Geobox> geoboxes = new LinkedList<Geobox>();
 		
 		final Geocoder geocoder = new Geocoder();
+		
 		GeocoderRequest geocoderRequest = new GeocoderRequestBuilder().setAddress(description).setLanguage(language).getGeocoderRequest();
+		
 		GeocodeResponse geocoderResponse = geocoder.geocode(geocoderRequest);
+		if(geocoderResponse.getStatus() == GeocoderStatus.OVER_QUERY_LIMIT)
+			throw new RuntimeException("Exceeded query limit");
+					
 		List<GeocoderResult> results = geocoderResponse.getResults();
 		
 		for(GeocoderResult result : results) {
+			
+			boolean isSpecifiedType = Boolean.FALSE;
+
+			if(type != null) {
+				List<GeocoderAddressComponent> addresses = result.getAddressComponents();
+				// look for type here
+				for(GeocoderAddressComponent address : addresses) {
+					for(String addressType : address.getTypes()) {
+						if(addressType.equals(type)) {
+							isSpecifiedType = Boolean.TRUE;
+							break;
+						}
+					}
+				}
+				// skip if we are looking for a specific type and this isn't it
+				if(!isSpecifiedType)
+					continue;
+			}
+			
+			
 			GeocoderGeometry geometry = result.getGeometry();
 			
 			LatLng latLon = geometry.getLocation();
