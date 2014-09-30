@@ -57,15 +57,20 @@ public class SearchService {
 	 * 
 	 * @param messages
 	 */
-	public void indexMessages(List<Message> messages) {
+	public void indexMessages(Long userFilterId, List<Message> messages) {
 		List<Document> documents = new LinkedList<Document>();
 		for(Message message : messages) {
 
 			if(message == null)
 				continue; // TODO: remove this once the core issue is resolved
+			
+			String dataType = Message.class.getSimpleName();
+			Document document = new Document(dataType);
 
-			Document document = new Document(Message.class.getName());
-
+			// create identifier from the user filter (or default), the pk of the entity, and the data type
+			String id = SearchKeys.generateDocumentKeyForId(userFilterId, message.getMessageId(), dataType);
+			document.getFields().put(SearchKeys.Fields.FIELD_ID, id);
+			
 			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_DISPLAY_NAME, message.getSender().getDisplayName());
 			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_IDENTIFIER, message.getSender().getExternalIdentity().getIdentifier());
 			
@@ -79,7 +84,6 @@ public class SearchService {
 
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Message.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, message.getExternalNetwork().ordinal());
-			document.getFields().put(SearchKeys.Fields.FIELD_ID, message.getMessageId());
 
 			documents.add(document);
 		}
@@ -97,16 +101,15 @@ public class SearchService {
 		List<Document> documents = new LinkedList<Document>();
 		for(Activity activity : activities) {
 
-			String dataType = Activity.class.getName();
+			String dataType = Activity.class.getSimpleName();
 			Document document = new Document(dataType);
 			
-			Long ownerId = SearchKeys.generateOwnerId(userFilterId);
-			document.getFields().put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId); 
-
-		
 			// create identifier from the user filter (or default), the pk of the entity, and the data type
 			String id = SearchKeys.generateDocumentKeyForId(userFilterId, activity.getActivityId(), dataType);
 			document.getFields().put(SearchKeys.Fields.FIELD_ID, id); 
+						
+			Long ownerId = SearchKeys.generateOwnerId(userFilterId);
+			document.getFields().put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId); 
 
 			// contact, add image if we have one
 			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_DISPLAY_NAME, activity.getPostedBy().getDisplayName());

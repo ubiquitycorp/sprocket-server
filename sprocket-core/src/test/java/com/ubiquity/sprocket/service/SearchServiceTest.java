@@ -108,7 +108,7 @@ public class SearchServiceTest {
 		Message message = TestMessageFactory.createMessageWithMininumRequiredFields(owner, sender, ExternalNetwork.Facebook, UUID.randomUUID().toString());
 		
 		//ServiceFactory.getSocialService().create(message);
-		searchService.indexMessages(
+		searchService.indexMessages(message.getOwner().getUserId(),
 				Arrays.asList(new Message[] { message }));
 
 		// search by sender display name, making sure that only this entity shows up and it's of type "Message"

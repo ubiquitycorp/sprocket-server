@@ -180,7 +180,7 @@ public class DataSyncProcessor extends Thread {
 					.syncMessages(identity, network, lastMessageIdentifier);
 
 			// add messages to search results
-			ServiceFactory.getSearchService().indexMessages(messages);
+			ServiceFactory.getSearchService().indexMessages(identity.getUser().getUserId(), messages);
 			return messages.size();
 		} catch (Exception e) {
 			log.error("Could not process messages for identity: {}", ExceptionUtils.getRootCauseMessage(e));
