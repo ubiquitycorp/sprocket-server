@@ -90,6 +90,21 @@ public class DocumentsEndpoint {
 		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
 	}
 	
+	@GET
+	@Path("users/{userId}/indexed")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response searchIndexed(@PathParam("userId") Long userId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
+		DocumentsDto result = new DocumentsDto(q);
+
+		List<Document> documents = ServiceFactory.getSearchService().searchIndexedDocumentsWithinAllProviders(q, userId);
+		for(Document document : documents) {
+			result.getDocuments().add(DtoAssembler.assemble(document));
+		}
+		
+		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
+	}
+	
 	
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/live")

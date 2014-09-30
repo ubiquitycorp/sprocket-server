@@ -68,13 +68,14 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 
 	}
 
-	public List<Document> searchDocuments(String searchTerm, String[] fields, Map<String, Object> filters) {
+	public List<Document> searchDocuments(String searchTerm, String[] fields, Map<String, Object> filters, SolrOperator operator) {
 		List<Document> documents = new LinkedList<Document>();
 
 		// assemble query with filters
 		SolrQuery query = new SolrQuery();
-		query.setQuery(createQueryString(searchTerm, fields));
-		query.setFilterQueries(createFilterArguments(filters));
+		query.setQuery(createQueryString(searchTerm, fields, operator));
+		query.setFilterQueries(createFilterArguments(filters, operator));
+		
 		// do the search
 		SolrDocumentList results = search(query);
 
@@ -91,9 +92,9 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 	 * 
 	 * @return
 	 */
-	private String createQueryString(String searchTerm, String[] fields) {
+	private String createQueryString(String searchTerm, String[] fields, SolrOperator operator) {
 
-		StringBuilder queryBuilder = new StringBuilder("{!type=dismax qf='");
+		StringBuilder queryBuilder = new StringBuilder("{!type=dismax q.op=" + operator.name() + " qf='");
 		int i;
 		for(i = 0; i < fields.length - 1; i++)
 			queryBuilder.append(fields[i]).append(" "); 
@@ -103,14 +104,25 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 		return queryBuilder.toString();
 	}
 	
-	private String[] createFilterArguments(Map<String, Object> filter) {
+	private String[] createFilterArguments(Map<String, Object> filter, SolrOperator operator) {
 	
 		String[] filters = new String[filter.size()];
 		int i = 0;
 		for(String key : filter.keySet()) {
 			Object value = filter.get(key);
-			filters[i] = key + ":" + value;
-			i++;
+			if(value instanceof List){
+				@SuppressWarnings("unchecked")
+				List<Object> values = (List<Object>) value;
+				filters[i] = "";
+				//Add multi-values separated by spaces as key:value pair
+				for (Object object : values) {
+					filters[i] += key + ":" + object + " ";
+				}
+			} else
+				filters[i] = key + ":" + value + " ";
+			// Only add new filter entity if it is AND condition
+			if(operator.equals(SolrOperator.AND))
+				i++;
 		}
 	
 		for(String argument : filters) {

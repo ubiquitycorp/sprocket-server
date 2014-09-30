@@ -132,41 +132,39 @@ public class DtoAssembler {
 		Object data = null;
 		if (dataType.equals(VideoContent.class.getSimpleName())) {
 			// if we have a reference to an entity we build from data
-
 			data = document.getData();
 			if (data != null) {
 				VideoContent videoContent = (VideoContent) document.getData();
 				data = assemble(videoContent);
 			} else {
-				
+				Long ownerId = (Long) fields.get(SearchKeys.Fields.FIELD_OWNER_ID);
+				ownerId = ownerId == 0 ? null : ownerId;
 				data = new VideoDto.Builder()
-						.externalNetworkId((Integer)fields
-								.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
+						.externalNetworkId((Integer)fields.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
 						.itemKey(
-								(String) fields
-										.get(SearchKeys.Fields.FIELD_ITEM_KEY))
-						.thumb(new ImageDto((String) fields
-								.get(SearchKeys.Fields.FIELD_THUMBNAIL)))
-						.title((String) fields
-								.get(SearchKeys.Fields.FIELD_TITLE))
+								(String) fields.get(SearchKeys.Fields.FIELD_ITEM_KEY))
+						.thumb(new ImageDto((String) fields.get(SearchKeys.Fields.FIELD_THUMBNAIL)))
+						.title((String) fields.get(SearchKeys.Fields.FIELD_TITLE))
 						.description(
-								(String) fields
-										.get(SearchKeys.Fields.FIELD_DESCRIPTION))
+								(String) fields.get(SearchKeys.Fields.FIELD_DESCRIPTION))
+						.ownerId(ownerId)
 						.build();
 			}
 		} else if (dataType.equals(Message.class.getSimpleName())) {
-			
+			Long ownerId = (Long) fields.get(SearchKeys.Fields.FIELD_OWNER_ID);
+			ownerId = ownerId == 0 ? null : ownerId;
 			MessageDto message = new MessageDto.Builder()
 					.subject((String) fields.get(SearchKeys.Fields.FIELD_TITLE))
 					.date(System.currentTimeMillis())
 					.externalNetworkId(
-							(Integer) fields
-									.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
+							(Integer) fields.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
 					.body((String) fields.get(SearchKeys.Fields.FIELD_BODY))
+					.ownerId((Long) fields.get(SearchKeys.Fields.FIELD_OWNER_ID))
 					.sender(assembleContactDtoFromDocumentFields(fields)).build();
 			MessageDto topMessage = new MessageDto.Builder()
 				.externalNetworkId(message.getExternalNetworkId())
 				.lastMessageDate(message.getDate())
+				.ownerId(ownerId)
 				.build();
 				topMessage.getConversation().add(message);
 			data = topMessage;
@@ -177,13 +175,16 @@ public class DtoAssembler {
 				data = assemble(activity);
 
 			} else {
+				Long ownerId = (Long) fields.get(SearchKeys.Fields.FIELD_OWNER_ID);
+				ownerId = ownerId == 0 ? null : ownerId;
 				ActivityDto.Builder builder = new ActivityDto.Builder()
 						.title((String) fields
 								.get(SearchKeys.Fields.FIELD_TITLE))
 						.body((String) fields.get(SearchKeys.Fields.FIELD_BODY))
 						.externalIdentifier((String)fields.get(SearchKeys.Fields.FIELD_EXTERNAL_IDENTIFIER))
 						.externalNetworkId((Integer)fields.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
-						.date((Long) fields.get(SearchKeys.Fields.FIELD_DATE));
+						.date((Long) fields.get(SearchKeys.Fields.FIELD_DATE))
+						.ownerId(ownerId);
 
 				// add in content based on type
 				String activityType = (String) fields

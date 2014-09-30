@@ -27,6 +27,7 @@ import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchEngine;
 import com.ubiquity.sprocket.search.SearchKeys;
 import com.ubiquity.sprocket.search.solr.SearchEngineSolrjImpl;
+import com.ubiquity.sprocket.search.solr.SolrOperator;
 
 /***
  * Search service encapsulates all search functions for both indexed searches and live searches
@@ -259,7 +260,6 @@ public class SearchService {
 			rank++;
 			documents.add(document);
 		}
-			
 		return documents;
 	}
 	
@@ -277,13 +277,36 @@ public class SearchService {
 		// filters
 		Map<String, Object> filters = new HashMap<String, Object>();
 
-		
 		filters.put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, externalNetwork.ordinal());
 		Long ownerId = SearchKeys.generateOwnerId(userIdFilter);
 		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId);
 		
-		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
+		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters, SolrOperator.AND);
+	}
+	
+	/***
+	 * Searches documents for most popular within all networks and all private user data
+	 * 
+	 * @param searchTerm
+	 * @param userIdFilter
+	 * @param socialNetwork
+	 * @return
+	 */
+	public List<Document> searchIndexedDocumentsWithinAllProviders(String searchTerm, Long userIdFilter) {
 
+		// filters
+		Map<String, Object> filters = new HashMap<String, Object>();
+
+		List<Long> values = new LinkedList<Long>();
+		// private user data has owner id within all providers
+		Long ownerId = SearchKeys.generateOwnerId(userIdFilter);
+		values.add(ownerId);
+		
+		// most popular data has no owner within all providers
+		Long noOwner = SearchKeys.generateOwnerId(null);
+		values.add(noOwner);
+		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, values);
+		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters, SolrOperator.OR);
 	}
 	
 	
@@ -305,7 +328,7 @@ public class SearchService {
 		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId);
 
 
-		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
+		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters, SolrOperator.AND);
 	}
 
 	/***

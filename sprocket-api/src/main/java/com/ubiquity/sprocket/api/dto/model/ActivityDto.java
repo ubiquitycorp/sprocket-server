@@ -41,6 +41,8 @@ public class ActivityDto {
 	
 	private String category;
 
+	private Long ownerId;
+	
 	public Long getActivityId() {
 		return activityId;
 	}
@@ -93,6 +95,12 @@ public class ActivityDto {
 		return category;
 	}
 
+	public Long getOwnerId() {
+		return ownerId;
+	}
+
+
+
 	public static class Builder {
 		private String title;
 		private String body;
@@ -105,6 +113,7 @@ public class ActivityDto {
 		private String link;
 		private String externalIdentifier;
 		private String category;
+		private Long ownerId;
 		
 		public Builder title(String title) {
 			this.title = title;
@@ -138,6 +147,11 @@ public class ActivityDto {
 
 		public Builder externalNetworkId(Integer externalNetworkId) {
 			this.externalNetworkId = externalNetworkId;
+			return this;
+		}
+		
+		public Builder ownerId(Long ownerId) {
+			this.ownerId = ownerId;
 			return this;
 		}
 		
@@ -178,6 +192,7 @@ public class ActivityDto {
 		this.link = builder.link;
 		this.externalIdentifier = builder.externalIdentifier;
 		this.category = builder.category;
+		this.ownerId = builder.ownerId;
 	}
 
 	@Override

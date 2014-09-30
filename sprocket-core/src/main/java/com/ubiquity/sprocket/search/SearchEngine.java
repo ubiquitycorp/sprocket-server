@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ubiquity.sprocket.domain.Document;
+import com.ubiquity.sprocket.search.solr.SolrOperator;
 
 public interface SearchEngine {
 	
@@ -29,7 +30,7 @@ public interface SearchEngine {
 	 * @param fields
 	 * @return
 	 */
-	public List<Document> searchDocuments(String searchTerm, String[] fields, Map<String, Object> filter);
+	public List<Document> searchDocuments(String searchTerm, String[] fields, Map<String, Object> filter, SolrOperator operator);
 	
 	/***
 	 * Removes all documents 
