@@ -90,6 +90,14 @@ public class DocumentsEndpoint {
 		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
 	}
 	
+	/***
+	 * This end point returns searches for document over both most popular data and user data
+	 * @param userId
+	 * @param q
+	 * @param page
+	 * @return
+	 * @throws IOException
+	 */
 	@GET
 	@Path("users/{userId}/indexed")
 	@Produces(MediaType.APPLICATION_JSON)
