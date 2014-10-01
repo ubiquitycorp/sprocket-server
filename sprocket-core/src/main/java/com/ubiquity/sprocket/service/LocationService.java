@@ -14,7 +14,13 @@ import org.gavaghan.geodesy.GlobalPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.repository.CollectionVariant;
+import com.niobium.repository.cache.DataCacheKeys;
+import com.niobium.repository.cache.DataModificationCache;
+import com.niobium.repository.cache.DataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
+import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.external.repository.cache.CacheKeys;
 import com.ubiquity.location.LocationConverter;
 import com.ubiquity.location.domain.Geobox;
 import com.ubiquity.location.domain.Location;
@@ -38,11 +44,15 @@ public class LocationService {
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private GeodeticCalculator geoCalculator;
+	private DataModificationCache dataModificationCache;
 
 	public LocationService(Configuration configuration) {
 		geoCalculator = new GeodeticCalculator();
+		dataModificationCache = new DataModificationCacheRedisImpl(
+				configuration
+						.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GENERAL));
 	}
-	
+
 	/**
 	 * Saves location into underlying data store (or updates it)
 	 * 
@@ -55,14 +65,14 @@ public class LocationService {
 		try {
 			try {
 				locationRepository = new UserLocationRepositoryJpaImpl();
-				UserLocation persisted = locationRepository.findByUserId(location
-						.getUser().getUserId());
+				UserLocation persisted = locationRepository
+						.findByUserId(location.getUser().getUserId());
 				if (persisted != null)
 					location.setLocationId(persisted.getLocationId());
 
 			} catch (NoResultException e) {
 				create = Boolean.TRUE;
-			} 
+			}
 
 			location.setLastUpdated(System.currentTimeMillis());
 
@@ -72,7 +82,6 @@ public class LocationService {
 				locationRepository.create(location);
 			else
 				locationRepository.update(location);
-
 
 			EntityManagerSupport.commit();
 
@@ -89,8 +98,11 @@ public class LocationService {
 	 * Chicago, IL
 	 * 
 	 * @param name
-	 * @param description long description of the place, passed to geolocator library to narrow down the list of returned locations
-	 * @param granularity (neighborhood, locality) needed to disambiguate input
+	 * @param description
+	 *            long description of the place, passed to geolocator library to
+	 *            narrow down the list of returned locations
+	 * @param granularity
+	 *            (neighborhood, locality) needed to disambiguate input
 	 * 
 	 * @return A place with a geobox and center lat / lon
 	 * 
@@ -101,7 +113,8 @@ public class LocationService {
 	 *             result
 	 * 
 	 */
-	public Place getOrCreatePlaceByName(String name, String description, String granularity) {
+	public Place getOrCreatePlaceByName(String name, String description,
+			String granularity) {
 
 		Place place = null;
 		try {
@@ -111,10 +124,11 @@ public class LocationService {
 			} catch (PersistenceException e) {
 				try {
 					List<Geobox> geobox = LocationConverter.getInstance()
-							.convertFromLocationDescription(description, "en", granularity);
+							.convertFromLocationDescription(description, "en",
+									granularity);
 					if (geobox.isEmpty())
 						return null;
-									
+
 					if (geobox.size() > 1)
 						throw new IllegalArgumentException(
 								"Unable to disambiguate input: " + name);
@@ -148,7 +162,7 @@ public class LocationService {
 		// mysql
 
 		Place closest = null;
-		
+
 		try {
 
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
@@ -158,7 +172,6 @@ public class LocationService {
 			if (places.isEmpty())
 				return null;
 
-			
 			Double closestDistance = Double.MAX_VALUE;
 			for (Place place : places) {
 				// convert to model the geo lib uses
@@ -166,12 +179,14 @@ public class LocationService {
 						.getLatitude().doubleValue(), location.getLongitude()
 						.doubleValue(), 0.0);
 				Location center = place.getBoundingBox().getCenter();
-				GlobalPosition placePoint = new GlobalPosition(center.getLatitude()
-						.doubleValue(), center.getLongitude().doubleValue(), 0.0);
+				GlobalPosition placePoint = new GlobalPosition(center
+						.getLatitude().doubleValue(), center.getLongitude()
+						.doubleValue(), 0.0);
 
 				Ellipsoid reference = Ellipsoid.WGS84;
-				double distance = geoCalculator.calculateGeodeticCurve(reference,
-						locationPoint, placePoint).getEllipsoidalDistance(); // Distance
+				double distance = geoCalculator.calculateGeodeticCurve(
+						reference, locationPoint, placePoint)
+						.getEllipsoidalDistance(); // Distance
 				// between
 				// Point
 				// A
@@ -204,6 +219,51 @@ public class LocationService {
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
+	}
+
+	public CollectionVariant<Place> getAllCitiesAndNeighborhoods(String locale,
+			Long ifModifiedSince, Boolean delta) {
+		String key = CacheKeys
+				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.PLACES);
+		Long lastModified = dataModificationCache.getLastModified(key,
+				ifModifiedSince);
+
+		// If there is no cache entry, there is no data
+		if (lastModified == null) {
+			return null;
+		}
+		try {
+			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
+			List<Place> places;
+			if (delta == null || !delta) {
+				places = placeRepository.getAllCitiesAndNeighborhoods(locale);
+			} else {
+				places = placeRepository
+						.getAllCitiesAndNeighborhoodsWithModifiedSince(locale,
+								lastModified);
+			}
+			return new CollectionVariant<Place>(places, lastModified);
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+	}
+
+	public List<Place> findPlacesByInterestId(Long interestId,
+			ExternalNetwork externalNetwork) {
+
+		try {
+			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
+			return placeRepository.findPlacesByInterestIdAndProvider(
+					interestId, externalNetwork);
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+	}
+
+	public void resetPlaceLastModifiedCache() {
+		String key = CacheKeys
+				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.PLACES);
+		dataModificationCache.setLastModified(key, System.currentTimeMillis());
 	}
 
 }

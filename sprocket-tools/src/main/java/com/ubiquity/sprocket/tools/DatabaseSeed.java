@@ -101,7 +101,6 @@ public class DatabaseSeed {
 
 				log.info("Processing city \"{}\" and state \"{}\"", city, state);
 				// create the city
-
 				try {
 					currentCity = locationService.getOrCreatePlaceByName(city, city + ", " + state, "locality");
 					log.info("created city {}", currentCity);
