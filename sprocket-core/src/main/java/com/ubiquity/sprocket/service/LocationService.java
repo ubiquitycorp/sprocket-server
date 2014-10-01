@@ -21,6 +21,9 @@ import com.niobium.repository.cache.DataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.external.repository.cache.CacheKeys;
+import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.integration.api.PlaceAPI;
+import com.ubiquity.integration.api.PlaceAPIFactory;
 import com.ubiquity.location.LocationConverter;
 import com.ubiquity.location.domain.Geobox;
 import com.ubiquity.location.domain.Location;
@@ -45,7 +48,7 @@ public class LocationService {
 
 	private GeodeticCalculator geoCalculator;
 	private DataModificationCache dataModificationCache;
-
+	
 	public LocationService(Configuration configuration) {
 		geoCalculator = new GeodeticCalculator();
 		dataModificationCache = new DataModificationCacheRedisImpl(
@@ -65,14 +68,14 @@ public class LocationService {
 		try {
 			try {
 				locationRepository = new UserLocationRepositoryJpaImpl();
-				UserLocation persisted = locationRepository
-						.findByUserId(location.getUser().getUserId());
+				UserLocation persisted = locationRepository.findByUserId(location
+						.getUser().getUserId());
 				if (persisted != null)
 					location.setLocationId(persisted.getLocationId());
 
 			} catch (NoResultException e) {
 				create = Boolean.TRUE;
-			}
+			} 
 
 			location.setLastUpdated(System.currentTimeMillis());
 
@@ -82,6 +85,7 @@ public class LocationService {
 				locationRepository.create(location);
 			else
 				locationRepository.update(location);
+
 
 			EntityManagerSupport.commit();
 
@@ -98,11 +102,8 @@ public class LocationService {
 	 * Chicago, IL
 	 * 
 	 * @param name
-	 * @param description
-	 *            long description of the place, passed to geolocator library to
-	 *            narrow down the list of returned locations
-	 * @param granularity
-	 *            (neighborhood, locality) needed to disambiguate input
+	 * @param description long description of the place, passed to geolocator library to narrow down the list of returned locations
+	 * @param granularity (neighborhood, locality) needed to disambiguate input
 	 * 
 	 * @return A place with a geobox and center lat / lon
 	 * 
@@ -113,8 +114,7 @@ public class LocationService {
 	 *             result
 	 * 
 	 */
-	public Place getOrCreatePlaceByName(String name, String description,
-			String granularity) {
+	public Place getOrCreatePlaceByName(String name, String description, String granularity) {
 
 		Place place = null;
 		try {
@@ -124,8 +124,7 @@ public class LocationService {
 			} catch (PersistenceException e) {
 				try {
 					List<Geobox> geobox = LocationConverter.getInstance()
-							.convertFromLocationDescription(description, "en",
-									granularity);
+							.convertFromLocationDescription(description, "en", granularity);
 					if (geobox.isEmpty())
 						return null;
 
@@ -150,6 +149,35 @@ public class LocationService {
 		return place;
 	}
 
+
+	public void syncPlaces(ExternalNetwork network) {
+
+		if(network.equals(ExternalNetwork.Yelp)) {
+
+			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(ExternalNetwork.Yelp, null);
+			
+			try {
+				PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
+				List<Place> places = placeRepository.findWithNoChildren(Locale.US);
+				
+				// go through these and for each neighborhood, execute a query..., and then also for the parent, but only once.
+				for(Place place : places) {
+					log.info("looking for yelp stuff in {}", place);
+					// for each external interest for Yelp, do a search
+					// find all external interest by category
+					// loop through
+					// do a yelp search as seen below
+					
+					List<Place> businesses = placeAPI.searchPlacesWithinPlace("", place, null, 5); // search it all in culver city
+					log.info("businessess {}", businesses);
+				}
+				
+			} finally {
+				EntityManagerSupport.closeEntityManager();
+			}
+		}
+	}
+
 	/**
 	 * Returns place with the center point closest to this location
 	 * 
@@ -172,6 +200,7 @@ public class LocationService {
 			if (places.isEmpty())
 				return null;
 
+
 			Double closestDistance = Double.MAX_VALUE;
 			for (Place place : places) {
 				// convert to model the geo lib uses
@@ -179,14 +208,12 @@ public class LocationService {
 						.getLatitude().doubleValue(), location.getLongitude()
 						.doubleValue(), 0.0);
 				Location center = place.getBoundingBox().getCenter();
-				GlobalPosition placePoint = new GlobalPosition(center
-						.getLatitude().doubleValue(), center.getLongitude()
-						.doubleValue(), 0.0);
+				GlobalPosition placePoint = new GlobalPosition(center.getLatitude()
+						.doubleValue(), center.getLongitude().doubleValue(), 0.0);
 
 				Ellipsoid reference = Ellipsoid.WGS84;
-				double distance = geoCalculator.calculateGeodeticCurve(
-						reference, locationPoint, placePoint)
-						.getEllipsoidalDistance(); // Distance
+				double distance = geoCalculator.calculateGeodeticCurve(reference,
+						locationPoint, placePoint).getEllipsoidalDistance(); // Distance
 				// between
 				// Point
 				// A
@@ -221,6 +248,17 @@ public class LocationService {
 		}
 	}
 
+	public void create(Place place) {
+		try {
+			EntityManagerSupport.beginTransaction();
+			new PlaceRepositoryJpaImpl().create(place);
+			EntityManagerSupport.commit();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+		
+	}
+	
 	public CollectionVariant<Place> getAllCitiesAndNeighborhoods(String locale,
 			Long ifModifiedSince, Boolean delta) {
 		String key = CacheKeys
