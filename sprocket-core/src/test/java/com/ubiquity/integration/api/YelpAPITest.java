@@ -30,8 +30,8 @@ public class YelpAPITest {
 	public void testSearchPlacesWithinPlace() {
 		PlaceAPI placeApi = PlaceAPIFactory.createProvider(ExternalNetwork.Yelp, ClientPlatform.WEB);
 		
-		Place random = TestPlaceFactory.createLosAngelesWithMininumRequiredProperties();
-		List<Place> places = placeApi.searchPlacesWithinPlace("Peruvian", random, null, null);
+		Place random = TestPlaceFactory.createLosAngelesAndNeighborhoods();
+		List<Place> places = placeApi.searchPlacesWithinPlace("Peruvian", random, null, 3);
 		log.info("places {}", places);
 	
 	}

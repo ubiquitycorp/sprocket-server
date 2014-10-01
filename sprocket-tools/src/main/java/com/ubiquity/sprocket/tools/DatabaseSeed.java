@@ -42,6 +42,8 @@ public class DatabaseSeed {
 
 		parent = new Interest("Food", null);
 		loadParentInterestWithFile(parent, "/food.txt");
+		loadYelpMappings(parent, "/yelp_restaurants.txt");
+		
 		
 		parent = new Interest("Family", null);
 		loadParentInterestWithFile(parent, "/family.txt");
@@ -58,11 +60,32 @@ public class DatabaseSeed {
 		
 		
 		
+		
 		//		// added some external Interest 
 		//		analyticsService.create(new ExternalInterest("Music", interestMusic, ExternalNetwork.Twitter));
 		//		analyticsService.create(new ExternalInterest("Movies", interestMovies, ExternalNetwork.Twitter));
 		//		analyticsService.create(new ExternalInterest("Theater", interestTheater, ExternalNetwork.Twitter));
 
+	}
+
+	private void loadYelpMappings(Interest parent, String string) throws IOException {
+		List<String> categories = IOUtils.readLines(
+				this.getClass().getResourceAsStream(string),
+				"UTF-8"
+				);
+		for(String category : categories) {
+			if(!category.startsWith("\t")) {
+				// this is a yelp category
+				//parent.addChild(major);
+				log.info("sprocket interest {}", category);
+
+			} else {
+				log.info("yelp slug {}", category);
+
+//				Interest minor = new Interest(line.replaceAll("\t", ""));
+//				major.addChild(minor);
+			}
+		}
 	}
 
 	/***
@@ -73,7 +96,7 @@ public class DatabaseSeed {
 
 		LocationService locationService = ServiceFactory.getLocationService();
 
-		int i = 0;
+
 		List<String> neighborhoods = IOUtils.readLines(
 				this.getClass().getResourceAsStream("/neighborhoods.txt"),
 				"UTF-8"
@@ -85,10 +108,6 @@ public class DatabaseSeed {
 		String state = null;
 		for(String neighborhood : neighborhoods) {
 
-			i++;
-			if(i < 2790)
-				continue;
-
 			try {
 				Thread.sleep(200L);
 			} catch (InterruptedException e) {}
@@ -98,7 +117,6 @@ public class DatabaseSeed {
 				// we have a city; split it
 				city = neighborhood.substring(0, comma);
 				state = neighborhood.substring(comma + 1, neighborhood.length()).replaceAll(" ", "");
-
 				log.info("Processing city \"{}\" and state \"{}\"", city, state);
 				// create the city
 
@@ -120,7 +138,7 @@ public class DatabaseSeed {
 					String description = neighborhood + ", " + city + ", " + state;
 					Place place = locationService.getOrCreatePlaceByName(neighborhood, description, "neighborhood");
 					if(place == null) {
-						log.info("failed to create neighborhood by description {}", description);
+						log.info("failed to create neighborhood by description {} and city/state {}", description, city + " " + state);
 					}
 					else {
 						log.info("created neighborhood {}", place);
@@ -151,8 +169,8 @@ public class DatabaseSeed {
 		final DatabaseSeed loader = new DatabaseSeed();
 		try {
 			loader.initialize(new PropertiesConfiguration("tools.properties"));
-			loader.seedPlacesFromNeighborhoodsFeed();
-			//loader.seedInterests();
+			//loader.seedPlacesFromNeighborhoodsFeed();
+			loader.seedInterests();
 		} catch (ConfigurationException e) {
 			log.error("Unable to configure service", e);
 			System.exit(-1);

@@ -3,18 +3,21 @@ package com.ubiquity.sprocket.service;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.integration.api.PlaceAPIFactory;
+import com.ubiquity.integration.factory.TestPlaceFactory;
+import com.ubiquity.location.domain.Place;
 
 public class LocationServiceTest {
 	
-	
-	
-	@SuppressWarnings("unused")
 	private static LocationService locationService;
-
+	private static Place losAngeles;
+	
 	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
@@ -26,7 +29,17 @@ public class LocationServiceTest {
 		
 		JedisConnectionFactory.initialize(config);
 		ServiceFactory.initialize(config, null);
-
+		PlaceAPIFactory.initialize(config);
+		
+		losAngeles = TestPlaceFactory.createLosAngelesAndNeighborhoods();
+		locationService.create(losAngeles);
+		
+		
+	}
+	
+	@Test
+	public void testSyncYelpNeighborhood() {
+		locationService.syncPlaces(ExternalNetwork.Yelp);
 	}
 	
 	

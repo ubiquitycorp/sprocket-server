@@ -15,6 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
+import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.integration.api.PlaceAPI;
+import com.ubiquity.integration.api.PlaceAPIFactory;
 import com.ubiquity.location.LocationConverter;
 import com.ubiquity.location.domain.Geobox;
 import com.ubiquity.location.domain.Location;
@@ -42,7 +46,7 @@ public class LocationService {
 	public LocationService(Configuration configuration) {
 		geoCalculator = new GeodeticCalculator();
 	}
-	
+
 	/**
 	 * Saves location into underlying data store (or updates it)
 	 * 
@@ -114,7 +118,7 @@ public class LocationService {
 							.convertFromLocationDescription(description, "en", granularity);
 					if (geobox.isEmpty())
 						return null;
-									
+
 					if (geobox.size() > 1)
 						throw new IllegalArgumentException(
 								"Unable to disambiguate input: " + name);
@@ -136,6 +140,35 @@ public class LocationService {
 		return place;
 	}
 
+
+	public void syncPlaces(ExternalNetwork network) {
+
+		if(network.equals(ExternalNetwork.Yelp)) {
+
+			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(ExternalNetwork.Yelp, null);
+			
+			try {
+				PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
+				List<Place> places = placeRepository.findWithNoChildren(Locale.US);
+				
+				// go through these and for each neighborhood, execute a query..., and then also for the parent, but only once.
+				for(Place place : places) {
+					log.info("looking for yelp stuff in {}", place);
+					// for each external interest for Yelp, do a search
+					// find all external interest by category
+					// loop through
+					// do a yelp search as seen below
+					
+					List<Place> businesses = placeAPI.searchPlacesWithinPlace("", place, null, 5); // search it all in culver city
+					log.info("businessess {}", businesses);
+				}
+				
+			} finally {
+				EntityManagerSupport.closeEntityManager();
+			}
+		}
+	}
+
 	/**
 	 * Returns place with the center point closest to this location
 	 * 
@@ -148,7 +181,7 @@ public class LocationService {
 		// mysql
 
 		Place closest = null;
-		
+
 		try {
 
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
@@ -158,7 +191,7 @@ public class LocationService {
 			if (places.isEmpty())
 				return null;
 
-			
+
 			Double closestDistance = Double.MAX_VALUE;
 			for (Place place : places) {
 				// convert to model the geo lib uses
@@ -204,6 +237,17 @@ public class LocationService {
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
+	}
+
+	public void create(Place place) {
+		try {
+			EntityManagerSupport.beginTransaction();
+			new PlaceRepositoryJpaImpl().create(place);
+			EntityManagerSupport.commit();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+		
 	}
 
 }

@@ -1,21 +1,20 @@
-Restaurants
-	American
-	Chinese
-	Thai
-	Italian
-	French
-	Mexican
-	Fast Food
-	Desserts
+﻿Restaurants
 	African
+	American
 	Asian
-	Middle Eastern
-	Latin American
-	Japanese
-	Other
-	Breakfast & Brunch
-	European
+	Chinese
 	Eastern European
+	European
+	French
+	Indian
+	Italian
+	Japanese
+	Latin American
+	Mexican
+	Middle East
+	Australian
+	Cuisine
+	Genre
 Recipes
 	American
 	Chinese
