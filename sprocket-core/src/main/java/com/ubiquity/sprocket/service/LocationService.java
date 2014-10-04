@@ -125,7 +125,7 @@ public class LocationService {
 		try {
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
 			try {
-				return placeRepository.findByName(name, network, Locale.US);
+				return placeRepository.findByName(name, network, "us");
 			} catch (PersistenceException e) {
 				try {
 					List<Geobox> geobox = LocationConverter.getInstance()
@@ -138,7 +138,7 @@ public class LocationService {
 								"Unable to disambiguate input: " + name);
 
 					Geobox box = geobox.get(0);
-					place = new Place.Builder().name(name).boundingBox(box).locale(Locale.US).build();
+					place = new Place.Builder().name(name).boundingBox(box).region("us").build();
 					EntityManagerSupport.beginTransaction();
 					placeRepository.create(place);
 					EntityManagerSupport.commit();
