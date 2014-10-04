@@ -83,7 +83,7 @@ public class PlaceRepositoryTest {
 	@Test
 	public void testCreateParentAndChild() throws Exception {
 		// find place by name
-		Place place = placeRepository.findByName("Culver Hotel", Locale.US);
+		Place place = placeRepository.findByName("Culver Hotel", null, Locale.US);
 		Assert.assertNotNull(place);
 		Assert.assertNotNull(place.getParent());
 		

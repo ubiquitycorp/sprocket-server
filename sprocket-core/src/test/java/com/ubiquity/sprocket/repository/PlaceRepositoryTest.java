@@ -69,7 +69,7 @@ public class PlaceRepositoryTest {
 
 	@Test
 	public void testFindByName() throws Exception {
-		Place place = placeRepository.findByName("Los Angeles", Locale.US);
+		Place place = placeRepository.findByName("Los Angeles", null, Locale.US);
 		Assert.assertNotNull(place);
 	}
 	

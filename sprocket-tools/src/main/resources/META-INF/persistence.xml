@@ -10,18 +10,22 @@
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
 
-		<class>com.ubiquity.sprocket.domain.RecommendedVideo</class>
-
-		<class>com.ubiquity.sprocket.domain.RecommendedActivity</class>
-		<class>com.ubiquity.location.domain.UserLocation</class>
 		<class>com.ubiquity.location.domain.Place</class>
-		
+		<class>com.ubiquity.location.domain.UserLocation</class>
+		<class>com.ubiquity.social.domain.Interest</class>
+		<class>com.ubiquity.social.domain.ExternalInterest</class>
+
+		<class>com.ubiquity.sprocket.domain.RecommendedVideo</class>
+		<class>com.ubiquity.sprocket.domain.RecommendedActivity</class>
 		<class>com.ubiquity.sprocket.domain.GroupMembership</class>
 		<class>com.ubiquity.sprocket.domain.EngagedVideo</class>
 		<class>com.ubiquity.sprocket.domain.EngagedActivity</class>
 		<class>com.ubiquity.sprocket.domain.EngagedDocument</class>
 		<class>com.ubiquity.sprocket.domain.EngagedItem</class>
-		
+
+
+
+
 		<class>com.ubiquity.content.domain.VideoContent</class>
 		<class>com.ubiquity.identity.domain.User</class>
 		<class>com.ubiquity.identity.domain.Identity</class>
@@ -31,7 +35,6 @@
 		<class>com.ubiquity.social.domain.Conversation</class>
 		<class>com.ubiquity.social.domain.Message</class>
 		<class>com.ubiquity.social.domain.Activity</class>
-		<class>com.ubiquity.social.domain.Interest</class>
 		<class>com.ubiquity.social.domain.Event</class>
 
 		<properties>
@@ -45,8 +48,10 @@
 			<property name="hibernate.format_sql" value="${hibernate.debug}" />
 			<property name="hibernate.transaction.flush_before_completion"
 				value="true" />
+				
 
-
+<property name="hibernate.connection.useUnicode" value="true" />
+<property name="hibernate.connection.characterEncoding" value="UTF-8" />
 			<!-- Connection Pooling settings -->
 			
 		
