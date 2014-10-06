@@ -384,10 +384,21 @@ public class DtoAssembler {
 		return activityDtoBuilder.build();
 
 	}
-
-	public static PlaceDto assemble(Place place) {
+	public static PlaceDto assembleCityOrNeighborhood(Place place) {
+		if(place == null)
+			return null;
 		PlaceDto.Builder placeDtoBuilder = new PlaceDto.Builder();
-		
+		placeDtoBuilder.placeId(place.getPlaceId())
+				.description(place.getDescription())
+				.locale(place.getLocale())
+				.name(place.getName())
+				.parent(assembleCityOrNeighborhood(place.getParent()));
+		return placeDtoBuilder.build();
+	}
+	public static PlaceDto assemble(Place place) {
+		if(place == null)
+			return null;
+		PlaceDto.Builder placeDtoBuilder = new PlaceDto.Builder();
 		placeDtoBuilder.placeId(place.getPlaceId())
 				.description(place.getDescription())
 				.addressdto(assemble(place.getAddress()))
@@ -400,8 +411,9 @@ public class DtoAssembler {
 	}
 
 	public static AddressDto assemble(Address address) {
+		if(address == null)
+			return null;
 		AddressDto.Builder addressDtoBuilder = new AddressDto.Builder();
-
 		addressDtoBuilder.city(address.getCity()).country(address.getCountry())
 				.postalCode(address.getPostalCode())
 				.stateOrRegion(address.getStateOrRegion())
@@ -411,6 +423,8 @@ public class DtoAssembler {
 	}
 
 	public static GeoboxDto assemble(Geobox geobox) {
+		if(geobox == null)
+			return null;
 		GeoboxDto.Builder geoboxDtoBuilder = new GeoboxDto.Builder();
 		geoboxDtoBuilder.center(assemble(geobox.getCenter()))
 				.lowerLeft(assemble(geobox.getLowerLeft()))
@@ -421,6 +435,8 @@ public class DtoAssembler {
 	}
 
 	public static LocationDto assemble(Location location) {
+		if(location == null)
+			return null;
 		LocationDto.Builder locationDtoBuilder = new LocationDto.Builder();
 		locationDtoBuilder.altitude(location.getAltitude())
 				.latitude(location.getLatitude())
@@ -492,5 +508,41 @@ public class DtoAssembler {
 		return content;
 
 	}
+	public static Place assemble(PlaceDto placeDto) {
+		return new Place.Builder().placeId(placeDto.getPlaceId())
+				.description(placeDto.getDescription())
+				.address(assemble(placeDto.getAddressdto()))
+				.boundingBox(assemble(placeDto.getBoundingBox()))
+				.externalIdentitifer(placeDto.getExternalIdentitifer())
+				.locale(placeDto.getLocale()).name(placeDto.getName())
+				.network(placeDto.getNetwork())
+				.parent(assemble(placeDto.getParent())).build();
 
+	}
+	public static Address assemble(AddressDto addressdto) {
+		if(addressdto == null)
+			return null;
+		 return new Address.Builder().city(addressdto.getCity()).country(addressdto.getCountry())
+				.postalCode(addressdto.getPostalCode())
+				.stateOrRegion(addressdto.getStateOrRegion())
+				.streetName(addressdto.getStreetName())
+				.unitName(addressdto.getUnitName()).build();
+	}
+
+	public static Geobox assemble(GeoboxDto geoboxDto) {
+		if(geoboxDto == null)
+			return null;
+		return new Geobox.Builder().center(assemble(geoboxDto.getCenter()))
+				.lowerLeft(assemble(geoboxDto.getLowerLeft()))
+				.lowerRight(assemble(geoboxDto.getLowerRight()))
+				.upperLeft(assemble(geoboxDto.getUpperLeft()))
+				.upperRight(assemble(geoboxDto.getUpperRight())).build();
+	}
+	public static Location assemble(LocationDto locationDto) {
+		if(locationDto == null)
+			return null;
+		return new Location.Builder().altitude(locationDto.getAltitude())
+				.latitude(locationDto.getLatitude())
+				.longitude(locationDto.getLongitude()).build();
+	}
 }

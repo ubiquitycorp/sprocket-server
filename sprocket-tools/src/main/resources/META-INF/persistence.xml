@@ -9,7 +9,6 @@
 
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
-
 		<class>com.ubiquity.sprocket.domain.RecommendedVideo</class>
 
 		<class>com.ubiquity.sprocket.domain.RecommendedActivity</class>
@@ -21,6 +20,8 @@
 		<class>com.ubiquity.sprocket.domain.EngagedActivity</class>
 		<class>com.ubiquity.sprocket.domain.EngagedDocument</class>
 		<class>com.ubiquity.sprocket.domain.EngagedItem</class>
+		
+		<class>com.ubiquity.sprocket.domain.FavoritePlace</class>
 		
 		<class>com.ubiquity.content.domain.VideoContent</class>
 		<class>com.ubiquity.identity.domain.User</class>

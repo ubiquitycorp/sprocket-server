@@ -9,15 +9,20 @@ import org.slf4j.LoggerFactory;
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
 import com.ubiquity.content.domain.VideoContent;
+import com.ubiquity.identity.domain.User;
+import com.ubiquity.location.domain.Place;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.sprocket.datasync.worker.manager.DataSyncProcessor;
+import com.ubiquity.sprocket.domain.FavoritePlace;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedDocument;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedVideo;
+import com.ubiquity.sprocket.messaging.definition.UserFavoritePlace;
+import com.ubiquity.sprocket.repository.FavoritePlaceRepositoryJpaImpl;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 public class CacheInvalidateConsumer extends AbstractConsumerThread {
@@ -48,12 +53,23 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 				process((UserEngagedVideo)message.getContent());
 			else if(message.getType().equals(UserEngagedActivity.class.getSimpleName()))
 				process((UserEngagedActivity)message.getContent());
+			else if(message.getType().equals(UserFavoritePlace.class.getSimpleName()))
+				process((UserFavoritePlace)message.getContent());
 		} catch (Exception e) {
 			log.error("Could not process, message: {}, root cause message: {}",ExceptionUtils.getMessage(e), ExceptionUtils.getRootCauseMessage(e));
 			e.printStackTrace();
 		}
 	}
-
+	private void process(UserFavoritePlace favoritePlace) {
+		// persist it or update the activity if it exists already
+		log.debug("indexing this video to db...");
+		Place place = favoritePlace.getPlace();
+		place = ServiceFactory.getLocationService().findOrCreate(place);
+		User user = ServiceFactory.getUserService().getUserById(favoritePlace.getUserId());
+		FavoritePlace favPlace = new FavoritePlace(user,favoritePlace.getPlace());
+		favPlace = new FavoritePlaceRepositoryJpaImpl().updateAndSelect(favPlace);
+		
+	}
 	private void process(UserEngagedDocument engagedDocument) {
 		log.debug("found: {}", engagedDocument);
 			

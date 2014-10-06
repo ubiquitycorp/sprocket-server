@@ -30,6 +30,7 @@ public class ServiceFactory {
 	private static ErrorsConfigurationService errorsConfigurationService;
 	private static EmailService emailService;
 	private static LocationService locationService;
+	private static FavoriteService favoriteService;
 	
 	/***
 	 * Initializes all services with the specified configuration
@@ -65,6 +66,17 @@ public class ServiceFactory {
 			locationService = new LocationService(configuration);
 		return locationService;
 	}
+	
+	/***
+	 * Returns location service 
+	 * @return
+	 */
+	public static FavoriteService getFavoriteService() {
+		if(favoriteService == null)
+			favoriteService = new FavoriteService(configuration);
+		return favoriteService;
+	}
+	
 	
 	/***
 	 * Returns content service

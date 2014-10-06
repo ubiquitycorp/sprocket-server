@@ -21,7 +21,6 @@ import com.niobium.repository.cache.DataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.external.repository.cache.CacheKeys;
-import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.api.PlaceAPI;
 import com.ubiquity.integration.api.PlaceAPIFactory;
 import com.ubiquity.location.LocationConverter;
@@ -43,7 +42,6 @@ import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
  */
 public class LocationService {
 
-	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private GeodeticCalculator geoCalculator;
@@ -231,6 +229,59 @@ public class LocationService {
 		}
 		return closest;
 	}
+	/**
+	 * Returns place with the center point closest to this location
+	 * 
+	 * @param location
+	 * 
+	 * @return place or null if there are no places nearby
+	 */
+	public Place getClosestNeighborhoodIsWithin(Location location) {
+		// TODO: set query results caching for this; we don't want to geocode in
+		// mysql
+
+		Place closest = null;
+
+		try {
+
+			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
+
+			List<Place> places = placeRepository.getAllNeighborhoods();
+
+			if (places.isEmpty())
+				return null;
+
+
+			Double closestDistance = Double.MAX_VALUE;
+			for (Place place : places) {
+				// convert to model the geo lib uses
+				GlobalPosition locationPoint = new GlobalPosition(location
+						.getLatitude().doubleValue(), location.getLongitude()
+						.doubleValue(), 0.0);
+				Location center = place.getBoundingBox().getCenter();
+				GlobalPosition placePoint = new GlobalPosition(center.getLatitude()
+						.doubleValue(), center.getLongitude().doubleValue(), 0.0);
+
+				Ellipsoid reference = Ellipsoid.WGS84;
+				double distance = geoCalculator.calculateGeodeticCurve(reference,
+						locationPoint, placePoint).getEllipsoidalDistance(); // Distance
+				// between
+				// Point
+				// A
+				// and
+				// Point
+				// B
+				if (distance < closestDistance) {
+					closestDistance = distance;
+					closest = place;
+				}
+			}
+
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+		return closest;
+	}
 
 	/***
 	 * 
@@ -259,7 +310,7 @@ public class LocationService {
 		
 	}
 	
-	public CollectionVariant<Place> getAllCitiesAndNeighborhoods(String locale,
+	public CollectionVariant<Place> getAllCitiesAndNeighborhoods(Locale locale,
 			Long ifModifiedSince, Boolean delta) {
 		String key = CacheKeys
 				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.PLACES);
@@ -274,11 +325,10 @@ public class LocationService {
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
 			List<Place> places;
 			if (delta == null || !delta) {
-				places = placeRepository.getAllCitiesAndNeighborhoods(locale);
+				places = placeRepository.getAllCitiesAndNeighborhoods();
 			} else {
 				places = placeRepository
-						.getAllCitiesAndNeighborhoodsWithModifiedSince(locale,
-								lastModified);
+						.getAllCitiesAndNeighborhoodsWithModifiedSince(ifModifiedSince);
 			}
 			return new CollectionVariant<Place>(places, lastModified);
 		} finally {
@@ -286,12 +336,12 @@ public class LocationService {
 		}
 	}
 
-	public List<Place> findPlacesByInterestId(Long interestId,
+	public List<Place> findPlacesByInterestId(Long placeId ,List<Long> interestId,
 			ExternalNetwork externalNetwork) {
 
 		try {
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
-			return placeRepository.findPlacesByInterestIdAndProvider(
+			return placeRepository.findPlacesByInterestIdAndProvider(placeId ,
 					interestId, externalNetwork);
 		} finally {
 			EntityManagerSupport.closeEntityManager();
@@ -302,6 +352,21 @@ public class LocationService {
 		String key = CacheKeys
 				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.PLACES);
 		dataModificationCache.setLastModified(key, System.currentTimeMillis());
+	}
+	/***
+	 * find or create place
+	 * @param place
+	 * @return
+	 */
+	public Place findOrCreate(Place place) {
+		
+		PlaceRepositoryJpaImpl placeRepository = new PlaceRepositoryJpaImpl();
+		if(place.getPlaceId() != null) {
+			return placeRepository.read(place.getPlaceId());
+		}else{
+			create(place);
+		}
+		return place;
 	}
 
 }
