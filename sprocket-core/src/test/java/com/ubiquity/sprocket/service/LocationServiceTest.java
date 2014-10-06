@@ -31,7 +31,7 @@ public class LocationServiceTest {
 		ServiceFactory.initialize(config, null);
 		PlaceAPIFactory.initialize(config);
 		
-		losAngeles = TestPlaceFactory.createLosAngelesAndNeighborhoods();
+		losAngeles = TestPlaceFactory.createLosAngelesAndNeighborhoodsAndBusiness();
 		locationService.create(losAngeles);
 		
 		

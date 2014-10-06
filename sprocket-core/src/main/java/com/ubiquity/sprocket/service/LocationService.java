@@ -1,12 +1,12 @@
 package com.ubiquity.sprocket.service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.persistence.NoResultException;
-import javax.persistence.PersistenceException;
 
 import org.apache.commons.configuration.Configuration;
 import org.gavaghan.geodesy.Ellipsoid;
@@ -29,7 +29,9 @@ import com.ubiquity.location.repository.PlaceRepository;
 import com.ubiquity.location.repository.PlaceRepositoryJpaImpl;
 import com.ubiquity.location.repository.UserLocationRepository;
 import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
+import com.ubiquity.social.api.exception.ExternalNetworkException;
 import com.ubiquity.social.domain.ExternalInterest;
+import com.ubiquity.social.domain.Interest;
 
 /***
  * Service for managing location indexing, retrieval, and geo cluster
@@ -108,7 +110,7 @@ public class LocationService {
 	 * Chicago, IL
 	 * 
 	 * @param name
-	 * @param description long description of the place, passed to geolocator library to narrow down the list of returned locations
+	 * @param locator long description of the place, passed to geolocator library to narrow down the list of returned locations
 	 * @param granularity (neighborhood, locality) needed to disambiguate input
 	 * 
 	 * @return A place with a geobox and center lat / lon
@@ -120,16 +122,15 @@ public class LocationService {
 	 *             result
 	 * 
 	 */
-	public Place getOrCreatePlaceByName(String name, String description, ExternalNetwork network, String[] granularity) {
+	public Place getOrCreatePlaceByName(String name, String locator, ExternalNetwork network, String[] granularity) {
 		Place place = null;
 		try {
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
-			try {
-				return placeRepository.findByName(name, network, "us");
-			} catch (PersistenceException e) {
+			place = placeRepository.getByLocatorAndExternalNetwork(locator, network);
+			if(place == null) {
 				try {
 					List<Geobox> geobox = LocationConverter.getInstance()
-							.convertFromLocationDescription(description, "en", granularity);
+							.convertFromLocationDescription(locator, "en", granularity);
 					if (geobox.isEmpty())
 						return null;
 
@@ -138,7 +139,7 @@ public class LocationService {
 								"Unable to disambiguate input: " + name);
 
 					Geobox box = geobox.get(0);
-					place = new Place.Builder().name(name).boundingBox(box).region("us").build();
+					place = new Place.Builder().locator(locator).name(name).boundingBox(box).region("us").build();
 					EntityManagerSupport.beginTransaction();
 					placeRepository.create(place);
 					EntityManagerSupport.commit();
@@ -182,65 +183,70 @@ public class LocationService {
 		if(network.equals(ExternalNetwork.Yelp)) {
 
 			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(ExternalNetwork.Yelp, null);
-			
+
 			try {
-				
+
 				// get external mappings for yelp
-				List<ExternalInterest> externalInterests = new ExternalInterestRepositoryJpaImpl().findByExternalNetwork(ExternalNetwork.Yelp);
-				
+				//List<ExternalInterest> externalInterests = new ExternalInterestRepositoryJpaImpl().findByExternalNetwork(ExternalNetwork.Yelp);
+
 				PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
-				List<Place> places = placeRepository.findWithNoChildren(Locale.US);
-				
-				// go through these and for each neighborhood, execute a query..., and then also for the parent, but only once.
-				for(Place place : places) {
-					log.info("looking for yelp stuff in {}", place);
+				List<Place> places = placeRepository.findLastLevelWithoutNetwork(); // gets all neighborhoods
+
+				//				// yelp works best doing 1 query per major city, then filtering the results by neighborhood
+				//				List<Place> cities = new LinkedList<Place>();
+				//				
+				//				
+				// go through these and for each neighborhood;
+
+				for(Place neighborhood : places) {
 					
-					// for each external interest for Yelp, do a search
-					for(ExternalInterest externalInterest : externalInterests) {
-						log.info("looking for {} stuff", externalInterest.getName());
-						List<Place> businesses = placeAPI.searchPlacesWithinPlace("", place, Arrays.asList(new ExternalInterest[] { externalInterest }), 20);
-						log.info("places found {}", businesses);
-						for(Place business : businesses) {
-							Place persisted = placeRepository.getByExernalIdentifierAndNetwork(place.getExternalIdentitifer(), network);
-							if(persisted == null) {
-								// getting geo info for place
-								
-								try {
-									List<Geobox> boxes = LocationConverter.getInstance().convertFromAddress(business.getAddress(), "en", null);
-									if(boxes.size() == 1) {
-										business.setBoundingBox(boxes.get(0));
-										business.setParent(place);
-									} else {
-										log.error("Unable to get a specific location for place", business);
-										continue;
-									}
-								} catch (Exception e) {
-									log.error("Unable to get coordinates for place", business);
-									continue;
-								}
-								
-								log.info("creating place {}", business);
-								create(business);
-							} else {
-								log.info("We already have business {}, skipping...", business);
-							}
-						}
-						
-						
-						// save only if it does not exist, else update
-						
+					if(!placeRepository.findChildrenForPlace(neighborhood).isEmpty()) {
+						log.info("skipping {} because we already processed it", neighborhood);
+						continue;
 					}
-					// find by external interest, provider
-					// loop through thouse
-					
-					// find all external interest by category
-					// loop through
-					// do a yelp search as seen below
-					
-					//List<Place> businesses = placeAPI.searchPlacesWithinPlace("", place, null, 5); // search it all in culver city
-					//log.info("businessess {}", businesses);
+					log.info("looking for yelp stuff in {}", neighborhood);
+
+					// skip cities
+					Place city = neighborhood.getParent();
+					if(city == null)
+						continue;
+
+					List<Place> businesses;
+
+					Integer page = 0;
+					Boolean paging = Boolean.TRUE;
+					try {
+						do {
+							page++;
+							businesses = placeAPI.searchPlacesWithinPlace("", neighborhood, null, page, 20);
+							for(Place business : businesses) {
+								log.info("business {}", business.getName());
+								Place persisted = placeRepository.getByLocatorAndExternalNetwork(business.getLocator(), network);
+								if(persisted == null) {
+
+									// for now just set city
+									business.setBoundingBox(city.getBoundingBox());
+									business.setParent(neighborhood);
+									if(!business.getTags().isEmpty()) {
+										List<ExternalInterest> mappings = new ExternalInterestRepositoryJpaImpl().findByNamesAndExternalNetwork(business.getTags(), network);
+										for(ExternalInterest mapping : mappings) {
+											business.getInterests().add(mapping.getInterest());
+										}
+									}
+
+									create(business);
+
+								} else {
+									log.info("we already have this business {}, skipping...", persisted.getName());
+								}
+							}
+						} while (paging);
+					} catch (ExternalNetworkException e) {
+						log.warn("Search produced an error", null, e);
+						paging = Boolean.FALSE;
+					}
 				}
-				
+
 			} finally {
 				EntityManagerSupport.closeEntityManager();
 			}
@@ -325,7 +331,7 @@ public class LocationService {
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
-		
+
 	}
 
 }

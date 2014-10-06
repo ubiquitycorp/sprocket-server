@@ -1,17 +1,16 @@
 package com.ubiquity.social.repository;
 
-import java.math.BigDecimal;
-
 import javax.persistence.PersistenceException;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.location.domain.Geobox;
-import com.ubiquity.location.domain.Location;
+import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.integration.factory.TestPlaceFactory;
 import com.ubiquity.location.domain.Place;
 import com.ubiquity.location.repository.PlaceRepository;
 import com.ubiquity.location.repository.PlaceRepositoryJpaImpl;
@@ -31,7 +30,14 @@ public class PlaceRepositoryTest {
 
 	@After
 	public void tearDown() throws Exception {
-		EntityManagerSupport.closeEntityManager();
+
+		try {
+			EntityManagerSupport.beginTransaction();
+			placeRepository.delete(losAngeles);
+			EntityManagerSupport.commit();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
 	}
 
 	@Before
@@ -39,78 +45,64 @@ public class PlaceRepositoryTest {
 
 		placeRepository = new PlaceRepositoryJpaImpl();
 
-		losAngeles = new Place.Builder()
-		.region("us")
-		.name("Los Angeles, CA").boundingBox(new Geobox.Builder()
-		.center(new Location.Builder()
-		.latitude(new BigDecimal(34.0536))
-		.longitude(new BigDecimal(-118.2430))
-		.build())
-		.build())
-		.build();
-
-		culverCity = new Place.Builder()
-		.region("us")
-		.name("Culver City, CA").boundingBox(new Geobox.Builder()
-		.center(new Location.Builder()
-		.latitude(new BigDecimal(34.0211111))
-		.longitude(new BigDecimal(-118.3961111))
-		.build())
-		.build())
-		.build();
-
-		culverHotel = new Place.Builder()
-		.region("us")
-		.name("Culver Hotel").boundingBox(new Geobox.Builder()
-		.center(new Location.Builder()
-		.latitude(new BigDecimal(34.0238))
-		.longitude(new BigDecimal(118.3943))
-		.build())
-		.build())
-		.build();
-
-		// add parent / child relationship
-		culverCity.addChild(culverHotel);
-		losAngeles.addChild(culverCity);
+		losAngeles = TestPlaceFactory.createLosAngelesAndNeighborhoodsAndBusiness();
 
 		// save tree
 		EntityManagerSupport.beginTransaction();
 		placeRepository.create(losAngeles);
 		EntityManagerSupport.commit();
 
+		// now set the parents for easier testing
+		culverCity = losAngeles.getChildren().iterator().next();
+		culverHotel = culverCity.getChildren().iterator().next();
 
+	}
+
+	@Test
+	public void testGetByExternalIdentifierAndNetwork() throws Exception {
+		Place place = placeRepository.getByExernalIdentifierAndNetwork(culverHotel.getExternalIdentifier(), ExternalNetwork.Yelp);
+		Assert.assertNotNull(place);  
+
+		// make sure network filter is working with defaults
+		place = placeRepository.getByExernalIdentifierAndNetwork(culverHotel.getExternalIdentifier(), null);
+		Assert.assertNull(place);  
 	}
 
 	@Test
 	public void testCreateParentAndChild() throws Exception {
 		// find place by name
-		Place place = placeRepository.findByName("Culver Hotel", null, "us");
+		Place place = placeRepository.getByLocatorAndExternalNetwork(culverHotel.getLocator(), ExternalNetwork.Yelp);
 		Assert.assertNotNull(place);
 		Assert.assertNotNull(place.getParent());
-		
+
 		// make sure the parent is culver city
 		Assert.assertEquals(place.getParent().getPlaceId(), culverCity.getPlaceId());
 		// make sure grant parent is los angeles
 		Assert.assertEquals(place.getParent().getParent().getPlaceId(), losAngeles.getPlaceId());
 
 	}
-	
+
 	@Test
-	public void testFindByName() throws Exception {
-		Place place = placeRepository.findByName("Los Angeles", null, "us");
+	public void testGetByName() throws Exception {
+		Place place = placeRepository.getByLocatorAndExternalNetwork(losAngeles.getLocator(), null);
 		Assert.assertNotNull(place);
 	}
-	
-	
+
+
 	@Test(expected = PersistenceException.class)
+	@Ignore
 	public void testCompositeIndex() throws Exception {
 		Place duplicate = new Place.Builder().boundingBox(losAngeles.getBoundingBox()).region("us").name(losAngeles.getName()).build();
-		
-		EntityManagerSupport.beginTransaction();
-		placeRepository.create(duplicate);
-		EntityManagerSupport.commit();
+
+		try {
+			EntityManagerSupport.beginTransaction();
+			placeRepository.create(duplicate);
+			EntityManagerSupport.commit();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
 	}
-	
+
 
 
 
