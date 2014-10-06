@@ -64,6 +64,26 @@ public class PlacesEndpoint {
 				.build();
 	}
 	@GET
+	@Path("/users/{userId}/provider/{externalNetworkId}/location/{placeId}/live")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response liveSearchByInterestIdAndNeighborhood(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer socialProviderId ,@PathParam("placeId") Long placeId,@QueryParam("q") String q, @QueryParam("interestId") List<Long> interestIds) throws IOException {
+		
+		PlacesDto results = new PlacesDto();
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(socialProviderId);
+		List<Place> places = ServiceFactory.getLocationService().liveSearch(q, placeId, interestIds, externalNetwork);
+		
+		for(Place place : places) {
+			results.getPlaces().add(DtoAssembler.assemble(place));
+		}
+
+		return Response.ok()
+				//.header("Last-Modified", places.lastModified)
+				.entity(jsonConverter.convertToPayload(results))
+				.build();
+	}
+	
+	@GET
 	@Path("/users/{userId}/provider/{externalNetworkId}/location/{placeId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure

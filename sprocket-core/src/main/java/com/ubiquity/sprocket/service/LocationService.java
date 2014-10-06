@@ -2,6 +2,7 @@ package com.ubiquity.sprocket.service;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -21,6 +22,7 @@ import com.niobium.repository.cache.DataModificationCache;
 import com.niobium.repository.cache.DataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.external.repository.ExternalInterestRepository;
 import com.ubiquity.external.repository.ExternalInterestRepositoryJpaImpl;
 import com.ubiquity.external.repository.cache.CacheKeys;
 import com.ubiquity.integration.api.PlaceAPI;
@@ -256,6 +258,22 @@ public class LocationService {
 		}
 	}
 
+	public List<Place> liveSearch(String searchTerm,Long placeID, List<Long> interestIds, ExternalNetwork network)
+	{
+		if(network.equals(ExternalNetwork.Yelp)) {
+			
+			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(ExternalNetwork.Yelp, null);
+			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
+			Place place =  placeRepository.read(placeID);
+			ExternalInterestRepository externalRepository = new ExternalInterestRepositoryJpaImpl();
+			
+			List<ExternalInterest> interests = externalRepository.findByInterestIDsAndExternalNetwork(interestIds,	ExternalNetwork.Yelp);
+			return placeAPI.searchPlacesWithinPlace(searchTerm, place, interests, 25);
+		}
+		return null;
+	}
+
+		PlaceAPI placeAPI = PlaceAPIFactory.createProvider(ExternalNetwork.Yelp, null);
 	/**
 	 * Returns place with the center point closest to this location
 	 * 
