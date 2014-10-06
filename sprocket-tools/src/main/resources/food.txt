@@ -1,4 +1,4 @@
-﻿Restaurants
+Restaurants
 	African
 	American
 	Asian

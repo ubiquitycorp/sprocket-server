@@ -12,8 +12,11 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.integration.api.PlaceAPIFactory;
 import com.ubiquity.location.domain.Place;
 import com.ubiquity.social.api.SocialAPIFactory;
+import com.ubiquity.social.domain.ExternalInterest;
 import com.ubiquity.social.domain.Interest;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.AnalyticsService;
@@ -43,51 +46,66 @@ public class DatabaseSeed {
 		parent = new Interest("Food", null);
 		loadParentInterestWithFile(parent, "/food.txt");
 		loadYelpMappings(parent, "/yelp_restaurants.txt");
-		
-		
+
 		parent = new Interest("Family", null);
 		loadParentInterestWithFile(parent, "/family.txt");
-		
+
 		parent = new Interest("Leisure", null);
 		loadParentInterestWithFile(parent, "/leisure.txt");
-		
+
 		parent = new Interest("Games", null);
 		loadParentInterestWithFile(parent, "/games.txt");
-		
+
 		parent = new Interest("Connectivity", null);
 		loadParentInterestWithFile(parent, "/connectivity.txt");
-		
-		
-		
-		
-		
-		//		// added some external Interest 
-		//		analyticsService.create(new ExternalInterest("Music", interestMusic, ExternalNetwork.Twitter));
-		//		analyticsService.create(new ExternalInterest("Movies", interestMovies, ExternalNetwork.Twitter));
-		//		analyticsService.create(new ExternalInterest("Theater", interestTheater, ExternalNetwork.Twitter));
 
 	}
 
 	private void loadYelpMappings(Interest parent, String string) throws IOException {
+
+		AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
+
+		// get restaurants
+		Interest restaurants = scanForChildInterestByName(parent, "Restaurants");
+		if(restaurants == null)
+			throw new IllegalArgumentException("Could not find restaurant interest");
+
+		// now read the lines, creating an external mapping for each yelp category
 		List<String> categories = IOUtils.readLines(
 				this.getClass().getResourceAsStream(string),
 				"UTF-8"
 				);
+
+		Interest major = null;
 		for(String category : categories) {
-			if(!category.startsWith("\t")) {
-				// this is a yelp category
-				//parent.addChild(major);
-				log.info("sprocket interest {}", category);
-
+			if(category.startsWith("\t")) {
+				analyticsService.create(new ExternalInterest(category.replaceAll("\t", ""), major, ExternalNetwork.Yelp));
 			} else {
-				log.info("yelp slug {}", category);
-
-//				Interest minor = new Interest(line.replaceAll("\t", ""));
-//				major.addChild(minor);
+				major = scanForChildInterestByName(restaurants, category);
+				if(major == null) {
+					throw new IllegalArgumentException("Could not find internal mapping for:" + category);
+				}
 			}
 		}
 	}
 
+	/**
+	 * Returns an interest by name in the child list of interests
+	 * 
+	 * @param parent
+	 * @param name
+	 * @return
+	 */
+	private Interest scanForChildInterestByName(Interest parent, String name) {
+		Interest found = null;
+		for(Interest child : parent.getChildren()) {
+			if(child.getName().equals(name)) {
+				found = child;
+				break;
+			}
+		}
+		return found;
+	}
 	/***
 	 * Loads places from a feed of neighborhoods
 	 * @throws IOException 
@@ -108,42 +126,47 @@ public class DatabaseSeed {
 		String state = null;
 		for(String neighborhood : neighborhoods) {
 
-			try {
-				Thread.sleep(200L);
-			} catch (InterruptedException e) {}
-
+			
 			int comma = neighborhood.indexOf(",");
 			if(comma > 0) {
 				// we have a city; split it
 				city = neighborhood.substring(0, comma);
 				state = neighborhood.substring(comma + 1, neighborhood.length()).replaceAll(" ", "");
 				log.info("Processing city \"{}\" and state \"{}\"", city, state);
-				// create the city
 				try {
-					currentCity = locationService.getOrCreatePlaceByName(city, city + ", " + state, "locality");
+					currentCity = locationService.getOrCreatePlaceByName(city, city + ", " + state, null, "locality");
 					log.info("created city {}", currentCity);
 
-
 				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
 					log.error("Failed to process city \"{}\" and state \"{}\"", city, state);
 				}
 			} else {
-
-
 				try {
 					if(currentCity == null)
 						continue;
+					
+					log.info("current city {}", city);
+					
+					if(!city.equals("Los Angeles"))
+						continue;
+					
 					// if place is not null, get the neighborhood
 					String description = neighborhood + ", " + city + ", " + state;
-					Place place = locationService.getOrCreatePlaceByName(neighborhood, description, "neighborhood");
+					Place place = locationService.getOrCreatePlaceByName(neighborhood, description, null, new String[] { "neighborhood", "locality" });
 					if(place == null) {
 						log.info("failed to create neighborhood by description {} and city/state {}", description, city + " " + state);
 					}
 					else {
+						// if this has no id already, add a proxy
+						place.setParent(currentCity);
 						log.info("created neighborhood {}", place);
+						locationService.updatePlace(place);
 					}
 				} catch (IllegalArgumentException e) {
 					log.error("Failed to process neighborhood \"{}\"", neighborhood);
+				} catch (Exception e) {
+					log.error("Unkonwn error: ", e);
 				}
 
 			}
@@ -157,6 +180,7 @@ public class DatabaseSeed {
 		JedisConnectionFactory.initialize(configuration);
 		MessageQueueFactory.initialize(configuration);
 		SocialAPIFactory.initialize(configuration);
+		PlaceAPIFactory.initialize(configuration);
 	}
 
 	private void stopServices() {
@@ -168,8 +192,9 @@ public class DatabaseSeed {
 		final DatabaseSeed loader = new DatabaseSeed();
 		try {
 			loader.initialize(new PropertiesConfiguration("tools.properties"));
-			//loader.seedPlacesFromNeighborhoodsFeed();
+			loader.seedPlacesFromNeighborhoodsFeed();
 			loader.seedInterests();
+			//loader.goober();
 		} catch (ConfigurationException e) {
 			log.error("Unable to configure service", e);
 			System.exit(-1);
@@ -186,6 +211,11 @@ public class DatabaseSeed {
 			}
 		});
 	}
+	
+	private void goober() {
+		LocationService locationService = ServiceFactory.getLocationService();
+		locationService.syncPlaces(ExternalNetwork.Yelp);
+	}
 
 	private void loadParentInterestWithFile(Interest parent, String resource) throws IOException {
 
@@ -199,7 +229,7 @@ public class DatabaseSeed {
 		Interest major = null;
 		for(String line : lines) {
 			if(!line.startsWith("\t")) {
-				major = new Interest(line.replaceAll(" ", ""));
+				major = new Interest(line);
 				parent.addChild(major);
 			} else {
 				Interest minor = new Interest(line.replaceAll("\t", ""));

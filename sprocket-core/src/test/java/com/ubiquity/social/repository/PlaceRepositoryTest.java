@@ -1,7 +1,8 @@
 package com.ubiquity.social.repository;
 
 import java.math.BigDecimal;
-import java.util.Locale;
+
+import javax.persistence.PersistenceException;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -39,7 +40,7 @@ public class PlaceRepositoryTest {
 		placeRepository = new PlaceRepositoryJpaImpl();
 
 		losAngeles = new Place.Builder()
-		.locale(Locale.US)
+		.region("us")
 		.name("Los Angeles, CA").boundingBox(new Geobox.Builder()
 		.center(new Location.Builder()
 		.latitude(new BigDecimal(34.0536))
@@ -49,7 +50,7 @@ public class PlaceRepositoryTest {
 		.build();
 
 		culverCity = new Place.Builder()
-		.locale(Locale.US)
+		.region("us")
 		.name("Culver City, CA").boundingBox(new Geobox.Builder()
 		.center(new Location.Builder()
 		.latitude(new BigDecimal(34.0211111))
@@ -59,7 +60,7 @@ public class PlaceRepositoryTest {
 		.build();
 
 		culverHotel = new Place.Builder()
-		.locale(Locale.US)
+		.region("us")
 		.name("Culver Hotel").boundingBox(new Geobox.Builder()
 		.center(new Location.Builder()
 		.latitude(new BigDecimal(34.0238))
@@ -83,7 +84,7 @@ public class PlaceRepositoryTest {
 	@Test
 	public void testCreateParentAndChild() throws Exception {
 		// find place by name
-		Place place = placeRepository.findByName("Culver Hotel", Locale.US);
+		Place place = placeRepository.findByName("Culver Hotel", null, "us");
 		Assert.assertNotNull(place);
 		Assert.assertNotNull(place.getParent());
 		
@@ -94,6 +95,21 @@ public class PlaceRepositoryTest {
 
 	}
 	
+	@Test
+	public void testFindByName() throws Exception {
+		Place place = placeRepository.findByName("Los Angeles", null, "us");
+		Assert.assertNotNull(place);
+	}
+	
+	
+	@Test(expected = PersistenceException.class)
+	public void testCompositeIndex() throws Exception {
+		Place duplicate = new Place.Builder().boundingBox(losAngeles.getBoundingBox()).region("us").name(losAngeles.getName()).build();
+		
+		EntityManagerSupport.beginTransaction();
+		placeRepository.create(duplicate);
+		EntityManagerSupport.commit();
+	}
 	
 
 

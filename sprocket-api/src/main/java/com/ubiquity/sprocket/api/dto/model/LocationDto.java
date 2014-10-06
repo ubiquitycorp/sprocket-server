@@ -3,9 +3,6 @@ package com.ubiquity.sprocket.api.dto.model;
 import java.math.BigDecimal;
 
 import javax.validation.constraints.NotNull;
-
-import com.ubiquity.location.domain.Location;
-import com.ubiquity.location.domain.Location.Builder;
 /***
  * 
  * @author peter.tadros

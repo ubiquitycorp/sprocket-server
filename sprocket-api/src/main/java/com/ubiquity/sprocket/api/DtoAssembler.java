@@ -390,7 +390,7 @@ public class DtoAssembler {
 		PlaceDto.Builder placeDtoBuilder = new PlaceDto.Builder();
 		placeDtoBuilder.placeId(place.getPlaceId())
 				.description(place.getDescription())
-				.locale(place.getLocale())
+				.region(place.getRegion())
 				.name(place.getName())
 				.parent(assembleCityOrNeighborhood(place.getParent()));
 		return placeDtoBuilder.build();
@@ -404,8 +404,8 @@ public class DtoAssembler {
 				.addressdto(assemble(place.getAddress()))
 				.boundingBox(assemble(place.getBoundingBox()))
 				.externalIdentitifer(place.getExternalIdentitifer())
-				.locale(place.getLocale()).name(place.getName())
-				.network(place.getNetwork())
+				.region(place.getRegion()).name(place.getName())
+				.network(place.getExternalNetwork())
 				.parent(assemble(place.getParent()));
 		return placeDtoBuilder.build();
 	}
@@ -514,8 +514,8 @@ public class DtoAssembler {
 				.address(assemble(placeDto.getAddressdto()))
 				.boundingBox(assemble(placeDto.getBoundingBox()))
 				.externalIdentitifer(placeDto.getExternalIdentitifer())
-				.locale(placeDto.getLocale()).name(placeDto.getName())
-				.network(placeDto.getNetwork())
+				.region(placeDto.getRegion()).name(placeDto.getName())
+				.externalNetwork(placeDto.getNetwork())
 				.parent(assemble(placeDto.getParent())).build();
 
 	}

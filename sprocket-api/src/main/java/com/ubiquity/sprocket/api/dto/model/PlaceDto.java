@@ -1,11 +1,9 @@
 package com.ubiquity.sprocket.api.dto.model;
 
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 
 import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.location.domain.Geobox;
 
 
 public class PlaceDto {
@@ -13,7 +11,7 @@ public class PlaceDto {
 	private Long placeId;
 	private String name;
 	private String description;
-	private Locale locale;
+	private String region;
 	private GeoboxDto boundingBox;
 	private Set<InterestDto> interests = new HashSet<InterestDto>();
 	private Long lastUpdated;
@@ -36,8 +34,8 @@ public class PlaceDto {
 		return description;
 	}
 
-	public Locale getLocale() {
-		return locale;
+	public String getRegion() {
+		return region;
 	}
 
 	public GeoboxDto getBoundingBox() {
@@ -72,7 +70,7 @@ public class PlaceDto {
 		private Long placeId;
 		private String name;
 		private String description;
-		private Locale locale;
+		private String region;
 		private GeoboxDto boundingBox;
 		private String externalIdentitifer;
 		private ExternalNetwork network;
@@ -95,8 +93,8 @@ public class PlaceDto {
 			return this;
 		}
 
-		public Builder locale(Locale locale) {
-			this.locale = locale;
+		public Builder region(String region) {
+			this.region = region;
 			return this;
 		}
 
@@ -138,7 +136,7 @@ public class PlaceDto {
 		this.placeId = builder.placeId;
 		this.name = builder.name;
 		this.description = builder.description;
-		this.locale = builder.locale;
+		this.region = builder.region;
 		this.boundingBox = builder.boundingBox;
 		this.externalIdentitifer = builder.externalIdentitifer;
 		this.network = builder.network;
