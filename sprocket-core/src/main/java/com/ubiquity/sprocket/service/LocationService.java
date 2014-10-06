@@ -147,7 +147,7 @@ public class LocationService {
 								"Unable to disambiguate input: " + name);
 
 					Geobox box = geobox.get(0);
-					place = new Place.Builder().name(name).boundingBox(box).region("us").build();
+					place = new Place.Builder().name(name).boundingBox(box).region("us").lastUpdated(System.currentTimeMillis()).build();
 					EntityManagerSupport.beginTransaction();
 					placeRepository.create(place);
 					EntityManagerSupport.commit();
