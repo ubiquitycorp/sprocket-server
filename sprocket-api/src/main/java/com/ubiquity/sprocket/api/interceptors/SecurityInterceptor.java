@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ubiquity.api.exception.ErrorKeys;
 import com.ubiquity.identity.service.AuthenticationService;
-import com.ubiquity.social.api.exception.AuthorizationException;
+import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 

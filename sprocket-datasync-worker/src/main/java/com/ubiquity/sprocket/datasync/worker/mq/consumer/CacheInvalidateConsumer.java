@@ -8,10 +8,10 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
-import com.ubiquity.content.domain.VideoContent;
+import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
-import com.ubiquity.social.domain.Activity;
 import com.ubiquity.sprocket.datasync.worker.manager.DataSyncProcessor;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;

@@ -16,10 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.external.repository.ExternalInterestRepositoryJpaImpl;
 import com.ubiquity.integration.api.PlaceAPI;
 import com.ubiquity.integration.api.PlaceAPIFactory;
+import com.ubiquity.integration.api.exception.ExternalNetworkException;
+import com.ubiquity.integration.domain.ExternalInterest;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Interest;
+import com.ubiquity.integration.repository.ExternalInterestRepositoryJpaImpl;
 import com.ubiquity.location.LocationConverter;
 import com.ubiquity.location.domain.Geobox;
 import com.ubiquity.location.domain.Location;
@@ -29,9 +32,6 @@ import com.ubiquity.location.repository.PlaceRepository;
 import com.ubiquity.location.repository.PlaceRepositoryJpaImpl;
 import com.ubiquity.location.repository.UserLocationRepository;
 import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
-import com.ubiquity.social.api.exception.ExternalNetworkException;
-import com.ubiquity.social.domain.ExternalInterest;
-import com.ubiquity.social.domain.Interest;
 
 /***
  * Service for managing location indexing, retrieval, and geo cluster

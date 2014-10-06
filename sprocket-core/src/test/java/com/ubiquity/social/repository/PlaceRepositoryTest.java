@@ -9,7 +9,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.factory.TestPlaceFactory;
 import com.ubiquity.location.domain.Place;
 import com.ubiquity.location.repository.PlaceRepository;

@@ -7,7 +7,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.social.domain.Activity;
+import com.ubiquity.integration.domain.Activity;
 
 @Entity
 @DiscriminatorValue("activity")

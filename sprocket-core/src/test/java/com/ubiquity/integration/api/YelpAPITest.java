@@ -10,11 +10,11 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.integration.domain.ExternalInterest;
+import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.factory.TestPlaceFactory;
 import com.ubiquity.location.domain.Place;
-import com.ubiquity.social.domain.ExternalInterest;
 
 public class YelpAPITest {
 	

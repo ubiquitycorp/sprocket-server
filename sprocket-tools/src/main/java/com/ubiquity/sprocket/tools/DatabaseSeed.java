@@ -12,12 +12,12 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.integration.api.PlaceAPIFactory;
+import com.ubiquity.integration.api.SocialAPIFactory;
+import com.ubiquity.integration.domain.ExternalInterest;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Interest;
 import com.ubiquity.location.domain.Place;
-import com.ubiquity.social.api.SocialAPIFactory;
-import com.ubiquity.social.domain.ExternalInterest;
-import com.ubiquity.social.domain.Interest;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.AnalyticsService;
 import com.ubiquity.sprocket.service.LocationService;

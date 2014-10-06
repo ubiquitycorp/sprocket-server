@@ -2,12 +2,12 @@ package com.ubiquity.sprocket.service;
 
 import org.apache.commons.configuration.Configuration;
 
-import com.ubiquity.content.service.ContentService;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.identity.service.UserService;
-import com.ubiquity.social.service.ContactService;
-import com.ubiquity.external.service.ExternalIdentityService;
-import com.ubiquity.social.service.SocialService;
+import com.ubiquity.integration.service.ContactService;
+import com.ubiquity.integration.service.ContentService;
+import com.ubiquity.integration.service.ExternalIdentityService;
+import com.ubiquity.integration.service.SocialService;
 
 /***
  * Factory class returns a managers as singletons.

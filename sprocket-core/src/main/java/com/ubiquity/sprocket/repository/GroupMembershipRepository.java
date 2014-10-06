@@ -3,7 +3,7 @@ package com.ubiquity.sprocket.repository;
 import java.util.List;
 
 import com.niobium.repository.Repository;
-import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.sprocket.domain.GroupMembership;
 
 

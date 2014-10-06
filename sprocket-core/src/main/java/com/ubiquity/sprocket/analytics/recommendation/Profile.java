@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.social.domain.Contact;
+import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.location.domain.UserLocation;
 
 public class Profile implements Serializable {
