@@ -33,8 +33,21 @@ public interface SearchEngine {
 	public List<Document> searchDocuments(String searchTerm, String[] fields, Map<String, Object> filter, SolrOperator operator);
 	
 	/***
+	 * 
+	 * Search for indexed documents matching the value for this map of field / value pairs
+	 * and group by group field and adds limit to each group
+     *
+	 * @param searchTerm
+	 * @param fields
+	 * @return
+	 */
+	public List<Document> searchDocuments(String searchTerm, String[] fields, Map<String, Object> filters, 
+			SolrOperator operator, String groupField, Integer groupLimit, Integer resultsLimit);
+	
+	/***
 	 * Removes all documents 
 	 */
 	public void deleteAllDocuments();
 
+	public Integer findClicksById(String id);
 }

@@ -41,13 +41,16 @@ public class SearchService {
 	
 	private SearchEngine searchEngine;
 	
-	private Integer resultsLimit, pageLimit;
+	private Integer resultsLimit, pageLimit, networkLimit, networkNumbers;
 	
 	public SearchService(Configuration config) {
 		log.debug("Using solr api path: {}", config.getProperty("solr.api.path"));
 		resultsLimit = config.getInt("rules.search.results.limit");
 		pageLimit = config.getInt("rules.search.page.limit");
+		networkLimit = config.getInt("rules.search.network.limit");
+		networkNumbers = config.getInt("networks.number");
 		searchEngine = new SearchEngineSolrjImpl(config);
+		
 	}
 
 	
@@ -85,6 +88,8 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Message.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, message.getExternalNetwork().ordinal());
 
+			document.getFields().put(SearchKeys.Fields.FIELD_CLICKS, 1);
+			
 			documents.add(document);
 		}
 
@@ -96,13 +101,15 @@ public class SearchService {
      *
 	 * @param userFilterId
 	 * @param activities
+	 * @param isEngaged: indicates whether these activities are engaged or not
 	 */
-	public void indexActivities(Long userFilterId, List<Activity> activities) {
+	public void indexActivities(Long userFilterId, List<Activity> activities, Boolean isEngaged) {
 		List<Document> documents = new LinkedList<Document>();
 		for(Activity activity : activities) {
 
 			String dataType = Activity.class.getSimpleName();
 			Document document = new Document(dataType);
+			Integer clicks = 1;
 			
 			// create identifier from the user filter (or default), the pk of the entity, and the data type
 			String id = SearchKeys.generateDocumentKeyForId(userFilterId, activity.getActivityId(), dataType);
@@ -140,7 +147,12 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, activity.getExternalNetwork().ordinal());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_IDENTIFIER, activity.getExternalIdentifier());
 			document.getFields().put(SearchKeys.Fields.FIELD_DATE, activity.getCreationDate());
-
+			
+			if(isEngaged){
+				clicks = searchEngine.findClicksById(id);
+				clicks++;
+			}
+			document.getFields().put(SearchKeys.Fields.FIELD_CLICKS, clicks);
 			
 			documents.add(document);
 		}
@@ -154,14 +166,15 @@ public class SearchService {
 	 * @param videos
 	 * @param userId
 	 */
-	public void indexVideos(Long userId, List<VideoContent> videos) {
+	public void indexVideos(Long userId, List<VideoContent> videos, Boolean isEngaged) {
 
 		List<Document> documents = new LinkedList<Document>();
 		for(VideoContent videoContent : videos) {
 
 			String dataType = VideoContent.class.getSimpleName();
 			Document document = new Document(dataType);
-
+			Integer clicks = 1;
+			
 			// create identifier from the user filter (or default), the pk of the entity, and the data type
 			String id = SearchKeys.generateDocumentKeyForId(userId, videoContent.getVideoContentId(), dataType);
 			document.getFields().put(SearchKeys.Fields.FIELD_ID, id);
@@ -182,6 +195,11 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, VideoContent.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, videoContent.getExternalNetwork().ordinal());
 
+			if(isEngaged){
+				clicks = searchEngine.findClicksById(id);
+				clicks++;
+			}
+			document.getFields().put(SearchKeys.Fields.FIELD_CLICKS, clicks);
 
 			documents.add(document);
 		}
@@ -309,7 +327,8 @@ public class SearchService {
 		Long noOwner = SearchKeys.generateOwnerId(null);
 		values.add(noOwner);
 		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, values);
-		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters, SolrOperator.OR);
+		Integer resultsLimit = networkNumbers * networkLimit;
+		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters, SolrOperator.OR, SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, networkLimit, resultsLimit);
 	}
 	
 	

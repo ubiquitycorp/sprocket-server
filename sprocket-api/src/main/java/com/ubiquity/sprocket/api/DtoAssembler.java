@@ -148,6 +148,7 @@ public class DtoAssembler {
 						.description(
 								(String) fields.get(SearchKeys.Fields.FIELD_DESCRIPTION))
 						.ownerId(ownerId)
+						.clicks((Integer) fields.get(SearchKeys.Fields.FIELD_CLICKS))
 						.build();
 			}
 		} else if (dataType.equals(Message.class.getSimpleName())) {
@@ -165,6 +166,7 @@ public class DtoAssembler {
 				.externalNetworkId(message.getExternalNetworkId())
 				.lastMessageDate(message.getDate())
 				.ownerId(ownerId)
+				.clicks((Integer) fields.get(SearchKeys.Fields.FIELD_CLICKS))
 				.build();
 				topMessage.getConversation().add(message);
 			data = topMessage;
@@ -184,7 +186,8 @@ public class DtoAssembler {
 						.externalIdentifier((String)fields.get(SearchKeys.Fields.FIELD_EXTERNAL_IDENTIFIER))
 						.externalNetworkId((Integer)fields.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
 						.date((Long) fields.get(SearchKeys.Fields.FIELD_DATE))
-						.ownerId(ownerId);
+						.ownerId(ownerId)
+						.clicks((Integer) fields.get(SearchKeys.Fields.FIELD_CLICKS));
 
 				// add in content based on type
 				String activityType = (String) fields

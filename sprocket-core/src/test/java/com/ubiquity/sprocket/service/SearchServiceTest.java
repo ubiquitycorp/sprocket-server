@@ -128,7 +128,7 @@ public class SearchServiceTest {
 
 		// save with no use filter
 		searchService.indexVideos(null,
-				Arrays.asList(new VideoContent[] { videoContent }));
+				Arrays.asList(new VideoContent[] { videoContent }), true);
 		
 		// search for this user; should return public even though the user fitler is set
 		List<Document> documents = searchService.searchIndexedDocuments(videoContent.getDescription(), null, ExternalNetwork.YouTube);
@@ -137,7 +137,7 @@ public class SearchServiceTest {
 		
 		// save with user filter
 		searchService.indexVideos(owner.getUserId(),
-				Arrays.asList(new VideoContent[] { videoContent }));
+				Arrays.asList(new VideoContent[] { videoContent }), true);
 		
 		// search for this user; should return when searching with this user filter specified
 		documents = searchService.searchIndexedDocuments(videoContent.getDescription(), owner.getUserId(), ExternalNetwork.YouTube);
@@ -162,7 +162,7 @@ public class SearchServiceTest {
 		activity.setPostedBy(postedBy);
 		
 		searchService.indexActivities(null,
-				Arrays.asList(new Activity[] { activity }));
+				Arrays.asList(new Activity[] { activity }), true);
 		
 		// search by sender display name, making sure that only this entity shows up and it's of type "Message"
 		List<Document> documents = searchService.searchIndexedDocuments(activity.getTitle(), null, ExternalNetwork.Facebook);
@@ -183,7 +183,7 @@ public class SearchServiceTest {
 		ServiceFactory.getContentService().create(videoContent);
 		// add 2
 		searchService.indexVideos(null,
-				Arrays.asList(new VideoContent[] { videoContent, videoContent }));
+				Arrays.asList(new VideoContent[] { videoContent, videoContent }), false);
 
 		// search, making sure that only this entity shows up and it's of type "VideoContent"
 		List<Document> documents = searchService.searchIndexedDocuments(videoContent.getTitle(), null);
@@ -203,7 +203,7 @@ public class SearchServiceTest {
 		activity.setPostedBy(postedBy);
 		
 		searchService.indexActivities(owner.getUserId(),
-				Arrays.asList(new Activity[] { activity }));
+				Arrays.asList(new Activity[] { activity }), true);
 
 		// search by sender display name, making sure that only this entity shows up and it's of type "Message"
 		List<Document> documents = searchService.searchIndexedDocuments(activity.getTitle(), owner.getUserId());
@@ -227,7 +227,7 @@ public class SearchServiceTest {
 
 		
 		searchService.indexVideos(owner.getUserId(),
-				Arrays.asList(new VideoContent[] { videoContent }));
+				Arrays.asList(new VideoContent[] { videoContent }), false);
 
 		// search, making sure that only this entity shows up and it's of type "VideoContent"
 		List<Document> documents = searchService.searchIndexedDocuments(videoContent.getTitle(), owner.getUserId());

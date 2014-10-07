@@ -121,7 +121,7 @@ public class DataSyncProcessor extends Thread {
 					socialNetwork);
 
 			// index for searching
-			ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), synced);
+			ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), synced, false);
 			return synced.size();
 		} catch (Exception e) {
 			log.error("Could not process activities for identity: {}", ExceptionUtils.getRootCauseMessage(e));
@@ -155,7 +155,7 @@ public class DataSyncProcessor extends Thread {
 					externalNetwork);
 
 			// add videos to search results for this specific user
-			ServiceFactory.getSearchService().indexVideos(identity.getUser().getUserId(), synced);
+			ServiceFactory.getSearchService().indexVideos(identity.getUser().getUserId(), synced, false);
 			return synced.size();
 		} catch (Exception e) {
 			log.error("Unable to sync for identity: {}", identity.getIdentityId(), ExceptionUtils.getRootCauseMessage(e));

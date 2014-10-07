@@ -66,7 +66,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 
 			// index for search (this will update the index if the record exists already)
 			ServiceFactory.getSearchService().indexActivities(null,
-					Arrays.asList(new Activity[] { activity }));
+					Arrays.asList(new Activity[] { activity }), true);
 			
 		} else if(dataType.equalsIgnoreCase(VideoContent.class.getSimpleName())) {
 			// persist it or update the activity if it exists already
@@ -76,7 +76,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 
 			// index for search (this will update the index if the record exists already)
 			ServiceFactory.getSearchService().indexVideos(null,
-					Arrays.asList(new VideoContent[] { videoContent }));
+					Arrays.asList(new VideoContent[] { videoContent }), true);
 		}
 
 	}
@@ -89,7 +89,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 
 		// index for search (this will update the index if the record exists already)
 		ServiceFactory.getSearchService().indexVideos(null,
-				Arrays.asList(new VideoContent[] { videoContent }));
+				Arrays.asList(new VideoContent[] { videoContent }), true);
 
 	}
 
@@ -103,6 +103,6 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		// index for search (this will update the index if the record exists already)
 		ServiceFactory.getSearchService().indexActivities(
 				engagedActivity.getUserId(), 
-				Arrays.asList(new Activity[] { activity }));		
+				Arrays.asList(new Activity[] { activity }), true);		
 	}
 }

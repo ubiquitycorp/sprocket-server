@@ -20,6 +20,7 @@ public class MessageDto implements Comparable<MessageDto>{
 	private Set<ContactDto> receivers = new HashSet<ContactDto>();
 	
 	private Long ownerId;
+	private Integer clicks;
 	
 	public Integer getExternalNetworkId() {
 		return externalNetworkId;
@@ -62,6 +63,11 @@ public class MessageDto implements Comparable<MessageDto>{
 		return ownerId;
 	}
 
+	public Integer getClicks() {
+		return clicks;
+	}
+
+
 
 	public static class Builder {
 		private String subject;
@@ -71,6 +77,7 @@ public class MessageDto implements Comparable<MessageDto>{
 		private Integer externalNetworkId;
 		private Long lastMessageDate;
 		private Long ownerId;
+		private Integer clicks;
 		
 		public Builder subject(String subject) {
 			this.subject = subject;
@@ -106,9 +113,16 @@ public class MessageDto implements Comparable<MessageDto>{
 			return this;
 		}
 
+		public Builder clicks(Integer clicks) {
+			this.clicks = clicks;
+			return this;
+		}
+		
 		public MessageDto build() {
 			return new MessageDto(this);
 		}
+
+		
 	}
 
 	private MessageDto(Builder builder) {
@@ -119,6 +133,7 @@ public class MessageDto implements Comparable<MessageDto>{
 		this.sender = builder.sender;
 		this.externalNetworkId = builder.externalNetworkId;
 		this.ownerId = builder.ownerId;
+		this.clicks = builder.clicks;
 	}
 
 	@Override
