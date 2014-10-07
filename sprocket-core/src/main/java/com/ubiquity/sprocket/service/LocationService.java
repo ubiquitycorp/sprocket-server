@@ -1,10 +1,8 @@
 package com.ubiquity.sprocket.service;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.persistence.NoResultException;
 
@@ -15,14 +13,19 @@ import org.gavaghan.geodesy.GlobalPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.repository.CollectionVariant;
+import com.niobium.repository.cache.DataCacheKeys;
+import com.niobium.repository.cache.DataModificationCache;
+import com.niobium.repository.cache.DataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.integration.api.PlaceAPI;
 import com.ubiquity.integration.api.PlaceAPIFactory;
 import com.ubiquity.integration.api.exception.ExternalNetworkException;
 import com.ubiquity.integration.domain.ExternalInterest;
 import com.ubiquity.integration.domain.ExternalNetwork;
-import com.ubiquity.integration.domain.Interest;
+import com.ubiquity.integration.repository.ExternalInterestRepository;
 import com.ubiquity.integration.repository.ExternalInterestRepositoryJpaImpl;
+import com.ubiquity.integration.repository.cache.CacheKeys;
 import com.ubiquity.location.LocationConverter;
 import com.ubiquity.location.domain.Geobox;
 import com.ubiquity.location.domain.Location;
@@ -45,9 +48,13 @@ public class LocationService {
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private GeodeticCalculator geoCalculator;
-
+	private DataModificationCache dataModificationCache;
+	
 	public LocationService(Configuration configuration) {
 		geoCalculator = new GeodeticCalculator();
+		dataModificationCache = new DataModificationCacheRedisImpl(
+				configuration
+						.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GENERAL));
 	}
 
 	/**
@@ -139,7 +146,8 @@ public class LocationService {
 								"Unable to disambiguate input: " + name);
 
 					Geobox box = geobox.get(0);
-					place = new Place.Builder().locator(locator).name(name).boundingBox(box).region("us").build();
+					place = new Place.Builder().locator(locator).name(name).boundingBox(box).region("us").lastUpdated(System.currentTimeMillis()).build();
+
 					EntityManagerSupport.beginTransaction();
 					placeRepository.create(place);
 					EntityManagerSupport.commit();
@@ -186,20 +194,11 @@ public class LocationService {
 
 			try {
 
-				// get external mappings for yelp
-				//List<ExternalInterest> externalInterests = new ExternalInterestRepositoryJpaImpl().findByExternalNetwork(ExternalNetwork.Yelp);
-
 				PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
 				List<Place> places = placeRepository.findLastLevelWithoutNetwork(); // gets all neighborhoods
-
-				//				// yelp works best doing 1 query per major city, then filtering the results by neighborhood
-				//				List<Place> cities = new LinkedList<Place>();
-				//				
-				//				
-				// go through these and for each neighborhood;
-
 				for(Place neighborhood : places) {
 					
+					// make sure we don't already have children
 					if(!placeRepository.findChildrenForPlace(neighborhood).isEmpty()) {
 						log.info("skipping {} because we already processed it", neighborhood);
 						continue;
@@ -253,6 +252,22 @@ public class LocationService {
 		}
 	}
 
+	public List<Place> liveSearch(String searchTerm, Long placeID, List<Long> interestIds, ExternalNetwork network)
+	{
+		if(network.equals(ExternalNetwork.Yelp)) {
+			
+			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(ExternalNetwork.Yelp, null);
+			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
+			Place place =  placeRepository.read(placeID);
+			ExternalInterestRepository externalRepository = new ExternalInterestRepositoryJpaImpl();
+			
+			List<ExternalInterest> interests = externalRepository.findByInterestIDsAndExternalNetwork(interestIds,	ExternalNetwork.Yelp);
+			return placeAPI.searchPlacesWithinPlace(searchTerm, place, interests, 1, 20);
+		}
+		return null;
+	}
+
+		PlaceAPI placeAPI = PlaceAPIFactory.createProvider(ExternalNetwork.Yelp, null);
 	/**
 	 * Returns place with the center point closest to this location
 	 * 
@@ -271,6 +286,57 @@ public class LocationService {
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
 
 			List<Place> places = placeRepository.findAll();
+
+			if (places.isEmpty())
+				return null;
+
+
+			Double closestDistance = Double.MAX_VALUE;
+			for (Place place : places) {
+				// convert to model the geo lib uses
+				GlobalPosition locationPoint = new GlobalPosition(location
+						.getLatitude().doubleValue(), location.getLongitude()
+						.doubleValue(), 0.0);
+				Location center = place.getBoundingBox().getCenter();
+				GlobalPosition placePoint = new GlobalPosition(center.getLatitude()
+						.doubleValue(), center.getLongitude().doubleValue(), 0.0);
+
+				Ellipsoid reference = Ellipsoid.WGS84;
+				double distance = geoCalculator.calculateGeodeticCurve(reference,
+						locationPoint, placePoint).getEllipsoidalDistance(); // Distance
+				// between
+				// Point
+				// A
+				// and
+				// Point
+				// B
+				if (distance < closestDistance) {
+					closestDistance = distance;
+					closest = place;
+				}
+			}
+
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+		return closest;
+	}
+	/**
+	 * Returns place with the center point closest to this location
+	 * 
+	 * @param location
+	 * 
+	 * @return place or null if there are no places nearby
+	 */
+	public Place getClosestNeighborhoodIsWithin(Location location) {
+		
+		Place closest = null;
+
+		try {
+
+			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
+
+			List<Place> places = placeRepository.getAllNeighborhoods();
 
 			if (places.isEmpty())
 				return null;
@@ -332,6 +398,65 @@ public class LocationService {
 			EntityManagerSupport.closeEntityManager();
 		}
 
+	}
+	
+	public CollectionVariant<Place> getAllCitiesAndNeighborhoods(Locale locale,
+			Long ifModifiedSince, Boolean delta) {
+		String key = CacheKeys
+				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.PLACES);
+		Long lastModified = dataModificationCache.getLastModified(key,
+				ifModifiedSince);
+
+		// If there is no cache entry, there is no data
+		if (lastModified == null) {
+			return null;
+		}
+		try {
+			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
+			List<Place> places;
+			if (delta == null || !delta) {
+				places = placeRepository.getAllCitiesAndNeighborhoods();
+			} else {
+				places = placeRepository
+						.getAllCitiesAndNeighborhoodsWithModifiedSince(ifModifiedSince);
+			}
+			return new CollectionVariant<Place>(places, lastModified);
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+	}
+
+	public List<Place> findPlacesByInterestId(Long placeId ,List<Long> interestId,
+			ExternalNetwork externalNetwork) {
+
+		try {
+			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
+			return placeRepository.findPlacesByInterestIdAndProvider(placeId ,
+					interestId, externalNetwork);
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+	}
+
+	public void resetPlaceLastModifiedCache() {
+		String key = CacheKeys
+				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.PLACES);
+		dataModificationCache.setLastModified(key, System.currentTimeMillis());
+	}
+	/***
+	 * find or create place
+	 * @param place
+	 * @return
+	 */
+	public Place findOrCreate(Place place) {
+		
+		PlaceRepositoryJpaImpl placeRepository = new PlaceRepositoryJpaImpl();
+		if(place.getPlaceId() != null) {
+			return placeRepository.read(place.getPlaceId());
+		}else{
+			create(place);
+		}
+		return place;
 	}
 
 }

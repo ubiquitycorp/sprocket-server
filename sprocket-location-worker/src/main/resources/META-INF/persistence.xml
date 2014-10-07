@@ -17,7 +17,8 @@
 		<class>com.ubiquity.sprocket.domain.EngagedDocument</class>
 		<class>com.ubiquity.sprocket.domain.EngagedItem</class>
 
-
+		<class>com.ubiquity.sprocket.domain.FavoritePlace</class>
+		
 		<class>com.ubiquity.content.domain.VideoContent</class>
 		<class>com.ubiquity.identity.domain.User</class>
 		<class>com.ubiquity.identity.domain.Identity</class>

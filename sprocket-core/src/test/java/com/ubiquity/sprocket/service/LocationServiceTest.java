@@ -14,34 +14,35 @@ import com.ubiquity.integration.factory.TestPlaceFactory;
 import com.ubiquity.location.domain.Place;
 
 public class LocationServiceTest {
-	
+
 	private static LocationService locationService;
 	private static Place losAngeles;
-	
+
 	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
-	
+
 	@BeforeClass
 	public static void setUp() throws Exception {
 		Configuration config = new PropertiesConfiguration("test.properties");
-		
+
 		locationService = new LocationService(config);
-		
+
 		JedisConnectionFactory.initialize(config);
 		ServiceFactory.initialize(config, null);
 		PlaceAPIFactory.initialize(config);
+
 		
 		losAngeles = TestPlaceFactory.createLosAngelesAndNeighborhoodsAndBusiness();
+
 		locationService.create(losAngeles);
-		
-		
+
 	}
+
 	
+
 	@Test
 	public void testSyncYelpNeighborhood() {
 		locationService.syncPlaces(ExternalNetwork.Yelp);
 	}
-	
-	
 
 }
