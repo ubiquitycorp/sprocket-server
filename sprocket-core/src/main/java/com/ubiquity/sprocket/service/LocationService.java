@@ -1,9 +1,7 @@
 package com.ubiquity.sprocket.service;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import javax.persistence.NoResultException;
 
@@ -454,7 +452,11 @@ public class LocationService {
 		PlaceRepositoryJpaImpl placeRepository = new PlaceRepositoryJpaImpl();
 		if(place.getPlaceId() != null) {
 			return placeRepository.read(place.getPlaceId());
-		}else{
+		}else if (place.getParent() != null && place.getParent().getPlaceId() !=null){
+			place.setParent(placeRepository.read(place.getParent().getPlaceId()));
+			create(place);
+		}else
+		{
 			create(place);
 		}
 		return place;

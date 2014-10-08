@@ -23,19 +23,19 @@ FavoritePlaceRepository {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Place> getFavoritePlaceByUserId(Long userId,ExternalNetwork externalNetwork) {
-		Query query = getEntityManager().createQuery("select fp.Place from FavoritePlace fp where fp.user.userId = :userId and fp.Place.network =:network");
+		Query query = getEntityManager().createQuery("select fp.place from FavoritePlace fp where fp.user.userId = :userId and fp.place.network =:network");
 		query.setParameter("userId", userId);
-		query.setParameter("network", externalNetwork);
+		query.setParameter("network", externalNetwork.ordinal());
 		return (List<Place>)query.getResultList();
 	}
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Place> getFavoritePlaceByUserIdAndPlaceId(Long userId,
 			ExternalNetwork externalNetwork, Long placeId) {
-		Query query = getEntityManager().createQuery("select fp.Place from FavoritePlace fp inner join fp.Place.parent as neighborhood inner join neighborhood.parent as city where fp.user.userId = :userId and fp.Place.network =:network and (neighborhood.placeId = :placeId or city.placeId = :placeId )");
+		Query query = getEntityManager().createQuery("select fp.place from FavoritePlace fp inner join fp.place.parent as neighborhood inner join neighborhood.parent as city where fp.user.userId = :userId and fp.place.network =:network and (neighborhood.placeId = :placeId or city.placeId = :placeId )");
 		query.setParameter("userId", userId);
 		query.setParameter("placeId", placeId);
-		query.setParameter("network", externalNetwork);
+		query.setParameter("network", externalNetwork.ordinal());
 		return (List<Place>)query.getResultList();
 	}
 }

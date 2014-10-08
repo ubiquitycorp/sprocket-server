@@ -390,6 +390,7 @@ public class DtoAssembler {
 		PlaceDto.Builder placeDtoBuilder = new PlaceDto.Builder();
 		placeDtoBuilder.placeId(place.getPlaceId())
 				.description(place.getDescription())
+				.network(place.getExternalNetwork())
 				.region(place.getRegion())
 				.name(place.getName())
 				.parent(assembleCityOrNeighborhood(place.getParent()));
@@ -509,6 +510,8 @@ public class DtoAssembler {
 
 	}
 	public static Place assemble(PlaceDto placeDto) {
+		if(placeDto == null)
+			return null;
 		return new Place.Builder().placeId(placeDto.getPlaceId())
 				.description(placeDto.getDescription())
 				.address(assemble(placeDto.getAddressdto()))

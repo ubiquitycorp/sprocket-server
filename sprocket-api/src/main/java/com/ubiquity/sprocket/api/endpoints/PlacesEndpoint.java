@@ -3,7 +3,6 @@ package com.ubiquity.sprocket.api.endpoints;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Locale;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -27,7 +26,6 @@ import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.PlacesDto;
 import com.ubiquity.sprocket.api.dto.model.PlaceDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
-import com.ubiquity.sprocket.api.validation.EngagementValidation;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.messaging.definition.UserFavoritePlace;
@@ -63,25 +61,7 @@ public class PlacesEndpoint {
 				.entity(jsonConverter.convertToPayload(results))
 				.build();
 	}
-	@GET
-	@Path("/users/{userId}/provider/{externalNetworkId}/location/{placeId}/live")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Secure
-	public Response liveSearchByInterestIdAndNeighborhood(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer socialProviderId ,@PathParam("placeId") Long placeId,@QueryParam("q") String q, @QueryParam("interestId") List<Long> interestIds) throws IOException {
-		
-		PlacesDto results = new PlacesDto();
-		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(socialProviderId);
-		List<Place> places = ServiceFactory.getLocationService().liveSearch(q, placeId, interestIds, externalNetwork);
-		
-		for(Place place : places) {
-			results.getPlaces().add(DtoAssembler.assemble(place));
-		}
-
-		return Response.ok()
-				//.header("Last-Modified", places.lastModified)
-				.entity(jsonConverter.convertToPayload(results))
-				.build();
-	}
+	
 	
 	@GET
 	@Path("/users/{userId}/provider/{externalNetworkId}/location/{placeId}")
@@ -191,7 +171,7 @@ public class PlacesEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response postfavorites(@PathParam("userId") Long userId, InputStream payload) throws IOException{
-		PlacesDto placesDto = jsonConverter.convertFromPayload(payload, PlacesDto.class, EngagementValidation.class);
+		PlacesDto placesDto = jsonConverter.convertFromPayload(payload, PlacesDto.class);
 		
 		for(PlaceDto placeDto : placesDto.getPlaces()) {
 			log.debug("tracking activity {}", placeDto);
