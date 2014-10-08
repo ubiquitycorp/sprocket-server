@@ -42,7 +42,6 @@ public class ActivityDto {
 	private String category;
 
 	private Long ownerId;
-	private Integer clicks;
 	
 	public Long getActivityId() {
 		return activityId;
@@ -100,10 +99,6 @@ public class ActivityDto {
 		return ownerId;
 	}
 
-	public Integer getClicks() {
-		return clicks;
-	}
-
 	public static class Builder {
 		private String title;
 		private String body;
@@ -117,7 +112,6 @@ public class ActivityDto {
 		private String externalIdentifier;
 		private String category;
 		private Long ownerId;
-		private Integer clicks;
 		
 		public Builder title(String title) {
 			this.title = title;
@@ -179,11 +173,6 @@ public class ActivityDto {
 			return this;
 		}
 		
-		public Builder clicks(Integer clicks) {
-			this.clicks = clicks;
-			return this;
-		}
-
 		public ActivityDto build() {
 			return new ActivityDto(this);
 		}
@@ -202,7 +191,6 @@ public class ActivityDto {
 		this.externalIdentifier = builder.externalIdentifier;
 		this.category = builder.category;
 		this.ownerId = builder.ownerId;
-		this.clicks = builder.clicks;
 	}
 
 	@Override
