@@ -2,7 +2,6 @@ package com.ubiquity.sprocket.service;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -408,7 +407,7 @@ public class LocationService {
 		
 	}
 	
-	public CollectionVariant<Place> getAllCitiesAndNeighborhoods(Locale locale,
+	public CollectionVariant<Place> getAllCitiesAndNeighborhoods(String region,
 			Long ifModifiedSince, Boolean delta) {
 		String key = CacheKeys
 				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.PLACES);

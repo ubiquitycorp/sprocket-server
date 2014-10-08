@@ -32,7 +32,7 @@ FavoritePlaceRepository {
 	@Override
 	public List<Place> getFavoritePlaceByUserIdAndPlaceId(Long userId,
 			ExternalNetwork externalNetwork, Long placeId) {
-		Query query = getEntityManager().createQuery("select fp.Place from FavoritePlace fp inner join fp.Place.parent as neighborhood inner join neighborhood.parnet as city where fp.user.userId = :userId and fp.Place.network =:network and (neighborhood.placeId = :placeId or city.placeId = :placeId )");
+		Query query = getEntityManager().createQuery("select fp.Place from FavoritePlace fp inner join fp.Place.parent as neighborhood inner join neighborhood.parent as city where fp.user.userId = :userId and fp.Place.network =:network and (neighborhood.placeId = :placeId or city.placeId = :placeId )");
 		query.setParameter("userId", userId);
 		query.setParameter("placeId", placeId);
 		query.setParameter("network", externalNetwork);

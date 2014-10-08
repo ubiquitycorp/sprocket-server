@@ -39,16 +39,16 @@ public class PlacesEndpoint {
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 	
 	@GET
-	@Path("/users/{userId}/locale/{locale}/neighborhoods")
+	@Path("/users/{userId}/Region/{region}/neighborhoods")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response neighborhoods(@PathParam("userId") Long userId,@PathParam("locale") String locale, @HeaderParam("delta") Boolean delta, @HeaderParam("If-Modified-Since")Long ifModifiedSince) throws IOException {
+	public Response neighborhoods(@PathParam("userId") Long userId,@PathParam("region") String region, @HeaderParam("delta") Boolean delta, @HeaderParam("If-Modified-Since")Long ifModifiedSince) throws IOException {
 		PlacesDto results = new PlacesDto();
 		//ServiceFactory.getLocationService().resetPlaceLastModifiedCache();
 		//ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
 		
-		Locale localeObj = new Locale(locale);
-		CollectionVariant<Place> variant = ServiceFactory.getLocationService().getAllCitiesAndNeighborhoods(localeObj,ifModifiedSince,delta);
+		//Locale localeObj = new Locale(locale);
+		CollectionVariant<Place> variant = ServiceFactory.getLocationService().getAllCitiesAndNeighborhoods(region,ifModifiedSince,delta);
 
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
@@ -190,7 +190,7 @@ public class PlacesEndpoint {
 	@Path("/users/{userId}/favorites")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response postfavorites(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws IOException{
+	public Response postfavorites(@PathParam("userId") Long userId, InputStream payload) throws IOException{
 		PlacesDto placesDto = jsonConverter.convertFromPayload(payload, PlacesDto.class, EngagementValidation.class);
 		
 		for(PlaceDto placeDto : placesDto.getPlaces()) {
