@@ -9,21 +9,21 @@ import java.util.Stack;
 import java.util.UUID;
 
 import com.niobium.common.serialize.JsonConverter;
-import com.ubiquity.content.domain.VideoContent;
-import com.ubiquity.external.domain.Category;
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.ActivityType;
+import com.ubiquity.integration.domain.Category;
+import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Interest;
+import com.ubiquity.integration.domain.Message;
+import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.integration.domain.Address;
 import com.ubiquity.location.domain.Geobox;
 import com.ubiquity.location.domain.Location;
 import com.ubiquity.location.domain.Place;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
-import com.ubiquity.social.domain.Activity;
-import com.ubiquity.social.domain.ActivityType;
-import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.Interest;
-import com.ubiquity.social.domain.Message;
 import com.ubiquity.social.domain.factories.ActivityFactory;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.AddressDto;
@@ -513,7 +513,7 @@ public class DtoAssembler {
 				.description(placeDto.getDescription())
 				.address(assemble(placeDto.getAddressdto()))
 				.boundingBox(assemble(placeDto.getBoundingBox()))
-				.externalIdentitifer(placeDto.getExternalIdentitifer())
+				.externalIdentifier(placeDto.getExternalIdentitifer())
 				.region(placeDto.getRegion()).name(placeDto.getName())
 				.externalNetwork(placeDto.getNetwork())
 				.parent(assemble(placeDto.getParent())).build();

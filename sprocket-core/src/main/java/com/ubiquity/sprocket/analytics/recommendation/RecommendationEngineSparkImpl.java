@@ -18,10 +18,10 @@ import org.apache.spark.mllib.linalg.Vectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.social.domain.Contact;
 import com.ubiquity.sprocket.domain.GroupMembership;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.location.domain.UserLocation;
 
 public class RecommendationEngineSparkImpl implements RecommendationEngine {

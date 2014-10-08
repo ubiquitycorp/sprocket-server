@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
-import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.location.domain.Place;
 import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.sprocket.api.DtoAssembler;

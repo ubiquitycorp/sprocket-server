@@ -8,19 +8,21 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.external.repository.InterestRepository;
-import com.ubiquity.external.repository.InterestRepositoryJpaImpl;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
+import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.ActivityType;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Interest;
 import com.ubiquity.integration.factory.TestActivityFactory;
+import com.ubiquity.integration.repository.ActivityRepository;
+import com.ubiquity.integration.repository.ActivityRepositoryJpaImpl;
+import com.ubiquity.integration.repository.InterestRepository;
+import com.ubiquity.integration.repository.InterestRepositoryJpaImpl;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
-import com.ubiquity.social.domain.Activity;
-import com.ubiquity.social.domain.ActivityType;
-import com.ubiquity.social.domain.Interest;
 
 /***
  * Tests testing basic CRUD operations for a user repository

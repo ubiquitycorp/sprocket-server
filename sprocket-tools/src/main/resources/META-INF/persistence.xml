@@ -11,8 +11,8 @@
 
 		<class>com.ubiquity.location.domain.Place</class>
 		<class>com.ubiquity.location.domain.UserLocation</class>
-		<class>com.ubiquity.social.domain.Interest</class>
-		<class>com.ubiquity.social.domain.ExternalInterest</class>
+		<class>com.ubiquity.integration.domain.Interest</class>
+		<class>com.ubiquity.integration.domain.ExternalInterest</class>
 
 		<class>com.ubiquity.sprocket.domain.RecommendedVideo</class>
 		<class>com.ubiquity.sprocket.domain.RecommendedActivity</class>
@@ -21,27 +21,23 @@
 		<class>com.ubiquity.sprocket.domain.EngagedActivity</class>
 		<class>com.ubiquity.sprocket.domain.EngagedDocument</class>
 		<class>com.ubiquity.sprocket.domain.EngagedItem</class>
-
-
-
-
 		<class>com.ubiquity.sprocket.domain.FavoritePlace</class>
-		
-		<class>com.ubiquity.content.domain.VideoContent</class>
+		<class>com.ubiquity.integration.domain.VideoContent</class>
 		<class>com.ubiquity.identity.domain.User</class>
 		<class>com.ubiquity.identity.domain.Identity</class>
 		<class>com.ubiquity.identity.domain.NativeIdentity</class>
 		<class>com.ubiquity.identity.domain.ExternalIdentity</class>
-		<class>com.ubiquity.social.domain.Contact</class>
-		<class>com.ubiquity.social.domain.Conversation</class>
-		<class>com.ubiquity.social.domain.Message</class>
-		<class>com.ubiquity.social.domain.Activity</class>
-		<class>com.ubiquity.social.domain.Event</class>
+		<class>com.ubiquity.integration.domain.Contact</class>
+		<class>com.ubiquity.integration.domain.Conversation</class>
+		<class>com.ubiquity.integration.domain.Message</class>
+		<class>com.ubiquity.integration.domain.Activity</class>
+		<class>com.ubiquity.integration.domain.Event</class>
 
 		<properties>
 
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
-			<property name="hibernate.connection.url" value="jdbc:mysql://${db.host}:3306/sprocket?autoReconnect=true" />
+			<property name="hibernate.connection.url"
+				value="jdbc:mysql://${db.host}:3306/sprocket?autoReconnect=true" />
 			<property name="hibernate.connection.username" value="${db.username}" />
 			<property name="hibernate.connection.password" value="${db.password}" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
@@ -49,14 +45,15 @@
 			<property name="hibernate.format_sql" value="${hibernate.debug}" />
 			<property name="hibernate.transaction.flush_before_completion"
 				value="true" />
-				
 
-<property name="hibernate.connection.useUnicode" value="true" />
-<property name="hibernate.connection.characterEncoding" value="UTF-8" />
+
+			<property name="hibernate.connection.useUnicode" value="true" />
+			<property name="hibernate.connection.characterEncoding"
+				value="UTF-8" />
 			<!-- Connection Pooling settings -->
-			
-		
-			
+
+
+
 			<property name="hibernate.connection.provider_class"
 				value="com.niobium.repository.jpa.provider.BoneCPConnectionProvider" />
 			<property name="bonecp.idleConnectionTestPeriodInMinutes"
@@ -66,10 +63,10 @@
 			<property name="bonecp.partitionCount" value="3" />
 			<property name="bonecp.maxConnectionsPerPartition" value="60" />
 			<property name="bonecp.minConnectionsPerPartition" value="20" />
-			
+
 			<property name="bonecp.disableConnectionTracking" value="false" />
 			<property name="bonecp.closedConnectionWatch" value="true" />
-			
+
 			<property name="bonecp.statementsCacheSize" value="100" />
 
 			<property name="hibernate.hbm2ddl.auto" value="${hibernate.schema.auto}" />

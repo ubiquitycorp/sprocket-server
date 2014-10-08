@@ -1,6 +1,6 @@
 package com.ubiquity.sprocket.messaging.definition;
 
-import com.ubiquity.social.domain.Activity;
+import com.ubiquity.integration.domain.Activity;
 
 public class UserEngagedActivity {
 

@@ -3,8 +3,8 @@ package com.ubiquity.sprocket.repository;
 import java.util.List;
 
 import com.niobium.repository.Repository;
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.social.domain.Activity;
+import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.sprocket.domain.RecommendedActivity;
 
 

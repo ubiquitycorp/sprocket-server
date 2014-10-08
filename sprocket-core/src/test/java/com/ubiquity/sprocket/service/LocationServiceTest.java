@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.redis.JedisConnectionFactory;
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.integration.api.PlaceAPIFactory;
+import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.factory.TestPlaceFactory;
 import com.ubiquity.location.domain.Place;
 
@@ -31,7 +31,9 @@ public class LocationServiceTest {
 		ServiceFactory.initialize(config, null);
 		PlaceAPIFactory.initialize(config);
 
-		losAngeles = TestPlaceFactory.createLosAngelesAndNeighborhoods();
+		
+		losAngeles = TestPlaceFactory.createLosAngelesAndNeighborhoodsAndBusiness();
+
 		locationService.create(losAngeles);
 
 	}

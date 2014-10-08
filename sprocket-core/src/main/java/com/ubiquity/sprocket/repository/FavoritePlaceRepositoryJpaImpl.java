@@ -6,7 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import com.niobium.repository.BaseRepositoryJpaImpl;
-import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.location.domain.Place;
 import com.ubiquity.sprocket.domain.FavoritePlace;
 

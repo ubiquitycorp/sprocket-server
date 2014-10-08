@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
-import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.location.domain.Place;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.Message;
-import com.ubiquity.social.domain.Activity;
 import com.ubiquity.sprocket.datasync.worker.manager.DataSyncProcessor;
 import com.ubiquity.sprocket.domain.FavoritePlace;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
@@ -67,7 +67,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		place = ServiceFactory.getLocationService().findOrCreate(place);
 		User user = ServiceFactory.getUserService().getUserById(favoritePlace.getUserId());
 		FavoritePlace favPlace = new FavoritePlace(user,favoritePlace.getPlace());
-		favPlace = new FavoritePlaceRepositoryJpaImpl().updateAndSelect(favPlace);
+		//favPlace = new FavoritePlaceRepositoryJpaImpl().updateAndSelect(favPlace); // TODO: was a compilation error
 		
 	}
 	private void process(UserEngagedDocument engagedDocument) {

@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.location.domain.Place;
 import com.ubiquity.sprocket.repository.FavoritePlaceRepositoryJpaImpl;
 

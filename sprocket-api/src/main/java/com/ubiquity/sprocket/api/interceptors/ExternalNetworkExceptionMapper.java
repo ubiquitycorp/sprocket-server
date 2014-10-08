@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.ubiquity.api.domain.ServerErrorCode;
 import com.ubiquity.api.dto.model.ErrorDto;
-import com.ubiquity.social.api.exception.ExternalNetworkException;
+import com.ubiquity.integration.api.exception.ExternalNetworkException;
 /***
  * 
  * @author mina.shafik
