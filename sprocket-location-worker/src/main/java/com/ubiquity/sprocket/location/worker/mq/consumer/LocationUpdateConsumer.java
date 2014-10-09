@@ -59,7 +59,7 @@ public class LocationUpdateConsumer extends AbstractConsumerThread {
 			.build();
 		
 		// Get nearest place to the new user's location
-		Place nearestPlace = ServiceFactory.getLocationService().getClosestPlaceLocationIsWithin(userLocation.getLocation());
+		Place nearestPlace = ServiceFactory.getLocationService().getClosestNeighborhoodIsWithin(userLocation.getLocation());
 		userLocation.setNearestPlace(nearestPlace);
 		
 		// this will update the user's location in the SQL data store

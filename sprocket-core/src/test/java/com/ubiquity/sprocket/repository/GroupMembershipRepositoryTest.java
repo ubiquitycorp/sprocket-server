@@ -11,15 +11,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
+import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.factory.TestContactFactory;
-import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.repository.ContactRepository;
-import com.ubiquity.social.repository.ContactRepositoryJpaImpl;
+import com.ubiquity.integration.repository.ContactRepository;
+import com.ubiquity.integration.repository.ContactRepositoryJpaImpl;
 import com.ubiquity.sprocket.domain.GroupMembership;
 
 /***

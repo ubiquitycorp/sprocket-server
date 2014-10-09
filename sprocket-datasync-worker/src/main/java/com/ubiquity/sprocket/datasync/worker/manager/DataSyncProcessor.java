@@ -10,15 +10,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.content.domain.VideoContent;
-import com.ubiquity.content.service.ContentService;
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.external.domain.Network;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.social.domain.Activity;
-import com.ubiquity.social.service.SocialService;
+import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Network;
+import com.ubiquity.integration.domain.VideoContent;
+import com.ubiquity.integration.service.ContentService;
+import com.ubiquity.integration.service.SocialService;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
@@ -172,7 +172,7 @@ public class DataSyncProcessor extends Thread {
 	private int processMessages(ExternalIdentity identity,
 			ExternalNetwork network,String lastMessageIdentifier) {
 
-		List<com.ubiquity.social.domain.Message> messages;
+		List<com.ubiquity.integration.domain.Message> messages;
 		try {
 			SocialService socialService = ServiceFactory.getSocialService();
 

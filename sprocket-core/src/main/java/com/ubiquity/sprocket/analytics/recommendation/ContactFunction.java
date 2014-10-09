@@ -9,10 +9,10 @@ import org.apache.spark.mllib.linalg.Vectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.social.domain.AgeRange;
-import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.Gender;
+import com.ubiquity.integration.domain.AgeRange;
+import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Gender;
 import com.ubiquity.location.domain.UserLocation;
 
 public class ContactFunction implements Function<Profile, Vector> {

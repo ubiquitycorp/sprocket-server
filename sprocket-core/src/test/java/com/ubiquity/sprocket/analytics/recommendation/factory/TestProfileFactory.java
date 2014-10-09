@@ -4,15 +4,15 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
+import com.ubiquity.integration.domain.AgeRange;
+import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Gender;
 import com.ubiquity.integration.factory.TestContactFactory;
 import com.ubiquity.location.domain.Location;
 import com.ubiquity.location.domain.UserLocation;
-import com.ubiquity.social.domain.AgeRange;
-import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.Gender;
 import com.ubiquity.sprocket.analytics.recommendation.Profile;
 
 public class TestProfileFactory {

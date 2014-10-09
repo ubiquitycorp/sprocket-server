@@ -17,26 +17,26 @@ import com.niobium.repository.cache.DataModificationCacheRedisImpl;
 import com.niobium.repository.cache.UserDataModificationCache;
 import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.content.domain.VideoContent;
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.external.repository.ExternalInterestRepositoryJpaImpl;
-import com.ubiquity.external.repository.InterestRepositoryJpaImpl;
-import com.ubiquity.external.repository.cache.CacheKeys;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
+import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalInterest;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Gender;
+import com.ubiquity.integration.domain.Interest;
+import com.ubiquity.integration.domain.VideoContent;
+import com.ubiquity.integration.repository.ContactRepository;
+import com.ubiquity.integration.repository.ContactRepositoryJpaImpl;
+import com.ubiquity.integration.repository.ExternalInterestRepositoryJpaImpl;
+import com.ubiquity.integration.repository.InterestRepositoryJpaImpl;
+import com.ubiquity.integration.repository.cache.CacheKeys;
 import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.location.repository.UserLocationRepository;
 import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
-import com.ubiquity.social.domain.Activity;
-import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.ExternalInterest;
-import com.ubiquity.social.domain.Gender;
-import com.ubiquity.social.domain.Interest;
-import com.ubiquity.social.repository.ContactRepository;
-import com.ubiquity.social.repository.ContactRepositoryJpaImpl;
 import com.ubiquity.sprocket.analytics.recommendation.Dimension;
 import com.ubiquity.sprocket.analytics.recommendation.Profile;
 import com.ubiquity.sprocket.analytics.recommendation.RecommendationEngine;
@@ -108,57 +108,7 @@ public class AnalyticsService {
 		}
 	}
 
-
-	public void bootstrapInterests() {
-		
-		if(findInterests(null) == null) {
-			try {
-				Interest interest = new Interest("Sports", null);
-				Interest interestFootball= new Interest("Football");
-				Interest interestBasketball = new Interest("Basketball");
-				Interest interestCricket = new Interest("Cricket");
-				Interest interestBaseball = new Interest("Baseball");
-				
-				interest.addChild(interestFootball);
-				interest.addChild(interestBasketball);
-				interest.addChild(interestCricket);
-				interest.addChild(interestBaseball);
-				
-				
-				create(interest);
-				// added some external Interest 
-				create(new ExternalInterest("Football", interestFootball, ExternalNetwork.Twitter));
-				create(new ExternalInterest("Basketball", interestBasketball, ExternalNetwork.Twitter));
-				create(new ExternalInterest("Cricket", interestCricket, ExternalNetwork.Twitter));
-				create(new ExternalInterest("Baseball", interestBaseball, ExternalNetwork.Twitter));
-				
-				interest = new Interest("Entertainment", null);
-				Interest interestMusic = new Interest("Music");
-				Interest interestMovies = new Interest("Movies");
-				Interest interestTheater = new Interest("Theater");
-				
-				interest.addChild(interestMusic);
-				interest.addChild(interestMovies);
-				interest.addChild(interestTheater);
-				create(interest);
-				// added some external Interest 
-				create(new ExternalInterest("Music", interestMusic, ExternalNetwork.Twitter));
-				create(new ExternalInterest("Movies", interestMovies, ExternalNetwork.Twitter));
-				create(new ExternalInterest("Theater", interestTheater, ExternalNetwork.Twitter));
-				
-				
-				
-				
-				dataModificationCache.setLastModified(CacheKeys.GlobalProperties.INTERESTS, System.currentTimeMillis());
-				
-			} finally {
-				EntityManagerSupport.closeEntityManager();
-			}
-		}
-		
-			
-		
-	}
+	
 	public void create(Interest interest) {
 		try {
 			EntityManagerSupport.beginTransaction();

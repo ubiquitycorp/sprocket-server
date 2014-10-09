@@ -14,17 +14,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
+import com.ubiquity.integration.domain.AgeRange;
+import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Gender;
 import com.ubiquity.integration.factory.TestContactFactory;
 import com.ubiquity.location.domain.Location;
 import com.ubiquity.location.domain.UserLocation;
-import com.ubiquity.social.domain.AgeRange;
-import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.Gender;
 import com.ubiquity.sprocket.domain.GroupMembership;
 
 public class RecommendationEngineTest{

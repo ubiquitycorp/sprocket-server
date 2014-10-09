@@ -9,15 +9,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.content.domain.VideoContent;
-import com.ubiquity.content.repository.VideoContentRepository;
-import com.ubiquity.content.repository.VideoContentRepositoryJpaImpl;
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.integration.factory.TestVideoContentFactory;
+import com.ubiquity.integration.repository.VideoContentRepository;
+import com.ubiquity.integration.repository.VideoContentRepositoryJpaImpl;
 
 /***
  * Tests testing basic CRUD operations for a user repository

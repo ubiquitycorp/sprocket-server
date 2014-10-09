@@ -5,8 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.ubiquity.content.domain.VideoContent;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.integration.domain.VideoContent;
 
 @Entity
 @DiscriminatorValue("video")

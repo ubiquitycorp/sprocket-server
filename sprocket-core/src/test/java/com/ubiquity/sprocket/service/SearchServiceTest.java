@@ -14,21 +14,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.redis.JedisConnectionFactory;
-import com.ubiquity.content.api.ContentAPIFactory;
-import com.ubiquity.content.domain.VideoContent;
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
+import com.ubiquity.integration.api.ContentAPIFactory;
+import com.ubiquity.integration.api.SocialAPIFactory;
+import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Message;
+import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.integration.factory.TestActivityFactory;
 import com.ubiquity.integration.factory.TestContactFactory;
 import com.ubiquity.integration.factory.TestMessageFactory;
 import com.ubiquity.integration.factory.TestVideoContentFactory;
-import com.ubiquity.social.api.SocialAPIFactory;
-import com.ubiquity.social.domain.Activity;
-import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.Message;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchKeys;
 

@@ -13,13 +13,15 @@ import org.slf4j.LoggerFactory;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.content.api.VimeoAPITest;
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
-import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.Message;
+import com.ubiquity.integration.api.SocialAPI;
+import com.ubiquity.integration.api.SocialAPIFactory;
+import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Message;
 
 public class FacebookApiTest {
 	

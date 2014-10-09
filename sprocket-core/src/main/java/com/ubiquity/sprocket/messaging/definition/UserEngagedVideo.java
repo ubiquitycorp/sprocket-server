@@ -1,6 +1,6 @@
 package com.ubiquity.sprocket.messaging.definition;
 
-import com.ubiquity.content.domain.VideoContent;
+import com.ubiquity.integration.domain.VideoContent;
 
 public class UserEngagedVideo {
 

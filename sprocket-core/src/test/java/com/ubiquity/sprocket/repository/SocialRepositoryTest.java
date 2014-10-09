@@ -15,9 +15,9 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.external.repository.ExternalIdentityRepository;
-import com.ubiquity.external.repository.ExternalIdentityRepositoryJpaImpl;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.repository.ExternalIdentityRepository;
+import com.ubiquity.integration.repository.ExternalIdentityRepositoryJpaImpl;
 
 /***
  * Tests testing basic CRUD operations for a user repository

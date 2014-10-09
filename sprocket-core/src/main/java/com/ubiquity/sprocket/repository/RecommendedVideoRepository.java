@@ -3,8 +3,8 @@ package com.ubiquity.sprocket.repository;
 import java.util.List;
 
 import com.niobium.repository.Repository;
-import com.ubiquity.content.domain.VideoContent;
-import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.sprocket.domain.RecommendedVideo;
 
 
