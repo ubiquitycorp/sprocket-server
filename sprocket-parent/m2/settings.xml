@@ -292,6 +292,9 @@
 				</recommendation.engine.hadoop.master>
 				<recommendation.engine.alg.kmeans.iterations>5
 				</recommendation.engine.alg.kmeans.iterations>
+				
+				
+
 			</properties>
 			<activation>
 				<property>

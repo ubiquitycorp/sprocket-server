@@ -13,9 +13,12 @@ public class MessageQueueFactory {
 
 	private static MessageQueueConnection cacheInvalidateQueueConsumerConnection;
 	private static MessageQueueConnection locationQueueConsumerConnection;
-	
+	private static MessageQueueConnection backchannelQueueConsumerConnection;
+
 	private static MessageQueueProducer cacheInvalidateQueueProducer;
 	private static MessageQueueProducer locationQueueProducer;
+	private static MessageQueueProducer backchannelQueueProducer;
+
 	
 	private static Configuration configuration;
 
@@ -29,6 +32,28 @@ public class MessageQueueFactory {
 	
 	public static MessageQueueChannel createCacheInvalidateConsumerChannel() throws IOException {
 		return getCacheInvalidateQueueConsumerConnection().createMessageQueueChannel();
+	}
+	
+	public static MessageQueueChannel createBackChannelConsumerChannel() throws IOException {
+		return getBackChannelQueueConnection().createMessageQueueChannel();
+	}
+	
+	private static MessageQueueConnection getBackChannelQueueConnection() {
+		if(backchannelQueueConsumerConnection == null) {
+			backchannelQueueConsumerConnection = new MessageQueueConnection.Builder()
+			.queueName(configuration.getString("mq.queue.backchannel.name"))
+			.host(configuration.getString("mq.queue.backchannel.host"))
+			.username(configuration.getString("mq.queue.backchannel.username"))
+			.password(configuration.getString("mq.queue.backchannel.password"))
+			.virtualHost(configuration.getString("mq.queue.backchannel.vhost"))
+			.port(configuration.getInt("mq.queue.backchannel.port"))
+			.exchange(configuration.getString("mq.queue.backchannel.exchange"))
+			.exchangeType(configuration.getString("mq.queue.backchannel.exchangeType"))
+			.routeKey(configuration.getString("mq.queue.backchannel.routeKey"))
+			.heartBeat(configuration.getInt("mq.queue.backchannel.heartbeat"))
+			.autoAck(configuration.getBoolean("mq.queue.backchannel.autoAck")).build();
+		}
+		return backchannelQueueConsumerConnection;
 	}
 	
 	private static MessageQueueConnection getLocationQueueConsumerConnection() {
@@ -68,6 +93,24 @@ public class MessageQueueFactory {
 		return cacheInvalidateQueueConsumerConnection;
 	}
 	
+	public static MessageQueueProducer getBackChannelQueueProducer() throws IOException {
+		if(backchannelQueueProducer == null) {
+			MessageQueueConnection connection = new MessageQueueConnection.Builder()
+			.queueName(configuration.getString("mq.queue.backchannel.name"))
+			.host(configuration.getString("mq.queue.backchannel.host"))
+			.username(configuration.getString("mq.queue.backchannel.username"))
+			.password(configuration.getString("mq.queue.backchannel.password"))
+			.virtualHost(configuration.getString("mq.queue.backchannel.vhost"))
+			.port(configuration.getInt("mq.queue.backchannel.port"))
+			.exchange(configuration.getString("mq.queue.backchannel.exchange"))
+			.exchangeType(configuration.getString("mq.queue.backchannel.exchangeType"))
+			.routeKey(configuration.getString("mq.queue.backchannel.routeKey"))
+			.heartBeat(configuration.getInt("mq.queue.backchannel.heartbeat"))
+			.autoAck(configuration.getBoolean("mq.queue.backchannel.autoAck")).build();
+			backchannelQueueProducer = new MessageQueueProducer(connection.createMessageQueueChannel());
+		}
+		return backchannelQueueProducer;
+	}
 	
 	public static MessageQueueProducer getCacheInvalidationQueueProducer() throws IOException {
 		if(cacheInvalidateQueueProducer == null) {

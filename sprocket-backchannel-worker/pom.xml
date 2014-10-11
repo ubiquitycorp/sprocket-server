@@ -1,10 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>sprocket-datasync-worker</artifactId>
-	<name>Sprocket Data Sync Worker</name>
-	<version>0.4.33</version>
-
+	<artifactId>sprocket-backchannel-worker</artifactId>
+	<name>Sprocket Backchannel Worker</name>
+	<version>0.1.0</version>
 	<parent>
 		<groupId>com.ubiquity</groupId>
 		<artifactId>sprocket-parent</artifactId>
@@ -22,45 +21,31 @@
 
 	<!-- turns on resource filtering -->
 	<build>
-		<finalName>sprocket-datasync-worker</finalName>
+		<finalName>sprocket-backchannel-worker</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-
-
-
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
+				<version>2.2</version>
+				<!-- nothing here -->
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.4</version>
+				<version>2.2-beta-4</version>
 				<configuration>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>com.ubiquity.sprocket.datasync.worker.DataSyncWorker</mainClass>
+							<mainClass>com.ubiquity.sprocket.backchannel.worker.BackchannelWorker</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -72,7 +57,7 @@
 						</goals>
 						<configuration>
 							<appendAssemblyId>false</appendAssemblyId>
-							<finalName>sprocket-datasync-worker</finalName>
+							<finalName>sprocket-backchannel-worker</finalName>
 							<attach>true</attach>
 							<outputDirectory>target/jar</outputDirectory>
 						</configuration>
@@ -95,12 +80,12 @@
 				</executions>
 				<configuration>
 					<copyright>2014, Ubiquity</copyright>
-					<distribution>Sprocket Datasync Woker</distribution>
+					<distribution>Sprocket Backchannel Worker</distribution>
 					<group>Application/Mobile</group>
 					<packager>Ubiquity</packager>
-					<prefix>/var/lib/tomcat7</prefix>
+					<!-- <prefix>/var/lib/tomcat7</prefix> -->
 					<defineStatements>
-						<defineStatement>Sprocket Datasync Worker</defineStatement>
+						<defineStatement>Sprocket Backchannel Worker</defineStatement>
 					</defineStatements>
 					<mappings>
 						<mapping>
@@ -137,9 +122,11 @@
 							</sources>
 						</mapping>
 					</mappings>
-					<postinstallScriptlet>
-						<scriptFile>rpm/deploy.sh</scriptFile>
-					</postinstallScriptlet>
+					
+					 <postinstallScriptlet>
+                        <scriptFile>rpm/deploy.sh</scriptFile>
+                    </postinstallScriptlet>
+
 				</configuration>
 			</plugin>
 
@@ -151,8 +138,8 @@
 						<phase>package</phase>
 						<configuration>
 							<tasks>
-								<copy todir="/var/www/html/repository/${repo.env}" flatten="true"
-									overwrite="true" verbose="true" failonerror="true">
+								<copy todir="/var/www/html/repository" flatten="true" overwrite="true"
+									verbose="true" failonerror="true">
 									<fileset dir="target/rpm/${build.finalName}/RPMS/noarch/"
 										includes="**.rpm" />
 								</copy>
@@ -162,6 +149,7 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
+
 				</executions>
 			</plugin>
 
@@ -172,32 +160,34 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>com.ubiquity</groupId>
-			<artifactId>sprocket-core</artifactId>
-			<version>0.2.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.jboss.resteasy</groupId>
-					<artifactId>resteasy-atom-provider</artifactId>
-				</exclusion>
-			</exclusions>
+			<groupId>com.niobium</groupId>
+			<artifactId>niobium-common</artifactId>
+			<version>0.3.1</version>
 		</dependency>
 
 		<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz</artifactId>
-			<version>2.1.1</version>
+			<groupId>com.niobium</groupId>
+			<artifactId>niobium-xmpp</artifactId>
+			<version>0.2</version>
 		</dependency>
-
-
 
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.6</version>
+			<groupId>com.niobium</groupId>
+			<artifactId>niobium-amqp</artifactId>
+			<version>0.1</version>
 		</dependency>
-
-
+        
+        <dependency>
+            <groupId>com.ubiquity</groupId>
+            <artifactId>sprocket-core</artifactId>
+            <version>0.2.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.resteasy</groupId>
+                    <artifactId>resteasy-atom-provider</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
 
 
