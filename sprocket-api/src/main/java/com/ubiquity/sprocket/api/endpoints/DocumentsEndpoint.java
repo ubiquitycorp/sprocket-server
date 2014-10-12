@@ -125,10 +125,10 @@ public class DocumentsEndpoint {
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, externalNetwork);
-		if(identity == null)
+		if(identity == null && externalNetwork != ExternalNetwork.Yelp)
 			throw new IllegalArgumentException("User does not have an identity for this provider");
-		
-		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
+		if(externalNetwork != ExternalNetwork.Yelp)
+			ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
 		
 		List<Document> documents = ServiceFactory.getSearchService().searchLiveDocuments(q, user, externalNetwork, page);
 		
