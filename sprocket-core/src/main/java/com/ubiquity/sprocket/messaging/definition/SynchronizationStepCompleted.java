@@ -4,7 +4,7 @@ import com.ubiquity.integration.domain.ExternalNetwork;
 
 public class SynchronizationStepCompleted {
 
-	private ExternalNetwork network;
+	private Integer externalNetworkId;
 	private String message;
 	private Long timestamp;
 	private String resourcePath;
@@ -18,8 +18,8 @@ public class SynchronizationStepCompleted {
 		return resourcePath;
 	}
 
-	public ExternalNetwork getNetwork() {
-		return network;
+	public Integer getExternalNetworkId() {
+		return externalNetworkId;
 	}
 
 	public String getMessage() {
@@ -32,20 +32,20 @@ public class SynchronizationStepCompleted {
 
 	@Override
 	public String toString() {
-		return "SynchronizationStepCompleted [network=" + network
+		return "SynchronizationStepCompleted [network=" + externalNetworkId
 				+ ", message=" + message + ", timestamp=" + timestamp
 				+ ", resourcePath=" + resourcePath + "]";
 	}
 
 	public static class Builder {
-		private ExternalNetwork network;
+		private Integer externalNetworkId;
 		private String message;
 		private Long timestamp;
 		private String resourcePath;
 		private Integer records;
 
-		public Builder network(ExternalNetwork network) {
-			this.network = network;
+		public Builder externalNetworkId(Integer externalNetworkId) {
+			this.externalNetworkId = externalNetworkId;
 			return this;
 		}
 
@@ -75,7 +75,7 @@ public class SynchronizationStepCompleted {
 	}
 
 	private SynchronizationStepCompleted(Builder builder) {
-		this.network = builder.network;
+		this.externalNetworkId = builder.externalNetworkId;
 		this.message = builder.message;
 		this.timestamp = builder.timestamp;
 		this.resourcePath = builder.resourcePath;

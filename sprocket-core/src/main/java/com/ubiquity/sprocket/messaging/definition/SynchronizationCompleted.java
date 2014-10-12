@@ -4,20 +4,20 @@ import com.ubiquity.integration.domain.ExternalNetwork;
 
 public class SynchronizationCompleted {
 	
-	private ExternalNetwork network;
+	private Integer externalNetworkId;
 	private Long timestamp;
 
 	
-	public SynchronizationCompleted(ExternalNetwork network, Long timestamp) {
+	public SynchronizationCompleted(Integer externalNetworkId, Long timestamp) {
 		super();
-		this.network = network;
+		this.externalNetworkId = externalNetworkId;
 		this.timestamp = timestamp;
 	}
-
-
-	public ExternalNetwork getNetwork() {
-		return network;
+	
+	public Integer getExternalNetworkId() {
+		return externalNetworkId;
 	}
+
 	
 	public Long getTimestamp() {
 		return timestamp;
@@ -26,7 +26,7 @@ public class SynchronizationCompleted {
 
 	@Override
 	public String toString() {
-		return "SynchronizationCompleted [network=" + network + ", timestamp="
+		return "SynchronizationCompleted [network=" + externalNetworkId + ", timestamp="
 				+ timestamp + "]";
 	}
 

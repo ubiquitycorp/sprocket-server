@@ -4,6 +4,7 @@ import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.messaging.definition.LocationUpdated;
 import com.ubiquity.sprocket.messaging.definition.SynchronizationCompleted;
+import com.ubiquity.sprocket.messaging.definition.SynchronizationStarted;
 import com.ubiquity.sprocket.messaging.definition.SynchronizationStepCompleted;
 import com.ubiquity.sprocket.messaging.definition.UserAuthenticated;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
@@ -29,6 +30,7 @@ public class MessageConverterFactory {
 				.registerMessageType(UserFavoritePlace.class)
 				.registerMessageType(SynchronizationStepCompleted.class)
 				.registerMessageType(SynchronizationCompleted.class)
+				.registerMessageType(SynchronizationStarted.class)
 				.build();
 		}
 		return converter;

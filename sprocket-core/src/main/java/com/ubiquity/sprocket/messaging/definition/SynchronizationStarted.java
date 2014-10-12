@@ -1,28 +1,33 @@
 package com.ubiquity.sprocket.messaging.definition;
 
-import com.ubiquity.integration.domain.ExternalNetwork;
 
 public class SynchronizationStarted {
 	
-	private ExternalNetwork network;
+	private Integer externalNetworkId;
+	private Long timestamp;
 
 	
-	public SynchronizationStarted(ExternalNetwork network) {
+	public SynchronizationStarted(Integer externalNetworkId, Long timestamp) {
 		super();
-		this.network = network;
+		this.externalNetworkId = externalNetworkId;
+		this.timestamp = timestamp;
+	}
+	
+	public Integer getExternalNetworkId() {
+		return externalNetworkId;
 	}
 
-
-	public ExternalNetwork getNetwork() {
-		return network;
+	
+	public Long getTimestamp() {
+		return timestamp;
 	}
 
 
 	@Override
 	public String toString() {
-		return "SynchronizationStarted [network=" + network + "]";
+		return "SynchronizationStarted [network=" + externalNetworkId + ", timestamp="
+				+ timestamp + "]";
 	}
-	
 	
 
 }
