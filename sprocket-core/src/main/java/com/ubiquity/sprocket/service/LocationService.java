@@ -403,13 +403,13 @@ public class LocationService {
 			Long ifModifiedSince, Boolean delta) {
 		String key = CacheKeys
 				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.PLACES);
-		Long lastModified = dataModificationCache.getLastModified(key,
-				ifModifiedSince);
-
-		// If there is no cache entry, there is no data
-		if (lastModified == null) {
-			return null;
-		}
+//		Long lastModified = dataModificationCache.getLastModified(key,
+//				ifModifiedSince);
+//
+//		// If there is no cache entry, there is no data
+//		if (lastModified == null) {
+//			return null;
+//		}
 		try {
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
 			List<Place> places;
@@ -419,7 +419,8 @@ public class LocationService {
 				places = placeRepository
 						.getAllCitiesAndNeighborhoodsWithModifiedSince(ifModifiedSince);
 			}
-			return new CollectionVariant<Place>(places, lastModified);
+//			return new CollectionVariant<Place>(places, lastModified);
+			return new CollectionVariant<Place>(places,null);
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
