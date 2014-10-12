@@ -109,44 +109,44 @@ public class DataSyncProcessor extends Thread {
 		sendSyncStartedMessageToIndividual(backchannel, externalNetwork, userId);
 
 		
-//		if (externalNetwork.network.equals(Network.Content)) {
-//			DateTime start = new DateTime();
-//			int n = processVideos(identity, externalNetwork);
-//			log.info("Processed {} videos in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-//			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized videos", "/videos", n, userId);
-//		} 
-//		else if (externalNetwork.equals(ExternalNetwork.Google)) {
-//			DateTime start = new DateTime();
-//			int n = processMessages(identity, externalNetwork, null);
-//			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-//			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", "/messages", n, userId);
-//
-//
-//		}  else if ( externalNetwork.equals(ExternalNetwork.Facebook) || externalNetwork.equals(ExternalNetwork.Twitter)) {
-//			DateTime start = new DateTime();
-//			int n = processActivities(identity, externalNetwork); 
-//			log.info("Processed {} activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-//			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", "/activities", n, userId);
-//
-//			if (externalNetwork.equals(ExternalNetwork.Facebook)) {
-//				start = new DateTime();
-//				n = processLocalActivities(identity, externalNetwork);
-//				log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-//				sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized local feed", "/activities/local", n, userId);
-//			}
-//
-//			start = new DateTime();
-//			n = processMessages(identity, externalNetwork, null);
-//			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-//			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", "/messages", n, userId);
-//
-//
-//		} else if(externalNetwork.equals(ExternalNetwork.LinkedIn)) {
-//			DateTime start = new DateTime();
-//			int n = processActivities(identity, ExternalNetwork.LinkedIn);
-//			log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-//			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", "/activities", n, userId);
-//		}
+		if (externalNetwork.network.equals(Network.Content)) {
+			DateTime start = new DateTime();
+			int n = processVideos(identity, externalNetwork);
+			log.info("Processed {} videos in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized videos", "/videos", n, userId);
+		} 
+		else if (externalNetwork.equals(ExternalNetwork.Google)) {
+			DateTime start = new DateTime();
+			int n = processMessages(identity, externalNetwork, null);
+			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", "/messages", n, userId);
+
+
+		}  else if ( externalNetwork.equals(ExternalNetwork.Facebook) || externalNetwork.equals(ExternalNetwork.Twitter)) {
+			DateTime start = new DateTime();
+			int n = processActivities(identity, externalNetwork); 
+			log.info("Processed {} activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", "/activities", n, userId);
+
+			if (externalNetwork.equals(ExternalNetwork.Facebook)) {
+				start = new DateTime();
+				n = processLocalActivities(identity, externalNetwork);
+				log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+				sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized local feed", "/activities/local", n, userId);
+			}
+
+			start = new DateTime();
+			n = processMessages(identity, externalNetwork, null);
+			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", "/messages", n, userId);
+
+
+		} else if(externalNetwork.equals(ExternalNetwork.LinkedIn)) {
+			DateTime start = new DateTime();
+			int n = processActivities(identity, ExternalNetwork.LinkedIn);
+			log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", "/activities", n, userId);
+		}
 		
 		sendSyncCompletedMessageToIndividual(backchannel, externalNetwork, userId);
 
