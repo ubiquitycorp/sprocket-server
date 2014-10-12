@@ -9,6 +9,7 @@ import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.api.ContentAPI;
@@ -251,7 +252,9 @@ public class SearchService {
 			
 		List<Document> documents = null;
 		// get the identity and social network
-		ExternalIdentity identity = ExternalIdentityService.getAssociatedExternalIdentity(user, externalNetwork);
+		ExternalIdentity identity = null;
+		if(externalNetwork != ExternalNetwork.Yelp) 
+			identity = ExternalIdentityService.getAssociatedExternalIdentity(user, externalNetwork);
 		
 		// if it's social, search activities only
 		if(externalNetwork.getNetwork() == Network.Social) {
@@ -268,13 +271,16 @@ public class SearchService {
 			documents = wrapEntitiesInDocuments(videoContent);
 		}else {
 			// if content, search videos
-			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(externalNetwork, identity.getClientPlatform());
+			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(externalNetwork, ClientPlatform.WEB);
 			UserLocationRepository repo = new UserLocationRepositoryJpaImpl();
 			UserLocation location = repo.findByUserId(user.getUserId());
 			if(location!= null)
 			{
-				List<Place> places = placeAPI.searchPlacesWithinPlace(searchTerm, location.getNearestPlace(), null, page, resultsLimit);			
+				List<Place> places = placeAPI.searchPlacesWithinPlace(searchTerm, location.getNearestPlace(), null, page, resultsLimit>20?20:resultsLimit);			
 				documents = wrapEntitiesInDocuments(places);
+			}
+			else{
+				throw new IllegalArgumentException("User doesn't set his locaion yet");
 			}
 		}
 

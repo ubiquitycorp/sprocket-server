@@ -226,7 +226,11 @@ public class DtoAssembler {
 				data = builder.build();
 			}
 
-		} else {
+		} else if (dataType.equals(Place.class.getSimpleName())){
+			Place place = (Place) document.getData();
+			PlaceDto placeDto = assemble(place);
+			data = placeDto;
+		}else {
 			throw new IllegalArgumentException("Unknown data type: " + dataType);
 		}
 
