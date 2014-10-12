@@ -129,15 +129,16 @@ public class AnalyticsService {
 	}
 	public CollectionVariant<Interest> findInterests(Long ifModifiedSince) {
 
-		Long lastModified = dataModificationCache.getLastModified(CacheKeys.GlobalProperties.INTERESTS, ifModifiedSince);
+//		Long lastModified = dataModificationCache.getLastModified(CacheKeys.GlobalProperties.INTERESTS, ifModifiedSince);
 
 		// If there is no cache entry, there is no data
-		if (lastModified == null) {
-			return null;
-		}
+//		if (lastModified == null) {
+//			return null;
+//		}
 
 		try {
-			return new CollectionVariant<Interest>(new InterestRepositoryJpaImpl().findTopLevel(), lastModified);
+//			return new CollectionVariant<Interest>(new InterestRepositoryJpaImpl().findTopLevel(), lastModified);
+			return new CollectionVariant<Interest>(new InterestRepositoryJpaImpl().findTopLevel(), null);
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
