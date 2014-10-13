@@ -84,16 +84,19 @@
 				<mq.host>localhost</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
+				<xmpp.host>localhost</xmpp.host>
+				<xmpp.port>5222</xmpp.port>
+				<xmpp.domain></xmpp.domain>
+				<xmpp.user>1@localhost</xmpp.user>
+				<xmpp.password>123456</xmpp.password>
+				<xmpp.resource></xmpp.resource>
 				<!-- recommendation engine -->
 				<recommendation.engine.appname>Sprocket
 				</recommendation.engine.appname>
 				<recommendation.engine.hadoop.master>local
 				</recommendation.engine.hadoop.master>
-
 				<recommendation.engine.alg.kmeans.iterations>5
 				</recommendation.engine.alg.kmeans.iterations>
-
-
 			</properties>
 			<activation>
 				<property>
