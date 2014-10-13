@@ -54,9 +54,15 @@ public class LocationService {
 		dataModificationCache = new DataModificationCacheRedisImpl(
 				configuration
 						.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GENERAL));
-		
-		if(new PlaceRepositoryJpaImpl().countAllPlaces()>0){
-			resetPlaceLastModifiedCache();
+		String key = CacheKeys
+				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.PLACES);
+		Long lastModified = dataModificationCache.getLastModified(key, 0L);
+
+		// If there is no cache entry
+		if (lastModified == null) {
+			if(new PlaceRepositoryJpaImpl().countAllPlaces()>0){
+				resetPlaceLastModifiedCache();
+			}
 		}
 	}
 

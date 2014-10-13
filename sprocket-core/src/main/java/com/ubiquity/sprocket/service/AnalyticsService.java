@@ -89,9 +89,15 @@ public class AnalyticsService {
 				.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GROUP));
 		dataModificationCache = new DataModificationCacheRedisImpl(
 				configuration.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GENERAL));
-		
-		if(new InterestRepositoryJpaImpl().countAllInterests()>0){
-			resetInterestsLastModifiedCache();
+		String key = CacheKeys
+				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.INTERESTS);
+		Long lastModified = dataModificationCache.getLastModified(key, 0L);
+
+		// If there is no cache entry
+		if (lastModified == null) {
+			if(new InterestRepositoryJpaImpl().countAllInterests()>0){
+				resetInterestsLastModifiedCache();
+			}
 		}
 	}
 
