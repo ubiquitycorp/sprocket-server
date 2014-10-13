@@ -42,7 +42,7 @@ public class PlacesEndpoint {
 	@Secure
 	public Response neighborhoods(@PathParam("userId") Long userId,@PathParam("region") String region, @HeaderParam("delta") Boolean delta, @HeaderParam("If-Modified-Since")Long ifModifiedSince) throws IOException {
 		PlacesDto results = new PlacesDto();
-		//ServiceFactory.getLocationService().resetPlaceLastModifiedCache();
+		
 		//ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
 		
 		//Locale localeObj = new Locale(locale);

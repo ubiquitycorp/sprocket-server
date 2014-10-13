@@ -89,7 +89,10 @@ public class AnalyticsService {
 				.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GROUP));
 		dataModificationCache = new DataModificationCacheRedisImpl(
 				configuration.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GENERAL));
-
+		
+		if(new InterestRepositoryJpaImpl().countAllInterests()>0){
+			resetInterestsLastModifiedCache();
+		}
 	}
 
 	/**
@@ -129,16 +132,15 @@ public class AnalyticsService {
 	}
 	public CollectionVariant<Interest> findInterests(Long ifModifiedSince) {
 
-//		Long lastModified = dataModificationCache.getLastModified(CacheKeys.GlobalProperties.INTERESTS, ifModifiedSince);
+		Long lastModified = dataModificationCache.getLastModified(CacheKeys.GlobalProperties.INTERESTS, ifModifiedSince);
 
 		// If there is no cache entry, there is no data
-//		if (lastModified == null) {
-//			return null;
-//		}
+		if (lastModified == null) {
+			return null;
+		}
 
 		try {
-//			return new CollectionVariant<Interest>(new InterestRepositoryJpaImpl().findTopLevel(), lastModified);
-			return new CollectionVariant<Interest>(new InterestRepositoryJpaImpl().findTopLevel(), null);
+			return new CollectionVariant<Interest>(new InterestRepositoryJpaImpl().findTopLevel(), lastModified);
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
@@ -638,6 +640,12 @@ public class AnalyticsService {
 		recommendationEngine.addDimension(new Dimension("lon", Range.between(
 				-180.0, 180.0), 0.5));
 
+	}
+	
+	public void resetInterestsLastModifiedCache() {
+		String key = CacheKeys
+				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.INTERESTS);
+		dataModificationCache.setLastModified(key, System.currentTimeMillis());
 	}
 
 }
