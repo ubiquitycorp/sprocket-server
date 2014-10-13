@@ -397,7 +397,6 @@ public class DtoAssembler {
 		PlaceDto.Builder placeDtoBuilder = new PlaceDto.Builder();
 		placeDtoBuilder.placeId(place.getPlaceId())
 				.description(place.getDescription())
-				.network(place.getExternalNetwork())
 				.region(place.getRegion())
 				.name(place.getName())
 				.parent(assembleCityOrNeighborhood(place.getParent()));
@@ -413,8 +412,8 @@ public class DtoAssembler {
 				.boundingBox(assemble(place.getBoundingBox()))
 				.externalIdentitifer(place.getExternalIdentitifer())
 				.region(place.getRegion()).name(place.getName())
-				.network(place.getExternalNetwork())
-				.parent(assemble(place.getParent()));
+				.network(place.getNetwork())
+				.parent(assembleCityOrNeighborhood(place.getParent()));
 		return placeDtoBuilder.build();
 	}
 
@@ -519,14 +518,17 @@ public class DtoAssembler {
 	public static Place assemble(PlaceDto placeDto) {
 		if(placeDto == null)
 			return null;
-		return new Place.Builder().placeId(placeDto.getPlaceId())
+		Place.Builder placeBuilder = new Place.Builder();
+		placeBuilder.placeId(placeDto.getPlaceId())
 				.description(placeDto.getDescription())
 				.address(assemble(placeDto.getAddressdto()))
 				.boundingBox(assemble(placeDto.getBoundingBox()))
 				.externalIdentifier(placeDto.getExternalIdentitifer())
 				.region(placeDto.getRegion()).name(placeDto.getName())
-				.externalNetwork(ExternalNetwork.getNetworkById(placeDto.getExternalNetworkId()))
-				.parent(assemble(placeDto.getParent())).build();
+				.parent(assemble(placeDto.getParent()));
+		if(placeDto.getExternalNetworkId() != null)
+			placeBuilder.externalNetwork(ExternalNetwork.getNetworkById(placeDto.getExternalNetworkId()));
+		return placeBuilder.build();
 
 	}
 	public static Address assemble(AddressDto addressdto) {

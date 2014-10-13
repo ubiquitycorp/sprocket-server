@@ -108,8 +108,8 @@ public class PlaceDto {
 			return this;
 		}
 
-		public Builder network(ExternalNetwork network) {
-			this.externalNetworkId = network.ordinal();
+		public Builder network(Integer externalNetworkId) {
+			this.externalNetworkId = externalNetworkId;
 			return this;
 		}
 
