@@ -261,7 +261,12 @@ public class DtoAssembler {
 				.build();
 
 	}
-
+	public static IdentityDto assemble (ExternalIdentity identity)
+	{
+		return new IdentityDto.Builder()
+		.identifier(identity.getIdentifier())
+		.externalNetworkId(identity.getExternalNetwork()).build();
+	}
 	public static ContactDto assemble(Contact contact) {
 		ContactDto.Builder contactDtoBuilder = new ContactDto.Builder()
 				.contactId(contact.getContactId())
