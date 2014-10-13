@@ -17,7 +17,7 @@ public class PlaceDto {
 	private Long lastUpdated;
 	private PlaceDto parent;
 	private String externalIdentitifer;
-	private ExternalNetwork network;
+	private Integer externalNetworkId;
 	private AddressDto addressdto;
 	
 	
@@ -58,8 +58,8 @@ public class PlaceDto {
 		return externalIdentitifer;
 	}
 
-	public ExternalNetwork getNetwork() {
-		return network;
+	public Integer getExternalNetworkId() {
+		return externalNetworkId;
 	}
 
 	public AddressDto getAddressdto() {
@@ -73,7 +73,7 @@ public class PlaceDto {
 		private String region;
 		private GeoboxDto boundingBox;
 		private String externalIdentitifer;
-		private ExternalNetwork network;
+		private Integer externalNetworkId;
 		private AddressDto addressdto;
 		private Long lastUpdated;
 		private PlaceDto parent;
@@ -109,7 +109,7 @@ public class PlaceDto {
 		}
 
 		public Builder network(ExternalNetwork network) {
-			this.network = network;
+			this.externalNetworkId = network.ordinal();
 			return this;
 		}
 
@@ -139,7 +139,7 @@ public class PlaceDto {
 		this.region = builder.region;
 		this.boundingBox = builder.boundingBox;
 		this.externalIdentitifer = builder.externalIdentitifer;
-		this.network = builder.network;
+		this.externalNetworkId = builder.externalNetworkId;
 		this.addressdto = builder.addressdto;
 		this.lastUpdated = builder.lastUpdated;
 		this.parent = builder.parent;

@@ -525,7 +525,7 @@ public class DtoAssembler {
 				.boundingBox(assemble(placeDto.getBoundingBox()))
 				.externalIdentifier(placeDto.getExternalIdentitifer())
 				.region(placeDto.getRegion()).name(placeDto.getName())
-				.externalNetwork(placeDto.getNetwork())
+				.externalNetwork(ExternalNetwork.getNetworkById(placeDto.getExternalNetworkId()))
 				.parent(assemble(placeDto.getParent())).build();
 
 	}

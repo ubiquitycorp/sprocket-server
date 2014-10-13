@@ -201,7 +201,8 @@ public class UsersEndpoint {
 		ServiceFactory.getUserService().update(user);
 		// create api key and pass back associated identities for this user (in
 		// case of a login from a different device)
-		String apiKey = AuthenticationService.generateApiKey();
+		
+		String apiKey = authenticationService.generateAPIKeyIfNotExsits(user.getUserId());
 		AccountDto accountDto = new AccountDto.Builder().apiKey(apiKey)
 				.userId(user.getUserId()).build();
 
@@ -251,7 +252,7 @@ public class UsersEndpoint {
 				clientPlatform, Boolean.TRUE);
 
 		// user now has a single, native identity
-		String apiKey = AuthenticationService.generateApiKey();
+		String apiKey = AuthenticationService.generateAPIKey();
 
 		// set the account DTO with an api key and new user id and send it back
 		AccountDto accountDto = new AccountDto.Builder().apiKey(apiKey)
