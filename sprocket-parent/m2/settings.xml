@@ -370,7 +370,7 @@
 				</stripe.api.client>
 				<stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO
 				</stripe.api.secret>
-				<repo.env>stage</repo.env>
+				<repo.env>swisscom</repo.env>
 				<mq.queue.cacheinvalidate.host>54.215.203.15
 				</mq.queue.cacheinvalidate.host>
 				<mq.queue.cacheinvalidate.username>netappusr
