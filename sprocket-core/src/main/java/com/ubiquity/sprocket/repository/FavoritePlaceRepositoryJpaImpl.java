@@ -25,7 +25,7 @@ FavoritePlaceRepository {
 	public List<Place> getFavoritePlaceByUserId(Long userId,ExternalNetwork externalNetwork) {
 		Query query = getEntityManager().createQuery("select fp.place from FavoritePlace fp where fp.user.userId = :userId and fp.place.network =:network");
 		query.setParameter("userId", userId);
-		query.setParameter("network", externalNetwork.ordinal());
+		query.setParameter("network", ExternalNetwork.ordinalOrDefault(externalNetwork));
 		return (List<Place>)query.getResultList();
 	}
 	@SuppressWarnings("unchecked")
@@ -35,7 +35,7 @@ FavoritePlaceRepository {
 		Query query = getEntityManager().createQuery("select fp.place from FavoritePlace fp inner join fp.place.parent as neighborhood inner join neighborhood.parent as city where fp.user.userId = :userId and fp.place.network =:network and (neighborhood.placeId = :placeId or city.placeId = :placeId )");
 		query.setParameter("userId", userId);
 		query.setParameter("placeId", placeId);
-		query.setParameter("network", externalNetwork.ordinal());
+		query.setParameter("network", ExternalNetwork.ordinalOrDefault(externalNetwork));
 		return (List<Place>)query.getResultList();
 	}
 }

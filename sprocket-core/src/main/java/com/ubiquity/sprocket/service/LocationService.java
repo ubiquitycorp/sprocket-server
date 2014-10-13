@@ -345,7 +345,7 @@ public class LocationService {
 
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
 
-			List<Place> places = placeRepository.getAllNeighborhoods();
+			List<Place> places = placeRepository.findLastLevelWithoutNetwork();
 
 			if (places.isEmpty())
 				return null;
@@ -424,10 +424,10 @@ public class LocationService {
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
 			List<Place> places;
 			if (delta == null || !delta) {
-				places = placeRepository.getAllCitiesAndNeighborhoods();
+				places = placeRepository.findLastLevelWithoutNetwork();
 			} else {
 				places = placeRepository
-						.getAllCitiesAndNeighborhoodsWithModifiedSince(ifModifiedSince);
+						.findLastLevelWithoutNetworkWithModifiedSince(ifModifiedSince);
 			}
 			return new CollectionVariant<Place>(places, lastModified);
 			//return new CollectionVariant<Place>(places,null);

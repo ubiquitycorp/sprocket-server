@@ -74,7 +74,8 @@ public class PlaceRepositoryTest {
 			interestRepository.create(parentInterest);
 			placeRepository.create(losAngeles);
 			interests.add(interest.getInterestId());
-		} finally {
+			
+		}finally {
 			EntityManagerSupport.commit();
 		}
 	}
@@ -114,7 +115,7 @@ public class PlaceRepositoryTest {
 	@Test(expected = PersistenceException.class)
 	@Ignore
 	public void testCompositeIndex() throws Exception {
-		Place duplicate = new Place.Builder().boundingBox(losAngeles.getBoundingBox()).region("us").name(losAngeles.getName()).build();
+		Place duplicate = new Place.Builder().boundingBox(losAngeles.getBoundingBox()).locator("Los Angeles, CA, USA").region("us").name(losAngeles.getName()).lastUpdated(System.currentTimeMillis()).build();
 
 		try {
 			EntityManagerSupport.beginTransaction();
@@ -126,17 +127,8 @@ public class PlaceRepositoryTest {
 	}
 
 	@Test
-	public void testAllCitiesAndNeighborhoods() {
-		List<Place> places = placeRepository.getAllCitiesAndNeighborhoods();
-		Assert.assertNotNull(places);
-		Assert.assertFalse(places.isEmpty());
-		Assert.assertEquals(places.size(), 2);
-
-	}
-
-	@Test
 	public void testAllNeighborhoods() {
-		List<Place> places = placeRepository.getAllNeighborhoods();
+		List<Place> places = placeRepository.findLastLevelWithoutNetwork();
 		Assert.assertNotNull(places);
 		Assert.assertFalse(places.isEmpty());
 		Assert.assertEquals(places.size(), 1);
