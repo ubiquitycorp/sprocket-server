@@ -2,8 +2,6 @@ package com.ubiquity.sprocket.datasync.worker.mq.consumer;
 
 import java.util.Arrays;
 
-import javax.persistence.EntityManager;
-
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
