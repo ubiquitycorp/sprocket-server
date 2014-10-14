@@ -14,10 +14,11 @@ import org.slf4j.LoggerFactory;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
-import com.ubiquity.integration.api.ContentAPI;
 import com.ubiquity.integration.api.ContentAPIFactory;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.VideoContent;
+import com.ubiquity.sprocket.service.SearchService;
+import com.ubiquity.sprocket.service.ServiceFactory;
 
 public class YouTubeAPITest {
 	

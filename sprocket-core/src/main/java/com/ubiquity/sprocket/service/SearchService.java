@@ -9,20 +9,10 @@ import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-<<<<<<< HEAD
 import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.cache.NestedMapCache;
 import com.niobium.repository.cache.UserCacheRedisImpl;
-import com.ubiquity.content.api.ContentAPI;
-import com.ubiquity.content.api.ContentAPIFactory;
-import com.ubiquity.content.domain.VideoContent;
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.external.domain.Network;
-import com.ubiquity.external.repository.cache.CacheKeys;
-import com.ubiquity.external.service.ExternalIdentityService;
-=======
 import com.ubiquity.identity.domain.ClientPlatform;
->>>>>>> develop
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.api.ContentAPI;
@@ -31,27 +21,20 @@ import com.ubiquity.integration.api.PlaceAPI;
 import com.ubiquity.integration.api.PlaceAPIFactory;
 import com.ubiquity.integration.api.SocialAPI;
 import com.ubiquity.integration.api.SocialAPIFactory;
+import com.ubiquity.integration.api.util.Pagination;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ActivityType;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Message;
 import com.ubiquity.integration.domain.Network;
 import com.ubiquity.integration.domain.VideoContent;
+import com.ubiquity.integration.repository.cache.CacheKeys;
 import com.ubiquity.integration.service.ExternalIdentityService;
 import com.ubiquity.location.domain.Place;
 import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.location.repository.UserLocationRepository;
 import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
 import com.ubiquity.media.domain.Image;
-<<<<<<< HEAD
-import com.ubiquity.social.api.SocialAPI;
-import com.ubiquity.social.api.SocialAPIFactory;
-import com.ubiquity.social.api.util.Pagination;
-import com.ubiquity.social.domain.Activity;
-import com.ubiquity.social.domain.ActivityType;
-import com.ubiquity.social.domain.Message;
-=======
->>>>>>> develop
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchEngine;
 import com.ubiquity.sprocket.search.SearchKeys;
@@ -69,14 +52,9 @@ public class SearchService {
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	private SearchEngine searchEngine;
-	
-<<<<<<< HEAD
-	private Integer resultsLimit, pageLimit;
-	private NestedMapCache requestStateCache;
-=======
+
 	private Integer resultsLimit, pageLimit, networkLimit, networkNumbers;
-	
->>>>>>> develop
+	private NestedMapCache requestStateCache;
 	public SearchService(Configuration config) {
 		log.debug("Using solr api path: {}", config.getProperty("solr.api.path"));
 		requestStateCache = new UserCacheRedisImpl(config.getInt("redis.external.uri.request.state"));
@@ -291,16 +269,9 @@ public class SearchService {
 			List<Activity> activities = socialAPI.searchActivities(searchTerm, page, resultsLimit, identity);
 			documents = wrapEntitiesInDocuments(activities);
 			
-<<<<<<< HEAD
-		} else {
-			List<VideoContent> videoContent = searchLiveVedios(searchTerm, identity, externalNetwork, page);
-=======
 		} else if(externalNetwork.getNetwork() == Network.Content){
 			// if content, search videos
-			ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, identity.getClientPlatform());
-			List<VideoContent> videoContent = contentAPI.searchVideos(searchTerm, page, resultsLimit, identity);
-			
->>>>>>> develop
+			List<VideoContent> videoContent = searchLiveVedios(searchTerm, identity, externalNetwork, page);
 			documents = wrapEntitiesInDocuments(videoContent);
 		}else {
 			// if content, search videos

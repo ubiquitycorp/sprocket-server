@@ -1,7 +1,5 @@
 package com.ubiquity.content.api;
 
-import java.util.List;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Assert;
