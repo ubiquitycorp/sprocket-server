@@ -10,8 +10,6 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import tachyon.thrift.WorkerService.Processor.returnSpace;
-
 import com.niobium.amqp.MessageQueueProducer;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.ExternalIdentity;

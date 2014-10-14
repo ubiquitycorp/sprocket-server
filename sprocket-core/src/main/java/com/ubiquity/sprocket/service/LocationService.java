@@ -8,6 +8,7 @@ import javax.persistence.NoResultException;
 import org.apache.commons.configuration.Configuration;
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
+import org.gavaghan.geodesy.GeodeticService;
 import org.gavaghan.geodesy.GlobalPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -302,23 +303,9 @@ public class LocationService {
 
 			Double closestDistance = Double.MAX_VALUE;
 			for (Place place : places) {
-				// convert to model the geo lib uses
-				GlobalPosition locationPoint = new GlobalPosition(location
-						.getLatitude().doubleValue(), location.getLongitude()
-						.doubleValue(), 0.0);
 				Location center = place.getBoundingBox().getCenter();
-				GlobalPosition placePoint = new GlobalPosition(center.getLatitude()
-						.doubleValue(), center.getLongitude().doubleValue(), 0.0);
-
-				Ellipsoid reference = Ellipsoid.WGS84;
-				double distance = geoCalculator.calculateGeodeticCurve(reference,
-						locationPoint, placePoint).getEllipsoidalDistance(); // Distance
-				// between
-				// Point
-				// A
-				// and
-				// Point
-				// B
+				double distance = GeodeticService.calculateGeodeticCurve(location, center);
+				//Distance between point A and point B
 				if (distance < closestDistance) {
 					closestDistance = distance;
 					closest = place;

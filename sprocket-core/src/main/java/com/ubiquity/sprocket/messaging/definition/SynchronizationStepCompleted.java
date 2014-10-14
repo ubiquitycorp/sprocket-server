@@ -1,7 +1,5 @@
 package com.ubiquity.sprocket.messaging.definition;
 
-import com.ubiquity.integration.domain.ExternalNetwork;
-
 public class SynchronizationStepCompleted {
 
 	private Integer externalNetworkId;
