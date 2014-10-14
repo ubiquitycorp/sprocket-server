@@ -289,8 +289,6 @@ public class DtoAssembler {
 	}
 
 	public static VideoDto assemble(VideoContent videoContent) {
-		String tempCategory = videoContent.getCategory() == null ? null
-				: videoContent.getCategory().getCategoryName();
 		VideoDto.Builder videoBuilder = new VideoDto.Builder()
 				.externalNetworkId(videoContent.getExternalNetwork().ordinal());
 		
@@ -531,7 +529,7 @@ public class DtoAssembler {
 				.externalIdentifier(placeDto.getExternalIdentitifer())
 				.region(placeDto.getRegion()).name(placeDto.getName())
 				.parent(assemble(placeDto.getParent()));
-		if(placeDto.getExternalNetworkId() != null)
+		if(placeDto.getExternalNetworkId() != null && placeDto.getExternalNetworkId() !=-1)
 			placeBuilder.externalNetwork(ExternalNetwork.getNetworkById(placeDto.getExternalNetworkId()));
 		return placeBuilder.build();
 

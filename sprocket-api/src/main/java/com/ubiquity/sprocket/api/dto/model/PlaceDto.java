@@ -3,8 +3,6 @@ package com.ubiquity.sprocket.api.dto.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.ubiquity.integration.domain.ExternalNetwork;
-
 
 public class PlaceDto {
 
