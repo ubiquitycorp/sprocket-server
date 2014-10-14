@@ -54,6 +54,16 @@ public class LocationService {
 		dataModificationCache = new DataModificationCacheRedisImpl(
 				configuration
 						.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GENERAL));
+		String key = CacheKeys
+				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.PLACES);
+		Long lastModified = dataModificationCache.getLastModified(key, 0L);
+
+		// If there is no cache entry
+		if (lastModified == null) {
+			if(new PlaceRepositoryJpaImpl().countAllPlaces()>0){
+				resetPlaceLastModifiedCache();
+			}
+		}
 	}
 
 	/**
@@ -403,13 +413,13 @@ public class LocationService {
 			Long ifModifiedSince, Boolean delta) {
 		String key = CacheKeys
 				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.PLACES);
-//		Long lastModified = dataModificationCache.getLastModified(key,
-//				ifModifiedSince);
-//
-//		// If there is no cache entry, there is no data
-//		if (lastModified == null) {
-//			return null;
-//		}
+		Long lastModified = dataModificationCache.getLastModified(key,
+				ifModifiedSince);
+
+		// If there is no cache entry, there is no data
+		if (lastModified == null) {
+			return null;
+		}
 		try {
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
 			List<Place> places;
@@ -419,8 +429,8 @@ public class LocationService {
 				places = placeRepository
 						.getAllCitiesAndNeighborhoodsWithModifiedSince(ifModifiedSince);
 			}
-//			return new CollectionVariant<Place>(places, lastModified);
-			return new CollectionVariant<Place>(places,null);
+			return new CollectionVariant<Place>(places, lastModified);
+			//return new CollectionVariant<Place>(places,null);
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}

@@ -2,7 +2,9 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.NoResultException;
 import javax.ws.rs.Consumes;
@@ -16,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -201,7 +204,8 @@ public class UsersEndpoint {
 		ServiceFactory.getUserService().update(user);
 		// create api key and pass back associated identities for this user (in
 		// case of a login from a different device)
-		String apiKey = AuthenticationService.generateApiKey();
+		
+		String apiKey = authenticationService.generateAPIKeyIfNotExsits(user.getUserId());
 		AccountDto accountDto = new AccountDto.Builder().apiKey(apiKey)
 				.userId(user.getUserId()).build();
 
@@ -251,7 +255,7 @@ public class UsersEndpoint {
 				clientPlatform, Boolean.TRUE);
 
 		// user now has a single, native identity
-		String apiKey = AuthenticationService.generateApiKey();
+		String apiKey = AuthenticationService.generateAPIKey();
 
 		// set the account DTO with an api key and new user id and send it back
 		AccountDto accountDto = new AccountDto.Builder().apiKey(apiKey)
@@ -265,7 +269,25 @@ public class UsersEndpoint {
 		return Response.ok().entity(jsonConverter.convertToPayload(accountDto))
 				.build();
 	}
+	@GET
+	@Path("/{userId}/identities")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response getIdentities(@PathParam("userId") Long userId) throws IOException {
 
+		// load user
+		User user = ServiceFactory.getUserService().getUserById(userId);
+		Set<Identity> identities = user.getIdentities();
+		List<IdentityDto> identitiesDto = new LinkedList<IdentityDto>();
+		for (Identity identity : identities) {
+			if(identity instanceof ExternalIdentity) {
+				identitiesDto.add(DtoAssembler.assemble((ExternalIdentity)identity));
+			}
+		}
+		return Response.ok()
+				.entity(jsonConverter.convertToPayload(identitiesDto)).build();
+	}
 	@POST
 	@Path("/{userId}/identities")
 	@Consumes(MediaType.APPLICATION_JSON)
