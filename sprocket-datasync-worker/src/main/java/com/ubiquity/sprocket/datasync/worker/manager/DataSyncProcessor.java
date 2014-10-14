@@ -10,6 +10,8 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import tachyon.thrift.WorkerService.Processor.returnSpace;
+
 import com.niobium.amqp.MessageQueueProducer;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.ExternalIdentity;
@@ -114,47 +116,44 @@ public class DataSyncProcessor extends Thread {
 			DateTime start = new DateTime();
 			int n = processVideos(identity, externalNetwork);
 			log.info("Processed {} videos in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized videos", "/videos", n, userId);
+			
+			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized videos", getResoursePath(userId, externalNetwork, ResourceType.videos), n, userId);
 		} 
 		else if (externalNetwork.equals(ExternalNetwork.Google)) {
 			DateTime start = new DateTime();
 			int n = processMessages(identity, externalNetwork, null);
 			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", "/messages", n, userId);
+			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId);
 
 
 		}  else if ( externalNetwork.equals(ExternalNetwork.Facebook) || externalNetwork.equals(ExternalNetwork.Twitter)) {
 			DateTime start = new DateTime();
 			int n = processActivities(identity, externalNetwork); 
 			log.info("Processed {} activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", "/activities", n, userId);
+			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", getResoursePath(userId, externalNetwork, ResourceType.activities), n, userId);
 
 			if (externalNetwork.equals(ExternalNetwork.Facebook)) {
 				start = new DateTime();
 				n = processLocalActivities(identity, externalNetwork);
 				log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-				sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized local feed", "/activities/local", n, userId);
+				sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized local feed", getResoursePath(userId, externalNetwork, ResourceType.localfeed), n, userId);
 			}
 
 			start = new DateTime();
 			n = processMessages(identity, externalNetwork, null);
 			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", "/messages", n, userId);
+			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId);
 
 
 		} else if(externalNetwork.equals(ExternalNetwork.LinkedIn)) {
 			DateTime start = new DateTime();
 			int n = processActivities(identity, ExternalNetwork.LinkedIn);
 			log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", "/activities", n, userId);
+			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", getResoursePath(userId, externalNetwork, ResourceType.activities), n, userId);
 		}
 		
 		sendSyncCompletedMessageToIndividual(backchannel, externalNetwork, userId);
-
-
 	}
-
-	
 
 	private int processActivities(ExternalIdentity identity, ExternalNetwork socialNetwork) {
 		List<Activity> synced;
@@ -348,5 +347,17 @@ public class DataSyncProcessor extends Thread {
 			log.warn("Could not send update message to user {}", userId);
 		}
 		
+	}
+	
+	private String getResoursePath(Long userId, ExternalNetwork externalNetwork, ResourceType resource){
+		StringBuilder resourcePath = new StringBuilder();
+		if(resourcePath.equals(ResourceType.videos))
+			resourcePath.append("/content/users/");
+		else
+			resourcePath.append("/social/users/");
+		resourcePath.append(userId)
+				.append("/providers/").append(externalNetwork.ordinal())
+				.append("/").append(resource.name());
+		return resourcePath.toString();
 	}
 }
