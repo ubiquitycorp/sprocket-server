@@ -9,7 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.ubiquity.social.domain.Activity;
+import com.ubiquity.integration.domain.Activity;
 
 @Entity
 @Table(name = "recommended_activity", indexes = {

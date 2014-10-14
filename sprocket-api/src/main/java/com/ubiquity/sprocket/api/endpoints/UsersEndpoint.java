@@ -2,6 +2,9 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import javax.persistence.NoResultException;
 import javax.ws.rs.Consumes;
@@ -20,22 +23,22 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.api.exception.HttpException;
-import com.ubiquity.content.api.ContentAPI;
-import com.ubiquity.content.api.ContentAPIFactory;
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.external.domain.Network;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
+import com.ubiquity.integration.api.ContentAPI;
+import com.ubiquity.integration.api.ContentAPIFactory;
+import com.ubiquity.integration.api.SocialAPI;
+import com.ubiquity.integration.api.SocialAPIFactory;
+import com.ubiquity.integration.api.linkedin.ExchangeService;
+import com.ubiquity.integration.api.twitter.TwitterAPI;
+import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Network;
+import com.ubiquity.integration.domain.SocialToken;
 import com.ubiquity.messaging.format.Message;
-import com.ubiquity.social.api.SocialAPI;
-import com.ubiquity.social.api.SocialAPIFactory;
-import com.ubiquity.social.api.linkedin.ExchangeService;
-import com.ubiquity.social.api.twitter.TwitterAPI;
-import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.SocialToken;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
@@ -101,15 +104,16 @@ public class UsersEndpoint {
 					"Autontication Failed no oAuth_token_returned", 401);
 
 		// create the identity if it does not exist; or use the existing one
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+		List<ExternalIdentity> identities = ServiceFactory.getExternalIdentityService()
 				.createOrUpdateExternalIdentity(user, accesstokens[0],
 						accesstokens[1], null, ClientPlatform.WEB,
 						ExternalNetwork.LinkedIn, null);
-
+		
+		ExternalIdentity identity = identities.get(0);
 		IdentityDto result = new IdentityDto.Builder().identifier(
 				identity.getIdentifier()).build();
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identity, result);
+		sendActivatedMessage(user, identities, result);
 
 		try {
 
@@ -199,7 +203,8 @@ public class UsersEndpoint {
 		ServiceFactory.getUserService().update(user);
 		// create api key and pass back associated identities for this user (in
 		// case of a login from a different device)
-		String apiKey = AuthenticationService.generateApiKey();
+		
+		String apiKey = authenticationService.generateAPIKeyIfNotExsits(user.getUserId());
 		AccountDto accountDto = new AccountDto.Builder().apiKey(apiKey)
 				.userId(user.getUserId()).build();
 
@@ -249,7 +254,7 @@ public class UsersEndpoint {
 				clientPlatform, Boolean.TRUE);
 
 		// user now has a single, native identity
-		String apiKey = AuthenticationService.generateApiKey();
+		String apiKey = AuthenticationService.generateAPIKey();
 
 		// set the account DTO with an api key and new user id and send it back
 		AccountDto accountDto = new AccountDto.Builder().apiKey(apiKey)
@@ -263,7 +268,25 @@ public class UsersEndpoint {
 		return Response.ok().entity(jsonConverter.convertToPayload(accountDto))
 				.build();
 	}
+	@GET
+	@Path("/{userId}/identities")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response getIdentities(@PathParam("userId") Long userId) throws IOException {
 
+		// load user
+		User user = ServiceFactory.getUserService().getUserById(userId);
+		Set<Identity> identities = user.getIdentities();
+		List<IdentityDto> identitiesDto = new LinkedList<IdentityDto>();
+		for (Identity identity : identities) {
+			if(identity instanceof ExternalIdentity) {
+				identitiesDto.add(DtoAssembler.assemble((ExternalIdentity)identity));
+			}
+		}
+		return Response.ok()
+				.entity(jsonConverter.convertToPayload(identitiesDto)).build();
+	}
 	@POST
 	@Path("/{userId}/identities")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -285,7 +308,7 @@ public class UsersEndpoint {
 		User user = ServiceFactory.getUserService().getUserById(userId);
 
 		// create the identity if it does not exist; or use the existing one
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+		List<ExternalIdentity> identity = ServiceFactory.getExternalIdentityService()
 				.createOrUpdateExternalIdentity(user,
 						identityDto.getAccessToken(),
 						identityDto.getSecretToken(),
@@ -300,13 +323,13 @@ public class UsersEndpoint {
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identity.getIdentityId());
+					.getBySocialIdentityId(identity.get(0).getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
 		} catch (NoResultException ex) {
 			IdentityDto result = new IdentityDto.Builder().identifier(
-					identity.getIdentifier()).build();
+					identity.get(0).getIdentifier()).build();
 			return Response.ok().entity(jsonConverter.convertToPayload(result))
 					.build();
 		}
@@ -337,7 +360,7 @@ public class UsersEndpoint {
 				.getClientPlatformId());
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identityDto.getExternalNetworkId());
-		ExternalIdentity identity = null;
+		List<ExternalIdentity> identiies = null;
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		if (externalNetwork.network == Network.Content) {
@@ -348,7 +371,7 @@ public class UsersEndpoint {
 					identityDto.getCode(), identityDto.getRedirectUrl());
 
 			// create the identity if it does not exist; or use the existing one
-			identity = ServiceFactory.getExternalIdentityService()
+			identiies = ServiceFactory.getExternalIdentityService()
 					.createOrUpdateExternalIdentity(user, accessToken,
 							identityDto.getSecretToken(),
 							identityDto.getRefreshToken(), clientPlatform,
@@ -368,7 +391,7 @@ public class UsersEndpoint {
 					identityDto.getCode(), identityDto.getOauthToken(),
 					identityDto.getOauthTokenSecret(), redirectUri);
 
-			identity = ServiceFactory.getExternalIdentityService()
+			identiies = ServiceFactory.getExternalIdentityService()
 					.createOrUpdateExternalIdentity(user,
 							externalidentity.getAccessToken(),
 							externalidentity.getSecretToken(),
@@ -378,7 +401,7 @@ public class UsersEndpoint {
 		}
 
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identity, identityDto);
+		sendActivatedMessage(user, identiies, identityDto);
 
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
@@ -386,13 +409,13 @@ public class UsersEndpoint {
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identity.getIdentityId());
+					.getBySocialIdentityId(identiies.get(0).getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
 		} catch (NoResultException ex) {
 			IdentityDto result = new IdentityDto.Builder().identifier(
-					identity.getIdentifier()).build();
+					identiies.get(0).getIdentifier()).build();
 			return Response.ok().entity(jsonConverter.convertToPayload(result))
 					.build();
 		}
@@ -491,18 +514,21 @@ public class UsersEndpoint {
 		return Response.ok().build();
 	}
 
-	private void sendActivatedMessage(User user, ExternalIdentity identity,
+	private void sendActivatedMessage(User user, List<ExternalIdentity> identities,
 			IdentityDto identityDto) throws IOException {
-		ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
-				.clientPlatformId(identityDto.getClientPlatformId())
-				.userId(user.getUserId()).identityId(identity.getIdentityId())
-				.build();
-
-		// serialize and send it
-		String message = MessageConverterFactory.getMessageConverter()
-				.serialize(new Message(content));
-		MessageQueueFactory.getCacheInvalidationQueueProducer().write(
-				message.getBytes());
+		for(ExternalIdentity identity : identities)
+		{
+			ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
+					.clientPlatformId(identityDto.getClientPlatformId())
+					.userId(user.getUserId()).identityId(identity.getIdentityId())
+					.build();
+	
+			// serialize and send it
+			String message = MessageConverterFactory.getMessageConverter()
+					.serialize(new Message(content));
+			MessageQueueFactory.getCacheInvalidationQueueProducer().write(
+					message.getBytes());
+		}
 	}
 	
 	private void sendLocationMessage(Long userId, LocationDto locationDto) throws IOException {

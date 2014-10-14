@@ -1,14 +1,14 @@
 package com.ubiquity.sprocket.datasync.worker;
 
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-
 import static org.quartz.DateBuilder.futureDate;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 import static org.quartz.TriggerKey.triggerKey;
+
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -25,7 +25,8 @@ import org.slf4j.LoggerFactory;
 import com.niobium.common.thread.ThreadPool;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
-import com.ubiquity.social.api.SocialAPIFactory;
+import com.ubiquity.integration.api.PlaceAPIFactory;
+import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.sprocket.datasync.worker.jobs.DataSyncJob;
 import com.ubiquity.sprocket.datasync.worker.mq.consumer.CacheInvalidateConsumer;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
@@ -55,10 +56,13 @@ public class DataSyncWorker {
 		// start the thread pool, 10 consumer threads
 		ThreadPool<CacheInvalidateConsumer> threadPool = new ThreadPool<CacheInvalidateConsumer>();
 		threadPool.start(consumers);
-		startScheduler();
+		
+		
+		startScheduler(configuration.getInt("rules.sync.blockSize", 20));
 		log.info("Initialized {} version: {}", configuration.getProperty("application.name"),
 				configuration.getProperty("application.version"));
 		
+				
 		while (true) {
 			try {
 				Thread.sleep(1000);
@@ -102,6 +106,7 @@ public class DataSyncWorker {
 		JedisConnectionFactory.initialize(configuration);
 		MessageQueueFactory.initialize(configuration);
 		SocialAPIFactory.initialize(configuration);
+		PlaceAPIFactory.initialize(configuration);
 	}
 
 	private void stopServices() {
@@ -110,12 +115,13 @@ public class DataSyncWorker {
 		// TODO: we need an mq disconnect
 	}
 	
-	private void startScheduler() throws SchedulerException {
+	private void startScheduler(int blockSize) throws SchedulerException {
 		Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
 		scheduler.start();
 
 		JobDetail job = newJob(DataSyncJob.class)
 				.withIdentity("dataSync", "sync")
+				.usingJobData("blockSize", blockSize)
 				.build();
 
 		Trigger trigger = newTrigger() 
@@ -123,7 +129,7 @@ public class DataSyncWorker {
 				.withSchedule(simpleSchedule()
 						.withIntervalInMinutes(8)
 						.repeatForever())
-						.startAt(futureDate(1, IntervalUnit.MINUTE))
+						.startAt(futureDate(1, IntervalUnit.SECOND))
 						.build();
 
 		scheduler.scheduleJob(job, trigger);

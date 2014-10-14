@@ -6,8 +6,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import com.niobium.repository.BaseRepositoryJpaImpl;
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.social.domain.Activity;
+import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.sprocket.domain.RecommendedActivity;
 
 public class RecommendedActivityRepositoryJpaImpl extends BaseRepositoryJpaImpl<Long, RecommendedActivity> implements

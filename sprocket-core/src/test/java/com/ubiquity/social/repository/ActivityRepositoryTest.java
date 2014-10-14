@@ -12,12 +12,17 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
+import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.ActivityType;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Interest;
 import com.ubiquity.integration.factory.TestActivityFactory;
+import com.ubiquity.integration.repository.ActivityRepository;
+import com.ubiquity.integration.repository.ActivityRepositoryJpaImpl;
+import com.ubiquity.integration.repository.InterestRepository;
+import com.ubiquity.integration.repository.InterestRepositoryJpaImpl;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
-import com.ubiquity.social.domain.Activity;
-import com.ubiquity.social.domain.ActivityType;
-import com.ubiquity.external.domain.ExternalNetwork;
 
 /***
  * Tests testing basic CRUD operations for a user repository
@@ -29,6 +34,8 @@ public class ActivityRepositoryTest {
 
 	private ActivityRepository activityRepository;
 	private UserRepository userRepository;
+	private InterestRepository interestRepository;
+	private Interest sports;
 	
 	private Activity statusActivity, photoActivity, videoActivity, linkActivity;
 	private User owner;
@@ -43,6 +50,7 @@ public class ActivityRepositoryTest {
 
 		activityRepository = new ActivityRepositoryJpaImpl();
 		userRepository = new UserRepositoryJpaImpl();
+		interestRepository = new InterestRepositoryJpaImpl();
 		
 		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 		
@@ -56,11 +64,14 @@ public class ActivityRepositoryTest {
 		photoActivity = TestActivityFactory.createActivityWithMininumRequirements(owner, ExternalNetwork.Facebook, new Image("http://my.image.url"));
 		linkActivity = TestActivityFactory.createActivityWithMininumRequirements(owner, ExternalNetwork.Facebook, "http://my.link.url");
 
+		sports = new Interest("Sports", null);
+
 		EntityManagerSupport.beginTransaction();
 		activityRepository.create(statusActivity);
 		activityRepository.create(videoActivity);
 		activityRepository.create(photoActivity);
 		activityRepository.create(linkActivity);
+		interestRepository.create(sports);
 		EntityManagerSupport.commit();
 	}
 
@@ -81,6 +92,25 @@ public class ActivityRepositoryTest {
 		Assert.assertEquals(persisted.getActivityType(), ActivityType.VIDEO);
 
 	}
+	
+	@Test
+	public void testAddVideoWithInterests() throws Exception {
+		
+		Activity withInterests = TestActivityFactory.createActivityWithMininumRequirements(owner, ExternalNetwork.Facebook, new Video.Builder().url("http://my.video.url").build());
+		// add some tags, to make sure they aren't being persisted
+		withInterests.getTags().add("#goirish"); 
+		withInterests.getInterests().add(sports);
+		
+		EntityManagerSupport.beginTransaction();
+		activityRepository.create(withInterests);
+		EntityManagerSupport.commit();
+		
+		// read it back
+		Activity persisted = activityRepository.read(withInterests.getActivityId());
+		Assert.assertFalse(persisted.getInterests().isEmpty());
+
+	}
+	
 	
 	@Test
 	public void testCreatePhoto() throws Exception {

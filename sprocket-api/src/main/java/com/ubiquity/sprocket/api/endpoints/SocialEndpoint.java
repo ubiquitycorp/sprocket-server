@@ -20,13 +20,14 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
-import com.ubiquity.external.domain.ExternalNetwork;
+import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Message;
+import com.ubiquity.integration.domain.PostActivity;
 import com.ubiquity.location.domain.UserLocation;
-import com.ubiquity.social.domain.Activity;
-import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.Message;
-import com.ubiquity.social.domain.PostActivity;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
@@ -88,6 +89,14 @@ public class SocialEndpoint {
 				.build();
 	}
 	
+	/***
+	 * Returns list of activities which represents local news feed in specific provider 
+	 * based on last updated user's location in the system
+	 * @param userId
+	 * @param socialProviderId
+	 * @param ifModifiedSince
+	 * @return
+	 */
 	@GET
 	@Path("users/{userId}/providers/{socialNetworkId}/localfeed")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -98,6 +107,7 @@ public class SocialEndpoint {
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
 
 		UserLocation userLocation = ServiceFactory.getLocationService().getLocation(userId);
+		// returns empty list if user has not set his location yet
 		if(userLocation == null)
 			return Response.ok().entity(jsonConverter.convertToPayload(results)).build();
 		
@@ -128,31 +138,36 @@ public class SocialEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response messages(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("delta") Boolean delta, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
-
-		MessagesDto result = new MessagesDto();
-
-		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
-					 
-		CollectionVariant<Message> variant = ServiceFactory.getSocialService().findMessagesByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince, delta);
-		
-		
-		// Throw a 304 if if there is no variant (no change)
-		if (variant == null)
-			return Response.notModified().build();
-		
-		
-		List<Message> messages = new LinkedList<Message>();
-		messages.addAll(variant.getCollection());
-		
-		// Assemble into message dto, constructing conversations if they are inherent in the data
-		List<MessageDto> conversations = DtoAssembler.assemble(messages);
-		Collections.sort(conversations, Collections.reverseOrder());
-		result.getMessages().addAll(conversations);
+		try
+		{
+			MessagesDto result = new MessagesDto();
 	
-		return Response.ok()
-				.header("Last-Modified", variant.getLastModified())
-				.entity(jsonConverter.convertToPayload(result))
-				.build();
+			ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
+						 
+			CollectionVariant<Message> variant = ServiceFactory.getSocialService().findMessagesByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince, delta);
+			
+			
+			// Throw a 304 if if there is no variant (no change)
+			if (variant == null)
+				return Response.notModified().build();
+			
+			
+			List<Message> messages = new LinkedList<Message>();
+			messages.addAll(variant.getCollection());
+			
+			// Assemble into message dto, constructing conversations if they are inherent in the data
+			List<MessageDto> conversations = DtoAssembler.assemble(messages);
+			Collections.sort(conversations, Collections.reverseOrder());
+			result.getMessages().addAll(conversations);
+			
+			return Response.ok()
+					.header("Last-Modified", variant.getLastModified())
+					.entity(jsonConverter.convertToPayload(result))
+					.build();
+		}finally 
+		{
+			EntityManagerSupport.closeEntityManager();
+		}
 	}
 	/***
 	 * This method send message to specific user in social network

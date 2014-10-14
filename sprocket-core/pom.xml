@@ -10,7 +10,7 @@
 	<artifactId>sprocket-core</artifactId>
 	<name>Sprocket Core</name>
 
-	<version>0.1.12</version>
+	<version>0.2.1</version>
 
 	<build>
 
@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-integration</artifactId>
-			<version>0.1.11</version>
+			<version>0.1.8</version>
 		</dependency>
 
 		<dependency>
@@ -78,13 +78,6 @@
 			<groupId>com.niobium</groupId>
 			<artifactId>niobium-amqp</artifactId>
 			<version>0.2</version>
-		</dependency>
-
-
-		<dependency>
-			<groupId>com.google.code.geocoder-java</groupId>
-			<artifactId>geocoder-java</artifactId>
-			<version>0.16</version>
 		</dependency>
 
 

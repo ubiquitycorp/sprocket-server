@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 
-import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.sprocket.domain.GroupMembership;
 
 public interface RecommendationEngine {

@@ -25,6 +25,8 @@ public class VideoDto {
 	
 	private Long lastUpdated;
 	private ImageDto thumb;
+	
+	private Long ownerId;
 
 	public ImageDto getThumb() {
 		return thumb;
@@ -57,6 +59,10 @@ public class VideoDto {
 	public String getCategory() {
 		return category;
 	}
+	
+	public Long getOwnerId(){
+		return ownerId;
+	}
 
 	public static class Builder {
 		private String url;
@@ -67,7 +73,8 @@ public class VideoDto {
 		private String description;
 		private String category;
 		private ImageDto thumb;
-
+		private Long ownerId;
+		
 		public Builder url(String url) {
 			this.url = url;
 			return this;
@@ -107,6 +114,11 @@ public class VideoDto {
 			this.thumb = thumb;
 			return this;
 		}
+		
+		public Builder ownerId(Long ownerId){
+			this.ownerId = ownerId;
+			return this;
+		}
 
 		public VideoDto build() {
 			return new VideoDto(this);
@@ -122,5 +134,6 @@ public class VideoDto {
 		this.description = builder.description;
 		this.category = builder.category;
 		this.thumb = builder.thumb;
+		this.ownerId = builder.ownerId;
 	}
 }

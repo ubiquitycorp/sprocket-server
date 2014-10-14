@@ -1,6 +1,5 @@
 package com.ubiquity.social.api;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.configuration.Configuration;
@@ -12,11 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.redis.JedisConnectionFactory;
-import com.ubiquity.content.domain.VideoContent;
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
-import com.ubiquity.social.domain.Contact;
+import com.ubiquity.integration.api.SocialAPI;
+import com.ubiquity.integration.api.SocialAPIFactory;
+import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalNetwork;
 
 public class GoogleApiTest {
 	

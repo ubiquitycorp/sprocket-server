@@ -16,15 +16,17 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.content.api.VimeoAPITest;
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.social.domain.Activity;
-import com.ubiquity.social.domain.ActivityType;
-import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.Message;
-import com.ubiquity.social.domain.PostActivity;
+import com.ubiquity.integration.api.SocialAPI;
+import com.ubiquity.integration.api.SocialAPIFactory;
+import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.ActivityType;
+import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Message;
+import com.ubiquity.integration.domain.PostActivity;
 
 public class TwitterApiTest {
 private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);

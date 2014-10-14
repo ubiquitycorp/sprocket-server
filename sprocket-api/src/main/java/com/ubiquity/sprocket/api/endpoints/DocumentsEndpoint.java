@@ -17,12 +17,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
-import com.ubiquity.content.domain.VideoContent;
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.social.domain.Activity;
-import com.ubiquity.social.domain.Message;
+import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Message;
+import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.DocumentsDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
@@ -90,6 +90,29 @@ public class DocumentsEndpoint {
 		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
 	}
 	
+	/***
+	 * This end point returns searches for document over both most popular data and user data
+	 * @param userId
+	 * @param q
+	 * @param page
+	 * @return
+	 * @throws IOException
+	 */
+	@GET
+	@Path("users/{userId}/indexed")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response searchIndexed(@PathParam("userId") Long userId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
+		DocumentsDto result = new DocumentsDto(q);
+
+		List<Document> documents = ServiceFactory.getSearchService().searchIndexedDocumentsWithinAllProviders(q, userId);
+		for(Document document : documents) {
+			result.getDocuments().add(DtoAssembler.assemble(document));
+		}
+		
+		return Response.ok().entity(jsonConverter.convertToPayload(result)).build();
+	}
+	
 	
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/live")
@@ -102,10 +125,10 @@ public class DocumentsEndpoint {
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, externalNetwork);
-		if(identity == null)
+		if(identity == null && externalNetwork != ExternalNetwork.Yelp)
 			throw new IllegalArgumentException("User does not have an identity for this provider");
-		
-		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
+		if(externalNetwork != ExternalNetwork.Yelp)
+			ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
 		
 		List<Document> documents = ServiceFactory.getSearchService().searchLiveDocuments(q, user, externalNetwork, page);
 		

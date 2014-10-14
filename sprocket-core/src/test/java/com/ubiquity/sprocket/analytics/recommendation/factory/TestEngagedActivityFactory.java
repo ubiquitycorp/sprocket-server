@@ -1,9 +1,9 @@
 package com.ubiquity.sprocket.analytics.recommendation.factory;
 
-import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.factory.TestActivityFactory;
-import com.ubiquity.social.domain.Activity;
 import com.ubiquity.sprocket.domain.EngagedActivity;
 
 public class TestEngagedActivityFactory {

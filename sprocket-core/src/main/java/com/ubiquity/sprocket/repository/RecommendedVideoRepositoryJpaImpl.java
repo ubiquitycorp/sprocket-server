@@ -6,9 +6,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import com.niobium.repository.BaseRepositoryJpaImpl;
-import com.ubiquity.content.domain.VideoContent;
-import com.ubiquity.external.domain.ExternalNetwork;
-import com.ubiquity.sprocket.domain.RecommendedActivity;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.sprocket.domain.RecommendedVideo;
 
 public class RecommendedVideoRepositoryJpaImpl extends BaseRepositoryJpaImpl<Long, RecommendedVideo> implements

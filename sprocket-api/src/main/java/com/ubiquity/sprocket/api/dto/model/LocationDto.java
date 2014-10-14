@@ -48,4 +48,35 @@ public class LocationDto {
 	public Double getHorizontalAccuracy() {
 		return horizontalAccuracy;
 	}
+	
+	public static class Builder {
+		private BigDecimal latitude;
+		private BigDecimal longitude;
+		private BigDecimal altitude;
+
+		public Builder latitude(BigDecimal latitude) {
+			this.latitude = latitude;
+			return this;
+		}
+
+		public Builder longitude(BigDecimal longitude) {
+			this.longitude = longitude;
+			return this;
+		}
+
+		public Builder altitude(BigDecimal altitude) {
+			this.altitude = altitude;
+			return this;
+		}
+
+		public LocationDto build() {
+			return new LocationDto(this);
+		}
+	}
+	private LocationDto(Builder builder) {
+		this.latitude = builder.latitude;
+		this.longitude = builder.longitude;
+		this.altitude = builder.altitude;
+	}
+
 }

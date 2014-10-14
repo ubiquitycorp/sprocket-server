@@ -9,6 +9,7 @@ import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+<<<<<<< HEAD
 import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.cache.NestedMapCache;
 import com.niobium.repository.cache.UserCacheRedisImpl;
@@ -19,19 +20,43 @@ import com.ubiquity.external.domain.ExternalNetwork;
 import com.ubiquity.external.domain.Network;
 import com.ubiquity.external.repository.cache.CacheKeys;
 import com.ubiquity.external.service.ExternalIdentityService;
+=======
+import com.ubiquity.identity.domain.ClientPlatform;
+>>>>>>> develop
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.integration.api.ContentAPI;
+import com.ubiquity.integration.api.ContentAPIFactory;
+import com.ubiquity.integration.api.PlaceAPI;
+import com.ubiquity.integration.api.PlaceAPIFactory;
+import com.ubiquity.integration.api.SocialAPI;
+import com.ubiquity.integration.api.SocialAPIFactory;
+import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.ActivityType;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Message;
+import com.ubiquity.integration.domain.Network;
+import com.ubiquity.integration.domain.VideoContent;
+import com.ubiquity.integration.service.ExternalIdentityService;
+import com.ubiquity.location.domain.Place;
+import com.ubiquity.location.domain.UserLocation;
+import com.ubiquity.location.repository.UserLocationRepository;
+import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
 import com.ubiquity.media.domain.Image;
+<<<<<<< HEAD
 import com.ubiquity.social.api.SocialAPI;
 import com.ubiquity.social.api.SocialAPIFactory;
 import com.ubiquity.social.api.util.Pagination;
 import com.ubiquity.social.domain.Activity;
 import com.ubiquity.social.domain.ActivityType;
 import com.ubiquity.social.domain.Message;
+=======
+>>>>>>> develop
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchEngine;
 import com.ubiquity.sprocket.search.SearchKeys;
 import com.ubiquity.sprocket.search.solr.SearchEngineSolrjImpl;
+import com.ubiquity.sprocket.search.solr.SolrOperator;
 
 /***
  * Search service encapsulates all search functions for both indexed searches and live searches
@@ -45,14 +70,22 @@ public class SearchService {
 	
 	private SearchEngine searchEngine;
 	
+<<<<<<< HEAD
 	private Integer resultsLimit, pageLimit;
 	private NestedMapCache requestStateCache;
+=======
+	private Integer resultsLimit, pageLimit, networkLimit, networkNumbers;
+	
+>>>>>>> develop
 	public SearchService(Configuration config) {
 		log.debug("Using solr api path: {}", config.getProperty("solr.api.path"));
 		requestStateCache = new UserCacheRedisImpl(config.getInt("redis.external.uri.request.state"));
 		resultsLimit = config.getInt("rules.search.results.limit");
 		pageLimit = config.getInt("rules.search.page.limit");
+		networkLimit = config.getInt("rules.search.network.limit");
+		networkNumbers = config.getInt("networks.number");
 		searchEngine = new SearchEngineSolrjImpl(config);
+		
 	}
 
 	
@@ -62,15 +95,20 @@ public class SearchService {
 	 * 
 	 * @param messages
 	 */
-	public void indexMessages(List<Message> messages) {
+	public void indexMessages(Long userFilterId, List<Message> messages) {
 		List<Document> documents = new LinkedList<Document>();
 		for(Message message : messages) {
 
 			if(message == null)
 				continue; // TODO: remove this once the core issue is resolved
+			
+			String dataType = Message.class.getSimpleName();
+			Document document = new Document(dataType);
 
-			Document document = new Document(Message.class.getName());
-
+			// create identifier from the user filter (or default), the pk of the entity, and the data type
+			String id = SearchKeys.generateDocumentKeyForId(userFilterId, message.getMessageId(), dataType);
+			document.getFields().put(SearchKeys.Fields.FIELD_ID, id);
+			
 			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_DISPLAY_NAME, message.getSender().getDisplayName());
 			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_IDENTIFIER, message.getSender().getExternalIdentity().getIdentifier());
 			
@@ -84,8 +122,9 @@ public class SearchService {
 
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Message.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, message.getExternalNetwork().ordinal());
-			document.getFields().put(SearchKeys.Fields.FIELD_ID, message.getMessageId());
 
+			document.getFields().put(SearchKeys.Fields.FIELD_CLICKS, 1);
+			
 			documents.add(document);
 		}
 
@@ -97,21 +136,22 @@ public class SearchService {
      *
 	 * @param userFilterId
 	 * @param activities
+	 * @param isEngaged: indicates whether these activities are engaged or not
 	 */
-	public void indexActivities(Long userFilterId, List<Activity> activities) {
+	public void indexActivities(Long userFilterId, List<Activity> activities, Boolean isEngaged) {
 		List<Document> documents = new LinkedList<Document>();
 		for(Activity activity : activities) {
 
-			String dataType = Activity.class.getName();
+			String dataType = Activity.class.getSimpleName();
 			Document document = new Document(dataType);
+			Integer clicks = 1;
 			
-			Long ownerId = SearchKeys.generateOwnerId(userFilterId);
-			document.getFields().put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId); 
-
-		
 			// create identifier from the user filter (or default), the pk of the entity, and the data type
 			String id = SearchKeys.generateDocumentKeyForId(userFilterId, activity.getActivityId(), dataType);
 			document.getFields().put(SearchKeys.Fields.FIELD_ID, id); 
+						
+			Long ownerId = SearchKeys.generateOwnerId(userFilterId);
+			document.getFields().put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId); 
 
 			// contact, add image if we have one
 			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_DISPLAY_NAME, activity.getPostedBy().getDisplayName());
@@ -142,7 +182,12 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, activity.getExternalNetwork().ordinal());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_IDENTIFIER, activity.getExternalIdentifier());
 			document.getFields().put(SearchKeys.Fields.FIELD_DATE, activity.getCreationDate());
-
+			
+			if(isEngaged){
+				clicks = searchEngine.findClicksById(id);
+				clicks++;
+			}
+			document.getFields().put(SearchKeys.Fields.FIELD_CLICKS, clicks);
 			
 			documents.add(document);
 		}
@@ -156,14 +201,15 @@ public class SearchService {
 	 * @param videos
 	 * @param userId
 	 */
-	public void indexVideos(Long userId, List<VideoContent> videos) {
+	public void indexVideos(Long userId, List<VideoContent> videos, Boolean isEngaged) {
 
 		List<Document> documents = new LinkedList<Document>();
 		for(VideoContent videoContent : videos) {
 
 			String dataType = VideoContent.class.getSimpleName();
 			Document document = new Document(dataType);
-
+			Integer clicks = 1;
+			
 			// create identifier from the user filter (or default), the pk of the entity, and the data type
 			String id = SearchKeys.generateDocumentKeyForId(userId, videoContent.getVideoContentId(), dataType);
 			document.getFields().put(SearchKeys.Fields.FIELD_ID, id);
@@ -184,6 +230,11 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, VideoContent.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, videoContent.getExternalNetwork().ordinal());
 
+			if(isEngaged){
+				clicks = searchEngine.findClicksById(id);
+				clicks++;
+			}
+			document.getFields().put(SearchKeys.Fields.FIELD_CLICKS, clicks);
 
 			documents.add(document);
 		}
@@ -227,9 +278,11 @@ public class SearchService {
 		if(page > pageLimit)
 			throw new IllegalArgumentException("Page limit reached");
 			
-		List<Document> documents;
+		List<Document> documents = null;
 		// get the identity and social network
-		ExternalIdentity identity = ExternalIdentityService.getAssociatedExternalIdentity(user, externalNetwork);
+		ExternalIdentity identity = null;
+		if(externalNetwork != ExternalNetwork.Yelp) 
+			identity = ExternalIdentityService.getAssociatedExternalIdentity(user, externalNetwork);
 		
 		// if it's social, search activities only
 		if(externalNetwork.getNetwork() == Network.Social) {
@@ -238,9 +291,30 @@ public class SearchService {
 			List<Activity> activities = socialAPI.searchActivities(searchTerm, page, resultsLimit, identity);
 			documents = wrapEntitiesInDocuments(activities);
 			
+<<<<<<< HEAD
 		} else {
 			List<VideoContent> videoContent = searchLiveVedios(searchTerm, identity, externalNetwork, page);
+=======
+		} else if(externalNetwork.getNetwork() == Network.Content){
+			// if content, search videos
+			ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, identity.getClientPlatform());
+			List<VideoContent> videoContent = contentAPI.searchVideos(searchTerm, page, resultsLimit, identity);
+			
+>>>>>>> develop
 			documents = wrapEntitiesInDocuments(videoContent);
+		}else {
+			// if content, search videos
+			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(externalNetwork, ClientPlatform.WEB);
+			UserLocationRepository repo = new UserLocationRepositoryJpaImpl();
+			UserLocation location = repo.findByUserId(user.getUserId());
+			if(location!= null)
+			{
+				List<Place> places = placeAPI.searchPlacesWithinPlace(searchTerm, location.getNearestPlace(), null, page, resultsLimit>20?20:resultsLimit);			
+				documents = wrapEntitiesInDocuments(places);
+			}
+			else{
+				throw new IllegalArgumentException("User doesn't set his locaion yet");
+			}
 		}
 
 		return documents;
@@ -282,7 +356,6 @@ public class SearchService {
 			rank++;
 			documents.add(document);
 		}
-			
 		return documents;
 	}
 	
@@ -300,13 +373,37 @@ public class SearchService {
 		// filters
 		Map<String, Object> filters = new HashMap<String, Object>();
 
-		
 		filters.put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, externalNetwork.ordinal());
 		Long ownerId = SearchKeys.generateOwnerId(userIdFilter);
 		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId);
 		
-		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
+		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters, SolrOperator.AND);
+	}
+	
+	/***
+	 * Searches documents for most popular within all networks and all private user data
+	 * 
+	 * @param searchTerm
+	 * @param userIdFilter
+	 * @param socialNetwork
+	 * @return
+	 */
+	public List<Document> searchIndexedDocumentsWithinAllProviders(String searchTerm, Long userIdFilter) {
 
+		// filters
+		Map<String, Object> filters = new HashMap<String, Object>();
+
+		List<Long> values = new LinkedList<Long>();
+		// private user data has owner id within all providers
+		Long ownerId = SearchKeys.generateOwnerId(userIdFilter);
+		values.add(ownerId);
+		
+		// most popular data has no owner within all providers
+		Long noOwner = SearchKeys.generateOwnerId(null);
+		values.add(noOwner);
+		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, values);
+		Integer resultsLimit = networkNumbers * networkLimit;
+		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters, SolrOperator.OR, SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, networkLimit, resultsLimit);
 	}
 	
 	
@@ -328,7 +425,7 @@ public class SearchService {
 		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId);
 
 
-		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters);
+		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters, SolrOperator.AND);
 	}
 
 	/***

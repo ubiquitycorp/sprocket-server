@@ -8,7 +8,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.ubiquity.content.domain.VideoContent;
+import com.ubiquity.integration.domain.VideoContent;
 
 @Entity
 @Table(name = "recommended_video")

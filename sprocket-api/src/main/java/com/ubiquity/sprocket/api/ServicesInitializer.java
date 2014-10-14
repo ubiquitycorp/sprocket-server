@@ -10,8 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
-import com.ubiquity.content.api.ContentAPIFactory;
-import com.ubiquity.social.api.SocialAPIFactory;
+import com.ubiquity.integration.api.ContentAPIFactory;
+import com.ubiquity.integration.api.SocialAPIFactory;
+import com.ubiquity.integration.api.PlaceAPIFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
@@ -62,7 +63,7 @@ public class ServicesInitializer implements ServletContextListener {
 			
 			SocialAPIFactory.initialize(configuration);
 			ContentAPIFactory.initialize(configuration);
-
+			PlaceAPIFactory.initialize(configuration);
 			bootstrap();
 		} catch (Exception e) {
 			log.error("Unable to initialize dependent services, exiting...", e);
@@ -70,26 +71,10 @@ public class ServicesInitializer implements ServletContextListener {
 		}
 	}
 
+	
 	private void bootstrap() {
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("Eureka, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("Chico, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("Sacramento, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("San Francisco, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("Oakland, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("San Jose, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("Santa Cruz, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("Monterey, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("Fresno, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("Bakersfield, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("San Luis Obispo, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("Santa Barbara, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("San Bernardino, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("Los Angeles, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("Long Beach, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("Palm Springs, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("Irvine, CA");
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("San Diego, CA");
+	
 		
-		ServiceFactory.getLocationService().getOrCreatePlaceByName("Alexandria, Egypt");
+		
 	}
 }

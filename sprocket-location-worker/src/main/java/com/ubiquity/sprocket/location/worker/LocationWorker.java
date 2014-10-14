@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.common.thread.ThreadPool;
 import com.niobium.repository.jpa.EntityManagerSupport;
+import com.ubiquity.integration.api.PlaceAPIFactory;
 import com.ubiquity.sprocket.location.worker.mq.consumer.LocationUpdateConsumer;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -83,6 +84,7 @@ public class LocationWorker {
 	private void startServices(Configuration configuration) throws IOException {
 		ServiceFactory.initialize(configuration, null); 
 		MessageQueueFactory.initialize(configuration);
+		PlaceAPIFactory.initialize(configuration);
 	}
 
 	private void stopServices() {

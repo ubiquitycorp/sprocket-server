@@ -2,12 +2,12 @@ package com.ubiquity.sprocket.service;
 
 import org.apache.commons.configuration.Configuration;
 
-import com.ubiquity.content.service.ContentService;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.identity.service.UserService;
-import com.ubiquity.social.service.ContactService;
-import com.ubiquity.external.service.ExternalIdentityService;
-import com.ubiquity.social.service.SocialService;
+import com.ubiquity.integration.service.ContactService;
+import com.ubiquity.integration.service.ContentService;
+import com.ubiquity.integration.service.ExternalIdentityService;
+import com.ubiquity.integration.service.SocialService;
 
 /***
  * Factory class returns a managers as singletons.
@@ -30,6 +30,7 @@ public class ServiceFactory {
 	private static ErrorsConfigurationService errorsConfigurationService;
 	private static EmailService emailService;
 	private static LocationService locationService;
+	private static FavoriteService favoriteService;
 	
 	/***
 	 * Initializes all services with the specified configuration
@@ -65,6 +66,17 @@ public class ServiceFactory {
 			locationService = new LocationService(configuration);
 		return locationService;
 	}
+	
+	/***
+	 * Returns location service 
+	 * @return
+	 */
+	public static FavoriteService getFavoriteService() {
+		if(favoriteService == null)
+			favoriteService = new FavoriteService(configuration);
+		return favoriteService;
+	}
+	
 	
 	/***
 	 * Returns content service
