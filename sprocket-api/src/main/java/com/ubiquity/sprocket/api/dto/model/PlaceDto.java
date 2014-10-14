@@ -17,7 +17,7 @@ public class PlaceDto {
 	private String externalIdentitifer;
 	private Integer externalNetworkId;
 	private AddressDto addressdto;
-	
+	private RatingDto ratingDto;
 	
 	
 	public Long getPlaceId() {
@@ -64,6 +64,10 @@ public class PlaceDto {
 		return addressdto;
 	}
 
+	public RatingDto getRatingDto() {
+		return ratingDto;
+	}
+
 	public static class Builder {
 		private Long placeId;
 		private String name;
@@ -75,6 +79,7 @@ public class PlaceDto {
 		private AddressDto addressdto;
 		private Long lastUpdated;
 		private PlaceDto parent;
+		private RatingDto ratingDto;
 		
 		public Builder placeId(Long placeId) {
 			this.placeId = placeId;
@@ -121,6 +126,11 @@ public class PlaceDto {
 			return this;
 		}
 		
+		public Builder ratingDto(RatingDto ratingDto) {
+			this.ratingDto = ratingDto;
+			return this;
+		}
+		
 		public Builder parent(PlaceDto parent){
 			this.parent = parent;
 			return this;
@@ -141,5 +151,6 @@ public class PlaceDto {
 		this.addressdto = builder.addressdto;
 		this.lastUpdated = builder.lastUpdated;
 		this.parent = builder.parent;
+		this.ratingDto = builder.ratingDto;
 	}
 }

@@ -12,13 +12,14 @@ import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ActivityType;
+import com.ubiquity.integration.domain.Address;
 import com.ubiquity.integration.domain.Category;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Interest;
 import com.ubiquity.integration.domain.Message;
+import com.ubiquity.integration.domain.Rating;
 import com.ubiquity.integration.domain.VideoContent;
-import com.ubiquity.integration.domain.Address;
 import com.ubiquity.location.domain.Geobox;
 import com.ubiquity.location.domain.Location;
 import com.ubiquity.location.domain.Place;
@@ -36,6 +37,7 @@ import com.ubiquity.sprocket.api.dto.model.InterestDto;
 import com.ubiquity.sprocket.api.dto.model.LocationDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 import com.ubiquity.sprocket.api.dto.model.PlaceDto;
+import com.ubiquity.sprocket.api.dto.model.RatingDto;
 import com.ubiquity.sprocket.api.dto.model.VideoDto;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchKeys;
@@ -144,18 +146,24 @@ public class DtoAssembler {
 				VideoContent videoContent = (VideoContent) document.getData();
 				data = assemble(videoContent);
 			} else {
-				Long ownerId = (Long) fields.get(SearchKeys.Fields.FIELD_OWNER_ID);
+				Long ownerId = (Long) fields
+						.get(SearchKeys.Fields.FIELD_OWNER_ID);
 				ownerId = ownerId == 0 ? null : ownerId;
 				data = new VideoDto.Builder()
-						.externalNetworkId((Integer)fields.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
+						.externalNetworkId(
+								(Integer) fields
+										.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
 						.itemKey(
-								(String) fields.get(SearchKeys.Fields.FIELD_ITEM_KEY))
-						.thumb(new ImageDto((String) fields.get(SearchKeys.Fields.FIELD_THUMBNAIL)))
-						.title((String) fields.get(SearchKeys.Fields.FIELD_TITLE))
+								(String) fields
+										.get(SearchKeys.Fields.FIELD_ITEM_KEY))
+						.thumb(new ImageDto((String) fields
+								.get(SearchKeys.Fields.FIELD_THUMBNAIL)))
+						.title((String) fields
+								.get(SearchKeys.Fields.FIELD_TITLE))
 						.description(
-								(String) fields.get(SearchKeys.Fields.FIELD_DESCRIPTION))
-						.ownerId(ownerId)
-						.build();
+								(String) fields
+										.get(SearchKeys.Fields.FIELD_DESCRIPTION))
+						.ownerId(ownerId).build();
 			}
 		} else if (dataType.equals(Message.class.getSimpleName())) {
 			Long ownerId = (Long) fields.get(SearchKeys.Fields.FIELD_OWNER_ID);
@@ -164,16 +172,18 @@ public class DtoAssembler {
 					.subject((String) fields.get(SearchKeys.Fields.FIELD_TITLE))
 					.date(System.currentTimeMillis())
 					.externalNetworkId(
-							(Integer) fields.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
+							(Integer) fields
+									.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
 					.body((String) fields.get(SearchKeys.Fields.FIELD_BODY))
-					.ownerId((Long) fields.get(SearchKeys.Fields.FIELD_OWNER_ID))
-					.sender(assembleContactDtoFromDocumentFields(fields)).build();
+					.ownerId(
+							(Long) fields.get(SearchKeys.Fields.FIELD_OWNER_ID))
+					.sender(assembleContactDtoFromDocumentFields(fields))
+					.build();
 			MessageDto topMessage = new MessageDto.Builder()
-				.externalNetworkId(message.getExternalNetworkId())
-				.lastMessageDate(message.getDate())
-				.ownerId(ownerId)
-				.build();
-				topMessage.getConversation().add(message);
+					.externalNetworkId(message.getExternalNetworkId())
+					.lastMessageDate(message.getDate()).ownerId(ownerId)
+					.build();
+			topMessage.getConversation().add(message);
 			data = topMessage;
 		} else if (dataType.equals(Activity.class.getSimpleName())) {
 			// if we have an object, build from the entity data
@@ -182,7 +192,8 @@ public class DtoAssembler {
 				data = assemble(activity);
 
 			} else {
-				Long ownerId = (Long) fields.get(SearchKeys.Fields.FIELD_OWNER_ID);
+				Long ownerId = (Long) fields
+						.get(SearchKeys.Fields.FIELD_OWNER_ID);
 				ownerId = ownerId == 0 ? null : ownerId;
 				ActivityDto.Builder builder = new ActivityDto.Builder()
 						.title((String) fields
@@ -226,16 +237,17 @@ public class DtoAssembler {
 				data = builder.build();
 			}
 
-		} else if (dataType.equals(Place.class.getSimpleName())){
+		} else if (dataType.equals(Place.class.getSimpleName())) {
 			Place place = (Place) document.getData();
 			PlaceDto placeDto = assemble(place);
 			data = placeDto;
-		}else {
+		} else {
 			throw new IllegalArgumentException("Unknown data type: " + dataType);
 		}
 
 		DocumentDto documentDto = new DocumentDto.Builder()
-				.rank((Integer) fields.get(SearchKeys.Fields.FIELD_CLICKS)).dataType(dataType).data(data).build();
+				.rank((Integer) fields.get(SearchKeys.Fields.FIELD_CLICKS))
+				.dataType(dataType).data(data).build();
 
 		return documentDto;
 	}
@@ -261,12 +273,12 @@ public class DtoAssembler {
 				.build();
 
 	}
-	public static IdentityDto assemble (ExternalIdentity identity)
-	{
-		return new IdentityDto.Builder()
-		.identifier(identity.getIdentifier())
-		.externalNetworkId(identity.getExternalNetwork()).build();
+
+	public static IdentityDto assemble(ExternalIdentity identity) {
+		return new IdentityDto.Builder().identifier(identity.getIdentifier())
+				.externalNetworkId(identity.getExternalNetwork()).build();
 	}
+
 	public static ContactDto assemble(Contact contact) {
 		ContactDto.Builder contactDtoBuilder = new ContactDto.Builder()
 				.contactId(contact.getContactId())
@@ -291,12 +303,12 @@ public class DtoAssembler {
 	public static VideoDto assemble(VideoContent videoContent) {
 		VideoDto.Builder videoBuilder = new VideoDto.Builder()
 				.externalNetworkId(videoContent.getExternalNetwork().ordinal());
-		
+
 		// add video category if exists
-		if(videoContent.getCategory() != null)
+		if (videoContent.getCategory() != null)
 			videoBuilder.category(videoContent.getCategory().getCategoryName());
-		
-		if(videoContent.getVideo() != null)
+
+		if (videoContent.getVideo() != null)
 			videoBuilder.itemKey(videoContent.getVideo().getItemKey());
 
 		if (videoContent.getThumb() != null)
@@ -394,19 +406,20 @@ public class DtoAssembler {
 		return activityDtoBuilder.build();
 
 	}
+
 	public static PlaceDto assembleCityOrNeighborhood(Place place) {
-		if(place == null)
+		if (place == null)
 			return null;
 		PlaceDto.Builder placeDtoBuilder = new PlaceDto.Builder();
 		placeDtoBuilder.placeId(place.getPlaceId())
-				.description(place.getDescription())
-				.region(place.getRegion())
+				.description(place.getDescription()).region(place.getRegion())
 				.name(place.getName())
 				.parent(assembleCityOrNeighborhood(place.getParent()));
 		return placeDtoBuilder.build();
 	}
+
 	public static PlaceDto assemble(Place place) {
-		if(place == null)
+		if (place == null)
 			return null;
 		PlaceDto.Builder placeDtoBuilder = new PlaceDto.Builder();
 		placeDtoBuilder.placeId(place.getPlaceId())
@@ -416,24 +429,35 @@ public class DtoAssembler {
 				.externalIdentitifer(place.getExternalIdentitifer())
 				.region(place.getRegion()).name(place.getName())
 				.network(place.getNetwork())
+				.ratingDto(assemble(place.getRating()))
 				.parent(assembleCityOrNeighborhood(place.getParent()));
 		return placeDtoBuilder.build();
 	}
 
+	public static RatingDto assemble(Rating rating) {
+		if (rating == null)
+			return null;
+		RatingDto.Builder ratingDtoBuilder = new RatingDto.Builder();
+		ratingDtoBuilder.max(rating.getMax()).min(rating.getMin())
+				.numRatings(rating.getNumRatings()).rating(rating.getRating());
+		return ratingDtoBuilder.build();
+	}
+
 	public static AddressDto assemble(Address address) {
-		if(address == null)
+		if (address == null)
 			return null;
 		AddressDto.Builder addressDtoBuilder = new AddressDto.Builder();
 		addressDtoBuilder.city(address.getCity()).country(address.getCountry())
 				.postalCode(address.getPostalCode())
 				.stateOrRegion(address.getStateOrRegion())
 				.streetName(address.getStreetName())
-				.unitName(address.getUnitName());
+				.unitName(address.getUnitName())
+				.displayPhone(address.getDisplayPhone());
 		return addressDtoBuilder.build();
 	}
 
 	public static GeoboxDto assemble(Geobox geobox) {
-		if(geobox == null)
+		if (geobox == null)
 			return null;
 		GeoboxDto.Builder geoboxDtoBuilder = new GeoboxDto.Builder();
 		geoboxDtoBuilder.center(assemble(geobox.getCenter()))
@@ -445,7 +469,7 @@ public class DtoAssembler {
 	}
 
 	public static LocationDto assemble(Location location) {
-		if(location == null)
+		if (location == null)
 			return null;
 		LocationDto.Builder locationDtoBuilder = new LocationDto.Builder();
 		locationDtoBuilder.altitude(location.getAltitude())
@@ -518,8 +542,9 @@ public class DtoAssembler {
 		return content;
 
 	}
+
 	public static Place assemble(PlaceDto placeDto) {
-		if(placeDto == null)
+		if (placeDto == null)
 			return null;
 		Place.Builder placeBuilder = new Place.Builder();
 		placeBuilder.placeId(placeDto.getPlaceId())
@@ -529,15 +554,19 @@ public class DtoAssembler {
 				.externalIdentifier(placeDto.getExternalIdentitifer())
 				.region(placeDto.getRegion()).name(placeDto.getName())
 				.parent(assemble(placeDto.getParent()));
-		if(placeDto.getExternalNetworkId() != null && placeDto.getExternalNetworkId() !=-1)
-			placeBuilder.externalNetwork(ExternalNetwork.getNetworkById(placeDto.getExternalNetworkId()));
+		if (placeDto.getExternalNetworkId() != null
+				&& placeDto.getExternalNetworkId() != -1)
+			placeBuilder.externalNetwork(ExternalNetwork
+					.getNetworkById(placeDto.getExternalNetworkId()));
 		return placeBuilder.build();
 
 	}
+
 	public static Address assemble(AddressDto addressdto) {
-		if(addressdto == null)
+		if (addressdto == null)
 			return null;
-		 return new Address.Builder().city(addressdto.getCity()).country(addressdto.getCountry())
+		return new Address.Builder().city(addressdto.getCity())
+				.country(addressdto.getCountry())
 				.postalCode(addressdto.getPostalCode())
 				.stateOrRegion(addressdto.getStateOrRegion())
 				.streetName(addressdto.getStreetName())
@@ -545,7 +574,7 @@ public class DtoAssembler {
 	}
 
 	public static Geobox assemble(GeoboxDto geoboxDto) {
-		if(geoboxDto == null)
+		if (geoboxDto == null)
 			return null;
 		return new Geobox.Builder().center(assemble(geoboxDto.getCenter()))
 				.lowerLeft(assemble(geoboxDto.getLowerLeft()))
@@ -553,8 +582,9 @@ public class DtoAssembler {
 				.upperLeft(assemble(geoboxDto.getUpperLeft()))
 				.upperRight(assemble(geoboxDto.getUpperRight())).build();
 	}
+
 	public static Location assemble(LocationDto locationDto) {
-		if(locationDto == null)
+		if (locationDto == null)
 			return null;
 		return new Location.Builder().altitude(locationDto.getAltitude())
 				.latitude(locationDto.getLatitude())
