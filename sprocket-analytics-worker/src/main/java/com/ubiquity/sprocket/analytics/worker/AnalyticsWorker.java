@@ -38,7 +38,7 @@ public class AnalyticsWorker {
 	
 	public void initialize(Configuration configuration, Configuration errorsConfiguration) throws SchedulerException, IOException {
 
-		startServices(configuration, errorsConfiguration);
+		startServices(configuration);
 
 		log.info("Service initialized.");
 
@@ -80,8 +80,8 @@ public class AnalyticsWorker {
 
 	}
 
-	private void startServices(Configuration configuration, Configuration errorsConfiguration) throws IOException {
-		ServiceFactory.initialize(configuration, errorsConfiguration);
+	private void startServices(Configuration configuration) throws IOException {
+		ServiceFactory.initialize(configuration);
 		JedisConnectionFactory.initialize(configuration);
 		MessageQueueFactory.initialize(configuration);
 	}

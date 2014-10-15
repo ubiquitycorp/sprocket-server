@@ -82,7 +82,7 @@ public class LocationWorker {
 	}
 
 	private void startServices(Configuration configuration) throws IOException {
-		ServiceFactory.initialize(configuration, null); 
+		ServiceFactory.initialize(configuration); 
 		MessageQueueFactory.initialize(configuration);
 		PlaceAPIFactory.initialize(configuration);
 	}

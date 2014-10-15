@@ -38,9 +38,8 @@ public class ServiceFactory {
 	 * 
 	 * @param configuration
 	 */
-	public static void initialize(Configuration config, Configuration errorsConfig) {
+	public static void initialize(Configuration config) {
 		configuration = config;
-		errorsConfiguration = errorsConfig;
 	}
 	
 	

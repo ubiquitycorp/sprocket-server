@@ -28,7 +28,7 @@ public class LocationServiceTest {
 		locationService = new LocationService(config);
 
 		JedisConnectionFactory.initialize(config);
-		ServiceFactory.initialize(config, null);
+		ServiceFactory.initialize(config);
 		PlaceAPIFactory.initialize(config);
 
 		
