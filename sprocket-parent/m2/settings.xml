@@ -84,12 +84,19 @@
 				<mq.host>localhost</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
+				<!-- xmpp configuration -->
 				<xmpp.host>localhost</xmpp.host>
 				<xmpp.port>5222</xmpp.port>
 				<xmpp.domain>localhost</xmpp.domain>
 				<xmpp.user>bot</xmpp.user>
 				<xmpp.password>sprocketusr</xmpp.password>
 				<xmpp.resource>sprocket9801</xmpp.resource>
+				<!-- mail configuration -->
+				<mail.host>email-smtp.us-west-2.amazonaws.com</mail.host>
+				<mail.port>465</mail.port>
+				<mail.from>no-reply\@sprocketlive.com</mail.from>
+				<mail.username>AKIAIBIMFN7QRWAVFV2A</mail.username>
+				<mail.password>AjJEA/pBTFxolvU0bO1ivVpRNeLoJM0KTh7yC7cBMTWA</mail.password>
 				<!-- recommendation engine -->
 				<recommendation.engine.appname>Sprocket
 				</recommendation.engine.appname>
@@ -194,6 +201,12 @@
 				<xmpp.user>bot</xmpp.user>
 				<xmpp.password>sprocketusr</xmpp.password>
 				<xmpp.resource>sprocket9801</xmpp.resource>
+				<!-- mail configuration -->
+				<mail.host>email-smtp.us-west-2.amazonaws.com</mail.host>
+				<mail.port>465</mail.port>
+				<mail.from>no-reply\@sprocketlive.com</mail.from>
+				<mail.username>AKIAIBIMFN7QRWAVFV2A</mail.username>
+				<mail.password>AjJEA/pBTFxolvU0bO1ivVpRNeLoJM0KTh7yC7cBMTWA</mail.password>
 				<!-- recommendation engine -->
 				<recommendation.engine.appname>Sprocket
 				</recommendation.engine.appname>
@@ -298,6 +311,12 @@
 				<xmpp.user>bot</xmpp.user>
 				<xmpp.password>sprocketusr</xmpp.password>
 				<xmpp.resource>sprocket9801</xmpp.resource>
+				<!-- mail configuration -->
+				<mail.host>email-smtp.us-west-2.amazonaws.com</mail.host>
+				<mail.port>465</mail.port>
+				<mail.from>no-reply\@sprocketlive.com</mail.from>
+				<mail.username>AKIAIBIMFN7QRWAVFV2A</mail.username>
+				<mail.password>AjJEA/pBTFxolvU0bO1ivVpRNeLoJM0KTh7yC7cBMTWA</mail.password>
 				<!-- recommendation engine -->
 				<recommendation.engine.appname>Sprocket
 				</recommendation.engine.appname>
