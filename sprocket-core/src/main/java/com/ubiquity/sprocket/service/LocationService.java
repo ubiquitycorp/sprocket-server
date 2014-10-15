@@ -8,7 +8,7 @@ import javax.persistence.NoResultException;
 import org.apache.commons.configuration.Configuration;
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
-import org.gavaghan.geodesy.GeodeticService;
+import org.gavaghan.geodesy.DistanceCalculator;
 import org.gavaghan.geodesy.GlobalPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -304,7 +304,7 @@ public class LocationService {
 			Double closestDistance = Double.MAX_VALUE;
 			for (Place place : places) {
 				Location center = place.getBoundingBox().getCenter();
-				double distance = GeodeticService.calculateGeodeticCurve(location, center);
+				double distance = DistanceCalculator.calculateGeodeticCurve(location, center);
 				//Distance between point A and point B
 				if (distance < closestDistance) {
 					closestDistance = distance;
