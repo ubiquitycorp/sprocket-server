@@ -40,6 +40,7 @@ import com.ubiquity.integration.domain.Network;
 import com.ubiquity.integration.domain.SocialToken;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.sprocket.api.DtoAssembler;
+import com.ubiquity.sprocket.api.dto.containers.IdentitiesDto;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.ExchangeTokenDto;
@@ -278,10 +279,10 @@ public class UsersEndpoint {
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		Set<Identity> identities = user.getIdentities();
-		List<IdentityDto> identitiesDto = new LinkedList<IdentityDto>();
+		IdentitiesDto identitiesDto = new IdentitiesDto();
 		for (Identity identity : identities) {
 			if(identity instanceof ExternalIdentity) {
-				identitiesDto.add(DtoAssembler.assemble((ExternalIdentity)identity));
+				identitiesDto.getIdentities().add(DtoAssembler.assemble((ExternalIdentity)identity));
 			}
 		}
 		return Response.ok()
