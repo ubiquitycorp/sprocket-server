@@ -414,6 +414,7 @@ public class DtoAssembler {
 		placeDtoBuilder.placeId(place.getPlaceId())
 				.description(place.getDescription()).region(place.getRegion())
 				.name(place.getName())
+				.boundingBox(assemble(place.getBoundingBox()))
 				.parent(assembleCityOrNeighborhood(place.getParent()));
 		return placeDtoBuilder.build();
 	}
@@ -431,6 +432,8 @@ public class DtoAssembler {
 				.network(place.getNetwork())
 				.ratingDto(assemble(place.getRating()))
 				.parent(assembleCityOrNeighborhood(place.getParent()));
+		if (place.getThumb()!=null)
+			placeDtoBuilder.thumb(new ImageDto(place.getThumb().getUrl()));
 		return placeDtoBuilder.build();
 	}
 
@@ -460,11 +463,7 @@ public class DtoAssembler {
 		if (geobox == null)
 			return null;
 		GeoboxDto.Builder geoboxDtoBuilder = new GeoboxDto.Builder();
-		geoboxDtoBuilder.center(assemble(geobox.getCenter()))
-				.lowerLeft(assemble(geobox.getLowerLeft()))
-				.lowerRight(assemble(geobox.getLowerRight()))
-				.upperLeft(assemble(geobox.getUpperLeft()))
-				.upperRight(assemble(geobox.getUpperRight()));
+		geoboxDtoBuilder.center(assemble(geobox.getCenter()));
 		return geoboxDtoBuilder.build();
 	}
 
@@ -558,6 +557,8 @@ public class DtoAssembler {
 				&& placeDto.getExternalNetworkId() != -1)
 			placeBuilder.externalNetwork(ExternalNetwork
 					.getNetworkById(placeDto.getExternalNetworkId()));
+		if (placeDto.getThumb()!=null)
+			placeBuilder.thumb(new Image(placeDto.getThumb().getUrl()));
 		return placeBuilder.build();
 
 	}

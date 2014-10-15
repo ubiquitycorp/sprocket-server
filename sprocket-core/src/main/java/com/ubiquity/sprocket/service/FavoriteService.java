@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.location.domain.Place;
+import com.ubiquity.sprocket.domain.FavoritePlace;
+import com.ubiquity.sprocket.repository.FavoritePlaceRepository;
 import com.ubiquity.sprocket.repository.FavoritePlaceRepositoryJpaImpl;
 
 public class FavoriteService {
@@ -38,5 +40,18 @@ public class FavoriteService {
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
+	}
+	
+	public FavoritePlace findOrCreate(FavoritePlace favPlace){
+		FavoritePlaceRepository favoritePlaceRepositoryJpaImpl =new FavoritePlaceRepositoryJpaImpl();
+		FavoritePlace temp = favoritePlaceRepositoryJpaImpl.getFavoritePlaceByUserIdAndBusinessId(favPlace.getUser().getUserId(),favPlace.getPlace().getExternalNetwork(),favPlace.getPlace().getPlaceId());
+		if(temp!= null)
+		{
+			EntityManagerSupport.beginTransaction();
+			favoritePlaceRepositoryJpaImpl.create(favPlace);
+			EntityManagerSupport.commit();
+			return favPlace;
+		}
+		return temp;
 	}
 }

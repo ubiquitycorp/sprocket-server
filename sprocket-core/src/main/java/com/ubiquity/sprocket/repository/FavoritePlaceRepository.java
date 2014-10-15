@@ -23,5 +23,14 @@ public interface FavoritePlaceRepository extends Repository <Long, FavoritePlace
 	 */
 	List<Place> getFavoritePlaceByUserIdAndPlaceId(Long userId,
 			ExternalNetwork externalNetwork, Long placeId);
+	/***
+	 * find favorite by bussniessId ,userId ,ExternalNetwork 
+	 * @param userId
+	 * @param externalNetwork
+	 * @param businessId
+	 * @return
+	 */
+	FavoritePlace getFavoritePlaceByUserIdAndBusinessId(Long userId,
+			ExternalNetwork externalNetwork, Long businessId);
 
 }
