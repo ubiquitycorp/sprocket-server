@@ -1,4 +1,4 @@
-package com.ubiquity.backchannel.worker;
+package com.ubiquity.sprocket.backchannel.worker;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -8,7 +8,7 @@ import org.apache.commons.configuration.Configuration;
 
 import com.niobium.common.thread.ThreadPool;
 import com.niobium.xmpp.XMPPConnector;
-import com.ubiquity.backchannel.worker.mq.consumer.BackChannelConsumer;
+import com.ubiquity.sprocket.backchannel.worker.mq.consumer.BackChannelConsumer;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 
 

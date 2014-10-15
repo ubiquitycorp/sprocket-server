@@ -1,4 +1,4 @@
-package com.ubiquity.backchannel.worker;
+package com.ubiquity.sprocket.backchannel.worker;
 
 import java.io.IOException;
 
