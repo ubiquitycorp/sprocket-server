@@ -3,6 +3,8 @@ package com.ubiquity.sprocket.repository;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 
 import com.niobium.repository.BaseRepositoryJpaImpl;
@@ -37,5 +39,25 @@ FavoritePlaceRepository {
 		query.setParameter("placeId", placeId);
 		query.setParameter("network", ExternalNetwork.ordinalOrDefault(externalNetwork));
 		return (List<Place>)query.getResultList();
+	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public FavoritePlace getFavoritePlaceByUserIdAndBusinessId(Long userId,
+			ExternalNetwork externalNetwork, Long businessId) {
+		Query query = getEntityManager().createQuery("select fp from FavoritePlace fp where fp.user.userId = :userId and fp.place.network =:network and fp.place.placeId = :placeId ");
+		query.setParameter("userId", userId);
+		query.setParameter("placeId", businessId);
+		query.setParameter("network", ExternalNetwork.ordinalOrDefault(externalNetwork));
+		try{
+			return (FavoritePlace)query.getSingleResult();
+		}
+		catch(NoResultException ex)
+		{
+			return null;
+		}
+		catch(NonUniqueResultException ex)
+		{
+			return ((List<FavoritePlace>)query.getResultList()).get(0);
+		}
 	}
 }

@@ -280,7 +280,7 @@ public class SearchService {
 				documents = wrapEntitiesInDocuments(places);
 			}
 			else{
-				throw new IllegalArgumentException("User doesn't set his locaion yet");
+				throw new IllegalArgumentException("User doesn't set his location yet");
 			}
 		}
 

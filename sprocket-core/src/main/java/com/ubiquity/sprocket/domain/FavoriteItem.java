@@ -25,6 +25,9 @@ public class FavoriteItem {
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
+	
+	@Column(name = "last_updated", nullable = false)
+	private Long lastUpdated;
 
 	protected FavoriteItem() {}
 	
@@ -32,15 +35,19 @@ public class FavoriteItem {
 	 * Parameterized constructor creates entity with required properties
 	 * @param user
 	 */
-	protected FavoriteItem(User user) {
+	protected FavoriteItem(User user,Long lastUpdated) {
 		this.user = user;
+		this.lastUpdated = lastUpdated;
 	}
 
 
 	public Long getFavoriteItemId() {
 		return favoriteItemId;
 	}
-
+	
+	public Long getLastUpdated() {
+		return lastUpdated;
+	}
 
 	public User getUser() {
 		return user;

@@ -18,6 +18,7 @@ public class PlaceDto {
 	private Integer externalNetworkId;
 	private AddressDto addressdto;
 	private RatingDto ratingDto;
+	private ImageDto thumb;
 	
 	
 	public Long getPlaceId() {
@@ -67,6 +68,10 @@ public class PlaceDto {
 	public RatingDto getRatingDto() {
 		return ratingDto;
 	}
+	
+	public ImageDto getThumb() {
+		return thumb;
+	}
 
 	public static class Builder {
 		private Long placeId;
@@ -80,6 +85,7 @@ public class PlaceDto {
 		private Long lastUpdated;
 		private PlaceDto parent;
 		private RatingDto ratingDto;
+		private ImageDto thumb;
 		
 		public Builder placeId(Long placeId) {
 			this.placeId = placeId;
@@ -135,6 +141,10 @@ public class PlaceDto {
 			this.parent = parent;
 			return this;
 		}
+		public Builder thumb(ImageDto thumb){
+			this.thumb= thumb;
+			return this;
+		}
 		public PlaceDto build() {
 			return new PlaceDto(this);
 		}
@@ -152,5 +162,6 @@ public class PlaceDto {
 		this.lastUpdated = builder.lastUpdated;
 		this.parent = builder.parent;
 		this.ratingDto = builder.ratingDto;
+		this.thumb = builder.thumb;
 	}
 }
