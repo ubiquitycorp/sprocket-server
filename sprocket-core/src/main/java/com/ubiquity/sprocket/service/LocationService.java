@@ -204,56 +204,43 @@ public class LocationService {
 
 			try {
 
+				int processed = 0;
 				PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
 				List<Place> places = placeRepository.findLastLevelWithoutNetwork(); // gets all neighborhoods
 				for(Place neighborhood : places) {
+					if(!neighborhood.getParent().getLocator().contains(", CA"))
+						continue;
 					
-					// make sure we don't already have children
-					if(!placeRepository.findChildrenForPlace(neighborhood).isEmpty()) {
-						log.info("skipping {} because we already processed it", neighborhood);
-						continue;
-					}
-					log.info("looking for yelp stuff in {}", neighborhood);
-
-					// skip cities
-					Place city = neighborhood.getParent();
-					if(city == null)
-						continue;
-
-					List<Place> businesses;
-
-					Integer page = 0;
-					Boolean paging = Boolean.TRUE;
-					try {
-						do {
-							page++;
-							businesses = placeAPI.searchPlacesWithinPlace("", neighborhood, null, page, 20);
-							for(Place business : businesses) {
-								log.info("business {}", business.getName());
-								Place persisted = placeRepository.getByLocatorAndExternalNetwork(business.getLocator(), network);
-								if(persisted == null) {
-
-									// for now just set city
-									business.setBoundingBox(city.getBoundingBox());
-									business.setParent(neighborhood);
-									if(!business.getTags().isEmpty()) {
-										List<ExternalInterest> mappings = new ExternalInterestRepositoryJpaImpl().findByNamesAndExternalNetwork(business.getTags(), network);
-										for(ExternalInterest mapping : mappings) {
-											business.getInterests().add(mapping.getInterest());
-										}
-									}
-
-									create(business);
-
-								} else {
-									log.info("we already have this business {}, skipping...", persisted.getName());
+					log.info("Synchronizing neighborhood {}", neighborhood.getName());
+					List<Place> businesses = placeRepository.findChildrenForPlace(neighborhood);
+					for(Place business : businesses) {
+							
+						log.info("Synchronizing {}", business.getName());
+						processed++;
+						try {
+							Place place = placeAPI.getPlaceByExternalIdentifier(business.getExternalIdentifier());
+							if(!place.getTags().isEmpty()) {
+								// clear out tags in business
+								List<ExternalInterest> mappings = new ExternalInterestRepositoryJpaImpl().findByNamesAndExternalNetwork(place.getTags(), network);
+								for(ExternalInterest mapping : mappings) {
+									// interests hashcode/equals is set to interest id, so dupes won't be added, but this will effectively update the interest collection
+									place.getInterests().add(mapping.getInterest());
 								}
 							}
-						} while (paging);
-					} catch (ExternalNetworkException e) {
-						log.warn("Search produced an error", null, e);
-						paging = Boolean.FALSE;
+							// update the place with location data that we've derived or augmented
+							place.setPlaceId(business.getPlaceId());
+							place.setParent(neighborhood);
+														
+							updatePlace(place);
+						} catch (Exception e) {
+							log.warn("Skipping: {}", business.getName(), e);
+						}
+					
+
 					}
+
+					log.info("processed {}", processed);
+
 				}
 
 			} finally {
