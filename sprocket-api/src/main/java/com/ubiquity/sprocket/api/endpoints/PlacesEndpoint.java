@@ -24,7 +24,7 @@ import com.ubiquity.location.domain.Place;
 import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.PlacesDto;
-import com.ubiquity.sprocket.api.dto.model.LocationDto;
+import com.ubiquity.sprocket.api.dto.model.GeoboxDto;
 import com.ubiquity.sprocket.api.dto.model.PlaceDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.PlaceLocationUpdateValidation;
@@ -228,12 +228,12 @@ public class PlacesEndpoint {
 	public Response postUpdatePlace(@PathParam("userId") Long userId,
 			@PathParam("placeId") Long placeId, InputStream payload)
 			throws IOException {
-		LocationDto locationDto = jsonConverter.convertFromPayload(payload,
-				LocationDto.class, PlaceLocationUpdateValidation.class);
+		GeoboxDto geoDto = jsonConverter.convertFromPayload(payload,
+				GeoboxDto.class, PlaceLocationUpdateValidation.class);
 
 		Place place = ServiceFactory.getLocationService().getPlaceByID(placeId);
 		if (place != null)
-			sendTrackAndSyncMessage(placeId, locationDto);
+			sendTrackAndSyncMessage(placeId, geoDto);
 		return Response.ok().build();
 	}
 
@@ -258,13 +258,12 @@ public class PlacesEndpoint {
 		MessageQueueFactory.getCacheInvalidationQueueProducer().write(bytes);
 	}
 
-	private void sendTrackAndSyncMessage(long placeId, LocationDto locationDto)
+	private void sendTrackAndSyncMessage(long placeId, GeoboxDto geoboxDto)
 			throws IOException {
 
 		PlaceLocationUpdated messageContent = new PlaceLocationUpdated.Builder()
-				.placeId(placeId).longitude(locationDto.getLongitude())
-				.latitude(locationDto.getLatitude())
-				.altitude(locationDto.getAltitude()).build();
+				.placeId(placeId)
+				.geobox(DtoAssembler.assemble(geoboxDto)).build();
 		String message = MessageConverterFactory.getMessageConverter()
 				.serialize(
 						new com.ubiquity.messaging.format.Message(
