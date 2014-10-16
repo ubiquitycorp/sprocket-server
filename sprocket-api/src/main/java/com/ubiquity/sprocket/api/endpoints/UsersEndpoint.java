@@ -2,7 +2,6 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -542,10 +541,11 @@ public class UsersEndpoint {
 			.longitude(locationDto.getLongitude())
 			.altitude(locationDto.getAltitude())
 		.build();
-
+		
 		// serialize and send it
 		String message = MessageConverterFactory.getMessageConverter()
 				.serialize(new Message(content));
+		log.info("message send to worker: {}", message);
 		MessageQueueFactory.getLocationQueueProducer().write(
 				message.getBytes());
 	}

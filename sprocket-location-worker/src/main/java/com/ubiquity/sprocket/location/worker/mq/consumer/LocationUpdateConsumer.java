@@ -32,7 +32,7 @@ public class LocationUpdateConsumer extends AbstractConsumerThread {
 		// Currently just automatically fan these out to all parties
 		try {
 			Message message = messageConverter.deserialize(msg, Message.class);
-			log.debug("message received: {}", message);
+			log.info("message received: {}", message);
 			if(message.getType().equals(
 					LocationUpdated.class.getSimpleName()))
 				process((LocationUpdated) message.getContent());
@@ -57,13 +57,14 @@ public class LocationUpdateConsumer extends AbstractConsumerThread {
 			.horizontalAccuracy(locationUpdated.getHorizontalAccuracy())
 			.verticalAccuracy(locationUpdated.getVerticalAccuracy())
 			.build();
-		
+		log.info("getting user{} nearest neigborhood: ", locationUpdated.getUserId());
 		// Get nearest place to the new user's location
 		Place nearestPlace = ServiceFactory.getLocationService().getClosestNeighborhoodIsWithin(userLocation.getLocation());
 		userLocation.setNearestPlace(nearestPlace);
 		
 		// this will update the user's location in the SQL data store
 		ServiceFactory.getLocationService().updateLocation(userLocation);
+		log.info("user{} location updated: ", locationUpdated.getUserId());
 	
 	}
 
