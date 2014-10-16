@@ -1,4 +1,4 @@
-package com.ubiquity.backchannel.worker.mq.consumer;
+package com.ubiquity.sprocket.backchannel.worker.mq.consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
