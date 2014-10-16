@@ -430,6 +430,7 @@ public class DtoAssembler {
 				.externalIdentitifer(place.getExternalIdentitifer())
 				.region(place.getRegion()).name(place.getName())
 				.network(place.getNetwork())
+				.locator(place.getLocator())
 				.ratingDto(assemble(place.getRating()))
 				.parent(assembleCityOrNeighborhood(place.getParent()));
 		if (place.getThumb()!=null)
@@ -552,7 +553,8 @@ public class DtoAssembler {
 				.boundingBox(assemble(placeDto.getBoundingBox()))
 				.externalIdentifier(placeDto.getExternalIdentitifer())
 				.region(placeDto.getRegion()).name(placeDto.getName())
-				.parent(assemble(placeDto.getParent()));
+				.parent(assemble(placeDto.getParent()))
+				.locator(placeDto.getLocator());
 		if (placeDto.getExternalNetworkId() != null
 				&& placeDto.getExternalNetworkId() != -1)
 			placeBuilder.externalNetwork(ExternalNetwork

@@ -68,9 +68,13 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		place = ServiceFactory.getLocationService().findOrCreate(place);
 		User user = ServiceFactory.getUserService().getUserById(favoritePlace.getUserId());
 		FavoritePlace favPlace = new FavoritePlace(user,favoritePlace.getPlace(),System.currentTimeMillis());
-		EntityManagerSupport.beginTransaction();
-		new FavoritePlaceRepositoryJpaImpl().create(favPlace);
-		EntityManagerSupport.commit();
+		FavoritePlace favoritePlace2 = new FavoritePlaceRepositoryJpaImpl().getFavoritePlaceByUserIdAndBusinessId(favoritePlace.getUserId(), favoritePlace.getPlace().getExternalNetwork(), favoritePlace.getPlace().getPlaceId());
+		if(favoritePlace2 == null)
+		{
+			EntityManagerSupport.beginTransaction();
+			new FavoritePlaceRepositoryJpaImpl().create(favPlace);
+			EntityManagerSupport.commit();
+		}
 		
 	}
 	private void process(UserEngagedDocument engagedDocument) {

@@ -458,5 +458,13 @@ public class LocationService {
 		}
 		return place;
 	}
+	/***
+	 * 
+	 * @param placeID
+	 * @return
+	 */
+	public Place getPlaceByID(long placeID){
+		return new PlaceRepositoryJpaImpl().read(placeID);
+	}
 
 }

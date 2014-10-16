@@ -50,8 +50,10 @@ import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.AuthorizationValidation;
+import com.ubiquity.sprocket.api.validation.PlaceLocationUpdateValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
 import com.ubiquity.sprocket.api.validation.ResetValidation;
+import com.ubiquity.sprocket.api.validation.UserLocationUpdateValidation;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 //import com.ubiquity.sprocket.messaging.definition.EventTracked;
@@ -507,7 +509,7 @@ public class UsersEndpoint {
 	public Response setLocation(@PathParam("userId") Long userId,
 			InputStream payload) throws IOException {
 		
-		LocationDto locationDto = jsonConverter.convertFromPayload(payload,LocationDto.class);
+		LocationDto locationDto = jsonConverter.convertFromPayload(payload,LocationDto.class,UserLocationUpdateValidation.class);
 		
 		sendLocationMessage(userId, locationDto);
 		
