@@ -74,6 +74,7 @@ public class LocationService {
 	 */
 	public void updatePlace(Place place) {
 		try {
+			place.ensureDefaults(); // needed when updating
 			EntityManagerSupport.beginTransaction();
 			new PlaceRepositoryJpaImpl().update(place);
 			EntityManagerSupport.commit();
@@ -230,7 +231,8 @@ public class LocationService {
 							// update the place with location data that we've derived or augmented
 							place.setPlaceId(business.getPlaceId());
 							place.setParent(neighborhood);
-														
+							place.setBoundingBox(null);
+							place.setLastUpdated(System.currentTimeMillis());
 							updatePlace(place);
 						} catch (Exception e) {
 							log.warn("Skipping: {}", business.getName(), e);
