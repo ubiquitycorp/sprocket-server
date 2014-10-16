@@ -19,6 +19,7 @@ public class PlaceDto {
 	private AddressDto addressdto;
 	private RatingDto ratingDto;
 	private ImageDto thumb;
+	private String locator;
 	
 	
 	public Long getPlaceId() {
@@ -72,7 +73,11 @@ public class PlaceDto {
 	public ImageDto getThumb() {
 		return thumb;
 	}
-
+	
+	public String getLocator() {
+		return locator;
+	}
+	
 	public static class Builder {
 		private Long placeId;
 		private String name;
@@ -86,6 +91,7 @@ public class PlaceDto {
 		private PlaceDto parent;
 		private RatingDto ratingDto;
 		private ImageDto thumb;
+		private String locator;
 		
 		public Builder placeId(Long placeId) {
 			this.placeId = placeId;
@@ -145,6 +151,10 @@ public class PlaceDto {
 			this.thumb= thumb;
 			return this;
 		}
+		public Builder locator(String locator){
+			this.locator= locator;
+			return this;
+		}
 		public PlaceDto build() {
 			return new PlaceDto(this);
 		}
@@ -163,5 +173,6 @@ public class PlaceDto {
 		this.parent = builder.parent;
 		this.ratingDto = builder.ratingDto;
 		this.thumb = builder.thumb;
+		this.locator = builder.locator;
 	}
 }

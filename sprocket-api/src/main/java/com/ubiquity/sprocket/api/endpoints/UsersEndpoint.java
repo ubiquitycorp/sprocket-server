@@ -2,7 +2,6 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -51,8 +50,10 @@ import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.AuthorizationValidation;
+import com.ubiquity.sprocket.api.validation.PlaceLocationUpdateValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
 import com.ubiquity.sprocket.api.validation.ResetValidation;
+import com.ubiquity.sprocket.api.validation.UserLocationUpdateValidation;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 //import com.ubiquity.sprocket.messaging.definition.EventTracked;
@@ -508,7 +509,7 @@ public class UsersEndpoint {
 	public Response setLocation(@PathParam("userId") Long userId,
 			InputStream payload) throws IOException {
 		
-		LocationDto locationDto = jsonConverter.convertFromPayload(payload,LocationDto.class);
+		LocationDto locationDto = jsonConverter.convertFromPayload(payload,LocationDto.class,UserLocationUpdateValidation.class);
 		
 		sendLocationMessage(userId, locationDto);
 		
@@ -542,10 +543,11 @@ public class UsersEndpoint {
 			.longitude(locationDto.getLongitude())
 			.altitude(locationDto.getAltitude())
 		.build();
-
+		
 		// serialize and send it
 		String message = MessageConverterFactory.getMessageConverter()
 				.serialize(new Message(content));
+		log.info("message send to worker: {}", message);
 		MessageQueueFactory.getLocationQueueProducer().write(
 				message.getBytes());
 	}
