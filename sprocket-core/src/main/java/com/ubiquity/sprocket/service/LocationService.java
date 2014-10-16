@@ -264,7 +264,6 @@ public class LocationService {
 		return null;
 	}
 
-		PlaceAPI placeAPI = PlaceAPIFactory.createProvider(ExternalNetwork.Yelp, null);
 	/**
 	 * Returns place with the center point closest to this location
 	 * 
