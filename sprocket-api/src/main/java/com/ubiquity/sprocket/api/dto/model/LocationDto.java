@@ -4,10 +4,7 @@ import java.math.BigDecimal;
 
 import javax.validation.constraints.NotNull;
 
-import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.PlaceLocationUpdateValidation;
-import com.ubiquity.sprocket.api.validation.RegistrationValidation;
-import com.ubiquity.sprocket.api.validation.ResetValidation;
 import com.ubiquity.sprocket.api.validation.UserLocationUpdateValidation;
 /***
  * 

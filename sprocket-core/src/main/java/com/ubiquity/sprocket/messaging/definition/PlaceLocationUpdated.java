@@ -2,55 +2,34 @@ package com.ubiquity.sprocket.messaging.definition;
 
 import java.math.BigDecimal;
 
+import com.ubiquity.location.domain.Geobox;
+import com.ubiquity.location.domain.Location;
+
+
 public class PlaceLocationUpdated {
 	private Long placeId;
 
-	private BigDecimal latitude;
+	private Geobox geobox ;
 
-	private BigDecimal longitude;
-
-	private BigDecimal altitude;
-
-	
 	public Long getPlaceId() {
 		return placeId;
 	}
 
-	public BigDecimal getLatitude() {
-		return latitude;
-	}
-
-	public BigDecimal getLongitude() {
-		return longitude;
-	}
-
-	public BigDecimal getAltitude() {
-		return altitude;
+	public Geobox getGeobox() {
+		return geobox;
 	}
 
 	public static class Builder {
 		private Long placeId;
-		private BigDecimal latitude;
-		private BigDecimal longitude;
-		private BigDecimal altitude;
+		private Geobox geobox;
 
 		public Builder placeId(Long placeId) {
 			this.placeId = placeId;
 			return this;
 		}
 
-		public Builder latitude(BigDecimal latitude) {
-			this.latitude = latitude;
-			return this;
-		}
-
-		public Builder longitude(BigDecimal longitude) {
-			this.longitude = longitude;
-			return this;
-		}
-
-		public Builder altitude(BigDecimal altitude) {
-			this.altitude = altitude;
+		public Builder geobox(Geobox geobox) {
+			this.geobox = geobox;
 			return this;
 		}
 
@@ -61,8 +40,6 @@ public class PlaceLocationUpdated {
 
 	private PlaceLocationUpdated(Builder builder) {
 		this.placeId = builder.placeId;
-		this.latitude = builder.latitude;
-		this.longitude = builder.longitude;
-		this.altitude = builder.altitude;
+		this.geobox = builder.geobox;
 	}
 }
