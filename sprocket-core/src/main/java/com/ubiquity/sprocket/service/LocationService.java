@@ -6,9 +6,9 @@ import java.util.List;
 import javax.persistence.NoResultException;
 
 import org.apache.commons.configuration.Configuration;
+import org.gavaghan.geodesy.DistanceCalculator;
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
-import org.gavaghan.geodesy.DistanceCalculator;
 import org.gavaghan.geodesy.GlobalPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,6 @@ import com.niobium.repository.cache.DataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.integration.api.PlaceAPI;
 import com.ubiquity.integration.api.PlaceAPIFactory;
-import com.ubiquity.integration.api.exception.ExternalNetworkException;
 import com.ubiquity.integration.domain.ExternalInterest;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.repository.ExternalInterestRepository;
