@@ -546,8 +546,10 @@ public class UsersEndpoint {
 		// serialize and send it
 		String message = MessageConverterFactory.getMessageConverter()
 				.serialize(new Message(content));
+		
 		MessageQueueFactory.getLocationQueueProducer().write(
 				message.getBytes());
+		log.info("message sent: {}", message);
 	}
 	
 

@@ -74,6 +74,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			EntityManagerSupport.beginTransaction();
 			new FavoritePlaceRepositoryJpaImpl().create(favPlace);
 			EntityManagerSupport.commit();
+			ServiceFactory.getFavoriteService().setFavoritePlaceCache(user.getUserId(), favoritePlace.getPlace().getExternalNetwork(), favoritePlace.getPlace().getParent().getPlaceId());
 		}
 		
 	}

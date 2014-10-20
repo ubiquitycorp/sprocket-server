@@ -132,20 +132,24 @@ public class PlacesEndpoint {
 	public Response favoritesByOwnerAndProvider(
 			@PathParam("userId") Long userId,
 			@PathParam("providerId") Integer socialProviderId,
-			@QueryParam("interestId") Long interestId) throws IOException {
+			@QueryParam("interestId") Long interestId,
+			@HeaderParam("delta") Boolean delta,
+			@HeaderParam("If-Modified-Since") Long ifModifiedSince)
+			throws IOException {
 
 		PlacesDto results = new PlacesDto();
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(socialProviderId);
-		List<Place> places = ServiceFactory.getFavoriteService()
-				.getFavoritePlacesByOwnerIdandProvider(userId, externalNetwork);
-
-		for (Place place : places) {
+		CollectionVariant<Place> places = ServiceFactory.getFavoriteService()
+				.getFavoritePlacesByOwnerIdandProvider(userId, externalNetwork,
+						ifModifiedSince, delta);
+		if (places == null)
+			return Response.notModified().build();
+		for (Place place : places.collection) {
 			results.getPlaces().add(DtoAssembler.assemble(place));
 		}
 
-		return Response.ok()
-		// .header("Last-Modified", places.lastModified)
+		return Response.ok().header("Last-Modified", places.lastModified)
 				.entity(jsonConverter.convertToPayload(results)).build();
 	}
 
@@ -157,21 +161,24 @@ public class PlacesEndpoint {
 			@PathParam("userId") Long userId,
 			@PathParam("providerId") Integer socialProviderId,
 			@PathParam("placeId") Long placeId,
-			@QueryParam("interestId") Long interestId) throws IOException {
+			@QueryParam("interestId") Long interestId,
+			@HeaderParam("delta") Boolean delta,
+			@HeaderParam("If-Modified-Since") Long ifModifiedSince)
+			throws IOException {
 
 		PlacesDto results = new PlacesDto();
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(socialProviderId);
-		List<Place> places = ServiceFactory.getFavoriteService()
+		CollectionVariant<Place> places = ServiceFactory.getFavoriteService()
 				.getFavoritePlacesByOwnerIdandProviderAndPlaceId(userId,
-						externalNetwork, placeId);
-
-		for (Place place : places) {
+						externalNetwork, placeId, ifModifiedSince, delta);
+		if (places == null)
+			return Response.notModified().build();
+		for (Place place : places.collection) {
 			results.getPlaces().add(DtoAssembler.assemble(place));
 		}
 
-		return Response.ok()
-		// .header("Last-Modified", places.lastModified)
+		return Response.ok().header("Last-Modified", places.lastModified)
 				.entity(jsonConverter.convertToPayload(results)).build();
 	}
 
@@ -182,7 +189,10 @@ public class PlacesEndpoint {
 	public Response favoritesByOwnerAndProviderAndCurrent(
 			@PathParam("userId") Long userId,
 			@PathParam("providerId") Integer socialProviderId,
-			@QueryParam("interestId") Long interestId) throws IOException {
+			@QueryParam("interestId") Long interestId,
+			@HeaderParam("delta") Boolean delta,
+			@HeaderParam("If-Modified-Since") Long ifModifiedSince)
+			throws IOException {
 		UserLocation userLocation = ServiceFactory.getLocationService()
 				.getLocation(userId);
 		if (userLocation == null)
@@ -191,17 +201,18 @@ public class PlacesEndpoint {
 		PlacesDto results = new PlacesDto();
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(socialProviderId);
-		List<Place> places = ServiceFactory.getFavoriteService()
+		CollectionVariant<Place> places = ServiceFactory.getFavoriteService()
 				.getFavoritePlacesByOwnerIdandProviderAndPlaceId(userId,
 						externalNetwork,
-						userLocation.getNearestPlace().getPlaceId());
-
-		for (Place place : places) {
+						userLocation.getNearestPlace().getPlaceId(),
+						ifModifiedSince, delta);
+		if (places == null)
+			return Response.notModified().build();
+		for (Place place : places.collection) {
 			results.getPlaces().add(DtoAssembler.assemble(place));
 		}
 
-		return Response.ok()
-		// .header("Last-Modified", places.lastModified)
+		return Response.ok().header("Last-Modified", places.lastModified)
 				.entity(jsonConverter.convertToPayload(results)).build();
 	}
 
@@ -262,8 +273,8 @@ public class PlacesEndpoint {
 			throws IOException {
 
 		PlaceLocationUpdated messageContent = new PlaceLocationUpdated.Builder()
-				.placeId(placeId)
-				.geobox(DtoAssembler.assemble(geoboxDto)).build();
+				.placeId(placeId).geobox(DtoAssembler.assemble(geoboxDto))
+				.build();
 		String message = MessageConverterFactory.getMessageConverter()
 				.serialize(
 						new com.ubiquity.messaging.format.Message(

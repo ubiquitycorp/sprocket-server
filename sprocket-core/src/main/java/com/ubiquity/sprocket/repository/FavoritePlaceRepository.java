@@ -15,6 +15,15 @@ public interface FavoritePlaceRepository extends Repository <Long, FavoritePlace
 	 */
 	List<Place> getFavoritePlaceByUserId(Long userId ,ExternalNetwork externalNetwork);
 	/***
+	 * selects modified favorite Places by userId and ExternalNetwork
+	 * @param userId
+	 * @param externalNetwork
+	 * @param modifiedSince
+	 * @return
+	 */
+	List<Place> getFavoritePlaceByUserIdAndModifiedSince(Long userId,
+			ExternalNetwork externalNetwork, Long modifiedSince);
+	/***
 	 * selects favorite Places by userId , ExternalNetwork and placeID
 	 * @param userId
 	 * @param externalNetwork
@@ -24,6 +33,16 @@ public interface FavoritePlaceRepository extends Repository <Long, FavoritePlace
 	List<Place> getFavoritePlaceByUserIdAndPlaceId(Long userId,
 			ExternalNetwork externalNetwork, Long placeId);
 	/***
+	 * selects modified favorite Places by userId , ExternalNetwork and placeID
+	 * @param userId
+	 * @param externalNetwork
+	 * @param placeId
+	 * @param modifiedSince
+	 * @return
+	 */
+	List<Place> getFavoritePlaceByUserIdAndPlaceIdAndModifiedSince(Long userId,
+			ExternalNetwork externalNetwork, Long placeId, Long modifiedSince);
+	/***
 	 * find favorite by bussniessId ,userId ,ExternalNetwork 
 	 * @param userId
 	 * @param externalNetwork
@@ -32,5 +51,5 @@ public interface FavoritePlaceRepository extends Repository <Long, FavoritePlace
 	 */
 	FavoritePlace getFavoritePlaceByUserIdAndBusinessId(Long userId,
 			ExternalNetwork externalNetwork, Long businessId);
-
+	
 }
