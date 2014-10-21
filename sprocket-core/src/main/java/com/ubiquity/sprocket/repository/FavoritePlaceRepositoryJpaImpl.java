@@ -32,6 +32,16 @@ FavoritePlaceRepository {
 	}
 	@SuppressWarnings("unchecked")
 	@Override
+	public List<Place> getFavoritePlaceByUserIdAndModifiedSince(Long userId,ExternalNetwork externalNetwork, Long modifiedSince) {
+		Query query = getEntityManager().createQuery("select fp.place from FavoritePlace fp where fp.user.userId = :userId and fp.place.network =:network and fp.lastUpdated >:modifiedSince");
+		query.setParameter("userId", userId);
+		query.setParameter("network", ExternalNetwork.ordinalOrDefault(externalNetwork));
+		query.setParameter("modifiedSince", modifiedSince);
+		return (List<Place>)query.getResultList();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
 	public List<Place> getFavoritePlaceByUserIdAndPlaceId(Long userId,
 			ExternalNetwork externalNetwork, Long placeId) {
 		Query query = getEntityManager().createQuery("select fp.place from FavoritePlace fp inner join fp.place.parent as neighborhood inner join neighborhood.parent as city where fp.user.userId = :userId and fp.place.network =:network and (neighborhood.placeId = :placeId or city.placeId = :placeId )");
@@ -40,6 +50,18 @@ FavoritePlaceRepository {
 		query.setParameter("network", ExternalNetwork.ordinalOrDefault(externalNetwork));
 		return (List<Place>)query.getResultList();
 	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Place> getFavoritePlaceByUserIdAndPlaceIdAndModifiedSince(Long userId,
+			ExternalNetwork externalNetwork, Long placeId, Long modifiedSince) {
+		Query query = getEntityManager().createQuery("select fp.place from FavoritePlace fp inner join fp.place.parent as neighborhood inner join neighborhood.parent as city where fp.user.userId = :userId and fp.place.network =:network and fp.lastUpdated >:modifiedSince and (neighborhood.placeId = :placeId or city.placeId = :placeId )");
+		query.setParameter("userId", userId);
+		query.setParameter("placeId", placeId);
+		query.setParameter("network", ExternalNetwork.ordinalOrDefault(externalNetwork));
+		query.setParameter("modifiedSince", modifiedSince);
+		return (List<Place>)query.getResultList();
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public FavoritePlace getFavoritePlaceByUserIdAndBusinessId(Long userId,

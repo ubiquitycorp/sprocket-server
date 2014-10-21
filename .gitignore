@@ -23,3 +23,4 @@ sprocket-api/bin
 /sprocket-backchannel-worker\target\classes/backchannelworker.properties
 /sprocket-backchannel-worker\target\classes\com\ubiquity\backchannel\worker/.DS_Store
 /sprocket-backchannel-worker\target\classes/logback.xml
+/sprocket-backchannel-worker\.settings/*.prefs
