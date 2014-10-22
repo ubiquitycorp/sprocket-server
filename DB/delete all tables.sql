@@ -5,6 +5,7 @@ delete from activity_interests;
 #delete i from interest as i inner join interest as i2 on i2.interest_id = i.parent_id where i2.parent_id is not null;
 #delete from interest where parent_id is not null;
 #delete from interest ;
+delete from favorite_item;
 #recommended
 delete from recommended_activity;
 delete from recommended_video;
