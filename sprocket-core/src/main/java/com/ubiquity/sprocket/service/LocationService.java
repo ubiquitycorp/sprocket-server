@@ -74,7 +74,7 @@ public class LocationService {
 	public void updatePlace(Place place) {
 		try {
 			place.setLastUpdated(System.currentTimeMillis());
-			place.ensureDefaults(); // needed when updating
+			///place.ensureDefaults(); // needed when updating
 			EntityManagerSupport.beginTransaction();
 			new PlaceRepositoryJpaImpl().update(place);
 			EntityManagerSupport.commit();
