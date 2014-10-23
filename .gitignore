@@ -25,3 +25,4 @@ sprocket-api/bin
 /sprocket-backchannel-worker\target\classes/logback.xml
 /sprocket-backchannel-worker\.settings/*.prefs
 /sprocket-backchannel-worker\.settings/*.prefs
+/sprocket-backchannel-worker\.settings/*.prefs
