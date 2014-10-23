@@ -212,8 +212,8 @@ public class DatabaseSeed {
 		try {
 			loader.initialize(new PropertiesConfiguration("tools.properties"));
 			//loader.seedPlacesFromNeighborhoodsFeed();
-			loader.seedInterests();
-			//loader.goober();
+			//loader.seedInterests();
+			loader.goober();
 		} catch (ConfigurationException e) {
 			log.error("Unable to configure service", e);
 			System.exit(-1);

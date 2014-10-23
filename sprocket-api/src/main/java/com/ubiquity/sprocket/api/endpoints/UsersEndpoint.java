@@ -39,7 +39,6 @@ import com.ubiquity.integration.domain.Network;
 import com.ubiquity.integration.domain.SocialToken;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.sprocket.api.DtoAssembler;
-import com.ubiquity.sprocket.api.dto.containers.ContactsDto;
 import com.ubiquity.sprocket.api.dto.containers.IdentitiesDto;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
@@ -278,14 +277,16 @@ public class UsersEndpoint {
 	public Response getIdentities(@PathParam("userId") Long userId) throws IOException {
 
 		// load user
-		List<Contact> contacts = ServiceFactory.getContactService().findAllContactByUserIdentities(userId);
-
-		ContactsDto contactsDto = new ContactsDto();
-		for (Contact contact : contacts) {
-			contactsDto.getContacts().add(DtoAssembler.assemble(contact));
+		User user = ServiceFactory.getUserService().getUserById(userId);
+		Set<Identity> identities = user.getIdentities();
+		IdentitiesDto identitiesDto = new IdentitiesDto();
+		for (Identity identity : identities) {
+			if(identity instanceof ExternalIdentity) {
+				identitiesDto.getIdentities().add(DtoAssembler.assemble((ExternalIdentity)identity));
+			}
 		}
 		return Response.ok()
-				.entity(jsonConverter.convertToPayload(contactsDto)).build();
+				.entity(jsonConverter.convertToPayload(identitiesDto)).build();
 	}
 	@POST
 	@Path("/{userId}/identities")

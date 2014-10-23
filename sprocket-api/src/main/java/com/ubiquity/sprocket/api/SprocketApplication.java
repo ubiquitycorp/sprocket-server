@@ -10,7 +10,6 @@ import com.ubiquity.sprocket.api.endpoints.AnalyticsEndpoint;
 import com.ubiquity.sprocket.api.endpoints.ClientEndpoint;
 import com.ubiquity.sprocket.api.endpoints.ContentEndpoint;
 import com.ubiquity.sprocket.api.endpoints.DocumentsEndpoint;
-import com.ubiquity.sprocket.api.endpoints.InternalServicesEndpoint;
 import com.ubiquity.sprocket.api.endpoints.PlacesEndpoint;
 import com.ubiquity.sprocket.api.endpoints.SocialEndpoint;
 import com.ubiquity.sprocket.api.endpoints.UsersEndpoint;
@@ -29,7 +28,6 @@ public class SprocketApplication extends Application {
 	    singletons.add(new ContentEndpoint());
 	    singletons.add(new AnalyticsEndpoint());
 	    singletons.add(new ClientEndpoint());
-	    singletons.add(new InternalServicesEndpoint());
 
 	  }
 

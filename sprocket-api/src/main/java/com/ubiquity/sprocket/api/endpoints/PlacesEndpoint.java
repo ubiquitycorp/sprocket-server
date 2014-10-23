@@ -244,10 +244,7 @@ public class PlacesEndpoint {
 
 		Place place = ServiceFactory.getLocationService().getPlaceByID(placeId);
 		if (place != null)
-			if(place.getExternalNetwork() != null)
-				sendTrackAndSyncMessage(placeId, geoDto);
-			else
-				throw new IllegalArgumentException("Not allowed to update location for city or neighborhood");
+			sendTrackAndSyncMessage(placeId, geoDto);
 		return Response.ok().build();
 	}
 

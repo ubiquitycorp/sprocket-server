@@ -91,8 +91,8 @@
 				<xmpp.port>5222</xmpp.port>
 				<xmpp.domain>localhost</xmpp.domain>
 				<xmpp.user>bot</xmpp.user>
-				<xmpp.password>sprocket9801</xmpp.password>
-				<xmpp.resource>localhost</xmpp.resource>
+				<xmpp.password>sprocketusr</xmpp.password>
+				<xmpp.resource>sprocket9801</xmpp.resource>
 				<!-- mail configuration -->
 				<mail.host>email-smtp.us-west-2.amazonaws.com</mail.host>
 				<mail.port>465</mail.port>
@@ -203,8 +203,8 @@
 				<xmpp.port>5222</xmpp.port>
 				<xmpp.domain>localhost</xmpp.domain>
 				<xmpp.user>bot</xmpp.user>
-				<xmpp.password>sprocket9801</xmpp.password>
-				<xmpp.resource>localhost</xmpp.resource>
+				<xmpp.password>sprocketusr</xmpp.password>
+				<xmpp.resource>sprocket9801</xmpp.resource>
 				<!-- mail configuration -->
 				<mail.host>email-smtp.us-west-2.amazonaws.com</mail.host>
 				<mail.port>465</mail.port>
@@ -260,8 +260,6 @@
 				<social.google.web.clientSecret>apLfEWdotpcaonJRFaior5wn
 				</social.google.web.clientSecret>
 				
-				
-				
 				<social.google.android.clientId>518857244614-odu6ukf381cd2vmg8e0rphkp0hfksg9l.apps.googleusercontent.com
 				</social.google.android.clientId>
 				<social.google.android.clientSecret>iLUKupqRjUl6gybpP7YYINE6
@@ -313,12 +311,12 @@
 				<mq.host>54.215.203.15</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
-				<xmpp.host>server.does.not.exist</xmpp.host>
+				<xmpp.host>localhost</xmpp.host>
 				<xmpp.port>5222</xmpp.port>
 				<xmpp.domain>localhost</xmpp.domain>
 				<xmpp.user>bot</xmpp.user>
-				<xmpp.password>sprocket9801</xmpp.password>
-				<xmpp.resource>localhost</xmpp.resource>
+				<xmpp.password>sprocketusr</xmpp.password>
+				<xmpp.resource>sprocket9801</xmpp.resource>
 				<!-- mail configuration -->
 				<mail.host>email-smtp.us-west-2.amazonaws.com</mail.host>
 				<mail.port>465</mail.port>

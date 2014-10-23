@@ -73,13 +73,10 @@ public class LocationUpdateConsumer extends AbstractConsumerThread {
 
 		// get user entity and then store eshtathis in the db (for now)
 		Place place = ServiceFactory.getLocationService().getPlaceByID(placeLocationUpdated.getPlaceId());
-		
-		if(place.getExternalNetwork() != null)
-		{
-			place.setBoundingBox(placeLocationUpdated.getGeobox());
-			
-			// this will update the place's location in the SQL data store
-			ServiceFactory.getLocationService().updatePlace(place);
-		}
+		place.setBoundingBox(placeLocationUpdated.getGeobox());
+
+		// this will update the user's location in the SQL data store
+		ServiceFactory.getLocationService().updatePlace(place);
+	
 	}
 }
