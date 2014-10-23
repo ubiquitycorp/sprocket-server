@@ -143,9 +143,9 @@ public class DataSyncProcessor extends Thread {
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId);
 
 
-		} else if(externalNetwork.equals(ExternalNetwork.LinkedIn)) {
+		} else if(externalNetwork.equals(ExternalNetwork.LinkedIn) || externalNetwork.equals(ExternalNetwork.Tumblr)) {
 			DateTime start = new DateTime();
-			int n = processActivities(identity, ExternalNetwork.LinkedIn);
+			int n = processActivities(identity, externalNetwork);
 			log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", getResoursePath(userId, externalNetwork, ResourceType.activities), n, userId);
 		}
@@ -157,8 +157,7 @@ public class DataSyncProcessor extends Thread {
 		List<Activity> synced;
 		try {
 			SocialService socialService = ServiceFactory.getSocialService();
-			synced = socialService.syncActivities(identity,
-					socialNetwork);
+			synced = socialService.syncActivities(identity, socialNetwork);
 
 			// index for searching
 			ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), synced, false);
