@@ -338,5 +338,105 @@
 			</activation>
 		</profile>
 
+
+                <profile>
+                        <id>swisscom</id>
+                        <properties>
+                                <app.log.level>INFO</app.log.level>
+                                <syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
+                                <redis.host>sprocket-search</redis.host>
+                                <hibernate.debug>false</hibernate.debug>
+                                <solr.api.host>sprocket-search</solr.api.host>
+                                <solr.api.port>8080</solr.api.port>
+                                <social.twitter.app.consumerKey>f5cMrdDfL4mxP1eaUOwAvUtfJ
+                                </social.twitter.app.consumerKey>
+                                <social.twitter.app.consumerSecret>Z7Q61m3kHejh09muK0aX97Ed1baamdF70svowkM2nKLYvh6EYp
+                                </social.twitter.app.consumerSecret>
+                                <social.linkedin.app.consumerKey>77fa6kjljumj8x
+                                </social.linkedin.app.consumerKey>
+                                <social.linkedin.app.consumerSecret>Qp7qxRm1usYix65e
+                                </social.linkedin.app.consumerSecret>
+                                <social.facebook.consumerKey>581439761976706
+                                </social.facebook.consumerKey>
+                                <social.facebook.consumerSecret>5968babeab5c14f940ac925da686c63f
+                                </social.facebook.consumerSecret>
+                                <social.google.android.apikey>AIzaSyC-EfEn6WHFEDg3UjuaNxb-ZhqsCzY1D84
+                                </social.google.android.apikey>
+                                <social.google.ios.apikey>AIzaSyDcW0lXISh704Z6tVwru78yLLuG6629bAk
+                                </social.google.ios.apikey>
+                                <social.google.web.apikey>AIzaSyAAohwXAj4cwNQt5Gjylf7ZV7ObZiMZH_o
+                                </social.google.web.apikey>
+
+                                <social.google.web.clientId>41815987463-mbca1f4ojnj29qed9abor6rjsbat61ld.apps.googleusercontent.com
+                                </social.google.web.clientId>
+                                <social.google.web.clientSecret>apLfEWdotpcaonJRFaior5wn
+                                </social.google.web.clientSecret>
+
+                                <social.google.android.clientId>518857244614-odu6ukf381cd2vmg8e0rphkp0hfksg9l.apps.googleusercontent.com
+                                </social.google.android.clientId>
+                                <social.google.android.clientSecret>iLUKupqRjUl6gybpP7YYINE6
+                                </social.google.android.clientSecret>
+                                <social.google.ios.clientId>441395842147-p7a9cau2ptsv0ebvhea27n84u1cjcia9.apps.googleusercontent.com
+                                </social.google.ios.clientId>
+                                <social.google.ios.clientSecret>y_5Qz6RSm7_LErx8TT8r_GCF
+                                </social.google.ios.clientSecret>
+                                <content.vimeo.web.clientId>32de4824c358a86ff15b5f53f7b840b044317390
+                                </content.vimeo.web.clientId>
+                                <content.vimeo.web.clientSecret>ac0720d3536d96815996ed0da0471418a0c55524
+                                </content.vimeo.web.clientSecret>
+                                <content.vimeo.mobile.clientId>00a3112427cc0de8be5710eceb5bd83524001a6b
+                                </content.vimeo.mobile.clientId>
+                                <content.vimeo.mobile.clientSecret>6814eea3b1195e9f8cd81688481c76688fea1120
+                                </content.vimeo.mobile.clientSecret>
+                                <yelp.consumerKey>mnm5G8XclwYIwbED8HV4EQ</yelp.consumerKey>
+                                <yelp.consumerSecret>3X5_IqGMVRE9dwb_pxV23FxS68k</yelp.consumerSecret>
+                                <yelp.token>wjVmlQFhPyMNYEPcyIyCenucRoBPPwJp</yelp.token>
+                                <yelp.tokenSecret>w7oeFsjoVLEb4c8bUbgRiQ4smec</yelp.tokenSecret>
+                                <constants.resetUrl>sprocket-web-stage.ubiquitycorp.com/#/reset?token=
+                                </constants.resetUrl>
+                                <db.pool.maxActive>50</db.pool.maxActive>
+                                <db.pool.maxIdle>3</db.pool.maxIdle>
+                                <db.pool.maxIdleTime>55</db.pool.maxIdleTime>
+                                <db.pool.maxWait>10000</db.pool.maxWait>
+                                <db.pool.idleConnectionTestPeriod>60
+                                </db.pool.idleConnectionTestPeriod>
+                                <db.username>sprocketusr</db.username>
+                                <db.password>sprocket9801</db.password>
+                                <db.host>sprocket-rds</db.host>
+                                <hibernate.schema.auto>none</hibernate.schema.auto>
+                                <stripe.api.client>pk_test_ujJiLWzAZymWRzD10MqT2tej
+                                </stripe.api.client>
+                                <stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO
+                                </stripe.api.secret>
+                                <repo.env>swisscom</repo.env>
+                                <mq.queue.cacheinvalidate.host>sprocket-rabbitmq
+                                </mq.queue.cacheinvalidate.host>
+                                <mq.queue.cacheinvalidate.username>netappusr
+                                </mq.queue.cacheinvalidate.username>
+                                <mq.queue.cacheinvalidate.password>blackdeer
+                                </mq.queue.cacheinvalidate.password>
+                                <mq.queue.track.host>sprocket-rabbitmq</mq.queue.track.host>
+                                <mq.queue.track.username>netappusr</mq.queue.track.username>
+                                <mq.queue.track.password>blackdeer</mq.queue.track.password>
+                                <mq.host>sprocket-rabbitmq</mq.host>
+                                <mq.username>netappusr</mq.username>
+                                <mq.password>blackdeer</mq.password>
+
+                                <!-- recommendation engine -->
+                                <recommendation.engine.appname>Sprocket
+                                </recommendation.engine.appname>
+                                <recommendation.engine.hadoop.master>local
+                                </recommendation.engine.hadoop.master>
+                                <recommendation.engine.alg.kmeans.iterations>5
+                                </recommendation.engine.alg.kmeans.iterations>
+                        </properties>
+                        <activation>
+                                <property>
+                                        <name>env</name>
+                                        <value>swisscom</value>
+                                </property>
+                        </activation>
+                </profile>
+
 	</profiles>
 </settings>
