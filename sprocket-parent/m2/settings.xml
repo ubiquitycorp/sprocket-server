@@ -421,7 +421,12 @@
                                 <mq.host>sprocket-rabbitmq</mq.host>
                                 <mq.username>netappusr</mq.username>
                                 <mq.password>blackdeer</mq.password>
-
+				<!-- mail configuration -->
+				<mail.host>email-smtp.us-west-2.amazonaws.com</mail.host>
+				<mail.port>465</mail.port>
+				<mail.from>no-reply\@sprocketlive.com</mail.from>
+				<mail.username>AKIAIBIMFN7QRWAVFV2A</mail.username>
+				<mail.password>AjJEA/pBTFxolvU0bO1ivVpRNeLoJM0KTh7yC7cBMTWA</mail.password>
                                 <!-- recommendation engine -->
                                 <recommendation.engine.appname>Sprocket
                                 </recommendation.engine.appname>
