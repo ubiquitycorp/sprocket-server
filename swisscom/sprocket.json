@@ -174,7 +174,7 @@
             "\n",
             [
              "#!/bin/sh",
-	"HOSTNAME=autosign17-rds-init",
+	"HOSTNAME=autosign18-rds-init",
         "vardir=/var/lib/puppet",
 	"echo NETWORKING=yes > /etc/sysconfig/network",
 	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
@@ -211,7 +211,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "autosign17-rds-init"
+            "Value": "autosign18-rds-init"
           },
           {
             "Key": "Database",
@@ -262,7 +262,7 @@
             "\n",
             [
              "#!/bin/sh",
-	"HOSTNAME=autosign17-sprocket-api-swisscom-01",
+	"HOSTNAME=autosign18-sprocket-api-swisscom-01",
         "vardir=/var/lib/puppet",
 	"echo NETWORKING=yes > /etc/sysconfig/network",
 	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
@@ -299,7 +299,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "autosign17-sprocket-api-swisscom-01"
+            "Value": "autosign18-sprocket-api-swisscom-01"
           }
         ],
         "Volumes": [
@@ -344,7 +344,7 @@
             "\n",
             [
              "#!/bin/sh",
-	"HOSTNAME=autosign17-sprocket-api-swisscom-02",
+	"HOSTNAME=autosign18-sprocket-api-swisscom-02",
         "vardir=/var/lib/puppet",
 	"echo NETWORKING=yes > /etc/sysconfig/network",
 	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
@@ -381,7 +381,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "autosign17-sprocket-api-swisscom-02"
+            "Value": "autosign18-sprocket-api-swisscom-02"
           }
         ],
         "Volumes": [
@@ -426,7 +426,7 @@
             "\n",
             [
              "#!/bin/sh",
-	"HOSTNAME=autosign17-sprocket-search-swisscom",
+	"HOSTNAME=autosign18-sprocket-search-swisscom",
         "vardir=/var/lib/puppet",
 	"echo NETWORKING=yes > /etc/sysconfig/network",
 	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
@@ -463,7 +463,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "autosign17-sprocket-search-swisscom"
+            "Value": "autosign18-sprocket-search-swisscom"
           }
         ],
         "NetworkInterfaces": [
@@ -501,7 +501,7 @@
             "\n",
             [
              "#!/bin/sh",
-	"HOSTNAME=autosign17-sprocket-rabbitmq-swisscom-01",
+	"HOSTNAME=autosign18-sprocket-rabbitmq-swisscom-01",
         "vardir=/var/lib/puppet",
 	"echo NETWORKING=yes > /etc/sysconfig/network",
 	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
@@ -538,7 +538,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "autosign17-sprocket-rabbitmq-swisscom-01"
+            "Value": "autosign18-sprocket-rabbitmq-swisscom-01"
           }
         ],
         "Volumes": [
@@ -583,7 +583,7 @@
             "\n",
             [
              "#!/bin/sh",
-	"HOSTNAME=autosign17-sprocket-redis-swisscom-01",
+	"HOSTNAME=autosign18-sprocket-redis-swisscom-01",
         "vardir=/var/lib/puppet",
 	"echo NETWORKING=yes > /etc/sysconfig/network",
 	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
@@ -620,7 +620,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "autosign17-sprocket-redis-swisscom-01"
+            "Value": "autosign18-sprocket-redis-swisscom-01"
           }
         ],
         "Volumes": [
@@ -665,7 +665,7 @@
             "\n",
             [
              "#!/bin/sh",
-	"HOSTNAME=autosign17-sprocket-worker-swisscom-01",
+	"HOSTNAME=autosign18-sprocket-worker-swisscom-01",
         "vardir=/var/lib/puppet",
 	"echo NETWORKING=yes > /etc/sysconfig/network",
 	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
@@ -702,7 +702,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "autosign17-sprocket-worker-swisscom-01"
+            "Value": "autosign18-sprocket-worker-swisscom-01"
           }
         ],
         "NetworkInterfaces": [
@@ -739,7 +739,7 @@
             "\n",
             [
              "#!/bin/sh",
-	"HOSTNAME=autosign17-sprocket-worker-swisscom-02",
+	"HOSTNAME=autosign18-sprocket-worker-swisscom-02",
         "vardir=/var/lib/puppet",
 	"echo NETWORKING=yes > /etc/sysconfig/network",
 	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
@@ -776,7 +776,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "autosign17-sprocket-worker-swisscom-02"
+            "Value": "autosign18-sprocket-worker-swisscom-02"
           }
         ],
         "NetworkInterfaces": [
