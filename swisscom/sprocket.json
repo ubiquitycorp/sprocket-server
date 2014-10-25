@@ -292,7 +292,7 @@
            ]
           }
 	},
-        "InstanceType": "t1.micro",
+        "InstanceType": "r3.large",
         "KernelId": "aki-eb7e26ae",
         "KeyName": "ubiquity",
         "Monitoring": "false",
@@ -374,7 +374,7 @@
            ]
           }
 	},
-        "InstanceType": "t1.micro",
+        "InstanceType": "r3.large",
         "KernelId": "aki-eb7e26ae",
         "KeyName": "ubiquity",
         "Monitoring": "false",
@@ -456,7 +456,7 @@
            ]
           }
 	},
-        "InstanceType": "t1.micro",
+        "InstanceType": "r3.large",
         "KernelId": "aki-eb7e26ae",
         "KeyName": "ubiquity",
         "Monitoring": "false",
@@ -531,7 +531,7 @@
            ]
           }
 	},
-        "InstanceType": "t1.micro",
+        "InstanceType": "r3.large",
         "KernelId": "aki-eb7e26ae",
         "KeyName": "ubiquity",
         "Monitoring": "false",
@@ -613,7 +613,7 @@
            ]
           }
 	},
-        "InstanceType": "t1.micro",
+        "InstanceType": "r3.large",
         "KernelId": "aki-eb7e26ae",
         "KeyName": "ubiquity",
         "Monitoring": "false",
@@ -695,7 +695,7 @@
            ]
           }
 	},
-        "InstanceType": "t1.micro",
+        "InstanceType": "r3.large",
         "KernelId": "aki-eb7e26ae",
         "KeyName": "ubiquity",
         "Monitoring": "false",
@@ -769,7 +769,7 @@
            ]
           }
 	},
-        "InstanceType": "t1.micro",
+        "InstanceType": "r3.large",
         "KernelId": "aki-eb7e26ae",
         "KeyName": "ubiquity",
         "Monitoring": "false",
