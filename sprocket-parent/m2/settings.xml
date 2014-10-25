@@ -344,7 +344,7 @@
                         <properties>
                                 <app.log.level>INFO</app.log.level>
                                 <syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
-                                <redis.host>sprocket-search</redis.host>
+                                <redis.host>sprocket-redis</redis.host>
                                 <hibernate.debug>false</hibernate.debug>
                                 <solr.api.host>sprocket-search</solr.api.host>
                                 <solr.api.port>8080</solr.api.port>
