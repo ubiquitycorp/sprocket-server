@@ -351,28 +351,28 @@
                                 <hibernate.debug>false</hibernate.debug>
                                 <solr.api.host>sprocket-search</solr.api.host>
                                 <solr.api.port>8080</solr.api.port>
-                                <social.twitter.app.consumerKey>f5cMrdDfL4mxP1eaUOwAvUtfJ
+                                <social.twitter.app.consumerKey>wzH6L355yCEXl6LJFh4r0oDuY
                                 </social.twitter.app.consumerKey>
-                                <social.twitter.app.consumerSecret>Z7Q61m3kHejh09muK0aX97Ed1baamdF70svowkM2nKLYvh6EYp
+                                <social.twitter.app.consumerSecret>69Po2Lc9DpwLp6AcXX24KOcPRk8IJjbJkh9PKAWlFz0PIZmApP
                                 </social.twitter.app.consumerSecret>
-                                <social.linkedin.app.consumerKey>77fa6kjljumj8x
+                                <social.linkedin.app.consumerKey>77n4swa5cr5n1a
                                 </social.linkedin.app.consumerKey>
-                                <social.linkedin.app.consumerSecret>Qp7qxRm1usYix65e
+                                <social.linkedin.app.consumerSecret>y3tzvamxG8VI7Scs
                                 </social.linkedin.app.consumerSecret>
-                                <social.facebook.consumerKey>581439761976706
+                                <social.facebook.consumerKey>643494622437886
                                 </social.facebook.consumerKey>
-                                <social.facebook.consumerSecret>5968babeab5c14f940ac925da686c63f
+                                <social.facebook.consumerSecret>4ddbaa9ce561e5d6512f96462d5accee
                                 </social.facebook.consumerSecret>
                                 <social.google.android.apikey>AIzaSyC-EfEn6WHFEDg3UjuaNxb-ZhqsCzY1D84
                                 </social.google.android.apikey>
                                 <social.google.ios.apikey>AIzaSyDcW0lXISh704Z6tVwru78yLLuG6629bAk
                                 </social.google.ios.apikey>
-                                <social.google.web.apikey>AIzaSyAAohwXAj4cwNQt5Gjylf7ZV7ObZiMZH_o
+                                <social.google.web.apikey>AIzaSyAKNri11J63gXklQzpjENGBwb3-JycBDDk
                                 </social.google.web.apikey>
 
-                                <social.google.web.clientId>41815987463-mbca1f4ojnj29qed9abor6rjsbat61ld.apps.googleusercontent.com
+                                <social.google.web.clientId>952784066700-lgcspbrl3nocrg02klhfprtlc6rnvvts.apps.googleusercontent.com
                                 </social.google.web.clientId>
-                                <social.google.web.clientSecret>apLfEWdotpcaonJRFaior5wn
+                                <social.google.web.clientSecret>W8MnfedXNnN_U3OFCnk6tGvt
                                 </social.google.web.clientSecret>
 
                                 <social.google.android.clientId>518857244614-odu6ukf381cd2vmg8e0rphkp0hfksg9l.apps.googleusercontent.com
@@ -383,9 +383,9 @@
                                 </social.google.ios.clientId>
                                 <social.google.ios.clientSecret>y_5Qz6RSm7_LErx8TT8r_GCF
                                 </social.google.ios.clientSecret>
-                                <content.vimeo.web.clientId>32de4824c358a86ff15b5f53f7b840b044317390
+                                <content.vimeo.web.clientId>440dfb21eac79cc18ea13186e5dbeefc573c7318
                                 </content.vimeo.web.clientId>
-                                <content.vimeo.web.clientSecret>ac0720d3536d96815996ed0da0471418a0c55524
+                                <content.vimeo.web.clientSecret>822201f6373bfa0d1c58d7554cb34a7752b7230f
                                 </content.vimeo.web.clientSecret>
                                 <content.vimeo.mobile.clientId>00a3112427cc0de8be5710eceb5bd83524001a6b
                                 </content.vimeo.mobile.clientId>
