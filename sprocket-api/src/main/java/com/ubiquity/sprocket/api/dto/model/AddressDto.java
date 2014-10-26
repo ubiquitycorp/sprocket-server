@@ -1,5 +1,6 @@
 package com.ubiquity.sprocket.api.dto.model;
 
+
 public class AddressDto {
 	private String streetName;
 
@@ -12,6 +13,8 @@ public class AddressDto {
 	private String postalCode;
 
 	private String country;
+	
+	private String displayPhone;
 
 	/***
 	 * Required by JPA
@@ -48,7 +51,9 @@ public class AddressDto {
 		return postalCode;
 	}
 
-
+	public String getDisplayPhone() {
+		return displayPhone;
+	}
 	public static class Builder {
 		private String streetName;
 		private String unitName;
@@ -56,6 +61,7 @@ public class AddressDto {
 		private String stateOrRegion;
 		private String postalCode;
 		private String country;
+		private String displayPhone;
 
 		public Builder streetName(String streetName) {
 			this.streetName = streetName;
@@ -81,6 +87,11 @@ public class AddressDto {
 			this.postalCode = postalCode;
 			return this;
 		}
+		
+		public Builder displayPhone(String displayPhone) {
+			this.displayPhone = displayPhone;
+			return this;
+		}
 
 		public Builder country(String country) {
 			this.country = country;
@@ -99,5 +110,6 @@ public class AddressDto {
 		this.stateOrRegion = builder.stateOrRegion;
 		this.postalCode = builder.postalCode;
 		this.country = builder.country;
+		this.displayPhone = builder.displayPhone;
 	}
 }

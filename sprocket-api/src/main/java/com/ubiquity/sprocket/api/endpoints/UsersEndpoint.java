@@ -38,6 +38,7 @@ import com.ubiquity.integration.domain.Network;
 import com.ubiquity.integration.domain.SocialToken;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.sprocket.api.DtoAssembler;
+import com.ubiquity.sprocket.api.dto.containers.ContactsDto;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.ExchangeTokenDto;
@@ -50,6 +51,7 @@ import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.AuthorizationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
 import com.ubiquity.sprocket.api.validation.ResetValidation;
+import com.ubiquity.sprocket.api.validation.UserLocationUpdateValidation;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 //import com.ubiquity.sprocket.messaging.definition.EventTracked;
@@ -201,7 +203,8 @@ public class UsersEndpoint {
 		ServiceFactory.getUserService().update(user);
 		// create api key and pass back associated identities for this user (in
 		// case of a login from a different device)
-		String apiKey = AuthenticationService.generateApiKey();
+		
+		String apiKey = authenticationService.generateAPIKeyIfNotExsits(user.getUserId());
 		AccountDto accountDto = new AccountDto.Builder().apiKey(apiKey)
 				.userId(user.getUserId()).build();
 
@@ -251,7 +254,7 @@ public class UsersEndpoint {
 				clientPlatform, Boolean.TRUE);
 
 		// user now has a single, native identity
-		String apiKey = AuthenticationService.generateApiKey();
+		String apiKey = AuthenticationService.generateAPIKey();
 
 		// set the account DTO with an api key and new user id and send it back
 		AccountDto accountDto = new AccountDto.Builder().apiKey(apiKey)
@@ -265,7 +268,23 @@ public class UsersEndpoint {
 		return Response.ok().entity(jsonConverter.convertToPayload(accountDto))
 				.build();
 	}
+	@GET
+	@Path("/{userId}/identities")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response getIdentities(@PathParam("userId") Long userId) throws IOException {
 
+		// load user
+		List<Contact> contacts = ServiceFactory.getContactService().findAllContactByUserIdentities(userId);
+
+		ContactsDto contactsDto = new ContactsDto();
+		for (Contact contact : contacts) {
+			contactsDto.getContacts().add(DtoAssembler.assemble(contact));
+		}
+		return Response.ok()
+				.entity(jsonConverter.convertToPayload(contactsDto)).build();
+	}
 	@POST
 	@Path("/{userId}/identities")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -486,7 +505,7 @@ public class UsersEndpoint {
 	public Response setLocation(@PathParam("userId") Long userId,
 			InputStream payload) throws IOException {
 		
-		LocationDto locationDto = jsonConverter.convertFromPayload(payload,LocationDto.class);
+		LocationDto locationDto = jsonConverter.convertFromPayload(payload,LocationDto.class,UserLocationUpdateValidation.class);
 		
 		sendLocationMessage(userId, locationDto);
 		
@@ -520,12 +539,14 @@ public class UsersEndpoint {
 			.longitude(locationDto.getLongitude())
 			.altitude(locationDto.getAltitude())
 		.build();
-
+		
 		// serialize and send it
 		String message = MessageConverterFactory.getMessageConverter()
 				.serialize(new Message(content));
+		
 		MessageQueueFactory.getLocationQueueProducer().write(
 				message.getBytes());
+		log.info("message sent: {}", message);
 	}
 	
 

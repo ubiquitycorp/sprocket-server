@@ -22,6 +22,7 @@ public class ServiceFactory {
 	private static AuthenticationService authenticationService;
 	private static UserService userService;
 	private static SocialService socialService;
+	private static ClientConfigurationService clientConfigurationService;
 	private static SearchService searchService;
 	private static ContentService contentService;
 	private static ContactService contactService;
@@ -54,6 +55,18 @@ public class ServiceFactory {
 		return analyticsService;
 	}
 	
+	
+
+	/***
+	 * Returns client configuration service
+	 * 
+	 * @return
+	 */
+	public static ClientConfigurationService getClientConfigurationService() {
+		if(clientConfigurationService == null)
+			clientConfigurationService = new ClientConfigurationService(configuration);
+		return clientConfigurationService;
+	}
 	
 	
 	/***

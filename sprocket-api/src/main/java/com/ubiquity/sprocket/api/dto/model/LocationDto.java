@@ -3,6 +3,9 @@ package com.ubiquity.sprocket.api.dto.model;
 import java.math.BigDecimal;
 
 import javax.validation.constraints.NotNull;
+
+import com.ubiquity.sprocket.api.validation.PlaceLocationUpdateValidation;
+import com.ubiquity.sprocket.api.validation.UserLocationUpdateValidation;
 /***
  * 
  * @author peter.tadros
@@ -10,13 +13,13 @@ import javax.validation.constraints.NotNull;
  */
 public class LocationDto {
 
-	@NotNull
+	@NotNull(groups = { UserLocationUpdateValidation.class})
 	private Long timestamp;
 	
-	@NotNull
+	@NotNull(groups = { UserLocationUpdateValidation.class,PlaceLocationUpdateValidation.class})
 	private BigDecimal latitude;
 	
-	@NotNull
+	@NotNull(groups = { UserLocationUpdateValidation.class,PlaceLocationUpdateValidation.class})
 	private BigDecimal longitude;
 	
 	private BigDecimal altitude;

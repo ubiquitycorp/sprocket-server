@@ -17,8 +17,8 @@ public class FavoritePlace extends FavoriteItem {
 	
 	protected FavoritePlace() {}
 	
-	public FavoritePlace(User user, Place place) {
-		super(user);
+	public FavoritePlace(User user, Place place,Long lastUpdated) {
+		super(user,lastUpdated);
 		this.place = place;
 	}
 

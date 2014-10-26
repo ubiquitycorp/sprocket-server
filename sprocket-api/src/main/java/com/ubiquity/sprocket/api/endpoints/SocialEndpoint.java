@@ -101,7 +101,7 @@ public class SocialEndpoint {
 	@Path("users/{userId}/providers/{socialNetworkId}/localfeed")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response getLocalFeed(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+	public Response getLocalFeed(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince,@HeaderParam("delta") Boolean delta) {
 		ActivitiesDto results = new ActivitiesDto();
 
 		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
@@ -111,7 +111,7 @@ public class SocialEndpoint {
 		if(userLocation == null)
 			return Response.ok().entity(jsonConverter.convertToPayload(results)).build();
 		
-		CollectionVariant<Activity> variant = ServiceFactory.getSocialService().findActivityByPlaceIdAndSocialNetwork(userLocation.getNearestPlace().getPlaceId(), socialNetwork, ifModifiedSince);
+		CollectionVariant<Activity> variant = ServiceFactory.getSocialService().findActivityByPlaceIdAndSocialNetwork(userLocation.getNearestPlace().getPlaceId(), socialNetwork, ifModifiedSince,delta);
 
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)

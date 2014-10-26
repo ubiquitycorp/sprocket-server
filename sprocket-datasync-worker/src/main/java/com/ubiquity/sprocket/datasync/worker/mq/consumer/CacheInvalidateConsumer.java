@@ -2,8 +2,6 @@ package com.ubiquity.sprocket.datasync.worker.mq.consumer;
 
 import java.util.Arrays;
 
-import javax.persistence.EntityManager;
-
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,10 +67,15 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		Place place = favoritePlace.getPlace();
 		place = ServiceFactory.getLocationService().findOrCreate(place);
 		User user = ServiceFactory.getUserService().getUserById(favoritePlace.getUserId());
-		FavoritePlace favPlace = new FavoritePlace(user,favoritePlace.getPlace());
-		EntityManagerSupport.beginTransaction();
-		new FavoritePlaceRepositoryJpaImpl().create(favPlace);
-		EntityManagerSupport.commit();
+		FavoritePlace favPlace = new FavoritePlace(user,place,System.currentTimeMillis());
+		FavoritePlace favoritePlace2 = new FavoritePlaceRepositoryJpaImpl().getFavoritePlaceByUserIdAndBusinessId(favoritePlace.getUserId(),place.getExternalNetwork(), place.getPlaceId());
+		if(favoritePlace2 == null)
+		{
+			EntityManagerSupport.beginTransaction();
+			new FavoritePlaceRepositoryJpaImpl().create(favPlace);
+			EntityManagerSupport.commit();
+			ServiceFactory.getFavoriteService().setFavoritePlaceCache(user.getUserId(), favoritePlace.getPlace().getExternalNetwork(), favoritePlace.getPlace().getParent().getPlaceId());
+		}
 		
 	}
 	private void process(UserEngagedDocument engagedDocument) {

@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.NoResultException;
 
 import org.apache.commons.configuration.Configuration;
+import org.gavaghan.geodesy.DistanceCalculator;
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
 import org.gavaghan.geodesy.GlobalPosition;
@@ -19,7 +20,6 @@ import com.niobium.repository.cache.DataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.integration.api.PlaceAPI;
 import com.ubiquity.integration.api.PlaceAPIFactory;
-import com.ubiquity.integration.api.exception.ExternalNetworkException;
 import com.ubiquity.integration.domain.ExternalInterest;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.repository.ExternalInterestRepository;
@@ -54,6 +54,16 @@ public class LocationService {
 		dataModificationCache = new DataModificationCacheRedisImpl(
 				configuration
 						.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GENERAL));
+		String key = CacheKeys
+				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.PLACES);
+		Long lastModified = dataModificationCache.getLastModified(key, 0L);
+
+		// If there is no cache entry
+		if (lastModified == null) {
+			if(new PlaceRepositoryJpaImpl().countAllPlaces()>0){
+				resetPlaceLastModifiedCache();
+			}
+		}
 	}
 
 	/**
@@ -63,6 +73,8 @@ public class LocationService {
 	 */
 	public void updatePlace(Place place) {
 		try {
+			place.setLastUpdated(System.currentTimeMillis());
+			///place.ensureDefaults(); // needed when updating
 			EntityManagerSupport.beginTransaction();
 			new PlaceRepositoryJpaImpl().update(place);
 			EntityManagerSupport.commit();
@@ -193,56 +205,44 @@ public class LocationService {
 
 			try {
 
+				int processed = 0;
 				PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
 				List<Place> places = placeRepository.findLastLevelWithoutNetwork(); // gets all neighborhoods
 				for(Place neighborhood : places) {
+					if(!neighborhood.getParent().getLocator().contains(", CA"))
+						continue;
 					
-					// make sure we don't already have children
-					if(!placeRepository.findChildrenForPlace(neighborhood).isEmpty()) {
-						log.info("skipping {} because we already processed it", neighborhood);
-						continue;
-					}
-					log.info("looking for yelp stuff in {}", neighborhood);
-
-					// skip cities
-					Place city = neighborhood.getParent();
-					if(city == null)
-						continue;
-
-					List<Place> businesses;
-
-					Integer page = 0;
-					Boolean paging = Boolean.TRUE;
-					try {
-						do {
-							page++;
-							businesses = placeAPI.searchPlacesWithinPlace("", neighborhood, null, page, 20);
-							for(Place business : businesses) {
-								log.info("business {}", business.getName());
-								Place persisted = placeRepository.getByLocatorAndExternalNetwork(business.getLocator(), network);
-								if(persisted == null) {
-
-									// for now just set city
-									business.setBoundingBox(city.getBoundingBox());
-									business.setParent(neighborhood);
-									if(!business.getTags().isEmpty()) {
-										List<ExternalInterest> mappings = new ExternalInterestRepositoryJpaImpl().findByNamesAndExternalNetwork(business.getTags(), network);
-										for(ExternalInterest mapping : mappings) {
-											business.getInterests().add(mapping.getInterest());
-										}
-									}
-
-									create(business);
-
-								} else {
-									log.info("we already have this business {}, skipping...", persisted.getName());
+					log.info("Synchronizing neighborhood {}", neighborhood.getName());
+					List<Place> businesses = placeRepository.findChildrenForPlace(neighborhood);
+					for(Place business : businesses) {
+							
+						log.info("Synchronizing {}", business.getName());
+						processed++;
+						try {
+							Place place = placeAPI.getPlaceByExternalIdentifier(business.getExternalIdentifier());
+							if(!place.getTags().isEmpty()) {
+								// clear out tags in business
+								List<ExternalInterest> mappings = new ExternalInterestRepositoryJpaImpl().findByNamesAndExternalNetwork(place.getTags(), network);
+								for(ExternalInterest mapping : mappings) {
+									// interests hashcode/equals is set to interest id, so dupes won't be added, but this will effectively update the interest collection
+									place.getInterests().add(mapping.getInterest());
 								}
 							}
-						} while (paging);
-					} catch (ExternalNetworkException e) {
-						log.warn("Search produced an error", null, e);
-						paging = Boolean.FALSE;
+							// update the place with location data that we've derived or augmented
+							place.setPlaceId(business.getPlaceId());
+							place.setParent(neighborhood);
+							place.setBoundingBox(null);
+							place.setLastUpdated(System.currentTimeMillis());
+							updatePlace(place);
+						} catch (Exception e) {
+							log.warn("Skipping: {}", business.getName(), e);
+						}
+					
+
 					}
+
+					log.info("processed {}", processed);
+
 				}
 
 			} finally {
@@ -266,7 +266,6 @@ public class LocationService {
 		return null;
 	}
 
-		PlaceAPI placeAPI = PlaceAPIFactory.createProvider(ExternalNetwork.Yelp, null);
 	/**
 	 * Returns place with the center point closest to this location
 	 * 
@@ -292,23 +291,9 @@ public class LocationService {
 
 			Double closestDistance = Double.MAX_VALUE;
 			for (Place place : places) {
-				// convert to model the geo lib uses
-				GlobalPosition locationPoint = new GlobalPosition(location
-						.getLatitude().doubleValue(), location.getLongitude()
-						.doubleValue(), 0.0);
 				Location center = place.getBoundingBox().getCenter();
-				GlobalPosition placePoint = new GlobalPosition(center.getLatitude()
-						.doubleValue(), center.getLongitude().doubleValue(), 0.0);
-
-				Ellipsoid reference = Ellipsoid.WGS84;
-				double distance = geoCalculator.calculateGeodeticCurve(reference,
-						locationPoint, placePoint).getEllipsoidalDistance(); // Distance
-				// between
-				// Point
-				// A
-				// and
-				// Point
-				// B
+				double distance = DistanceCalculator.calculateGeodeticCurve(location, center);
+				//Distance between point A and point B
 				if (distance < closestDistance) {
 					closestDistance = distance;
 					closest = place;
@@ -335,7 +320,7 @@ public class LocationService {
 
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
 
-			List<Place> places = placeRepository.getAllNeighborhoods();
+			List<Place> places = placeRepository.findLastLevelWithoutNetwork();
 
 			if (places.isEmpty())
 				return null;
@@ -403,24 +388,24 @@ public class LocationService {
 			Long ifModifiedSince, Boolean delta) {
 		String key = CacheKeys
 				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.PLACES);
-//		Long lastModified = dataModificationCache.getLastModified(key,
-//				ifModifiedSince);
-//
-//		// If there is no cache entry, there is no data
-//		if (lastModified == null) {
-//			return null;
-//		}
+		Long lastModified = dataModificationCache.getLastModified(key,
+				ifModifiedSince);
+
+		// If there is no cache entry, there is no data
+		if (lastModified == null) {
+			return null;
+		}
 		try {
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
 			List<Place> places;
 			if (delta == null || !delta) {
-				places = placeRepository.getAllCitiesAndNeighborhoods();
+				places = placeRepository.findLastLevelWithoutNetwork();
 			} else {
 				places = placeRepository
-						.getAllCitiesAndNeighborhoodsWithModifiedSince(ifModifiedSince);
+						.findLastLevelWithoutNetworkWithModifiedSince(ifModifiedSince);
 			}
-//			return new CollectionVariant<Place>(places, lastModified);
-			return new CollectionVariant<Place>(places,null);
+			return new CollectionVariant<Place>(places, lastModified);
+			//return new CollectionVariant<Place>(places,null);
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
@@ -461,6 +446,14 @@ public class LocationService {
 			create(place);
 		}
 		return place;
+	}
+	/***
+	 * 
+	 * @param placeID
+	 * @return
+	 */
+	public Place getPlaceByID(long placeID){
+		return new PlaceRepositoryJpaImpl().read(placeID);
 	}
 
 }

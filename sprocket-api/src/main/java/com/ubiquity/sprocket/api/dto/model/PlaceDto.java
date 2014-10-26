@@ -3,8 +3,6 @@ package com.ubiquity.sprocket.api.dto.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.ubiquity.integration.domain.ExternalNetwork;
-
 
 public class PlaceDto {
 
@@ -17,9 +15,11 @@ public class PlaceDto {
 	private Long lastUpdated;
 	private PlaceDto parent;
 	private String externalIdentitifer;
-	private ExternalNetwork network;
+	private Integer externalNetworkId;
 	private AddressDto addressdto;
-	
+	private RatingDto ratingDto;
+	private ImageDto thumb;
+	private String locator;
 	
 	
 	public Long getPlaceId() {
@@ -58,14 +58,26 @@ public class PlaceDto {
 		return externalIdentitifer;
 	}
 
-	public ExternalNetwork getNetwork() {
-		return network;
+	public Integer getExternalNetworkId() {
+		return externalNetworkId;
 	}
 
 	public AddressDto getAddressdto() {
 		return addressdto;
 	}
 
+	public RatingDto getRatingDto() {
+		return ratingDto;
+	}
+	
+	public ImageDto getThumb() {
+		return thumb;
+	}
+	
+	public String getLocator() {
+		return locator;
+	}
+	
 	public static class Builder {
 		private Long placeId;
 		private String name;
@@ -73,10 +85,13 @@ public class PlaceDto {
 		private String region;
 		private GeoboxDto boundingBox;
 		private String externalIdentitifer;
-		private ExternalNetwork network;
+		private Integer externalNetworkId;
 		private AddressDto addressdto;
 		private Long lastUpdated;
 		private PlaceDto parent;
+		private RatingDto ratingDto;
+		private ImageDto thumb;
+		private String locator;
 		
 		public Builder placeId(Long placeId) {
 			this.placeId = placeId;
@@ -108,8 +123,8 @@ public class PlaceDto {
 			return this;
 		}
 
-		public Builder network(ExternalNetwork network) {
-			this.network = network;
+		public Builder network(Integer externalNetworkId) {
+			this.externalNetworkId = externalNetworkId;
 			return this;
 		}
 
@@ -123,8 +138,21 @@ public class PlaceDto {
 			return this;
 		}
 		
+		public Builder ratingDto(RatingDto ratingDto) {
+			this.ratingDto = ratingDto;
+			return this;
+		}
+		
 		public Builder parent(PlaceDto parent){
 			this.parent = parent;
+			return this;
+		}
+		public Builder thumb(ImageDto thumb){
+			this.thumb= thumb;
+			return this;
+		}
+		public Builder locator(String locator){
+			this.locator= locator;
 			return this;
 		}
 		public PlaceDto build() {
@@ -139,9 +167,12 @@ public class PlaceDto {
 		this.region = builder.region;
 		this.boundingBox = builder.boundingBox;
 		this.externalIdentitifer = builder.externalIdentitifer;
-		this.network = builder.network;
+		this.externalNetworkId = builder.externalNetworkId;
 		this.addressdto = builder.addressdto;
 		this.lastUpdated = builder.lastUpdated;
 		this.parent = builder.parent;
+		this.ratingDto = builder.ratingDto;
+		this.thumb = builder.thumb;
+		this.locator = builder.locator;
 	}
 }

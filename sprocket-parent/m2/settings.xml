@@ -57,6 +57,8 @@
 				<yelp.consumerSecret>3X5_IqGMVRE9dwb_pxV23FxS68k</yelp.consumerSecret>
 				<yelp.token>wjVmlQFhPyMNYEPcyIyCenucRoBPPwJp</yelp.token>
 				<yelp.tokenSecret>w7oeFsjoVLEb4c8bUbgRiQ4smec</yelp.tokenSecret>
+				<social.tumblr.consumerKey>X4Jwwn3OaWgt9BlzaibfDw8ZFWcs1NUlgHTeitGSoC65cBXir3</social.tumblr.consumerKey>
+				<social.tumblr.consumerSecret>s7CPOLZnwSsdJkyYYus2r7KByMcwwgFWtGyPxhtjDXnhkUBLhg</social.tumblr.consumerSecret>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
 				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
@@ -84,16 +86,26 @@
 				<mq.host>localhost</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
+				<!-- xmpp configuration -->
+				<xmpp.host>localhost</xmpp.host>
+				<xmpp.port>5222</xmpp.port>
+				<xmpp.domain>localhost</xmpp.domain>
+				<xmpp.user>bot</xmpp.user>
+				<xmpp.password>sprocket9801</xmpp.password>
+				<xmpp.resource>localhost</xmpp.resource>
+				<!-- mail configuration -->
+				<mail.host>email-smtp.us-west-2.amazonaws.com</mail.host>
+				<mail.port>465</mail.port>
+				<mail.from>no-reply\@sprocketlive.com</mail.from>
+				<mail.username>AKIAIBIMFN7QRWAVFV2A</mail.username>
+				<mail.password>AjJEA/pBTFxolvU0bO1ivVpRNeLoJM0KTh7yC7cBMTWA</mail.password>
 				<!-- recommendation engine -->
 				<recommendation.engine.appname>Sprocket
 				</recommendation.engine.appname>
 				<recommendation.engine.hadoop.master>local
 				</recommendation.engine.hadoop.master>
-
 				<recommendation.engine.alg.kmeans.iterations>5
 				</recommendation.engine.alg.kmeans.iterations>
-
-
 			</properties>
 			<activation>
 				<property>
@@ -156,6 +168,8 @@
 				<yelp.consumerSecret>3X5_IqGMVRE9dwb_pxV23FxS68k</yelp.consumerSecret>
 				<yelp.token>wjVmlQFhPyMNYEPcyIyCenucRoBPPwJp</yelp.token>
 				<yelp.tokenSecret>w7oeFsjoVLEb4c8bUbgRiQ4smec</yelp.tokenSecret>
+				<social.tumblr.consumerKey>kIdbuVYutk0G294pS4et73SI9k9TGP4ONpjGPcXekNr8fQOMWZ</social.tumblr.consumerKey>
+				<social.tumblr.consumerSecret>C0vBoxsctnB6qEvtGIv3xhYLGIIyw1a7E43AQQDLrfZfY37Ns2</social.tumblr.consumerSecret>
 				<constants.resetUrl>http://sprocket-qa.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>
 				<db.pool.maxActive>50</db.pool.maxActive>
@@ -185,7 +199,18 @@
 				<mq.host>localhost</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
-
+				<xmpp.host>localhost</xmpp.host>
+				<xmpp.port>5222</xmpp.port>
+				<xmpp.domain>localhost</xmpp.domain>
+				<xmpp.user>bot</xmpp.user>
+				<xmpp.password>sprocket9801</xmpp.password>
+				<xmpp.resource>localhost</xmpp.resource>
+				<!-- mail configuration -->
+				<mail.host>email-smtp.us-west-2.amazonaws.com</mail.host>
+				<mail.port>465</mail.port>
+				<mail.from>no-reply\@sprocketlive.com</mail.from>
+				<mail.username>AKIAIBIMFN7QRWAVFV2A</mail.username>
+				<mail.password>AjJEA/pBTFxolvU0bO1ivVpRNeLoJM0KTh7yC7cBMTWA</mail.password>
 				<!-- recommendation engine -->
 				<recommendation.engine.appname>Sprocket
 				</recommendation.engine.appname>
@@ -235,6 +260,8 @@
 				<social.google.web.clientSecret>apLfEWdotpcaonJRFaior5wn
 				</social.google.web.clientSecret>
 				
+				
+				
 				<social.google.android.clientId>518857244614-odu6ukf381cd2vmg8e0rphkp0hfksg9l.apps.googleusercontent.com
 				</social.google.android.clientId>
 				<social.google.android.clientSecret>iLUKupqRjUl6gybpP7YYINE6
@@ -255,6 +282,8 @@
 				<yelp.consumerSecret>3X5_IqGMVRE9dwb_pxV23FxS68k</yelp.consumerSecret>
 				<yelp.token>wjVmlQFhPyMNYEPcyIyCenucRoBPPwJp</yelp.token>
 				<yelp.tokenSecret>w7oeFsjoVLEb4c8bUbgRiQ4smec</yelp.tokenSecret>
+				<social.tumblr.consumerKey>HXpAQmGwYutSonQNixGf23uy8SifTZU5WG2iALLwNgdzYhGYfs</social.tumblr.consumerKey>
+				<social.tumblr.consumerSecret>lbsptcaAFUhLExR2UllZZ1FqG0r0uIWeHD9UOP9lF5ywGCI92W</social.tumblr.consumerSecret>
 				<constants.resetUrl>sprocket-web-stage.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>
 				<db.pool.maxActive>50</db.pool.maxActive>
@@ -284,7 +313,18 @@
 				<mq.host>54.215.203.15</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
-
+				<xmpp.host>server.does.not.exist</xmpp.host>
+				<xmpp.port>5222</xmpp.port>
+				<xmpp.domain>localhost</xmpp.domain>
+				<xmpp.user>bot</xmpp.user>
+				<xmpp.password>sprocket9801</xmpp.password>
+				<xmpp.resource>localhost</xmpp.resource>
+				<!-- mail configuration -->
+				<mail.host>email-smtp.us-west-2.amazonaws.com</mail.host>
+				<mail.port>465</mail.port>
+				<mail.from>no-reply\@sprocketlive.com</mail.from>
+				<mail.username>AKIAIBIMFN7QRWAVFV2A</mail.username>
+				<mail.password>AjJEA/pBTFxolvU0bO1ivVpRNeLoJM0KTh7yC7cBMTWA</mail.password>
 				<!-- recommendation engine -->
 				<recommendation.engine.appname>Sprocket
 				</recommendation.engine.appname>

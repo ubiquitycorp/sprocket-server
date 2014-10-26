@@ -15,3 +15,14 @@ sprocket-api/bin
 /sprocket-location-worker/*.classpath
 /sprocket-datasync-worker/.classpath
 /sprocket-tracker-worker/.classpath
+/sprocket-backchannel-worker/.gitignore
+/sprocket-backchannel-worker/.project
+/sprocket-backchannel-worker\target\classes\META-INF/MANIFEST.MF
+/sprocket-backchannel-worker\target\classes\META-INF\maven\com.ubiquity\sprocket-backchannel-worker/pom.properties
+/sprocket-backchannel-worker\target\classes\META-INF\maven\com.ubiquity\sprocket-backchannel-worker/pom.xml
+/sprocket-backchannel-worker\target\classes/backchannelworker.properties
+/sprocket-backchannel-worker\target\classes\com\ubiquity\backchannel\worker/.DS_Store
+/sprocket-backchannel-worker\target\classes/logback.xml
+/sprocket-backchannel-worker\.settings/*.prefs
+/sprocket-backchannel-worker\.settings/*.prefs
+/sprocket-backchannel-worker\.settings/*.prefs
