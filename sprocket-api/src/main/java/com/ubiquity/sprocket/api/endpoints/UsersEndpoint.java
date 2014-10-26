@@ -3,7 +3,6 @@ package com.ubiquity.sprocket.api.endpoints;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.NoResultException;
 import javax.ws.rs.Consumes;
@@ -40,7 +39,6 @@ import com.ubiquity.integration.domain.SocialToken;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ContactsDto;
-import com.ubiquity.sprocket.api.dto.containers.IdentitiesDto;
 import com.ubiquity.sprocket.api.dto.model.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.ExchangeTokenDto;
