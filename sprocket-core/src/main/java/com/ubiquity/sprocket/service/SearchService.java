@@ -126,12 +126,13 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId); 
 
 			// contact, add image if we have one
-			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_DISPLAY_NAME, activity.getPostedBy().getDisplayName());
-			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_IDENTIFIER, activity.getPostedBy().getExternalIdentity().getIdentifier());
-			Image thumb = activity.getPostedBy().getImage();
-			if(thumb != null)
-				document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_THUMBNAIL, activity.getPostedBy().getImage().getUrl());
-			
+			if(activity.getPostedBy() != null){
+				document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_DISPLAY_NAME, activity.getPostedBy().getDisplayName());
+				document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_IDENTIFIER, activity.getPostedBy().getExternalIdentity().getIdentifier());
+				Image thumb = activity.getPostedBy().getImage();
+				if(thumb != null)
+					document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_THUMBNAIL, thumb.getUrl());
+			}
 			// content fields
 			document.getFields().put(SearchKeys.Fields.FIELD_BODY, activity.getBody());
 			document.getFields().put(SearchKeys.Fields.FIELD_TITLE, activity.getTitle());
