@@ -77,7 +77,8 @@ public class DtoAssembler {
 		if (imageDto != null)
 			activityBuilder.image(new Image(imageDto.getUrl()));
 
-		activityBuilder.postedBy(assemble(activityDto.getPostedBy()));
+		if(activityDto.getPostedBy() != null)
+			activityBuilder.postedBy(assemble(activityDto.getPostedBy()));
 
 		return activityBuilder.build();
 
@@ -389,9 +390,11 @@ public class DtoAssembler {
 				.date(activity.getCreationDate())
 				.externalNetworkId(activity.getExternalNetwork().ordinal())
 				.title(activity.getTitle()).link(activity.getLink())
-				.externalIdentifier(activity.getExternalIdentifier())
-				.postedBy(DtoAssembler.assemble(activity.getPostedBy()));
+				.externalIdentifier(activity.getExternalIdentifier());
 
+		if(activity.getPostedBy() != null)
+			activityDtoBuilder.postedBy(DtoAssembler.assemble(activity.getPostedBy()));
+		
 		if (activity.getCategory() != null)
 			activityDtoBuilder.category(activity.getCategory()
 					.getCategoryName());

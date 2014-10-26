@@ -57,6 +57,8 @@
 				<yelp.consumerSecret>3X5_IqGMVRE9dwb_pxV23FxS68k</yelp.consumerSecret>
 				<yelp.token>wjVmlQFhPyMNYEPcyIyCenucRoBPPwJp</yelp.token>
 				<yelp.tokenSecret>w7oeFsjoVLEb4c8bUbgRiQ4smec</yelp.tokenSecret>
+				<social.tumblr.consumerKey>X4Jwwn3OaWgt9BlzaibfDw8ZFWcs1NUlgHTeitGSoC65cBXir3</social.tumblr.consumerKey>
+				<social.tumblr.consumerSecret>s7CPOLZnwSsdJkyYYus2r7KByMcwwgFWtGyPxhtjDXnhkUBLhg</social.tumblr.consumerSecret>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
 				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
@@ -166,6 +168,8 @@
 				<yelp.consumerSecret>3X5_IqGMVRE9dwb_pxV23FxS68k</yelp.consumerSecret>
 				<yelp.token>wjVmlQFhPyMNYEPcyIyCenucRoBPPwJp</yelp.token>
 				<yelp.tokenSecret>w7oeFsjoVLEb4c8bUbgRiQ4smec</yelp.tokenSecret>
+				<social.tumblr.consumerKey>kIdbuVYutk0G294pS4et73SI9k9TGP4ONpjGPcXekNr8fQOMWZ</social.tumblr.consumerKey>
+				<social.tumblr.consumerSecret>C0vBoxsctnB6qEvtGIv3xhYLGIIyw1a7E43AQQDLrfZfY37Ns2</social.tumblr.consumerSecret>
 				<constants.resetUrl>http://sprocket-qa.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>
 				<db.pool.maxActive>50</db.pool.maxActive>
@@ -278,6 +282,8 @@
 				<yelp.consumerSecret>3X5_IqGMVRE9dwb_pxV23FxS68k</yelp.consumerSecret>
 				<yelp.token>wjVmlQFhPyMNYEPcyIyCenucRoBPPwJp</yelp.token>
 				<yelp.tokenSecret>w7oeFsjoVLEb4c8bUbgRiQ4smec</yelp.tokenSecret>
+				<social.tumblr.consumerKey>HXpAQmGwYutSonQNixGf23uy8SifTZU5WG2iALLwNgdzYhGYfs</social.tumblr.consumerKey>
+				<social.tumblr.consumerSecret>lbsptcaAFUhLExR2UllZZ1FqG0r0uIWeHD9UOP9lF5ywGCI92W</social.tumblr.consumerSecret>
 				<constants.resetUrl>sprocket-web-stage.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>
 				<db.pool.maxActive>50</db.pool.maxActive>
@@ -326,9 +332,6 @@
 				</recommendation.engine.hadoop.master>
 				<recommendation.engine.alg.kmeans.iterations>5
 				</recommendation.engine.alg.kmeans.iterations>
-				
-				
-
 			</properties>
 			<activation>
 				<property>
