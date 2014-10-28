@@ -1,0 +1,41 @@
+Bicycles
+	bikeassociations
+	bikerepair
+	bikeshop
+	specialbikes
+Car Cleaning
+	auto_detailing
+	carwash
+Customization
+	autocustomization
+	stereo_installation
+Dealers
+	aircraftdealers
+	autoloanproviders
+	boatdealers
+	car_dealers
+	motorcycledealers
+	rv_dealers
+Rentals
+	carshares
+	truck_rental
+Vehicle Repair
+	autoelectric
+	autoglass
+	autopartssupplies
+	autorepair
+	bodyshops
+	autodamageassessment
+	motorcyclerepair
+	oilchange
+	rvrepair
+	smog_check_stations
+	tires
+	towing
+	wheelrimrepair
+	windshieldinstallrepair
+Vehicle Services
+	servicestations
+	parking
+	registrationservices
+	vehicleshipping
