@@ -228,7 +228,7 @@ public class AnalyticsService {
 							.getNetworkById(contact.getExternalIdentity()
 									.getExternalNetwork());
 					if (network == ExternalNetwork.Facebook
-							|| network == ExternalNetwork.Google)
+							|| network == ExternalNetwork.Gmail)
 						recommendationEngine.assign(profile, network);
 				}
 			}
@@ -346,8 +346,8 @@ public class AnalyticsService {
 		Set<String> groups = assignGroups(ExternalNetwork.Facebook);
 		createRecommendedActivities(groups, ExternalNetwork.Facebook);
 
-		train(ExternalNetwork.Google);
-		groups = assignGroups(ExternalNetwork.Google);
+		train(ExternalNetwork.Gmail);
+		groups = assignGroups(ExternalNetwork.Gmail);
 		createRecommendedVideos(groups, ExternalNetwork.YouTube);
 
 	}
@@ -634,13 +634,13 @@ public class AnalyticsService {
 				-180.0, 180.0), 0.0));
 
 		// create google specific context, with dimensions where
-		recommendationEngine.addContext(ExternalNetwork.Google, configuration);
+		recommendationEngine.addContext(ExternalNetwork.Gmail, configuration);
 		recommendationEngine.addDimension(
 				Dimension.createFromEnum("gender", Gender.class, 1.0),
-				ExternalNetwork.Google);
+				ExternalNetwork.Gmail);
 		recommendationEngine.addDimension(
 				new Dimension("ageRange", Range.between(0.0, 100.0), 1.0),
-				ExternalNetwork.Google);
+				ExternalNetwork.Gmail);
 		recommendationEngine.addDimension(new Dimension("lat", Range.between(
 				-90.0, 90.0), 0.5)); // location so / so
 		recommendationEngine.addDimension(new Dimension("lon", Range.between(

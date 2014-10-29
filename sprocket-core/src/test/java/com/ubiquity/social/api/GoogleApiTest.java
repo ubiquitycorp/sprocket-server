@@ -40,7 +40,7 @@ public class GoogleApiTest {
 	
 	@Test
 	public void testAuthenticatedReturnsGenderAndAgeRange() {
-		SocialAPI socialApi = SocialAPIFactory.createProvider(ExternalNetwork.Google, ClientPlatform.Android);
+		SocialAPI socialApi = SocialAPIFactory.createProvider(ExternalNetwork.Gmail, ClientPlatform.Android);
 		Contact contact = socialApi.authenticateUser(identity);
 		Assert.assertTrue(contact.getGender() != null);	
 		Assert.assertTrue(contact.getAgeRange() != null);

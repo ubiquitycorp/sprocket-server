@@ -108,7 +108,6 @@ public class DataSyncProcessor extends Thread {
 		Long userId = identity.getUser().getUserId();
 		
 		sendSyncStartedMessageToIndividual(backchannel, externalNetwork, userId);
-
 		
 		if (externalNetwork.network.equals(Network.Content)) {
 			DateTime start = new DateTime();
@@ -117,7 +116,7 @@ public class DataSyncProcessor extends Thread {
 			
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized videos", getResoursePath(userId, externalNetwork, ResourceType.videos), n, userId);
 		} 
-		else if (externalNetwork.equals(ExternalNetwork.Google)) {
+		else if (externalNetwork.network.equals(Network.Mail)) {
 			DateTime start = new DateTime();
 			int n = processMessages(identity, externalNetwork, null);
 			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
@@ -142,7 +141,6 @@ public class DataSyncProcessor extends Thread {
 			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId);
 
-//		}|| externalNetwork.equals(ExternalNetwork.Tumblr)
 		} else if(externalNetwork.equals(ExternalNetwork.LinkedIn)) {
 			DateTime start = new DateTime();
 			int n = processActivities(identity, externalNetwork);
@@ -264,7 +262,6 @@ public class DataSyncProcessor extends Thread {
 				try
 				{
 					ExternalIdentity externalIdentity = (ExternalIdentity)identity;
-
 					ServiceFactory.getSocialService().checkValidityOfExternalIdentity(externalIdentity);
 					processSync(externalIdentity);
 
