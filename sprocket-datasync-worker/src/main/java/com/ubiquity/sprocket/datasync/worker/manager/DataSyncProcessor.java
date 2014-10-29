@@ -142,8 +142,8 @@ public class DataSyncProcessor extends Thread {
 			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId);
 
-
-		} else if(externalNetwork.equals(ExternalNetwork.LinkedIn) || externalNetwork.equals(ExternalNetwork.Tumblr)) {
+//		}|| externalNetwork.equals(ExternalNetwork.Tumblr)
+		} else if(externalNetwork.equals(ExternalNetwork.LinkedIn)) {
 			DateTime start = new DateTime();
 			int n = processActivities(identity, externalNetwork);
 			log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
