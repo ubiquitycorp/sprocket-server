@@ -189,7 +189,7 @@
 
 	"echo [agent] >> /etc/puppet/puppet.conf",
 	"echo classfile = $vardir/classes.txt >> /etc/puppet/puppet.conf",
-	"echo environment = swisscom >> /etc/puppet/puppet.conf",
+	"echo environment = timewarner >> /etc/puppet/puppet.conf",
 	"echo certname = ${HOSTNAME}.ubiquitybc.net >> /etc/puppet/puppet.conf",
 	"echo runinterval = 5m >> /etc/puppet/puppet.conf",
 	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
@@ -277,7 +277,7 @@
 
 	"echo [agent] >> /etc/puppet/puppet.conf",
 	"echo classfile = $vardir/classes.txt >> /etc/puppet/puppet.conf",
-	"echo environment = swisscom >> /etc/puppet/puppet.conf",
+	"echo environment = timewarner >> /etc/puppet/puppet.conf",
 	"echo certname = ${HOSTNAME}.ubiquitybc.net >> /etc/puppet/puppet.conf",
 	"echo runinterval = 5m >> /etc/puppet/puppet.conf",
 	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
@@ -359,7 +359,7 @@
 
 	"echo [agent] >> /etc/puppet/puppet.conf",
 	"echo classfile = $vardir/classes.txt >> /etc/puppet/puppet.conf",
-	"echo environment = swisscom >> /etc/puppet/puppet.conf",
+	"echo environment = timewarner >> /etc/puppet/puppet.conf",
 	"echo certname = ${HOSTNAME}.ubiquitybc.net >> /etc/puppet/puppet.conf",
 	"echo runinterval = 5m >> /etc/puppet/puppet.conf",
 	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
@@ -441,7 +441,7 @@
 
 	"echo [agent] >> /etc/puppet/puppet.conf",
 	"echo classfile = $vardir/classes.txt >> /etc/puppet/puppet.conf",
-	"echo environment = swisscom >> /etc/puppet/puppet.conf",
+	"echo environment = timewarner >> /etc/puppet/puppet.conf",
 	"echo certname = ${HOSTNAME}.ubiquitybc.net >> /etc/puppet/puppet.conf",
 	"echo runinterval = 5m >> /etc/puppet/puppet.conf",
 	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
@@ -516,7 +516,7 @@
 
 	"echo [agent] >> /etc/puppet/puppet.conf",
 	"echo classfile = $vardir/classes.txt >> /etc/puppet/puppet.conf",
-	"echo environment = swisscom >> /etc/puppet/puppet.conf",
+	"echo environment = timewarner >> /etc/puppet/puppet.conf",
 	"echo certname = ${HOSTNAME}.ubiquitybc.net >> /etc/puppet/puppet.conf",
 	"echo runinterval = 5m >> /etc/puppet/puppet.conf",
 	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
@@ -598,7 +598,7 @@
 
 	"echo [agent] >> /etc/puppet/puppet.conf",
 	"echo classfile = $vardir/classes.txt >> /etc/puppet/puppet.conf",
-	"echo environment = swisscom >> /etc/puppet/puppet.conf",
+	"echo environment = timewarner >> /etc/puppet/puppet.conf",
 	"echo certname = ${HOSTNAME}.ubiquitybc.net >> /etc/puppet/puppet.conf",
 	"echo runinterval = 5m >> /etc/puppet/puppet.conf",
 	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
@@ -680,7 +680,7 @@
 
 	"echo [agent] >> /etc/puppet/puppet.conf",
 	"echo classfile = $vardir/classes.txt >> /etc/puppet/puppet.conf",
-	"echo environment = swisscom >> /etc/puppet/puppet.conf",
+	"echo environment = timewarner >> /etc/puppet/puppet.conf",
 	"echo certname = ${HOSTNAME}.ubiquitybc.net >> /etc/puppet/puppet.conf",
 	"echo runinterval = 5m >> /etc/puppet/puppet.conf",
 	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
@@ -754,7 +754,7 @@
 
 	"echo [agent] >> /etc/puppet/puppet.conf",
 	"echo classfile = $vardir/classes.txt >> /etc/puppet/puppet.conf",
-	"echo environment = swisscom >> /etc/puppet/puppet.conf",
+	"echo environment = timewarner >> /etc/puppet/puppet.conf",
 	"echo certname = ${HOSTNAME}.ubiquitybc.net >> /etc/puppet/puppet.conf",
 	"echo runinterval = 5m >> /etc/puppet/puppet.conf",
 	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
