@@ -1,5 +1,4 @@
 PUPPETSERVER=ubiquity-provision.ubiquitybc.net
-CUSTOMER=swisscom
 
 all:	sprocket.json
 sprocket.json:	sprocket.json.in

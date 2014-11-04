@@ -174,7 +174,7 @@
             "\n",
             [
              "#!/bin/sh",
-	"HOSTNAME=CLOUDNAME-rds-init",
+	"HOSTNAME=autosign23-rds-init",
         "vardir=/var/lib/puppet",
 	"echo NETWORKING=yes > /etc/sysconfig/network",
 	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
@@ -184,7 +184,7 @@
 	"echo logdir = /var/log/puppet >> /etc/puppet/puppet.conf",
 	"echo rundir = /var/run/puppet >> /etc/puppet/puppet.conf",
 	"echo ssldir = $vardir/ssl >> /etc/puppet/puppet.conf",
-	"echo server = PUPPETSERVER >> /etc/puppet/puppet.conf",
+	"echo server = ubiquity-provision.ubiquitybc.net >> /etc/puppet/puppet.conf",
 	"echo pluginsync = true >> /etc/puppet/puppet.conf",
 
 	"echo [agent] >> /etc/puppet/puppet.conf",
@@ -195,7 +195,7 @@
 	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
         "echo database:",  { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] },
         "find /var/lib/puppet -type f -exec rm '{}' \\; ",
-        "rm -f /var/lib/puppet/ssl/certs/*CUSTOMER*.pem",
+        "rm -f /var/lib/puppet/ssl/certs/*timewarner*.pem",
 	"hostname $HOSTNAME",
 	"puppet agent -t --waitforcert 60",
 	"service puppet restart",
@@ -211,7 +211,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "CLOUDNAME-rds-init"
+            "Value": "autosign23-rds-init"
           },
           {
             "Key": "Database",
@@ -262,7 +262,7 @@
             "\n",
             [
              "#!/bin/sh",
-	"HOSTNAME=CLOUDNAME-sprocket-api-CUSTOMER-01",
+	"HOSTNAME=autosign23-sprocket-api-timewarner-01",
         "vardir=/var/lib/puppet",
 	"echo NETWORKING=yes > /etc/sysconfig/network",
 	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
@@ -272,7 +272,7 @@
 	"echo logdir = /var/log/puppet >> /etc/puppet/puppet.conf",
 	"echo rundir = /var/run/puppet >> /etc/puppet/puppet.conf",
 	"echo ssldir = $vardir/ssl >> /etc/puppet/puppet.conf",
-	"echo server = PUPPETSERVER >> /etc/puppet/puppet.conf",
+	"echo server = ubiquity-provision.ubiquitybc.net >> /etc/puppet/puppet.conf",
 	"echo pluginsync = true >> /etc/puppet/puppet.conf",
 
 	"echo [agent] >> /etc/puppet/puppet.conf",
@@ -283,7 +283,7 @@
 	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
         "echo database:",  { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] },
         "find /var/lib/puppet -type f -exec rm '{}' \\; ",
-        "rm -f /var/lib/puppet/ssl/certs/*CUSTOMER*.pem",
+        "rm -f /var/lib/puppet/ssl/certs/*timewarner*.pem",
 	"hostname $HOSTNAME",
 	"puppet agent -t --waitforcert 60",
 	"service puppet restart",
@@ -299,7 +299,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "CLOUDNAME-sprocket-api-CUSTOMER-01"
+            "Value": "autosign23-sprocket-api-timewarner-01"
           }
         ],
         "Volumes": [
@@ -344,7 +344,7 @@
             "\n",
             [
              "#!/bin/sh",
-	"HOSTNAME=CLOUDNAME-sprocket-api-CUSTOMER-02",
+	"HOSTNAME=autosign23-sprocket-api-timewarner-02",
         "vardir=/var/lib/puppet",
 	"echo NETWORKING=yes > /etc/sysconfig/network",
 	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
@@ -354,7 +354,7 @@
 	"echo logdir = /var/log/puppet >> /etc/puppet/puppet.conf",
 	"echo rundir = /var/run/puppet >> /etc/puppet/puppet.conf",
 	"echo ssldir = $vardir/ssl >> /etc/puppet/puppet.conf",
-	"echo server = PUPPETSERVER >> /etc/puppet/puppet.conf",
+	"echo server = ubiquity-provision.ubiquitybc.net >> /etc/puppet/puppet.conf",
 	"echo pluginsync = true >> /etc/puppet/puppet.conf",
 
 	"echo [agent] >> /etc/puppet/puppet.conf",
@@ -365,7 +365,7 @@
 	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
         "echo database:",  { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] },
         "find /var/lib/puppet -type f -exec rm '{}' \\; ",
-        "rm -f /var/lib/puppet/ssl/certs/*CUSTOMER*.pem",
+        "rm -f /var/lib/puppet/ssl/certs/*timewarner*.pem",
 	"hostname $HOSTNAME",
 	"puppet agent -t --waitforcert 60",
 	"service puppet restart",
@@ -381,7 +381,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "CLOUDNAME-sprocket-api-CUSTOMER-02"
+            "Value": "autosign23-sprocket-api-timewarner-02"
           }
         ],
         "Volumes": [
@@ -426,7 +426,7 @@
             "\n",
             [
              "#!/bin/sh",
-	"HOSTNAME=CLOUDNAME-sprocket-search-CUSTOMER",
+	"HOSTNAME=autosign23-sprocket-search-timewarner",
         "vardir=/var/lib/puppet",
 	"echo NETWORKING=yes > /etc/sysconfig/network",
 	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
@@ -436,7 +436,7 @@
 	"echo logdir = /var/log/puppet >> /etc/puppet/puppet.conf",
 	"echo rundir = /var/run/puppet >> /etc/puppet/puppet.conf",
 	"echo ssldir = $vardir/ssl >> /etc/puppet/puppet.conf",
-	"echo server = PUPPETSERVER >> /etc/puppet/puppet.conf",
+	"echo server = ubiquity-provision.ubiquitybc.net >> /etc/puppet/puppet.conf",
 	"echo pluginsync = true >> /etc/puppet/puppet.conf",
 
 	"echo [agent] >> /etc/puppet/puppet.conf",
@@ -447,7 +447,7 @@
 	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
         "echo database:",  { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] },
         "find /var/lib/puppet -type f -exec rm '{}' \\; ",
-        "rm -f /var/lib/puppet/ssl/certs/*CUSTOMER*.pem",
+        "rm -f /var/lib/puppet/ssl/certs/*timewarner*.pem",
 	"hostname $HOSTNAME",
 	"puppet agent -t --waitforcert 60",
 	"service puppet restart",
@@ -463,7 +463,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "CLOUDNAME-sprocket-search-CUSTOMER"
+            "Value": "autosign23-sprocket-search-timewarner"
           }
         ],
         "NetworkInterfaces": [
@@ -501,7 +501,7 @@
             "\n",
             [
              "#!/bin/sh",
-	"HOSTNAME=CLOUDNAME-sprocket-rabbitmq-CUSTOMER-01",
+	"HOSTNAME=autosign23-sprocket-rabbitmq-timewarner-01",
         "vardir=/var/lib/puppet",
 	"echo NETWORKING=yes > /etc/sysconfig/network",
 	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
@@ -511,7 +511,7 @@
 	"echo logdir = /var/log/puppet >> /etc/puppet/puppet.conf",
 	"echo rundir = /var/run/puppet >> /etc/puppet/puppet.conf",
 	"echo ssldir = $vardir/ssl >> /etc/puppet/puppet.conf",
-	"echo server = PUPPETSERVER >> /etc/puppet/puppet.conf",
+	"echo server = ubiquity-provision.ubiquitybc.net >> /etc/puppet/puppet.conf",
 	"echo pluginsync = true >> /etc/puppet/puppet.conf",
 
 	"echo [agent] >> /etc/puppet/puppet.conf",
@@ -522,7 +522,7 @@
 	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
         "echo database:",  { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] },
         "find /var/lib/puppet -type f -exec rm '{}' \\; ",
-        "rm -f /var/lib/puppet/ssl/certs/*CUSTOMER*.pem",
+        "rm -f /var/lib/puppet/ssl/certs/*timewarner*.pem",
 	"hostname $HOSTNAME",
 	"puppet agent -t --waitforcert 60",
 	"service puppet restart",
@@ -538,7 +538,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "CLOUDNAME-sprocket-rabbitmq-CUSTOMER-01"
+            "Value": "autosign23-sprocket-rabbitmq-timewarner-01"
           }
         ],
         "Volumes": [
@@ -583,7 +583,7 @@
             "\n",
             [
              "#!/bin/sh",
-	"HOSTNAME=CLOUDNAME-sprocket-redis-CUSTOMER-01",
+	"HOSTNAME=autosign23-sprocket-redis-timewarner-01",
         "vardir=/var/lib/puppet",
 	"echo NETWORKING=yes > /etc/sysconfig/network",
 	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
@@ -593,7 +593,7 @@
 	"echo logdir = /var/log/puppet >> /etc/puppet/puppet.conf",
 	"echo rundir = /var/run/puppet >> /etc/puppet/puppet.conf",
 	"echo ssldir = $vardir/ssl >> /etc/puppet/puppet.conf",
-	"echo server = PUPPETSERVER >> /etc/puppet/puppet.conf",
+	"echo server = ubiquity-provision.ubiquitybc.net >> /etc/puppet/puppet.conf",
 	"echo pluginsync = true >> /etc/puppet/puppet.conf",
 
 	"echo [agent] >> /etc/puppet/puppet.conf",
@@ -604,7 +604,7 @@
 	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
         "echo database:",  { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] },
         "find /var/lib/puppet -type f -exec rm '{}' \\; ",
-        "rm -f /var/lib/puppet/ssl/certs/*CUSTOMER*.pem",
+        "rm -f /var/lib/puppet/ssl/certs/*timewarner*.pem",
 	"hostname $HOSTNAME",
 	"puppet agent -t --waitforcert 60",
 	"service puppet restart",
@@ -620,7 +620,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "CLOUDNAME-sprocket-redis-CUSTOMER-01"
+            "Value": "autosign23-sprocket-redis-timewarner-01"
           }
         ],
         "Volumes": [
@@ -665,7 +665,7 @@
             "\n",
             [
              "#!/bin/sh",
-	"HOSTNAME=CLOUDNAME-sprocket-worker-CUSTOMER-01",
+	"HOSTNAME=autosign23-sprocket-worker-timewarner-01",
         "vardir=/var/lib/puppet",
 	"echo NETWORKING=yes > /etc/sysconfig/network",
 	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
@@ -675,7 +675,7 @@
 	"echo logdir = /var/log/puppet >> /etc/puppet/puppet.conf",
 	"echo rundir = /var/run/puppet >> /etc/puppet/puppet.conf",
 	"echo ssldir = $vardir/ssl >> /etc/puppet/puppet.conf",
-	"echo server = PUPPETSERVER >> /etc/puppet/puppet.conf",
+	"echo server = ubiquity-provision.ubiquitybc.net >> /etc/puppet/puppet.conf",
 	"echo pluginsync = true >> /etc/puppet/puppet.conf",
 
 	"echo [agent] >> /etc/puppet/puppet.conf",
@@ -686,7 +686,7 @@
 	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
         "echo database:",  { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] },
         "find /var/lib/puppet -type f -exec rm '{}' \\; ",
-        "rm -f /var/lib/puppet/ssl/certs/*CUSTOMER*.pem",
+        "rm -f /var/lib/puppet/ssl/certs/*timewarner*.pem",
 	"hostname $HOSTNAME",
 	"puppet agent -t --waitforcert 60",
 	"service puppet restart",
@@ -702,7 +702,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "CLOUDNAME-sprocket-worker-CUSTOMER-01"
+            "Value": "autosign23-sprocket-worker-timewarner-01"
           }
         ],
         "NetworkInterfaces": [
@@ -739,7 +739,7 @@
             "\n",
             [
              "#!/bin/sh",
-	"HOSTNAME=CLOUDNAME-sprocket-worker-CUSTOMER-02",
+	"HOSTNAME=autosign23-sprocket-worker-timewarner-02",
         "vardir=/var/lib/puppet",
 	"echo NETWORKING=yes > /etc/sysconfig/network",
 	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
@@ -749,7 +749,7 @@
 	"echo logdir = /var/log/puppet >> /etc/puppet/puppet.conf",
 	"echo rundir = /var/run/puppet >> /etc/puppet/puppet.conf",
 	"echo ssldir = $vardir/ssl >> /etc/puppet/puppet.conf",
-	"echo server = PUPPETSERVER >> /etc/puppet/puppet.conf",
+	"echo server = ubiquity-provision.ubiquitybc.net >> /etc/puppet/puppet.conf",
 	"echo pluginsync = true >> /etc/puppet/puppet.conf",
 
 	"echo [agent] >> /etc/puppet/puppet.conf",
@@ -760,7 +760,7 @@
 	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
         "echo database:",  { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] },
         "find /var/lib/puppet -type f -exec rm '{}' \\; ",
-        "rm -f /var/lib/puppet/ssl/certs/*CUSTOMER*.pem",
+        "rm -f /var/lib/puppet/ssl/certs/*timewarner*.pem",
 	"hostname $HOSTNAME",
 	"puppet agent -t --waitforcert 60",
 	"service puppet restart",
@@ -776,7 +776,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "CLOUDNAME-sprocket-worker-CUSTOMER-02"
+            "Value": "autosign23-sprocket-worker-timewarner-02"
           }
         ],
         "NetworkInterfaces": [
