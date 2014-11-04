@@ -199,6 +199,7 @@
 	"hostname $HOSTNAME",
 	"puppet agent -t --waitforcert 60",
 	"service puppet restart",
+        "rm /etc/bootstrap-rds",
 	"puppet agent -t"
             ]
            ]
