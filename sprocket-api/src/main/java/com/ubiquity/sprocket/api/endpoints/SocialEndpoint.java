@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.jpa.EntityManagerSupport;
+import com.ubiquity.api.exception.HttpException;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.Contact;
@@ -174,13 +175,13 @@ public class SocialEndpoint {
 	 * @param userId
 	 * @param externalNetworkId
 	 * @return
-	 * @throws org.jets3t.service.impl.rest.HttpException 
+	 * @throws org.apache.http.HttpException 
 	 */
 	@POST
 	@Path("users/{userId}/providers/{externalNetworkId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
+	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws org.apache.http.HttpException {
 
 		//Cast the input into SendMessageObject
 		SendMessageDto sendMessageDto = jsonConverter.convertFromPayload(payload, SendMessageDto.class);
@@ -207,13 +208,12 @@ public class SocialEndpoint {
 	 * @param userId
 	 * @param externalNetworkId
 	 * @return
-	 * @throws org.jets3t.service.impl.rest.HttpException 
 	 */
 	@POST
 	@Path("users/{userId}/providers/{externalNetworkId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response postactivity(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
+	public Response postactivity(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws HttpException {
 
 		//Cast the input into SendMessageObject
 		PostActivity postActivity = jsonConverter.convertFromPayload(payload, PostActivity.class);
