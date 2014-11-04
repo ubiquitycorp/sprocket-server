@@ -81,10 +81,10 @@
         },
         "Instances": [
           {
-            "Ref": "SprocketAPIStage01"
+            "Ref": "SprocketAPI01"
           },
           {
-            "Ref": "SprocketAPIStage02"
+            "Ref": "SprocketAPI02"
           }
         ],
         "SecurityGroups": [
@@ -112,7 +112,7 @@
         ]
       }
     },
-    "SprocketStageELB": {
+    "SprocketELB": {
       "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
       "Properties": {
         "Subnets": [
@@ -132,10 +132,10 @@
         },
         "Instances": [
           {
-            "Ref": "SprocketAPIStage01"
+            "Ref": "SprocketAPI01"
           },
           {
-            "Ref": "SprocketAPIStage02"
+            "Ref": "SprocketAPI02"
           }
         ],
         "SecurityGroups": [
@@ -252,7 +252,7 @@
         ]
       }
     },
-    "SprocketAPIStage01": {
+    "SprocketAPI01": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
         "DisableApiTermination": "FALSE",
@@ -307,7 +307,7 @@
           {
             "Device": "/dev/sdb",
             "VolumeId": {
-              "Ref": "SprocketAPIStage01Volume"
+              "Ref": "SprocketAPI01Volume"
             }
           }
         ],
@@ -334,7 +334,7 @@
         ]
       }
     },
-    "SprocketAPIStage02": {
+    "SprocketAPI02": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
         "DisableApiTermination": "FALSE",
@@ -389,7 +389,7 @@
           {
             "Device": "/dev/sdb",
             "VolumeId": {
-              "Ref": "SprocketAPIStage02Volume"
+              "Ref": "SprocketAPI02Volume"
             }
           }
         ],
@@ -416,7 +416,7 @@
         ]
       }
     },
-    "SprocketSearchStage": {
+    "SprocketSearch": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
         "DisableApiTermination": "FALSE",
@@ -486,12 +486,12 @@
                 "Ref": "sgApplicationServer"
               }
             ],
-            "AssociatePublicIpAddress": "true"
+            "AssociatePublicIpAddress": "false"
           }
         ]
       }
     },
-    "SprocketRabbitMQStage01": {
+    "SprocketRabbitMQ01": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
         "DisableApiTermination": "FALSE",
@@ -546,7 +546,7 @@
           {
             "Device": "/dev/sdb",
             "VolumeId": {
-              "Ref": "SprocketRabbitMQStage01Volume"
+              "Ref": "SprocketRabbitMQ01Volume"
             }
           }
         ],
@@ -568,12 +568,12 @@
                 "Ref": "sgRabbitMQ"
               }
             ],
-            "AssociatePublicIpAddress": "true"
+            "AssociatePublicIpAddress": "false"
           }
         ]
       }
     },
-    "SprocketRedisStage01": {
+    "SprocketRedis01": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
         "DisableApiTermination": "FALSE",
@@ -628,7 +628,7 @@
           {
             "Device": "/dev/sdb",
             "VolumeId": {
-              "Ref": "SprocketRedisStage01Volume"
+              "Ref": "SprocketRedis01Volume"
             }
           }
         ],
@@ -650,12 +650,12 @@
                 "Ref": "sgRedis"
               }
             ],
-            "AssociatePublicIpAddress": "true"
+            "AssociatePublicIpAddress": "false"
           }
         ]
       }
     },
-    "SprocketWorkerStage01": {
+    "SprocketWorker01": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
         "DisableApiTermination": "FALSE",
@@ -721,7 +721,7 @@
             ],
             "GroupSet": [
               {
-                "Ref": "sglaunchwizard1"
+                "Ref": "sgmisc"
               }
             ],
             "AssociatePublicIpAddress": "true"
@@ -729,7 +729,7 @@
         ]
       }
     },
-    "SprocketWorkerStage02": {
+    "SprocketWorker02": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
         "DisableApiTermination": "FALSE",
@@ -795,15 +795,15 @@
             ],
             "GroupSet": [
               {
-                "Ref": "sglaunchwizard1"
+                "Ref": "sgmisc"
               }
             ],
-            "AssociatePublicIpAddress": "true"
+            "AssociatePublicIpAddress": "false"
           }
         ]
       }
     },
-    "SprocketAPIStage01Volume": {
+    "SprocketAPI01Volume": {
       "Type": "AWS::EC2::Volume",
       "Properties": {
         "AvailabilityZone": "us-west-1c",
@@ -811,7 +811,7 @@
         "VolumeType": "gp2"
       }
     },
-    "SprocketAPIStage02Volume": {
+    "SprocketAPI02Volume": {
       "Type": "AWS::EC2::Volume",
       "Properties": {
         "AvailabilityZone": "us-west-1c",
@@ -819,7 +819,7 @@
         "VolumeType": "gp2"
       }
     },
-    "SprocketRabbitMQStage01Volume": {
+    "SprocketRabbitMQ01Volume": {
       "Type": "AWS::EC2::Volume",
       "Properties": {
         "AvailabilityZone": "us-west-1c",
@@ -827,7 +827,7 @@
         "VolumeType": "gp2"
       }
     },
-    "SprocketRedisStage01Volume": {
+    "SprocketRedis01Volume": {
       "Type": "AWS::EC2::Volume",
       "Properties": {
         "AvailabilityZone": "us-west-1c",
@@ -1105,10 +1105,10 @@
         ]
       }
     },
-    "sglaunchwizard1": {
+    "sgmisc": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
-        "GroupDescription": "launch-wizard-1 created on Saturday, April 19, 2014 12:35:33 PM UTC-7",
+        "GroupDescription": "Miscellaneous",
         "VpcId": {
           "Ref": "SprocketVPC"
         },
