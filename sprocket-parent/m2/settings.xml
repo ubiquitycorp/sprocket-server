@@ -59,6 +59,9 @@
 				<yelp.tokenSecret>w7oeFsjoVLEb4c8bUbgRiQ4smec</yelp.tokenSecret>
 				<social.tumblr.consumerKey>X4Jwwn3OaWgt9BlzaibfDw8ZFWcs1NUlgHTeitGSoC65cBXir3</social.tumblr.consumerKey>
 				<social.tumblr.consumerSecret>s7CPOLZnwSsdJkyYYus2r7KByMcwwgFWtGyPxhtjDXnhkUBLhg</social.tumblr.consumerSecret>
+				<social.reddit.web.consumerKey>yIhf9yZdXmU4_w</social.reddit.web.consumerKey>
+				<social.reddit.web.consumerSecret>0rJkc9DYrC-WpiMCypl0hoy8S0c</social.reddit.web.consumerSecret>
+				<social.reddit.installed.consumerSecret>NVMIMSbywkA7xA</social.reddit.installed.consumerSecret>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
 				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
@@ -170,6 +173,9 @@
 				<yelp.tokenSecret>w7oeFsjoVLEb4c8bUbgRiQ4smec</yelp.tokenSecret>
 				<social.tumblr.consumerKey>kIdbuVYutk0G294pS4et73SI9k9TGP4ONpjGPcXekNr8fQOMWZ</social.tumblr.consumerKey>
 				<social.tumblr.consumerSecret>C0vBoxsctnB6qEvtGIv3xhYLGIIyw1a7E43AQQDLrfZfY37Ns2</social.tumblr.consumerSecret>
+				<social.reddit.web.consumerKey>zJ60a4wDHj6oMQ</social.reddit.web.consumerKey>
+				<social.reddit.web.consumerSecret>3t4KMhBuPrtAeS2sBoGRboqieng</social.reddit.web.consumerSecret>
+				<social.reddit.installed.consumerSecret>xvOJZJMeG5HQZw</social.reddit.installed.consumerSecret>
 				<constants.resetUrl>http://sprocket-qa.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>
 				<db.pool.maxActive>50</db.pool.maxActive>
@@ -284,6 +290,11 @@
 				<yelp.tokenSecret>w7oeFsjoVLEb4c8bUbgRiQ4smec</yelp.tokenSecret>
 				<social.tumblr.consumerKey>HXpAQmGwYutSonQNixGf23uy8SifTZU5WG2iALLwNgdzYhGYfs</social.tumblr.consumerKey>
 				<social.tumblr.consumerSecret>lbsptcaAFUhLExR2UllZZ1FqG0r0uIWeHD9UOP9lF5ywGCI92W</social.tumblr.consumerSecret>
+				
+				<social.reddit.web.consumerKey>gTwisdAm0FV8DQ</social.reddit.web.consumerKey>
+				<social.reddit.web.consumerSecret>dJ-nLWxl_TuAoDnUnYXWkj3N9QM</social.reddit.web.consumerSecret>
+				<social.reddit.installed.consumerSecret>Fm2rYVyn5bVhmw</social.reddit.installed.consumerSecret>
+				
 				<constants.resetUrl>sprocket-web-stage.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>
 				<db.pool.maxActive>50</db.pool.maxActive>
