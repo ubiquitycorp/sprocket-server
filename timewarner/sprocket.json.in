@@ -486,7 +486,7 @@
                 "Ref": "sgApplicationServer"
               }
             ],
-            "AssociatePublicIpAddress": "false"
+            "AssociatePublicIpAddress": "true"
           }
         ]
       }
@@ -568,7 +568,7 @@
                 "Ref": "sgRabbitMQ"
               }
             ],
-            "AssociatePublicIpAddress": "false"
+            "AssociatePublicIpAddress": "true"
           }
         ]
       }
@@ -650,7 +650,7 @@
                 "Ref": "sgRedis"
               }
             ],
-            "AssociatePublicIpAddress": "false"
+            "AssociatePublicIpAddress": "true"
           }
         ]
       }
@@ -798,7 +798,7 @@
                 "Ref": "sgmisc"
               }
             ],
-            "AssociatePublicIpAddress": "false"
+            "AssociatePublicIpAddress": "true"
           }
         ]
       }
