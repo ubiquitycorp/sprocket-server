@@ -118,7 +118,7 @@ public class UsersEndpoint {
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identity.getIdentityId());
+					.getBySocialIdentityId(identity.getIdentityId(),user.getUserId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
@@ -321,7 +321,7 @@ public class UsersEndpoint {
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identity.get(0).getIdentityId());
+					.getBySocialIdentityId(identity.get(0).getIdentityId(),userId);
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
@@ -407,7 +407,7 @@ public class UsersEndpoint {
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identiies.get(0).getIdentityId());
+					.getBySocialIdentityId(identiies.get(0).getIdentityId(),userId);
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();

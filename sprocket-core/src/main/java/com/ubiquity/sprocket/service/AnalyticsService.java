@@ -320,8 +320,7 @@ public class AnalyticsService {
 					if (identity instanceof ExternalIdentity) {
 						// get own contact by the identity id
 						Contact contact = new ContactRepositoryJpaImpl()
-						.getByExternalIdentityId(identity
-								.getIdentityId());
+						.getByExternalIdentityIdAndUserId(identity.getIdentityId(),user.getUserId());
 						if (contact != null) // TODO: find underlying reason why
 							// this can happen
 							profile.getContacts().add(contact);
