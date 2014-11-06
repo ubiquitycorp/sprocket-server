@@ -37,6 +37,7 @@
 		<class>com.ubiquity.integration.domain.Activity</class>
 		<class>com.ubiquity.integration.domain.Event</class>
 
+		<class>com.ubiquity.sprocket.domain.Configuration</class>
 		<properties>
 
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />

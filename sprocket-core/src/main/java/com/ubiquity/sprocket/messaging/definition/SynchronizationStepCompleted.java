@@ -6,6 +6,7 @@ public class SynchronizationStepCompleted {
 	private String message;
 	private Long timestamp;
 	private String resourcePath;
+	private String resourceType;
 	private Integer records;
 
 	public Long getTimestamp() {
@@ -28,6 +29,10 @@ public class SynchronizationStepCompleted {
 		return records;
 	}
 
+	public String getResourceType() {
+		return resourceType;
+	}
+
 	@Override
 	public String toString() {
 		return "SynchronizationStepCompleted [network=" + externalNetworkId
@@ -40,6 +45,7 @@ public class SynchronizationStepCompleted {
 		private String message;
 		private Long timestamp;
 		private String resourcePath;
+		private String resourceType;
 		private Integer records;
 
 		public Builder externalNetworkId(Integer externalNetworkId) {
@@ -61,6 +67,11 @@ public class SynchronizationStepCompleted {
 			this.resourcePath = resourcePath;
 			return this;
 		}
+		
+		public Builder resourceType(String resourceType) {
+			this.resourceType = resourceType;
+			return this;
+		}
 
 		public Builder records(Integer records) {
 			this.records = records;
@@ -77,6 +88,7 @@ public class SynchronizationStepCompleted {
 		this.message = builder.message;
 		this.timestamp = builder.timestamp;
 		this.resourcePath = builder.resourcePath;
+		this.resourceType = builder.resourceType;
 		this.records = builder.records;
 	}
 }
