@@ -212,6 +212,9 @@ public class LocationService {
 				for(Place neighborhood : places) {
 					
 					log.info("Synchronizing neighborhood {}", neighborhood.getName());
+					if(!neighborhood.getLocator().contains(", CA")) 
+						continue;
+					
 					int page = 0;
 					Boolean paging = Boolean.TRUE;
 					do {
