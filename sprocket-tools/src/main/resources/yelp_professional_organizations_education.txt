@@ -1,0 +1,33 @@
+Schools
+	Adult Education
+	collegeuniv
+	elementaryschools
+	highschools
+	preschools
+	privateschools
+	religiousschools
+	specialed
+	artclasses
+School Services
+	collegecounseling
+	educationservices
+	privatetutors
+	testprep
+	tutoring
+Speciality Schools
+	artschools
+	bartendingschools
+	cprclasses
+	circusschools
+	cookingschools
+	cosmetology_schools
+	dance_schools
+	driving_schools
+	firstaidclasses
+	flightinstruction
+	foodsafety
+	language_schools
+	massage_schools
+	parentingclasses
+	swimminglessons
+	vocation

@@ -1,0 +1,16 @@
+Community
+	communitycenters
+	libraries
+First Responder
+	firedepartments	
+	policedepartments
+Departments
+	departmentsofmotorvehicles
+	postoffices
+	courthouses
+	authorized_postal_representative
+State, Federal & International
+	embassy
+	landmarks
+	taxoffice
+	registry_office
