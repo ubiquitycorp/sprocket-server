@@ -1,0 +1,10 @@
+Management
+	financialadvising
+	investing
+	taxservices
+Banking
+	banks
+	paydayloans
+	debtrelief
+	insurance
+	
