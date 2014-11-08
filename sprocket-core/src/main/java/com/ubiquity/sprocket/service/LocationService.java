@@ -212,8 +212,14 @@ public class LocationService {
 				for(Place neighborhood : places) {
 					
 					log.info("Synchronizing neighborhood {}", neighborhood.getName());
-					if(!neighborhood.getLocator().contains(", CA")) 
+					if(neighborhood.getLocator().contains(", CA")) 
 						continue;
+					
+					// check to see if we have something in the db already for this neighborhood....
+					if(!placeRepository.findChildrenForPlace(neighborhood).isEmpty()) {
+						log.info("Found businsesses for neighborhood {}, skipping", neighborhood);
+						continue;
+					}
 					
 					int page = 0;
 					Boolean paging = Boolean.TRUE;
@@ -222,7 +228,6 @@ public class LocationService {
 						List<Place> results =  null;
 						try {
 							page++;
-							log.info("searching neighborhood {} and page {}", neighborhood, page);
 							results = placeAPI.searchPlacesWithinPlace("", neighborhood, null, page, 20);
 						} catch (ExternalNetworkException e) {
 							paging = Boolean.FALSE;
@@ -233,8 +238,10 @@ public class LocationService {
 							
 							// check to see if we have a dupe
 							Place persisted = placeRepository.getByLocatorAndExternalNetwork(business.getLocator(), network);
-							if(persisted != null)
+							if(persisted != null) {
+								log.info("already have this business {}, skipping persist...", persisted.getName());
 								continue;
+							}
 							
 							processed++;
 							if(!business.getTags().isEmpty()) {
