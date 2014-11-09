@@ -1,0 +1,27 @@
+Staff
+	bartenders
+	catering
+	clowns
+	djs
+	eventplanning
+	facepainting
+	magicians
+	musicians
+	officiants
+	personalchefs
+	photographers
+	eventphotography
+	sessionphotography
+	triviahosts
+	valetservices
+	videographers
+	wedding_planning
+Rentals
+	boatcharters
+	hotels
+	agriturismi
+	partybusrentals
+	partyequipmentrentals
+	partysupplies
+	photoboothrentals
+	venues

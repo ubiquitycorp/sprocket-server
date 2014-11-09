@@ -1,0 +1,12 @@
+Pets
+	animalshelters
+	horse_boarding
+	petadoption
+	petservices
+	aquariumservices
+	dogwalkers
+	pet_sitting
+	groomer
+	pet_training
+	petstore
+	vet
