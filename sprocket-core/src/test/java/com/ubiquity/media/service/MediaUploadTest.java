@@ -3,7 +3,6 @@ package com.ubiquity.media.service;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.apache.commons.configuration.Configuration;
