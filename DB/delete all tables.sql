@@ -12,6 +12,8 @@ delete from recommended_video;
 delete from engaged_item;
 delete from group_membership;
 #activities,messages and vedios 
+update comment set parent_id = null;
+delete from comment ;
 delete from activity ;
 delete from message;
 delete from conversation_contact;
@@ -24,7 +26,7 @@ delete from user_location;
 #delete from place where parent_id is not null;
 #identities and users
 
-delete from external_identity;
-delete from native_identity;
-delete from identity;
-delete from user;
+#delete from external_identity;
+#delete from native_identity;
+#delete from identity;
+#delete from user;
