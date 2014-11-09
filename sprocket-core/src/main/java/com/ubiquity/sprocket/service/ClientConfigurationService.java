@@ -1,9 +1,14 @@
 package com.ubiquity.sprocket.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.configuration.Configuration;
+
+import com.ubiquity.sprocket.domain.ConfigurationType;
+import com.ubiquity.sprocket.repository.ConfigurationRepository;
+import com.ubiquity.sprocket.repository.ConfigurationRepositoryJpaImpl;
 
 public class ClientConfigurationService {
 
@@ -19,12 +24,19 @@ public class ClientConfigurationService {
 	}
 	
 	public ClientConfigurationService(Configuration configuration) {
-		services.put("message.service.host", configuration.getProperty("xmpp.host"));
-		services.put("message.service.port", configuration.getProperty("xmpp.port"));
-		services.put("message.service.protocol", "xmpp");
 		
-		rules.put("http.timeout.seconds", configuration.getProperty("client.http.timeout.seconds"));
+		ConfigurationRepository configRepository = new ConfigurationRepositoryJpaImpl();
+		List<com.ubiquity.sprocket.domain.Configuration> configurations = configRepository.findConfigurationByType(ConfigurationType.SERVICE);
+		
+		for (com.ubiquity.sprocket.domain.Configuration configuration2 : configurations) {
+			services.put(configuration2.getName(), configuration2.getValue());
+		}
 
+		configurations = configRepository.findConfigurationByType(ConfigurationType.RULE);
+		
+		for (com.ubiquity.sprocket.domain.Configuration configuration2 : configurations) {
+			rules.put(configuration2.getName(), configuration2.getValue());
+		}
 	}
 
 }

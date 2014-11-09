@@ -13,7 +13,7 @@
 
 		<class>com.ubiquity.location.domain.UserLocation</class>
 		<class>com.ubiquity.sprocket.domain.GroupMembership</class>
-		
+
 		<class>com.ubiquity.sprocket.domain.RecommendedActivity</class>
 		<class>com.ubiquity.sprocket.domain.RecommendedVideo</class>
 
@@ -22,10 +22,10 @@
 		<class>com.ubiquity.sprocket.domain.EngagedActivity</class>
 		<class>com.ubiquity.sprocket.domain.EngagedDocument</class>
 		<class>com.ubiquity.sprocket.domain.EngagedItem</class>
-		
+
 		<class>com.ubiquity.sprocket.domain.FavoritePlace</class>
 		<class>com.ubiquity.sprocket.domain.FavoriteItem</class>
-		
+
 		<class>com.ubiquity.integration.domain.VideoContent</class>
 		<class>com.ubiquity.identity.domain.User</class>
 		<class>com.ubiquity.identity.domain.Identity</class>
@@ -40,6 +40,7 @@
 		<class>com.ubiquity.integration.domain.Event</class>
 		<class>com.ubiquity.integration.domain.Comment</class>
 
+		<class>com.ubiquity.sprocket.domain.Configuration</class>
 		<properties>
 
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
@@ -56,7 +57,7 @@
 			<property name="hibernate.hbm2ddl.auto" value="${hibernate.schema.auto}" />
 
 			<!-- Connection Pooling settings -->
- 
+
 			<property name="hibernate.connection.provider_class"
 				value="com.niobium.repository.jpa.provider.BoneCPConnectionProvider" />
 			<property name="bonecp.idleConnectionTestPeriodInMinutes"

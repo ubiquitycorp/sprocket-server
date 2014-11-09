@@ -1,0 +1,39 @@
+Transportation
+	airports
+	carrental
+	dolmusstation
+	motorcycle_rental
+	rvrental
+	trainstations
+	transport
+	airlines
+	airport_shuttles
+	buses
+	ferries
+	limos
+	publictransport
+	taxis
+	trains
+	watertaxis
+	travelservices
+Accommodations
+	bedbreakfast
+	campgrounds
+	guesthouses
+	healthretreats
+	hostels
+	hotels
+	agriturismi
+	rvparks
+	resorts
+	skiresorts
+	vacationrentalagents
+	vacation_rentals
+Tours
+	architecturaltours
+	arttours
+	bustours
+	foodtours
+	historicaltours
+	walkingtours
+	winetours

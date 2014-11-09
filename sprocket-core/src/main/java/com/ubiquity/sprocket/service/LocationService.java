@@ -20,6 +20,7 @@ import com.niobium.repository.cache.DataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.integration.api.PlaceAPI;
 import com.ubiquity.integration.api.PlaceAPIFactory;
+import com.ubiquity.integration.api.exception.ExternalNetworkException;
 import com.ubiquity.integration.domain.ExternalInterest;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.repository.ExternalInterestRepository;
@@ -140,7 +141,7 @@ public class LocationService {
 	 *             result
 	 * 
 	 */
-	public Place getOrCreatePlaceByName(String name, String locator, ExternalNetwork network, String[] granularity) {
+	public Place getOrCreatePlaceByName(String name, String locator, String region, ExternalNetwork network, String[] granularity) {
 		Place place = null;
 		try {
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
@@ -148,7 +149,7 @@ public class LocationService {
 			if(place == null) {
 				try {
 					List<Geobox> geobox = LocationConverter.getInstance()
-							.convertFromLocationDescription(locator, "en", granularity);
+							.convertFromLocationDescription(locator, region, granularity);
 					if (geobox.isEmpty())
 						return null;
 
@@ -157,7 +158,7 @@ public class LocationService {
 								"Unable to disambiguate input: " + name);
 
 					Geobox box = geobox.get(0);
-					place = new Place.Builder().locator(locator).name(name).boundingBox(box).region("us").lastUpdated(System.currentTimeMillis()).build();
+					place = new Place.Builder().externalNetwork(null).locator(locator).name(name).boundingBox(box).region(region).lastUpdated(System.currentTimeMillis()).build();
 
 					EntityManagerSupport.beginTransaction();
 					placeRepository.create(place);
@@ -192,8 +193,8 @@ public class LocationService {
 	 *             result
 	 * 
 	 */
-	public Place getOrCreatePlaceByName(String name, String description, ExternalNetwork network, String granularity) {
-		return getOrCreatePlaceByName(name, description, network, new String[] { granularity });
+	public Place getOrCreatePlaceByName(String name, String description, String region, ExternalNetwork network, String granularity) {
+		return getOrCreatePlaceByName(name, description, region, network, new String[] { granularity });
 	}
 
 
@@ -209,37 +210,57 @@ public class LocationService {
 				PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
 				List<Place> places = placeRepository.findLastLevelWithoutNetwork(); // gets all neighborhoods
 				for(Place neighborhood : places) {
-					if(!neighborhood.getParent().getLocator().contains(", CA"))
-						continue;
 					
 					log.info("Synchronizing neighborhood {}", neighborhood.getName());
-					List<Place> businesses = placeRepository.findChildrenForPlace(neighborhood);
-					for(Place business : businesses) {
-							
-						log.info("Synchronizing {}", business.getName());
-						processed++;
+					if(neighborhood.getLocator().contains(", CA")) 
+						continue;
+					
+					// check to see if we have something in the db already for this neighborhood....
+					if(!placeRepository.findChildrenForPlace(neighborhood).isEmpty()) {
+						log.info("Found businsesses for neighborhood {}, skipping", neighborhood);
+						continue;
+					}
+					
+					int page = 0;
+					Boolean paging = Boolean.TRUE;
+					do {
+						
+						List<Place> results =  null;
 						try {
-							Place place = placeAPI.getPlaceByExternalIdentifier(business.getExternalIdentifier());
-							if(!place.getTags().isEmpty()) {
+							page++;
+							results = placeAPI.searchPlacesWithinPlace("", neighborhood, null, page, 20);
+						} catch (ExternalNetworkException e) {
+							paging = Boolean.FALSE;
+							continue;
+						}
+						// set paging control
+						for(Place business : results) {
+							
+							// check to see if we have a dupe
+							Place persisted = placeRepository.getByLocatorAndExternalNetwork(business.getLocator(), network);
+							if(persisted != null) {
+								log.info("already have this business {}, skipping persist...", persisted.getName());
+								continue;
+							}
+							
+							processed++;
+							if(!business.getTags().isEmpty()) {
 								// clear out tags in business
-								List<ExternalInterest> mappings = new ExternalInterestRepositoryJpaImpl().findByNamesAndExternalNetwork(place.getTags(), network);
+								List<ExternalInterest> mappings = new ExternalInterestRepositoryJpaImpl().findByNamesAndExternalNetwork(business.getTags(), network);
 								for(ExternalInterest mapping : mappings) {
 									// interests hashcode/equals is set to interest id, so dupes won't be added, but this will effectively update the interest collection
-									place.getInterests().add(mapping.getInterest());
+									business.getInterests().add(mapping.getInterest());
 								}
 							}
+							
 							// update the place with location data that we've derived or augmented
-							place.setPlaceId(business.getPlaceId());
-							place.setParent(neighborhood);
-							place.setBoundingBox(null);
-							place.setLastUpdated(System.currentTimeMillis());
-							updatePlace(place);
-						} catch (Exception e) {
-							log.warn("Skipping: {}", business.getName(), e);
+							business.setBoundingBox(null);
+							business.setParent(neighborhood);
+							business.setLastUpdated(System.currentTimeMillis());
+							create(business);
 						}
-					
-
-					}
+					} while (paging);
+				
 
 					log.info("processed {}", processed);
 

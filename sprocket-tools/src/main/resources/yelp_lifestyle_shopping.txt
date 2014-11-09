@@ -1,0 +1,121 @@
+Clothing, Shoes, & Jewelry
+	bespoke
+	fashion
+	menscloth
+	plus_size_fashion
+	childcloth
+	kimonos
+	formalwear
+	hats
+	leather
+	lingerie
+	maternity
+	shoes
+	sleepwear
+	sportswear
+	swimwear
+	womenscloth
+	goldbuyers
+	jewelry
+	stockings
+	wigs
+	perfume
+	watches
+Sports & Outdoors
+	surfshop
+	poolbilliards
+	fireworks
+	golfequipment
+	outdoorgear
+	sportswear
+	golfshops
+	fitnessequipment
+	guns_and_ammo
+	trophyshops
+	luggage
+	bikes
+	motorcyclinggear
+	sportgoods
+Kids
+	baby_gear
+	toys
+Movies, Video, Music & Games
+	adult
+	media
+	videoandgames
+	vinyl_records
+	hifi
+	tickets
+Books
+	bookstores
+	comicbooks
+	mags
+	usedbooks
+Art & Collectible
+	antiques
+	galleries
+	auctionhouses
+	framing
+	embroideryandcrochet
+Supplies
+	artsandcrafts
+	artsupplies
+	stationery
+	costumes
+	fabricstores
+	brewingsupplies
+	knittingsupplies
+	uniforms
+	medicalsupplies
+	officeequipment
+Beauty & Health
+	cosmetics
+	bridal
+	opticians
+	florists
+	gardening
+	flowers
+	flowersonly
+Electronics
+	computers
+	appliances
+	mobilephones
+Hobby & Special Interest
+	photographystores
+	souvenirs
+	cookingclasses
+	tobaccoshops
+House & Home Improvement
+	furniture	
+	hardware
+	homedecor
+	homeandgarden
+	hottubandpool
+	kitchenandbath
+	linens
+	mattresses
+	rugs
+	tableware
+Hipster
+	chinesebazaar
+	concept_shops
+	vintage
+	vapeshops
+	popupshops
+	scandinaviandesign
+	spiritual_shop
+Genre
+	deptstores
+	discountstore
+	drugstores
+	hobbyshops
+	giftshops
+	fleamarkets
+	thrift_stores
+	wholesale_stores
+	kiosk
+	shoppingcenters
+	marketstalls
+	outlet_stores
+	personal_shopping
+	pawn

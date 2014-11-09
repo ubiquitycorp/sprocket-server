@@ -115,37 +115,37 @@ public class DataSyncProcessor extends Thread {
 			int n = processVideos(identity, externalNetwork);
 			log.info("Processed {} videos in {} seconds", n, new Period(start, new DateTime()).getSeconds());
 			
-			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized videos", getResoursePath(userId, externalNetwork, ResourceType.videos), n, userId);
+			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized videos", getResoursePath(userId, externalNetwork, ResourceType.videos), n, userId, ResourceType.videos);
 		} 
 		else if (externalNetwork.equals(ExternalNetwork.Google)) {
 			DateTime start = new DateTime();
 			int n = processMessages(identity, externalNetwork, null);
 			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId);
+			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId, ResourceType.messages);
 
 
 		}  else if ( externalNetwork.equals(ExternalNetwork.Facebook) || externalNetwork.equals(ExternalNetwork.Twitter)) {
 			DateTime start = new DateTime();
 			int n = processActivities(identity, externalNetwork); 
 			log.info("Processed {} activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", getResoursePath(userId, externalNetwork, ResourceType.activities), n, userId);
+			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", getResoursePath(userId, externalNetwork, ResourceType.activities), n, userId, ResourceType.activities);
 
 			if (externalNetwork.equals(ExternalNetwork.Facebook)) {
 				start = new DateTime();
 				n = processLocalActivities(identity, externalNetwork);
 				log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-				sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized local feed", getResoursePath(userId, externalNetwork, ResourceType.localfeed), n, userId);
+				sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized local feed", getResoursePath(userId, externalNetwork, ResourceType.localfeed), n, userId, ResourceType.localfeed);
 			}
 
 			start = new DateTime();
 			n = processMessages(identity, externalNetwork, null);
 			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId);
+			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId, ResourceType.messages);
 		}else if(externalNetwork.equals(ExternalNetwork.LinkedIn) || externalNetwork.equals(ExternalNetwork.Tumblr) || externalNetwork.equals(ExternalNetwork.Reddit)) {			
 			DateTime start = new DateTime();
 			int n = processActivities(identity, externalNetwork);
 			log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
-			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", getResoursePath(userId, externalNetwork, ResourceType.activities), n, userId);
+			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", getResoursePath(userId, externalNetwork, ResourceType.activities), n, userId, ResourceType.activities);
 		}
 		
 		sendSyncCompletedMessageToIndividual(backchannel, externalNetwork, userId);
@@ -292,7 +292,7 @@ public class DataSyncProcessor extends Thread {
 	 * @param userId
 	 * 
 	 */
-	private void sendStepCompletedMessageToIndividual(MessageQueueProducer backchannel, ExternalNetwork network, String message, String resourcePath, Integer records, Long userId)  {
+	private void sendStepCompletedMessageToIndividual(MessageQueueProducer backchannel, ExternalNetwork network, String message, String resourcePath, Integer records, Long userId, ResourceType resourceType)  {
 
 		if(backchannel == null)
 			return;
@@ -301,6 +301,7 @@ public class DataSyncProcessor extends Thread {
 				new com.ubiquity.messaging.format.Message(new SynchronizationStepCompleted.Builder()
 					.message(message)
 					.resourcePath(resourcePath)
+					.resourceType(resourceType.name())
 					.records(records)
 					.timestamp(System.currentTimeMillis())
 					.externalNetworkId(network.ordinal()).build()));
