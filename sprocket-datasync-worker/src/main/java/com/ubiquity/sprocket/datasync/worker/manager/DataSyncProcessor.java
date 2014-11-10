@@ -347,7 +347,7 @@ public class DataSyncProcessor extends Thread {
 	
 	private String getResoursePath(Long userId, ExternalNetwork externalNetwork, ResourceType resource){
 		StringBuilder resourcePath = new StringBuilder();
-		if(resourcePath.equals(ResourceType.videos))
+		if(resource.equals(ResourceType.videos))
 			resourcePath.append("/content/users/");
 		else
 			resourcePath.append("/social/users/");
