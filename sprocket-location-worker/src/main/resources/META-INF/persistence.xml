@@ -36,6 +36,7 @@
 		<class>com.ubiquity.integration.domain.Interest</class>
 		<class>com.ubiquity.integration.domain.Activity</class>
 		<class>com.ubiquity.integration.domain.Event</class>
+		<class>com.ubiquity.integration.domain.UnmappedInterest</class>
 
 		<class>com.ubiquity.sprocket.domain.Configuration</class>
 		<properties>
