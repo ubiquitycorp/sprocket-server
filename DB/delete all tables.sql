@@ -13,7 +13,7 @@ delete from engaged_item;
 delete from group_membership;
 #activities,messages and vedios 
 #update comment set parent_id = null;
-delete from comment ;
+#delete from comment ;
 delete from activity ;
 delete from message;
 delete from conversation_contact;

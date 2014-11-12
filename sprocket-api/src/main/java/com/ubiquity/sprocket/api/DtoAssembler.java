@@ -14,6 +14,7 @@ import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ActivityType;
 import com.ubiquity.integration.domain.Address;
 import com.ubiquity.integration.domain.Category;
+import com.ubiquity.integration.domain.Comment;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Interest;
@@ -28,6 +29,7 @@ import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.domain.factories.ActivityFactory;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.AddressDto;
+import com.ubiquity.sprocket.api.dto.model.CommentDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
 import com.ubiquity.sprocket.api.dto.model.GeoboxDto;
@@ -392,9 +394,10 @@ public class DtoAssembler {
 				.title(activity.getTitle()).link(activity.getLink())
 				.externalIdentifier(activity.getExternalIdentifier());
 
-		if(activity.getPostedBy() != null)
-			activityDtoBuilder.postedBy(DtoAssembler.assemble(activity.getPostedBy()));
-		
+		if (activity.getPostedBy() != null)
+			activityDtoBuilder.postedBy(DtoAssembler.assemble(activity
+					.getPostedBy()));
+
 		if (activity.getCategory() != null)
 			activityDtoBuilder.category(activity.getCategory()
 					.getCategoryName());
@@ -405,9 +408,26 @@ public class DtoAssembler {
 			activityDtoBuilder.video(new VideoDto.Builder()
 					.url(activity.getVideo().getUrl())
 					.itemKey(activity.getVideo().getItemKey()).build());
-
+		if (activity.getComments() != null){
+			for (Comment comment : activity.getComments())
+				activityDtoBuilder.addComment(assemble(comment));
+		}
+		activityDtoBuilder.rating(assemble(activity.getRating()));
 		return activityDtoBuilder.build();
 
+	}
+
+	public static CommentDto assemble(Comment comment) {
+		CommentDto.Builder commentDtoBuilder = new CommentDto.Builder();
+		commentDtoBuilder.body(comment.getBody())
+				.commentId(comment.getCommentId())
+				.creationDate(comment.getCreationDate())
+				.externalIdentifier(comment.getExternalIdentifier())
+				.postedBy(assemble(comment.getPostedBy()))
+				.rating(assemble(comment.getRating()));
+		for (Comment reply : comment.getReplies())
+			commentDtoBuilder.addReply(assemble(reply));
+		return commentDtoBuilder.build();
 	}
 
 	public static PlaceDto assembleCityOrNeighborhood(Place place) {
