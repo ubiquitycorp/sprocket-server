@@ -17,6 +17,7 @@ import com.niobium.repository.cache.DataModificationCacheRedisImpl;
 import com.niobium.repository.cache.UserDataModificationCache;
 import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
+import com.niobium.repository.lily.LilyRepositoryFactory;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
@@ -57,6 +58,8 @@ import com.ubiquity.sprocket.repository.EngagedVideoRepository;
 import com.ubiquity.sprocket.repository.EngagedVideoRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.GroupMembershipRepository;
 import com.ubiquity.sprocket.repository.GroupMembershipRepositoryJpaImpl;
+import com.ubiquity.sprocket.repository.ProfileRepository;
+import com.ubiquity.sprocket.repository.ProfileRepositoryLilyImpl;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepository;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedVideoRepository;
@@ -76,13 +79,18 @@ public class AnalyticsService {
 	private DataModificationCache dataModificationCache;
 	private RecommendationEngine recommendationEngine;
 
+	
 	/***
 	 * Sets up repositories and data modification cache
 	 * 
 	 * @param configuration
 	 */
 	public AnalyticsService(Configuration configuration) {
-		setUpRecommendationEngine(configuration);
+		setUpLily(configuration);
+		
+		
+		
+//		setUpRecommendationEngine(configuration);
 
 		userDataModificationCache = new UserDataModificationCacheRedisImpl(
 				configuration
@@ -101,6 +109,18 @@ public class AnalyticsService {
 		}
 	}
 
+	
+	public Profile createProfile(User user) {
+		ProfileRepository profileRepository = new ProfileRepositoryLilyImpl("sp", LilyRepositoryFactory.createRepository());
+		
+		
+		return null;
+	}
+	
+	public Profile getProfile(User user) {
+		ProfileRepository profileRepository = new ProfileRepositoryLilyImpl("sp", LilyRepositoryFactory.createRepository());
+		return null;
+	}
 	/**
 	 * Tracks an engaged item by persisting to the underlying data store
 	 * 
@@ -115,6 +135,16 @@ public class AnalyticsService {
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
+	}
+	
+	/**
+	 * Save a user's search term to the data warehouse
+	 * 
+	 * @param user
+	 * @param searchTerm
+	 */
+	public void track(User user, String searchTerm) {
+		
 	}
 
 	
@@ -645,6 +675,10 @@ public class AnalyticsService {
 		recommendationEngine.addDimension(new Dimension("lon", Range.between(
 				-180.0, 180.0), 0.5));
 
+	}
+	
+	private void setUpLily(Configuration configuration) {
+		LilyRepositoryFactory.initialize(configuration);
 	}
 	
 	public void resetInterestsLastModifiedCache() {

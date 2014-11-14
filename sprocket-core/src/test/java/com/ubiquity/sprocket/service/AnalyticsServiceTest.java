@@ -7,6 +7,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,13 @@ public class AnalyticsServiceTest {
 	}
 
 	@Test
+	public void testTrackMostPopularSearchTerm() {
+		
+	}
+	
+	
+	@Test
+	@Ignore
 	public void testRecommendActivities() {
 
 
