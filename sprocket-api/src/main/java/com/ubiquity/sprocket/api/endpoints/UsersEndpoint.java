@@ -37,6 +37,7 @@ import com.ubiquity.integration.api.ContentAPIFactory;
 import com.ubiquity.integration.api.SocialAPI;
 import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.integration.api.linkedin.ExchangeService;
+import com.ubiquity.integration.api.tumblr.TumblrAPI;
 import com.ubiquity.integration.api.twitter.TwitterAPI;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
@@ -162,26 +163,33 @@ public class UsersEndpoint {
 		// .getClientPlatformId());
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identityDto.getExternalNetworkId());
+		SocialToken requestToken = null;
 		if (externalNetwork == ExternalNetwork.Twitter) {
 			SocialAPI socialApi = SocialAPIFactory
 					.createTwitterProvider(identityDto.getRedirectUrl());
 			TwitterAPI twitterApi = (TwitterAPI) socialApi;
-			SocialToken requestToken = twitterApi.requesttoken();
-			if (requestToken == null
-					|| requestToken.getAccessToken().equalsIgnoreCase(""))
-				throw new HttpException(
-						"Autontication Failed no oAuth_token_returned", 401);
-			else
-				return Response
-						.ok()
-						.entity("{\"oauthToken\":\""
-								+ requestToken.getAccessToken()
-								+ "\",\"oauthTokenSecret\":\""
-								+ requestToken.getSecretToken() + "\"}")
-						// .entity(jsonConverter.convertToPayload(requestToken))
-						.build();
+			requestToken = twitterApi.requesttoken();
+		}else if(externalNetwork == ExternalNetwork.Tumblr){
+			SocialAPI socialApi = SocialAPIFactory
+					.createTumblrProvider(identityDto.getRedirectUrl());
+			TumblrAPI tumblrApi = (TumblrAPI) socialApi;
+			requestToken = tumblrApi.requesttoken();
+		}else{
+			throw new NotImplementedException("ExternalNetwork is not supported");
 		}
-		throw new NotImplementedException("ExternalNetwork is not supported");
+		if (requestToken == null
+				|| requestToken.getAccessToken().equalsIgnoreCase(""))
+			throw new HttpException(
+					"Autontication Failed no oAuth_token_returned", 401);
+		else
+			return Response
+					.ok()
+					.entity("{\"oauthToken\":\""
+							+ requestToken.getAccessToken()
+							+ "\",\"oauthTokenSecret\":\""
+							+ requestToken.getSecretToken() + "\"}")
+					// .entity(jsonConverter.convertToPayload(requestToken))
+					.build();
 
 	}
 
