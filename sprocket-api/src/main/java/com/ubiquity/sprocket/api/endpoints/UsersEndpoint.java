@@ -540,6 +540,7 @@ public class UsersEndpoint {
 			.altitude(locationDto.getAltitude())
 		.build();
 		
+		ServiceFactory.getLocationService().addUpdateLocationInCache(userId);
 		// serialize and send it
 		String message = MessageConverterFactory.getMessageConverter()
 				.serialize(new Message(content));
