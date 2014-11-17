@@ -494,8 +494,7 @@ public class LocationService {
 	public Long checkUpdateLocationInProgress(Long userId) {
 		String key = CacheKeys
 				.generateCacheKeyForPlaces(CacheKeys.UserProperties.LOCATION);
-		return userLocationModificationCache.getLastModified(userId, key,
-				System.currentTimeMillis()-10000);
+		return userLocationModificationCache.getLastModified(userId, key,null);
 		
 	}
 
