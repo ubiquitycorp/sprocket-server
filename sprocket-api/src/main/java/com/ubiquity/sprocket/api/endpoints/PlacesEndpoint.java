@@ -105,8 +105,27 @@ public class PlacesEndpoint {
 			@QueryParam("interestId") List<Long> interestId) throws IOException {
 		UserLocation userLocation = ServiceFactory.getLocationService()
 				.getLocation(userId);
-		if (userLocation == null)
-			throw new IllegalArgumentException("User location is not available");
+		if (userLocation == null) {
+			Long lastModified = ServiceFactory.getLocationService()
+					.checkUpdateLocationInProgress(userId);
+			if (lastModified == null)
+				throw new IllegalArgumentException(
+						"User location is not available");
+			else {
+				
+				try {
+					Thread.sleep(4000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				userLocation = ServiceFactory.getLocationService()
+						.getLocation(userId);
+				if (userLocation == null)
+					return Response.notModified().build();
+
+			}
+		}
 
 		PlacesDto results = new PlacesDto();
 		ExternalNetwork externalNetwork = ExternalNetwork
@@ -244,10 +263,11 @@ public class PlacesEndpoint {
 
 		Place place = ServiceFactory.getLocationService().getPlaceByID(placeId);
 		if (place != null)
-			if(place.getExternalNetwork() != null)
+			if (place.getExternalNetwork() != null)
 				sendTrackAndSyncMessage(placeId, geoDto);
 			else
-				throw new IllegalArgumentException("Not allowed to update location for city or neighborhood");
+				throw new IllegalArgumentException(
+						"Not allowed to update location for city or neighborhood");
 		return Response.ok().build();
 	}
 

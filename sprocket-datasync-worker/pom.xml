@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>sprocket-datasync-worker</artifactId>
 	<name>Sprocket Data Sync Worker</name>
-	<version>0.4.46</version>
+	<version>0.4.47</version>
 
 	<parent>
 		<groupId>com.ubiquity</groupId>
@@ -79,7 +79,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 
 			<!-- RPM Packaging -->
 			<plugin>
@@ -164,13 +163,10 @@
 					</execution>
 				</executions>
 			</plugin>
-
 		</plugins>
-
 	</build>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>sprocket-core</artifactId>
@@ -188,19 +184,11 @@
 			<artifactId>quartz</artifactId>
 			<version>2.1.1</version>
 		</dependency>
-
-
-
+		
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.6</version>
 		</dependency>
-
-
-
-
-
-
 	</dependencies>
 </project>

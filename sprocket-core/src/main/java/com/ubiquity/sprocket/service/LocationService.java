@@ -17,6 +17,8 @@ import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.cache.DataCacheKeys;
 import com.niobium.repository.cache.DataModificationCache;
 import com.niobium.repository.cache.DataModificationCacheRedisImpl;
+import com.niobium.repository.cache.UserDataModificationCache;
+import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.integration.api.PlaceAPI;
 import com.ubiquity.integration.api.PlaceAPIFactory;
@@ -49,9 +51,14 @@ public class LocationService {
 
 	private GeodeticCalculator geoCalculator;
 	private DataModificationCache dataModificationCache;
+	private UserDataModificationCache userLocationModificationCache;
 	
 	public LocationService(Configuration configuration) {
 		geoCalculator = new GeodeticCalculator();
+		
+		userLocationModificationCache = new UserDataModificationCacheRedisImpl(
+				configuration
+						.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_USER));
 		dataModificationCache = new DataModificationCacheRedisImpl(
 				configuration
 						.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GENERAL));
@@ -475,6 +482,20 @@ public class LocationService {
 	 */
 	public Place getPlaceByID(long placeID){
 		return new PlaceRepositoryJpaImpl().read(placeID);
+	}
+
+	public Boolean addUpdateLocationInCache(Long userId) {
+		String key = CacheKeys
+				.generateCacheKeyForPlaces(CacheKeys.UserProperties.LOCATION);
+		userLocationModificationCache.put(userId, key, System.currentTimeMillis());
+		return true;
+	}
+	
+	public Long checkUpdateLocationInProgress(Long userId) {
+		String key = CacheKeys
+				.generateCacheKeyForPlaces(CacheKeys.UserProperties.LOCATION);
+		return userLocationModificationCache.getLastModified(userId, key,null);
+		
 	}
 
 }

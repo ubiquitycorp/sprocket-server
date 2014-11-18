@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-integration</artifactId>
-			<version>0.1.26</version>
+			<version>0.1.30</version>
 		</dependency>
 
 		<dependency>
@@ -115,6 +115,10 @@
 			    <artifactId>hadoop-client</artifactId>
 			    <groupId>org.apache.hadoop</groupId>
 			  </exclusion>
+				<exclusion>
+					<artifactId>jets3t</artifactId>
+					<groupId>net.java.dev.jets3t</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -137,8 +141,6 @@
 			<scope>test</scope>
 		</dependency>
 
-
-
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-identity-test</artifactId>
@@ -147,8 +149,6 @@
 			<scope>test</scope>
 			<optional>false</optional>
 		</dependency>
-
-
 
 		<dependency>
 			<groupId>com.ubiquity</groupId>

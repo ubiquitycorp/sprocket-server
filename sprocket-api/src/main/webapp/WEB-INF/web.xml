@@ -16,12 +16,7 @@
 		<param-value>com.ubiquity.sprocket.api.interceptors.SecurityInterceptor,com.ubiquity.api.interceptors.CatchAllExceptionMapper,com.ubiquity.api.interceptors.IOExceptionMapper,com.ubiquity.api.interceptors.ConstraintValidationExceptionMapper,com.ubiquity.api.interceptors.IllegalArgumentExceptionMapper,com.ubiquity.api.interceptors.HttpExceptionMapper,com.ubiquity.api.interceptors.UnSupportedOperationExceptionMapper,com.ubiquity.sprocket.api.interceptors.AuthorizationExceptionMapper,com.ubiquity.sprocket.api.interceptors.ExternalNetworkExceptionMapper
       </param-value>
 	</context-param>
-
-
-
-
-
-
+	
 	<!-- <listener> <listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class> 
 		</listener> -->
 	<listener>
