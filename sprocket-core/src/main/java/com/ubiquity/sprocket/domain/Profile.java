@@ -5,8 +5,10 @@ import java.util.List;
 
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.AgeRange;
+import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Gender;
 import com.ubiquity.integration.domain.Interest;
+import com.ubiquity.location.domain.UserLocation;
 
 /***
  * 
@@ -23,8 +25,36 @@ public class Profile {
 	private AgeRange ageRange;
 	private List<Interest> interests = new LinkedList<Interest>();
 	private List<String> searchHistory = new LinkedList<String>();
+	private List<Profile> identities = new LinkedList<Profile>();
+	private UserLocation location;
+	private ExternalNetwork externalNetwork;
+	private String externalIdentifier;
 
 	public Profile() {
+	}
+
+	public Profile getIdentityForExternalNetwork(ExternalNetwork network) {
+		for (Profile identity : identities) {
+			if (identity.getExternalNetwork() == network)
+				return identity;
+		}
+		return null;
+	}
+
+	public List<Profile> getIdentities() {
+		return identities;
+	}
+
+	public ExternalNetwork getExternalNetwork() {
+		return externalNetwork;
+	}
+
+	public String getExternalIdentifier() {
+		return externalIdentifier;
+	}
+
+	public UserLocation getLocation() {
+		return location;
 	}
 
 	/**
@@ -35,7 +65,6 @@ public class Profile {
 	public void setProfileId(String profileId) {
 		this.profileId = profileId;
 	}
-
 
 	public void setGender(Gender gender) {
 		this.gender = gender;
@@ -74,6 +103,9 @@ public class Profile {
 		private User user;
 		private Gender gender;
 		private AgeRange ageRange;
+		private UserLocation location;
+		private ExternalNetwork externalNetwork;
+		private String externalIdentifier;
 
 		public Builder profileId(String profileId) {
 			this.profileId = profileId;
@@ -90,8 +122,23 @@ public class Profile {
 			return this;
 		}
 
-		public Builder ageRage(AgeRange ageRage) {
-			this.ageRange = ageRage;
+		public Builder ageRange(AgeRange ageRange) {
+			this.ageRange = ageRange;
+			return this;
+		}
+
+		public Builder location(UserLocation location) {
+			this.location = location;
+			return this;
+		}
+
+		public Builder externalNetwork(ExternalNetwork externalNetwork) {
+			this.externalNetwork = externalNetwork;
+			return this;
+		}
+
+		public Builder externalIdentifier(String externalIdentifier) {
+			this.externalIdentifier = externalIdentifier;
 			return this;
 		}
 
@@ -105,5 +152,8 @@ public class Profile {
 		this.user = builder.user;
 		this.gender = builder.gender;
 		this.ageRange = builder.ageRange;
+		this.location = builder.location;
+		this.externalNetwork = builder.externalNetwork;
+		this.externalIdentifier = builder.externalIdentifier;
 	}
 }

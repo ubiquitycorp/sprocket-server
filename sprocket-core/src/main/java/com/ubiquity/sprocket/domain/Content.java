@@ -1,5 +1,9 @@
 package com.ubiquity.sprocket.domain;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.location.domain.Place;
@@ -10,15 +14,29 @@ public class Content {
 	private Activity activity;
 	private Place place;
 	private Document document;
-	private VideoContent video;
-
+	private VideoContent videoContent;
+	private List<UserEngagement> userEngagement = new LinkedList<UserEngagement>();
+	
+	/***
+	 * Convenience method return owner of the embedded content (i.e. Activity)
+	 * 
+	 * @return owner or null if it does not exist
+	 */
+	public User getOwner() {
+		if(activity != null)
+			return activity.getOwner();
+		if(videoContent != null)
+			return videoContent.getOwner();
+		return null;
+	}
+	
+	
+	public String getContentId() {
+		return contentId;
+	}
 	
 	public void setContentId(String contentId) {
 		this.contentId = contentId;
-	}
-
-	public String getContentId() {
-		return contentId;
 	}
 
 	public Activity getActivity() {
@@ -33,16 +51,22 @@ public class Content {
 		return document;
 	}
 
-	public VideoContent getVideo() {
-		return video;
+	public VideoContent getVideoContent() {
+		return videoContent;
 	}
+
+	
+	public List<UserEngagement> getUserEngagement() {
+		return userEngagement;
+	}
+
 
 	public static class Builder {
 		private String contentId;
 		private Activity activity;
 		private Place place;
 		private Document document;
-		private VideoContent video;
+		private VideoContent videoContent;
 
 		public Builder contentId(String contentId) {
 			this.contentId = contentId;
@@ -64,8 +88,8 @@ public class Content {
 			return this;
 		}
 
-		public Builder video(VideoContent video) {
-			this.video = video;
+		public Builder videoContent(VideoContent videoContent) {
+			this.videoContent = videoContent;
 			return this;
 		}
 
@@ -79,6 +103,17 @@ public class Content {
 		this.activity = builder.activity;
 		this.place = builder.place;
 		this.document = builder.document;
-		this.video = builder.video;
+		this.videoContent = builder.videoContent;
 	}
+
+
+	@Override
+	public String toString() {
+		return "Content [contentId=" + contentId + ", activity=" + activity
+				+ ", place=" + place + ", document=" + document
+				+ ", videoContent=" + videoContent + ", userEngagement="
+				+ userEngagement + "]";
+	}
+	
+	
 }

@@ -6,6 +6,7 @@ import org.apache.commons.configuration.Configuration;
 
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.sprocket.domain.GroupMembership;
+import com.ubiquity.sprocket.domain.Profile;
 
 public interface RecommendationEngine {
 		

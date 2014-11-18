@@ -25,11 +25,11 @@ import com.ubiquity.integration.repository.ExternalIdentityRepositoryJpaImpl;
  * @author chris
  *
  */
-public class SocialRepositoryTest {
+public class ExternalIdentityRepositoryTest {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 
-	private ExternalIdentityRepository socialRepository;
+	private ExternalIdentityRepository externalIdentityRepository;
 	private UserRepository userRepository;
 	
 	private User user;
@@ -43,7 +43,7 @@ public class SocialRepositoryTest {
 	@Before
 	public void setUp() throws Exception {
 
-		socialRepository = new ExternalIdentityRepositoryJpaImpl();
+		externalIdentityRepository = new ExternalIdentityRepositoryJpaImpl();
 		userRepository = new UserRepositoryJpaImpl();
 		
 		// create user and identity as we normally would
@@ -70,7 +70,7 @@ public class SocialRepositoryTest {
 
 	@Test
 	public void testFindSocialIdentityByUserIdAndProvider() throws Exception {
-		ExternalIdentity persisted = socialRepository.getExternalIdentityByUserAndNetwork(user.getUserId(), ExternalNetwork.Facebook);
+		ExternalIdentity persisted = externalIdentityRepository.getExternalIdentityByUserAndNetwork(user.getUserId(), ExternalNetwork.Facebook);
 		Assert.assertNotNull(persisted);
 		Assert.assertEquals(persisted.getIdentityId(), identity.getIdentityId());
 	
@@ -78,7 +78,7 @@ public class SocialRepositoryTest {
 	
 	@Test
 	public void testUpdateSocialIdentity() throws Exception {
-		ExternalIdentity persisted = socialRepository.getExternalIdentityByUserAndNetwork(user.getUserId(), ExternalNetwork.Facebook);
+		ExternalIdentity persisted = externalIdentityRepository.getExternalIdentityByUserAndNetwork(user.getUserId(), ExternalNetwork.Facebook);
 		String newToken = UUID.randomUUID().toString();
 		persisted.setAccessToken(newToken);
 		
@@ -86,7 +86,7 @@ public class SocialRepositoryTest {
 		userRepository.update(user);
 		EntityManagerSupport.commit();
 		
-		persisted = socialRepository.getExternalIdentityByUserAndNetwork(user.getUserId(), ExternalNetwork.Facebook);
+		persisted = externalIdentityRepository.getExternalIdentityByUserAndNetwork(user.getUserId(), ExternalNetwork.Facebook);
 		Assert.assertEquals(persisted.getAccessToken(), newToken);
 
 		
