@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-integration</artifactId>
-			<version>0.1.28</version>
+			<version>0.1.30</version>
 		</dependency>
 
 		<dependency>
@@ -110,6 +110,12 @@
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-core_2.10</artifactId>
 			<version>1.0.1</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>jets3t</artifactId>
+					<groupId>net.java.dev.jets3t</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -131,8 +137,6 @@
 			<scope>test</scope>
 		</dependency>
 
-
-
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-identity-test</artifactId>
@@ -141,8 +145,6 @@
 			<scope>test</scope>
 			<optional>false</optional>
 		</dependency>
-
-
 
 		<dependency>
 			<groupId>com.ubiquity</groupId>

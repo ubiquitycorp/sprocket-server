@@ -3,23 +3,29 @@ package com.ubiquity.sprocket.api.endpoints;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.NoResultException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.niobium.repository.cloud.RemoteAsset;
 import com.ubiquity.api.exception.HttpException;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
@@ -31,11 +37,15 @@ import com.ubiquity.integration.api.ContentAPIFactory;
 import com.ubiquity.integration.api.SocialAPI;
 import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.integration.api.linkedin.ExchangeService;
+import com.ubiquity.integration.api.tumblr.TumblrAPI;
 import com.ubiquity.integration.api.twitter.TwitterAPI;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Network;
 import com.ubiquity.integration.domain.SocialToken;
+import com.ubiquity.media.domain.AudioTrack;
+import com.ubiquity.media.domain.Image;
+import com.ubiquity.media.domain.Video;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ContactsDto;
@@ -104,11 +114,11 @@ public class UsersEndpoint {
 					"Autontication Failed no oAuth_token_returned", 401);
 
 		// create the identity if it does not exist; or use the existing one
-		List<ExternalIdentity> identities = ServiceFactory.getExternalIdentityService()
-				.createOrUpdateExternalIdentity(user, accesstokens[0],
-						accesstokens[1], null, ClientPlatform.WEB,
-						ExternalNetwork.LinkedIn, null);
-		
+		List<ExternalIdentity> identities = ServiceFactory
+				.getExternalIdentityService().createOrUpdateExternalIdentity(
+						user, accesstokens[0], accesstokens[1], null,
+						ClientPlatform.WEB, ExternalNetwork.LinkedIn, null);
+
 		ExternalIdentity identity = identities.get(0);
 		IdentityDto result = new IdentityDto.Builder().identifier(
 				identity.getIdentifier()).build();
@@ -153,26 +163,33 @@ public class UsersEndpoint {
 		// .getClientPlatformId());
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identityDto.getExternalNetworkId());
+		SocialToken requestToken = null;
 		if (externalNetwork == ExternalNetwork.Twitter) {
 			SocialAPI socialApi = SocialAPIFactory
 					.createTwitterProvider(identityDto.getRedirectUrl());
 			TwitterAPI twitterApi = (TwitterAPI) socialApi;
-			SocialToken requestToken = twitterApi.requesttoken();
-			if (requestToken == null
-					|| requestToken.getAccessToken().equalsIgnoreCase(""))
-				throw new HttpException(
-						"Autontication Failed no oAuth_token_returned", 401);
-			else
-				return Response
-						.ok()
-						.entity("{\"oauthToken\":\""
-								+ requestToken.getAccessToken()
-								+ "\",\"oauthTokenSecret\":\""
-								+ requestToken.getSecretToken() + "\"}")
-						// .entity(jsonConverter.convertToPayload(requestToken))
-						.build();
+			requestToken = twitterApi.requesttoken();
+		}else if(externalNetwork == ExternalNetwork.Tumblr){
+			SocialAPI socialApi = SocialAPIFactory
+					.createTumblrProvider(identityDto.getRedirectUrl());
+			TumblrAPI tumblrApi = (TumblrAPI) socialApi;
+			requestToken = tumblrApi.requesttoken();
+		}else{
+			throw new NotImplementedException("ExternalNetwork is not supported");
 		}
-		throw new NotImplementedException("ExternalNetwork is not supported");
+		if (requestToken == null
+				|| requestToken.getAccessToken().equalsIgnoreCase(""))
+			throw new HttpException(
+					"Autontication Failed no oAuth_token_returned", 401);
+		else
+			return Response
+					.ok()
+					.entity("{\"oauthToken\":\""
+							+ requestToken.getAccessToken()
+							+ "\",\"oauthTokenSecret\":\""
+							+ requestToken.getSecretToken() + "\"}")
+					// .entity(jsonConverter.convertToPayload(requestToken))
+					.build();
 
 	}
 
@@ -197,14 +214,15 @@ public class UsersEndpoint {
 				identityDto.getUsername(), identityDto.getPassword());
 		if (user == null)
 			throw new HttpException("Username / password incorrect", 401);
-		
-		// update user last login 
+
+		// update user last login
 		user.setLastLogin(System.currentTimeMillis());
 		ServiceFactory.getUserService().update(user);
 		// create api key and pass back associated identities for this user (in
 		// case of a login from a different device)
-		
-		String apiKey = authenticationService.generateAPIKeyIfNotExsits(user.getUserId());
+
+		String apiKey = authenticationService.generateAPIKeyIfNotExsits(user
+				.getUserId());
 		AccountDto accountDto = new AccountDto.Builder().apiKey(apiKey)
 				.userId(user.getUserId()).build();
 
@@ -268,15 +286,18 @@ public class UsersEndpoint {
 		return Response.ok().entity(jsonConverter.convertToPayload(accountDto))
 				.build();
 	}
+
 	@GET
 	@Path("/{userId}/identities")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response getIdentities(@PathParam("userId") Long userId) throws IOException {
+	public Response getIdentities(@PathParam("userId") Long userId)
+			throws IOException {
 
 		// load user
-		List<Contact> contacts = ServiceFactory.getContactService().findAllContactByUserIdentities(userId);
+		List<Contact> contacts = ServiceFactory.getContactService()
+				.findAllContactByUserIdentities(userId);
 
 		ContactsDto contactsDto = new ContactsDto();
 		for (Contact contact : contacts) {
@@ -285,6 +306,7 @@ public class UsersEndpoint {
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(contactsDto)).build();
 	}
+
 	@POST
 	@Path("/{userId}/identities")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -306,9 +328,9 @@ public class UsersEndpoint {
 		User user = ServiceFactory.getUserService().getUserById(userId);
 
 		// create the identity if it does not exist; or use the existing one
-		List<ExternalIdentity> identity = ServiceFactory.getExternalIdentityService()
-				.createOrUpdateExternalIdentity(user,
-						identityDto.getAccessToken(),
+		List<ExternalIdentity> identity = ServiceFactory
+				.getExternalIdentityService().createOrUpdateExternalIdentity(
+						user, identityDto.getAccessToken(),
 						identityDto.getSecretToken(),
 						identityDto.getRefreshToken(), clientPlatform,
 						externalNetwork, identityDto.getExpiresIn());
@@ -504,23 +526,104 @@ public class UsersEndpoint {
 	@Secure
 	public Response setLocation(@PathParam("userId") Long userId,
 			InputStream payload) throws IOException {
-		
-		LocationDto locationDto = jsonConverter.convertFromPayload(payload,LocationDto.class,UserLocationUpdateValidation.class);
-		
+
+		LocationDto locationDto = jsonConverter.convertFromPayload(payload,
+				LocationDto.class, UserLocationUpdateValidation.class);
+
 		sendLocationMessage(userId, locationDto);
-		
+
 		return Response.ok().build();
 	}
 
-	private void sendActivatedMessage(User user, List<ExternalIdentity> identities,
-			IdentityDto identityDto) throws IOException {
-		for(ExternalIdentity identity : identities)
-		{
+	/***
+	 * This method receives user's location and saves it into database
+	 * 
+	 * @param payload
+	 * @return
+	 * @throws IOException
+	 */
+	@POST
+	@Path("/{userId}/uploaded")
+	@Consumes("multipart/form-data")
+	@Produces(MediaType.APPLICATION_JSON)
+	// @Secure
+	public Response uploadFile(@PathParam("userId") Long userId,
+			MultipartFormDataInput input,
+			@HeaderParam("Content-Length") Long contentLength)
+			throws IOException {
+		String fileName = "";
+
+		Map<String, List<InputPart>> formParts = input.getFormDataMap();
+
+		List<InputPart> inPart = formParts.get("file");
+		RemoteAsset media = null;
+		for (InputPart inputPart : inPart) {
+			try {
+				// Retrieve headers, read the Content-Disposition header to
+				// obtain the original name of the file
+				MultivaluedMap<String, String> headers = inputPart.getHeaders();
+				fileName = parseFileName(headers);
+
+				long startTime = System.currentTimeMillis();
+				// Handle the body of that part with an InputStream
+				InputStream istream = inputPart
+						.getBody(InputStream.class, null);
+
+				log.debug(fileName);
+				if (inputPart.getMediaType().getType().equals("image")) {
+					media = new Image.Builder().itemKey(fileName).build();
+				} else if (inputPart.getMediaType().getType().equals("audio")) {
+					media = new AudioTrack.Builder().itemKey(fileName).build();
+				} else if (inputPart.getMediaType().getType().equals("video")) {
+					media = new Video.Builder().itemKey(fileName).build();
+				}
+
+				media.setInputStream(istream);
+				ServiceFactory.getMediaService().create(media);
+				long endTime = System.currentTimeMillis();
+				log.debug("media uploaded successfully:\n url:" + media.getUrl() + "\n upload time: " + (endTime - startTime) / 1000 + " seconds");
+				
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+
+		String output = "{\"url\":\"" + media.getUrl() + "\"}";
+
+		return Response.status(200).entity(output).build();
+	}
+
+	// Parse Content-Disposition header to get the original file name
+	private String parseFileName(MultivaluedMap<String, String> headers) {
+
+		String[] contentDispositionHeader = headers.getFirst(
+				"Content-Disposition").split(";");
+
+		for (String name : contentDispositionHeader) {
+
+			if ((name.trim().startsWith("filename"))) {
+
+				String[] tmp = name.split("=");
+
+				String fileName = tmp[1].trim().replaceAll("\"", "");
+
+				return fileName;
+			}
+		}
+		return "randomName";
+	}
+
+	private void sendActivatedMessage(User user,
+			List<ExternalIdentity> identities, IdentityDto identityDto)
+			throws IOException {
+		for (ExternalIdentity identity : identities) {
 			ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
 					.clientPlatformId(identityDto.getClientPlatformId())
-					.userId(user.getUserId()).identityId(identity.getIdentityId())
-					.build();
-	
+					.userId(user.getUserId())
+					.identityId(identity.getIdentityId()).build();
+
 			// serialize and send it
 			String message = MessageConverterFactory.getMessageConverter()
 					.serialize(new Message(content));
@@ -528,26 +631,25 @@ public class UsersEndpoint {
 					message.getBytes());
 		}
 	}
-	
-	private void sendLocationMessage(Long userId, LocationDto locationDto) throws IOException {
-		LocationUpdated content = new LocationUpdated.Builder()
-			.userId(userId)
-			.horizontalAccuracy(locationDto.getHorizontalAccuracy())
-			.verticalAccuracy(locationDto.getVerticalAccuracy())
-			.timestamp(locationDto.getTimestamp())
-			.latitude(locationDto.getLatitude())
-			.longitude(locationDto.getLongitude())
-			.altitude(locationDto.getAltitude())
-		.build();
-		
+
+	private void sendLocationMessage(Long userId, LocationDto locationDto)
+			throws IOException {
+		LocationUpdated content = new LocationUpdated.Builder().userId(userId)
+				.horizontalAccuracy(locationDto.getHorizontalAccuracy())
+				.verticalAccuracy(locationDto.getVerticalAccuracy())
+				.timestamp(locationDto.getTimestamp())
+				.latitude(locationDto.getLatitude())
+				.longitude(locationDto.getLongitude())
+				.altitude(locationDto.getAltitude()).build();
+
+		ServiceFactory.getLocationService().addUpdateLocationInCache(userId);
 		// serialize and send it
 		String message = MessageConverterFactory.getMessageConverter()
 				.serialize(new Message(content));
-		
-		MessageQueueFactory.getLocationQueueProducer().write(
-				message.getBytes());
+
+		MessageQueueFactory.getLocationQueueProducer()
+				.write(message.getBytes());
 		log.info("message sent: {}", message);
 	}
-	
 
 }

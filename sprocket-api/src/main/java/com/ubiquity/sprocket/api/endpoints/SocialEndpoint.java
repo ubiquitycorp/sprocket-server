@@ -176,13 +176,13 @@ public class SocialEndpoint {
 	 * @param userId
 	 * @param externalNetworkId
 	 * @return
-	 * @throws org.jets3t.service.impl.rest.HttpException 
+	 * @throws org.apache.http.HttpException 
 	 */
 	@POST
 	@Path("users/{userId}/providers/{externalNetworkId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws HttpException, org.jets3t.service.impl.rest.HttpException {
+	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws org.apache.http.HttpException {
 
 		//Cast the input into SendMessageObject
 		SendMessageDto sendMessageDto = jsonConverter.convertFromPayload(payload, SendMessageDto.class);
@@ -207,25 +207,25 @@ public class SocialEndpoint {
 	/***
 	 * This method send message to specific user in social network
 	 * @param userId
-	 * @param socialProviderId
+	 * @param externalNetworkId
 	 * @return
-	 * @throws org.jets3t.service.impl.rest.HttpException 
 	 */
 	@POST
-	@Path("users/{userId}/providers/{socialNetworkId}/activities")
+	@Path("users/{userId}/providers/{externalNetworkId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response postactivity(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
+	public Response postactivity(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws HttpException {
 
 		//Cast the input into SendMessageObject
 		PostActivity postActivity = jsonConverter.convertFromPayload(payload, PostActivity.class);
 				
-		// load user
-		ServiceFactory.getUserService().getUserById(userId);
 		// get social network 
-		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
+		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		// get the identity from DB
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
+		
+		if(identity == null)
+			throw new IllegalArgumentException("User has no identity for this network");
 		
 		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
 		
