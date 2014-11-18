@@ -8,6 +8,7 @@ import com.ubiquity.integration.service.ContactService;
 import com.ubiquity.integration.service.ContentService;
 import com.ubiquity.integration.service.ExternalIdentityService;
 import com.ubiquity.integration.service.SocialService;
+import com.ubiquity.media.service.MediaService;
 
 /***
  * Factory class returns a managers as singletons.
@@ -32,6 +33,7 @@ public class ServiceFactory {
 	private static EmailService emailService;
 	private static LocationService locationService;
 	private static FavoriteService favoriteService;
+	private static MediaService mediaService;
 	
 	/***
 	 * Initializes all services with the specified configuration
@@ -185,6 +187,16 @@ public class ServiceFactory {
 		if(emailService == null)
 			emailService = new EmailService(configuration);
 		return emailService;
+	}
+	
+	/**
+	 * Creates or returns a new media service
+	 * @return
+	 */
+	public static MediaService getMediaService() {
+		if(mediaService == null)
+			mediaService = new MediaService(configuration);
+		return mediaService;
 	}
 }
 

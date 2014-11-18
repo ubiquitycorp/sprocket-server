@@ -25,17 +25,17 @@
 				<filtering>true</filtering>
 			</testResource>
 		</testResources>
-		
+
 		<plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.6</version>
-        <configuration>
-          <escapeString>\</escapeString>
-        </configuration>
-      </plugin>
-    
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<escapeString>\</escapeString>
+				</configuration>
+			</plugin>
+
 
 			<!-- This compiler plugin is included via parent but needed here for a 
 				bug in dynamic web module with Java 1.7 -->
@@ -147,12 +147,11 @@
 			</exclusions>
 		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.jboss.resteasy</groupId> -->
-<!-- 			<artifactId>resteasy-hibernatevalidator-provider</artifactId> -->
-<!-- 			<version>3.0.8.Final</version> -->
-<!-- 		</dependency> -->
-
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-multipart-provider</artifactId>
+			<version>3.0.8.Final</version>
+		</dependency>
 
 		<dependency>
 			<groupId>javax.servlet</groupId>
