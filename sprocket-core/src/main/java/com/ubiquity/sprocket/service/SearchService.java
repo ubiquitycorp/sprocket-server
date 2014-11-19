@@ -276,13 +276,13 @@ public class SearchService {
 //			UserLocation location = repo.findByUserId(user.getUserId());
 //			if(location!= null)
 //			{
-			if(longitude != null && latitude != null)
+			if(longitude != null && latitude != null && locator != null)
 			{
 				List<Place> places = placeAPI.searchPlacesWithLongAndLatAndLocator(searchTerm, longitude,latitude,locator, null, page, resultsLimit>20?20:resultsLimit);			
 				documents = wrapEntitiesInDocuments(places);
 			}
 			else{
-				throw new IllegalArgumentException("longitude/latitude can't be null");
+				throw new IllegalArgumentException("longitude/latitude/locator can't be null");
 			}
 		}
 
