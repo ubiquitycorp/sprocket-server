@@ -51,9 +51,9 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 	            String apiKey = values.get(0).replaceFirst(AUTHENTICATION_SCHEME + " ", "");
 				String userId = requestContext.getUriInfo().getPathParameters().getFirst("userId");
 				log.debug("Recieved user_id :"+userId + ",apiKey :"+apiKey);
-				boolean isValid = ServiceFactory.getUserService().isValid(Long.parseLong(userId));
-				if (!isValid)
-					throw new IllegalArgumentException(ServiceFactory.getErrorsConfigurationService().getErrorMessage(ErrorKeys.USER_NOT_EXIST));
+//				boolean isValid = ServiceFactory.getUserService().isValid(Long.parseLong(userId));
+//				if (!isValid)
+//					throw new IllegalArgumentException(ServiceFactory.getErrorsConfigurationService().getErrorMessage(ErrorKeys.USER_NOT_EXIST));
 				
 				AuthenticationService authenticationService = ServiceFactory.getAuthenticationService();
 				// get the user id

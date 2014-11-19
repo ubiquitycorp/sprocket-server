@@ -14,7 +14,7 @@ import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 
 public class BackChannelWorkerEjabberdImpl extends BackChannelWorker {
 
-	private static final int DEFAULT_NUM_CONSUMERS = 20;
+	private static final int DEFAULT_NUM_CONSUMERS = 1;
 
 	@Override
 	public void initialize(Configuration configuration) throws IOException {
@@ -34,18 +34,12 @@ public class BackChannelWorkerEjabberdImpl extends BackChannelWorker {
 		
 		ThreadPool<BackChannelConsumer> threadPool = new ThreadPool<BackChannelConsumer>();
 		threadPool.start(consumers);
-
 	}
-	
 	
 	private void startServices(Configuration configuration) throws IOException {
 		MessageQueueFactory.initialize(configuration);
 	}
 
-
 	@Override
 	public void destroy() {}
-
-
-
 }
