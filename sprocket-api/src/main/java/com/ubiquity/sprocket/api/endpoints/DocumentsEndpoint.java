@@ -2,6 +2,7 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -118,7 +119,7 @@ public class DocumentsEndpoint {
 	@Path("users/{userId}/providers/{externalNetworkId}/live")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response searchLive(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
+	public Response searchLive(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @QueryParam("q") String q, @QueryParam("page") Integer page, @QueryParam("longitude") BigDecimal longitude, @QueryParam("latitude") BigDecimal latitude, @QueryParam("locator") String locator) throws IOException {
 		DocumentsDto result = new DocumentsDto(q);
 
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
@@ -130,7 +131,7 @@ public class DocumentsEndpoint {
 		if(externalNetwork != ExternalNetwork.Yelp)
 			ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
 		
-		List<Document> documents = ServiceFactory.getSearchService().searchLiveDocuments(q, user, externalNetwork, page);
+		List<Document> documents = ServiceFactory.getSearchService().searchLiveDocuments(q, user, externalNetwork, page ,longitude,latitude,locator);
 		
 		for(Document document : documents) {
 			result.getDocuments().add(DtoAssembler.assemble(document));
