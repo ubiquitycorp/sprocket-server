@@ -72,7 +72,7 @@ public class DtoAssembler {
 		activityBuilder.title(activityDto.getTitle());
 		activityBuilder.body(activityDto.getBody());
 		activityBuilder.link(activityDto.getLink());
-
+		activityBuilder.ownerVote(activityDto.getOwnerVote());
 		// set video / photo urls if we have them
 		VideoDto videoDto = activityDto.getVideo();
 		if (videoDto != null)
@@ -414,8 +414,9 @@ public class DtoAssembler {
 				.date(activity.getCreationDate())
 				.externalNetworkId(activity.getExternalNetwork().ordinal())
 				.title(activity.getTitle()).link(activity.getLink())
-				.externalIdentifier(activity.getExternalIdentifier());
-
+				.externalIdentifier(activity.getExternalIdentifier())
+				.ownerVote(activity.getOwnerVote());
+		
 		if (activity.getPostedBy() != null)
 			activityDtoBuilder.postedBy(DtoAssembler.assemble(activity
 					.getPostedBy()));
@@ -450,7 +451,8 @@ public class DtoAssembler {
 				.creationDate(comment.getCreationDate())
 				.externalIdentifier(comment.getExternalIdentifier())
 				.postedBy(assemble(comment.getPostedBy()))
-				.rating(assemble(comment.getRating()));
+				.rating(assemble(comment.getRating()))
+				.ownerVote(comment.getOwnerVote());
 		for (Comment reply : comment.getReplies())
 			commentDtoBuilder.addReply(assemble(reply));
 		return commentDtoBuilder.build();

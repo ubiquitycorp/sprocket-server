@@ -25,6 +25,8 @@ public class ActivityDto {
 	@NotNull(groups = { EngagementValidation.class })
 	private Integer externalNetworkId;
 
+	private Integer ownerVote;
+	
 	@NotNull(groups = { EngagementValidation.class })
 	private String type;
 
@@ -121,8 +123,12 @@ public class ActivityDto {
 		return interests;
 	}
 
+	public Integer getOwnerVote() {
+		return ownerVote;
+	}
 
 	public static class Builder {
+		private Integer ownerVote;
 		private String title;
 		private String body;
 		private Long date;
@@ -189,6 +195,10 @@ public class ActivityDto {
 			return this;
 		}
 
+		public Builder ownerVote(Integer ownerVote){
+			this.ownerVote = ownerVote;
+			return this;
+		}
 		public Builder externalIdentifier(String externalIdentifier) {
 			this.externalIdentifier = externalIdentifier;
 			return this;
@@ -234,6 +244,7 @@ public class ActivityDto {
 		this.rating = builder.rating;
 		this.comments = builder.comments;
 		this.interests = builder.interests;
+		this.ownerVote = builder.ownerVote;
 	}
 
 	@Override

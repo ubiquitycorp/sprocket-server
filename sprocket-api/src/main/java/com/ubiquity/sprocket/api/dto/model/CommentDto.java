@@ -12,6 +12,7 @@ public class CommentDto {
 	private ContactDto postedBy;
 	private String externalIdentifier;
 	private RatingDto rating;
+	private Integer ownerVote;
 	private List<CommentDto> replies = new LinkedList<CommentDto>();
 	
 
@@ -50,6 +51,10 @@ public class CommentDto {
 	public List<CommentDto> getReplies() {
 		return replies;
 	}
+	
+	public Integer getOwnerVote() {
+		return ownerVote;
+	}
 
 	public static class Builder {
 		private Long commentId;
@@ -67,6 +72,8 @@ public class CommentDto {
 		private String externalIdentifier;
 		
 		private RatingDto rating;
+		
+		private Integer ownerVote;
 		
 		private List<CommentDto> replies = new LinkedList<CommentDto>();
 		
@@ -111,6 +118,11 @@ public class CommentDto {
 			this.replies.add(commentDto);
 			return this;
 		}
+		
+		public Builder ownerVote(Integer ownerVote){
+			this.ownerVote = ownerVote;
+			return this;
+		}
 
 		public CommentDto build() {
 			return new CommentDto(this);
@@ -128,6 +140,7 @@ public class CommentDto {
 		this.externalIdentifier = builder.externalIdentifier;
 		this.rating = builder.rating;
 		this.replies = builder.replies;
+		this.ownerVote = builder.ownerVote;
 	}
 	
 }
