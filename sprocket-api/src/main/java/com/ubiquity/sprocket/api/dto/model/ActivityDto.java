@@ -36,7 +36,10 @@ public class ActivityDto {
 	private Long date;
 	
 	private RatingDto rating;
+	
 	private List<CommentDto> comments = new LinkedList<CommentDto>();
+	
+	private List<InterestDto> interests = new LinkedList<InterestDto>();
 
 	@NotNull(groups = { EngagementValidation.class })
 	private ContactDto postedBy;
@@ -114,6 +117,10 @@ public class ActivityDto {
 		return comments;
 	}
 
+	public List<InterestDto> getInterests() {
+		return interests;
+	}
+
 
 	public static class Builder {
 		private String title;
@@ -130,6 +137,7 @@ public class ActivityDto {
 		private Long ownerId;
 		private RatingDto rating;
 		private List<CommentDto> comments = new LinkedList<CommentDto>();
+		private List<InterestDto> interests = new LinkedList<InterestDto>();
 
 		public Builder title(String title) {
 			this.title = title;
@@ -196,6 +204,11 @@ public class ActivityDto {
 			return this;
 		}
 		
+		public Builder addInterest(InterestDto interestDto) {
+			this.interests.add(interestDto);
+			return this;
+		}
+		
 		public Builder rating(RatingDto rating) {
 			this.rating = rating;
 			return this;
@@ -220,6 +233,7 @@ public class ActivityDto {
 		this.ownerId = builder.ownerId;
 		this.rating = builder.rating;
 		this.comments = builder.comments;
+		this.interests = builder.interests;
 	}
 
 	@Override
