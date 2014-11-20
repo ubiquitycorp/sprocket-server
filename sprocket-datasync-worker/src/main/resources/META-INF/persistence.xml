@@ -58,18 +58,16 @@
 			<property name="hibernate.connection.provider_class"
 				value="com.niobium.repository.jpa.provider.BoneCPConnectionProvider" />
 			<property name="bonecp.idleConnectionTestPeriodInMinutes"
-				value="2" />
-			<property name="bonecp.maxConnectionAgeInSeconds" value="25000" />
-
+				value="1" />
+			<property name="bonecp.connectionTestStatement" value="select 1" />
 			<property name="bonecp.partitionCount" value="3" />
-			<property name="bonecp.maxConnectionsPerPartition" value="60" />
-			<property name="bonecp.minConnectionsPerPartition" value="20" />
-			<property name="bonecp.disableConnectionTracking" value="true" />
-			<property name="bonecp.releaseHelperThreads" value="0" />
+			<property name="bonecp.maxConnectionsPerPartition" value="10" />
+			<property name="bonecp.minConnectionsPerPartition" value="5" />
+
+			<property name="bonecp.disableConnectionTracking" value="false" />
+			<property name="bonecp.closedConnectionWatch" value="true" />
+
 			<property name="bonecp.statementsCacheSize" value="100" />
-			<property name="bonecp.releaseHelperThreads" value="2" />
-			<property name="bonecp.statementCachePerConnection" value="10" />
-			<property name="acquireRetryAttempts" value="5" />
 
 			<property name="hibernate.hbm2ddl.auto" value="${hibernate.schema.auto}" />
 
