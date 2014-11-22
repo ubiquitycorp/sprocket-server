@@ -54,6 +54,7 @@ public class ProfileRepositoryLilyImpl extends BaseRepositoryLilyImpl <Profile> 
 			setFieldValue(record, "identities", records);
 		}
 	}
+	
 	private void loadProfileRecord(Record record, Profile profile) {
 		Gender gender = profile.getGender();
 		if(profile.getGender() != null)
