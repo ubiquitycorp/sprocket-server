@@ -401,11 +401,17 @@ public class DtoAssembler {
 		if (activity.getImage() != null)
 			activityDtoBuilder
 					.photo(new ImageDto(activity.getImage().getUrl()));
-		if (activity.getVideo() != null)
-			activityDtoBuilder.video(new VideoDto.Builder()
-					.url(activity.getVideo().getUrl())
-					.itemKey(activity.getVideo().getItemKey()).build());
-
+		if (activity.getVideo() != null){
+			VideoDto.Builder videoDtoBuilder = new VideoDto.Builder();
+			videoDtoBuilder.itemKey(activity.getVideo().getItemKey());
+			if(activity.getVideo().getEmbedCode() != null)
+				videoDtoBuilder.url(activity.getVideo().getEmbedCode());
+			else 
+				videoDtoBuilder.url(activity.getVideo().getUrl());
+			
+			activityDtoBuilder.video(videoDtoBuilder.build());
+		}
+			
 		return activityDtoBuilder.build();
 
 	}
