@@ -54,18 +54,11 @@
 			<property name="hibernate.transaction.flush_before_completion"
 				value="true" />
 
-
 			<!-- Connection Pooling settings -->
-			
-		
-			
-		<property name="hibernate.connection.provider_class"
+			<property name="hibernate.connection.provider_class"
 				value="com.niobium.repository.jpa.provider.BoneCPConnectionProvider" />
-			<property name="bonecp.idleConnectionTestPeriodInMinutes"
-				value="2" />
-			<property name="bonecp.maxConnectionAgeInSeconds" value="25000" />
-			<property name="bonecp.connectionTimeoutInMs" value="3000" />
-
+			<property name="bonecp.idleConnectionTestPeriodInMinutes" value="1" />
+			<property name="bonecp.connectionTestStatement" value="select 1"/>
 			<property name="bonecp.partitionCount" value="3" />
 			<property name="bonecp.maxConnectionsPerPartition" value="10" />
 			<property name="bonecp.minConnectionsPerPartition" value="5" />
@@ -74,7 +67,7 @@
 			<property name="bonecp.closedConnectionWatch" value="true" />
 			
 			<property name="bonecp.statementsCacheSize" value="100" />
-
+			
 			<property name="hibernate.hbm2ddl.auto" value="${hibernate.schema.auto}" />
  
 
