@@ -277,9 +277,10 @@ public class SocialEndpoint {
 				.title(postActivityDto.getTitle())
 				.body(postActivityDto.getBody())
 				.link(postActivityDto.getLink())
-				.embed(postActivityDto.getEmbed()).build();
+				.embed(postActivityDto.getEmbed())
+				.pageId(postActivityDto.getPageId()).build();
 		
-		ServiceFactory.getSocialService().PostActivity(identity, socialNetwork,
+		ServiceFactory.getSocialService().postActivity(identity, socialNetwork,
 				postActivity);
 
 		return Response.ok().build();
