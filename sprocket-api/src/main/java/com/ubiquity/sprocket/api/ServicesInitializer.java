@@ -75,6 +75,7 @@ public class ServicesInitializer implements ServletContextListener {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void bootstrap() {
 		try
 		{
