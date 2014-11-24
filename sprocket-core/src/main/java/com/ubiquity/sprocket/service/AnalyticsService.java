@@ -152,6 +152,24 @@ public class AnalyticsService {
 		}
 
 	}
+	
+	
+	public CollectionVariant<Interest> findInterestsByExternalNetworkId(ExternalNetwork network, Long ifModifiedSince ) {
+
+//		Long lastModified = dataModificationCache.getLastModified(CacheKeys.GlobalProperties.INTERESTS, ifModifiedSince);
+
+		// If there is no cache entry, there is no data
+//		if (lastModified == null) {
+//			return null;
+//		}
+
+		try {
+			return new CollectionVariant<Interest>(new ExternalInterestRepositoryJpaImpl().getByDistinctInterestByExternalNetwork(network),null);
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+
+	}
 
 
 
