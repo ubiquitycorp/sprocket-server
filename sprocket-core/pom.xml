@@ -80,6 +80,11 @@
 			<version>0.2</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.niobium</groupId>
+			<artifactId>niobium-data-access</artifactId>
+			<version>0.9.3</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.solr</groupId>

@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.lilyproject.repository.api.Record;
 import org.lilyproject.repository.api.Repository;
 
-import com.niobium.repository.BaseRepositoryLilyImpl;
+import com.niobium.repository.lily.BaseRepositoryLilyImpl;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ExternalNetwork;

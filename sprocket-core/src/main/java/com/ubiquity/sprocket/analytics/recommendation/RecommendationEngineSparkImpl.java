@@ -202,7 +202,8 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 			String groupIdentifier = String.valueOf(idx);
 
 			// only create a membership assignment for a registered user
-			return new GroupMembership(profile.getUser(), groupIdentifier);
+			//return new GroupMembership(profile.getUser(), groupIdentifier);
+			return null;
 		}
 
 		

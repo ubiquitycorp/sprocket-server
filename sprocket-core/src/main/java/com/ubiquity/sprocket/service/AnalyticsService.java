@@ -120,7 +120,7 @@ public class AnalyticsService {
 		contentRepository.create(content);
 	}
 	
-	public void track(Content content, User user, Long timestamp) {
+	public void track(Content content, Long userId, Long timestamp) {
 		
 	}
 	
@@ -270,8 +270,7 @@ public class AnalyticsService {
 			GroupMembershipRepository groupMembershipRepository = new GroupMembershipRepositoryJpaImpl();
 
 			EntityManagerSupport.beginTransaction();
-			groupMembershipRepository.deleteByUserId(profile.getUser()
-					.getUserId());
+			groupMembershipRepository.deleteByUserId(profile.getUserId());
 
 			// persisting this for now but we may not need to in the future
 			for (GroupMembership membership : membershipList) {

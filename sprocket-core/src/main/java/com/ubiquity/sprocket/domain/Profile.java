@@ -3,7 +3,6 @@ package com.ubiquity.sprocket.domain;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.AgeRange;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Gender;
@@ -20,7 +19,7 @@ import com.ubiquity.location.domain.UserLocation;
 public class Profile {
 
 	private String profileId;
-	private User user;
+	private Long userId;
 	private Gender gender;
 	private AgeRange ageRange;
 	private List<Interest> interests = new LinkedList<Interest>();
@@ -78,8 +77,8 @@ public class Profile {
 		return profileId;
 	}
 
-	public User getUser() {
-		return user;
+	public Long getUserId() {
+		return userId;
 	}
 
 	public Gender getGender() {
@@ -100,7 +99,7 @@ public class Profile {
 
 	public static class Builder {
 		private String profileId;
-		private User user;
+		private Long userId;
 		private Gender gender;
 		private AgeRange ageRange;
 		private UserLocation location;
@@ -112,8 +111,8 @@ public class Profile {
 			return this;
 		}
 
-		public Builder user(User user) {
-			this.user = user;
+		public Builder userId(Long userId) {
+			this.userId = userId;
 			return this;
 		}
 
@@ -149,7 +148,7 @@ public class Profile {
 
 	private Profile(Builder builder) {
 		this.profileId = builder.profileId;
-		this.user = builder.user;
+		this.userId = builder.userId;
 		this.gender = builder.gender;
 		this.ageRange = builder.ageRange;
 		this.location = builder.location;

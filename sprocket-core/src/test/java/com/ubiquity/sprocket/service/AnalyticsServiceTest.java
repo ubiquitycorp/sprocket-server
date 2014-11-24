@@ -5,7 +5,6 @@ import java.util.Map;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,18 +58,21 @@ public class AnalyticsServiceTest {
 		analyticsService.track(content);
 	}
 	
+	public void testMapReduce() {
+		
+	}
 	
 	@Test
 	public void testRecommendActivities() {
-		Profile jack = TestProfileFactory.createProfileAndIdentity(TestUserFactory.createUserProxy(),
+		Profile jack = TestProfileFactory.createProfileAndIdentity(Math.abs(new java.util.Random().nextLong()),
 				ExternalNetwork.Facebook, Gender.Male, new AgeRange(21, 35), 34.0522300, -118.2436800);
-		Profile john = TestProfileFactory.createProfileAndIdentity(TestUserFactory.createUserProxy(),
+		Profile john = TestProfileFactory.createProfileAndIdentity(Math.abs(new java.util.Random().nextLong()),
 				ExternalNetwork.Facebook, Gender.Male, new AgeRange(55, 65), 34.1234567, -118.2412345);
-		Profile joe = TestProfileFactory.createProfileAndIdentity(TestUserFactory.createUserProxy(),
+		Profile joe = TestProfileFactory.createProfileAndIdentity(Math.abs(new java.util.Random().nextLong()),
 				ExternalNetwork.Facebook, Gender.Male, new AgeRange(55, 65), 34.1334567, -118.2499999);
-		Profile jill = TestProfileFactory.createProfileAndIdentity(TestUserFactory.createUserProxy(),
+		Profile jill = TestProfileFactory.createProfileAndIdentity(Math.abs(new java.util.Random().nextLong()),
 				ExternalNetwork.Facebook, Gender.Female, new AgeRange(55, 65), -34.6131500, -58.3772300);
-		Profile jane = TestProfileFactory.createProfileAndIdentity(TestUserFactory.createUserProxy(),
+		Profile jane = TestProfileFactory.createProfileAndIdentity(Math.abs(new java.util.Random().nextLong()),
 				ExternalNetwork.Facebook, Gender.Female, new AgeRange(55, 65), -34.6131500, -58.3772300);
 		
 		// persist all of these records
@@ -84,8 +86,8 @@ public class AnalyticsServiceTest {
 		Content content = new Content.Builder()
 			.activity(TestActivityFactory.createActivityWithMininumRequirements(null, ExternalNetwork.Facebook))
 			.build();
-		analyticsService.track(content, jack.getUser(), System.currentTimeMillis());
-		analyticsService.track(content, john.getUser(), System.currentTimeMillis());
+		analyticsService.track(content, jack.getUserId(), System.currentTimeMillis());
+		analyticsService.track(content, john.getUserId(), System.currentTimeMillis());
 
 
 //		analyticsService.refreshProfileRecords();

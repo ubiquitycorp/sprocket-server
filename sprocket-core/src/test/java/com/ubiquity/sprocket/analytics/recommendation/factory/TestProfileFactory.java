@@ -3,7 +3,6 @@ package com.ubiquity.sprocket.analytics.recommendation.factory;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.AgeRange;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Gender;
@@ -24,23 +23,23 @@ public class TestProfileFactory {
 	 * @param lon
 	 * @return
 	 */
-	public static Profile createProfileAndIdentity(User user, ExternalNetwork network, Gender gender, AgeRange ageRange, Double lat, Double lon) {		
+	public static Profile createProfileAndIdentity(Long userId, ExternalNetwork network, Gender gender, AgeRange ageRange, Double lat, Double lon) {		
 		Profile profile = new Profile.Builder()
 		.gender(gender)
-		.user(user)
+		.userId(userId)
 		.ageRange(ageRange)
 		.location(new UserLocation.Builder().location(
-				new Location.Builder().latitude(new BigDecimal(lat)).longitude(new BigDecimal(lon)).build()).user(user).build()).build();
+				new Location.Builder().latitude(new BigDecimal(lat)).longitude(new BigDecimal(lon)).build()).user(null).build()).build();
 
 		// build the profile with location
 		Profile identity = new Profile.Builder()
 		.gender(gender)
-		.user(user)
+		.userId(userId)
 		.externalIdentifier(UUID.randomUUID().toString())
 		.externalNetwork(network)
 		.ageRange(ageRange)
 		.location(new UserLocation.Builder().location(
-				new Location.Builder().latitude(new BigDecimal(lat)).longitude(new BigDecimal(lon)).build()).user(user).build()).build();
+				new Location.Builder().latitude(new BigDecimal(lat)).longitude(new BigDecimal(lon)).build()).user(null).build()).build();
 		// add to list of contacts
 		profile.getIdentities().add(identity);
 

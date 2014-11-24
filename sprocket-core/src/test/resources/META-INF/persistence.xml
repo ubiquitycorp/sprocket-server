@@ -16,12 +16,6 @@
 		
 		<class>com.ubiquity.sprocket.domain.RecommendedActivity</class>
 		<class>com.ubiquity.sprocket.domain.RecommendedVideo</class>
-
-		<class>com.ubiquity.sprocket.domain.EngagedVideo</class>
-		<class>com.ubiquity.sprocket.domain.EngagedActivity</class>
-		<class>com.ubiquity.sprocket.domain.EngagedDocument</class>
-		<class>com.ubiquity.sprocket.domain.EngagedItem</class>
-		
 		<class>com.ubiquity.sprocket.domain.FavoritePlace</class>
 		<class>com.ubiquity.sprocket.domain.FavoriteItem</class>
 		
