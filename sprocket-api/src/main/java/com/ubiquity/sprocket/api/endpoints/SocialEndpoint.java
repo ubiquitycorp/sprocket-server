@@ -28,6 +28,8 @@ import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Message;
 import com.ubiquity.integration.domain.PostActivity;
+import com.ubiquity.integration.domain.PostComment;
+import com.ubiquity.integration.domain.PostVote;
 import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
@@ -35,6 +37,8 @@ import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 import com.ubiquity.sprocket.api.dto.model.PostActivityDto;
+import com.ubiquity.sprocket.api.dto.model.PostCommentDto;
+import com.ubiquity.sprocket.api.dto.model.PostVoteDto;
 import com.ubiquity.sprocket.api.dto.model.SendMessageDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
@@ -273,15 +277,73 @@ public class SocialEndpoint {
 				.title(postActivityDto.getTitle())
 				.body(postActivityDto.getBody())
 				.link(postActivityDto.getLink())
-				.embed(postActivityDto.getEmbed()).build();
+				.embed(postActivityDto.getEmbed())
+				.pageId(postActivityDto.getPageId()).build();
 		
-		ServiceFactory.getSocialService().PostActivity(identity, socialNetwork,
+		ServiceFactory.getSocialService().postActivity(identity, socialNetwork,
 				postActivity);
 
 		return Response.ok().build();
 
 	}
+	/***
+	 * This method post comment to specific user in social network
+	 * @param userId
+	 * @param socialProviderId
+	 * @return
+	 * @throws org.jets3t.service.impl.rest.HttpException 
+	 */
+	@POST
+	@Path("users/{userId}/providers/{socialNetworkId}/comment")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response postComment(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
 
+		//Cast the input into SendMessageObject
+		PostCommentDto postCommentDto = jsonConverter.convertFromPayload(payload, PostCommentDto.class);
+				
+		// load user
+		ServiceFactory.getUserService().getUserById(userId);
+		// get social network 
+		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
+		// get the identity from DB
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
+		
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
+		
+		PostComment postComment = DtoAssembler.assemble(postCommentDto);
+		ServiceFactory.getSocialService().postComment(identity, socialNetwork, postComment);
+
+		return Response.ok().build();
+			
+	}
+	
+	@POST
+	@Path("users/{userId}/providers/{socialNetworkId}/vote")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response postVote(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
+
+		//Cast the input into SendMessageObject
+		PostVoteDto postVoteDto = jsonConverter.convertFromPayload(payload, PostVoteDto.class);
+				
+		// load user
+		ServiceFactory.getUserService().getUserById(userId);
+		// get social network 
+		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
+		// get the identity from DB
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
+		
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
+		
+		PostVote postComment = DtoAssembler.assemble(postVoteDto);
+		
+		ServiceFactory.getSocialService().postVote(identity, socialNetwork, postComment);
+
+		return Response.ok().build();
+			
+	}
+	
 	/**
 	 * Drops a message for tracking this event
 	 * 
