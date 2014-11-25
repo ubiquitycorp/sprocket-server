@@ -161,26 +161,15 @@
 
 		<dependency>
 			<groupId>com.niobium</groupId>
-			<artifactId>niobium-common</artifactId>
-			<version>0.3.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.niobium</groupId>
 			<artifactId>niobium-xmpp</artifactId>
 			<version>0.3</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.niobium</groupId>
-			<artifactId>niobium-amqp</artifactId>
-			<version>0.2</version>
-		</dependency>
         
         <dependency>
             <groupId>com.ubiquity</groupId>
             <artifactId>sprocket-core</artifactId>
-            <version>0.2.2</version>
+            <version>0.2.3</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.resteasy</groupId>
