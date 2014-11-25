@@ -25,7 +25,7 @@ delete from user_location;
 #delete from place where parent_id is not null;
 #identities and users
 
-#delete from external_identity;
-#delete from native_identity;
-#delete from identity;
-#delete from user;
+delete from external_identity;
+delete from native_identity;
+delete from identity;
+delete from user;
