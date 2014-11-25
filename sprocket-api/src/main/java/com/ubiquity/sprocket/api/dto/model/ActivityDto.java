@@ -1,5 +1,8 @@
 package com.ubiquity.sprocket.api.dto.model;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
 
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
@@ -8,22 +11,25 @@ import com.ubiquity.sprocket.api.validation.EngagementValidation;
  * Dto representing an activity (i.e. a post, news feed item)
  * 
  * @author chris
- *
+ * 
  */
 public class ActivityDto {
 
 	private Long activityId;
-	
+
 	/***
-	 * Constraints applied when this DTO is used to carry an input payload; these 3 properties are needed to determine
-	 * if a record has already been persisted
+	 * Constraints applied when this DTO is used to carry an input payload;
+	 * these 3 properties are needed to determine if a record has already been
+	 * persisted
 	 */
 	@NotNull(groups = { EngagementValidation.class })
 	private Integer externalNetworkId;
+
+	private Integer ownerVote;
 	
 	@NotNull(groups = { EngagementValidation.class })
 	private String type;
-	
+
 	@NotNull(groups = { EngagementValidation.class })
 	private String externalIdentifier;
 
@@ -31,18 +37,24 @@ public class ActivityDto {
 	private String body;
 	private Long date;
 	
+	private RatingDto rating;
+	
+	private List<CommentDto> comments = new LinkedList<CommentDto>();
+	
+	private List<InterestDto> interests = new LinkedList<InterestDto>();
+
 	@NotNull(groups = { EngagementValidation.class })
 	private ContactDto postedBy;
-	
+
 	private ImageDto photo;
 	private VideoDto video;
-	
+
 	private String link;
-	
+
 	private String category;
 
 	private Long ownerId;
-	
+
 	public Long getActivityId() {
 		return activityId;
 	}
@@ -89,7 +101,7 @@ public class ActivityDto {
 
 	public String getExternalIdentifier() {
 		return externalIdentifier;
-	}	
+	}
 
 	public String getCategory() {
 		return category;
@@ -98,8 +110,25 @@ public class ActivityDto {
 	public Long getOwnerId() {
 		return ownerId;
 	}
+	
+	public RatingDto getRating() {
+		return rating;
+	}
+
+	public List<CommentDto> getComments() {
+		return comments;
+	}
+
+	public List<InterestDto> getInterests() {
+		return interests;
+	}
+
+	public Integer getOwnerVote() {
+		return ownerVote;
+	}
 
 	public static class Builder {
+		private Integer ownerVote;
 		private String title;
 		private String body;
 		private Long date;
@@ -112,7 +141,10 @@ public class ActivityDto {
 		private String externalIdentifier;
 		private String category;
 		private Long ownerId;
-		
+		private RatingDto rating;
+		private List<CommentDto> comments = new LinkedList<CommentDto>();
+		private List<InterestDto> interests = new LinkedList<InterestDto>();
+
 		public Builder title(String title) {
 			this.title = title;
 			return this;
@@ -147,12 +179,12 @@ public class ActivityDto {
 			this.externalNetworkId = externalNetworkId;
 			return this;
 		}
-		
+
 		public Builder ownerId(Long ownerId) {
 			this.ownerId = ownerId;
 			return this;
 		}
-		
+
 		public Builder type(String type) {
 			this.type = type;
 			return this;
@@ -162,17 +194,35 @@ public class ActivityDto {
 			this.link = link;
 			return this;
 		}
-		
+
+		public Builder ownerVote(Integer ownerVote){
+			this.ownerVote = ownerVote;
+			return this;
+		}
 		public Builder externalIdentifier(String externalIdentifier) {
 			this.externalIdentifier = externalIdentifier;
 			return this;
 		}
-		
+
 		public Builder category(String category) {
 			this.category = category;
 			return this;
 		}
+
+		public Builder addComment(CommentDto commentDto) {
+			this.comments.add(commentDto);
+			return this;
+		}
 		
+		public Builder addInterest(InterestDto interestDto) {
+			this.interests.add(interestDto);
+			return this;
+		}
+		
+		public Builder rating(RatingDto rating) {
+			this.rating = rating;
+			return this;
+		}
 		public ActivityDto build() {
 			return new ActivityDto(this);
 		}
@@ -191,6 +241,10 @@ public class ActivityDto {
 		this.externalIdentifier = builder.externalIdentifier;
 		this.category = builder.category;
 		this.ownerId = builder.ownerId;
+		this.rating = builder.rating;
+		this.comments = builder.comments;
+		this.interests = builder.interests;
+		this.ownerVote = builder.ownerVote;
 	}
 
 	@Override
@@ -202,6 +256,5 @@ public class ActivityDto {
 				+ ", link=" + link + ", externalIdentifier="
 				+ externalIdentifier + "]";
 	}
-	
-	
+
 }

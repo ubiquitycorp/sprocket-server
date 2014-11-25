@@ -399,7 +399,7 @@ public class UsersEndpoint {
 		} else if (externalNetwork.network == Network.Social) {
 			SocialAPI socialApi = SocialAPIFactory.createProvider(
 					externalNetwork, clientPlatform);
-			String redirectUri = null;
+			String redirectUri = identityDto.getRedirectUrl();
 			if ((externalNetwork.equals(ExternalNetwork.Google) || externalNetwork
 					.equals(ExternalNetwork.YouTube))
 					&& clientPlatform.equals(ClientPlatform.WEB)) {

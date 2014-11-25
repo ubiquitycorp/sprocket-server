@@ -14,10 +14,13 @@ import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ActivityType;
 import com.ubiquity.integration.domain.Address;
 import com.ubiquity.integration.domain.Category;
+import com.ubiquity.integration.domain.Comment;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Interest;
 import com.ubiquity.integration.domain.Message;
+import com.ubiquity.integration.domain.PostComment;
+import com.ubiquity.integration.domain.PostVote;
 import com.ubiquity.integration.domain.Rating;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.location.domain.Geobox;
@@ -28,6 +31,7 @@ import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.domain.factories.ActivityFactory;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.AddressDto;
+import com.ubiquity.sprocket.api.dto.model.CommentDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
 import com.ubiquity.sprocket.api.dto.model.GeoboxDto;
@@ -37,6 +41,8 @@ import com.ubiquity.sprocket.api.dto.model.InterestDto;
 import com.ubiquity.sprocket.api.dto.model.LocationDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 import com.ubiquity.sprocket.api.dto.model.PlaceDto;
+import com.ubiquity.sprocket.api.dto.model.PostCommentDto;
+import com.ubiquity.sprocket.api.dto.model.PostVoteDto;
 import com.ubiquity.sprocket.api.dto.model.RatingDto;
 import com.ubiquity.sprocket.api.dto.model.VideoDto;
 import com.ubiquity.sprocket.domain.Document;
@@ -66,7 +72,7 @@ public class DtoAssembler {
 		activityBuilder.title(activityDto.getTitle());
 		activityBuilder.body(activityDto.getBody());
 		activityBuilder.link(activityDto.getLink());
-
+		activityBuilder.ownerVote(activityDto.getOwnerVote());
 		// set video / photo urls if we have them
 		VideoDto videoDto = activityDto.getVideo();
 		if (videoDto != null)
@@ -77,11 +83,22 @@ public class DtoAssembler {
 		if (imageDto != null)
 			activityBuilder.image(new Image(imageDto.getUrl()));
 
-		if(activityDto.getPostedBy() != null)
+		if (activityDto.getPostedBy() != null)
 			activityBuilder.postedBy(assemble(activityDto.getPostedBy()));
 
 		return activityBuilder.build();
 
+	}
+
+	public static PostComment assemble(PostCommentDto postCommentDto) {
+		return new PostComment.Builder().body(postCommentDto.getBody())
+				.parentId(postCommentDto.getParentId()).build();
+	}
+	
+	public static PostVote assemble(PostVoteDto postVoteDto) {
+		return new PostVote.Builder().direction(postVoteDto.getDirection())
+				.stars(postVoteDto.getStars())
+				.parentId(postVoteDto.getParentId()).build();
 	}
 
 	public static Contact assemble(ContactDto contactDto) {
@@ -301,6 +318,13 @@ public class DtoAssembler {
 		return contactDtoBuilder.build();
 	}
 
+	public static InterestDto assemble(Interest interest) {
+
+		InterestDto interestDto = new InterestDto(interest.getInterestId(),
+				interest.getName());
+		return interestDto;
+	}
+
 	public static VideoDto assemble(VideoContent videoContent) {
 		VideoDto.Builder videoBuilder = new VideoDto.Builder()
 				.externalNetworkId(videoContent.getExternalNetwork().ordinal());
@@ -390,24 +414,54 @@ public class DtoAssembler {
 				.date(activity.getCreationDate())
 				.externalNetworkId(activity.getExternalNetwork().ordinal())
 				.title(activity.getTitle()).link(activity.getLink())
-				.externalIdentifier(activity.getExternalIdentifier());
-
-		if(activity.getPostedBy() != null)
-			activityDtoBuilder.postedBy(DtoAssembler.assemble(activity.getPostedBy()));
+				.externalIdentifier(activity.getExternalIdentifier())
+				.ownerVote(activity.getOwnerVote());
 		
+		if (activity.getPostedBy() != null)
+			activityDtoBuilder.postedBy(DtoAssembler.assemble(activity
+					.getPostedBy()));
+
 		if (activity.getCategory() != null)
 			activityDtoBuilder.category(activity.getCategory()
 					.getCategoryName());
 		if (activity.getImage() != null)
 			activityDtoBuilder
 					.photo(new ImageDto(activity.getImage().getUrl()));
-		if (activity.getVideo() != null)
-			activityDtoBuilder.video(new VideoDto.Builder()
-					.url(activity.getVideo().getUrl())
-					.itemKey(activity.getVideo().getItemKey()).build());
-
+		if (activity.getVideo() != null){
+			VideoDto.Builder videoDtoBuilder = new VideoDto.Builder();
+			videoDtoBuilder.itemKey(activity.getVideo().getItemKey());
+			if(activity.getVideo().getEmbedCode() != null)
+				videoDtoBuilder.url(activity.getVideo().getEmbedCode());
+			else 
+				videoDtoBuilder.url(activity.getVideo().getUrl());
+			
+			activityDtoBuilder.video(videoDtoBuilder.build());			
+		}
+		if (activity.getComments() != null) {
+			for (Comment comment : activity.getComments())
+				activityDtoBuilder.addComment(assemble(comment));
+		}
+		if (activity.getInterests() != null) {
+			for (Interest interest : activity.getInterests())
+				activityDtoBuilder.addInterest(assemble(interest));
+		}
+		activityDtoBuilder.rating(assemble(activity.getRating()));
 		return activityDtoBuilder.build();
 
+	}
+
+	public static CommentDto assemble(Comment comment) {
+		CommentDto.Builder commentDtoBuilder = new CommentDto.Builder();
+		commentDtoBuilder.body(comment.getBody())
+				.commentId(comment.getCommentId())
+				.creationDate(comment.getCreationDate())
+				.externalIdentifier(comment.getExternalIdentifier())
+				.postedBy(assemble(comment.getPostedBy()))
+				.rating(assemble(comment.getRating()))
+				.ownerVote(comment.getOwnerVote());
+		for (Comment reply : comment.getReplies())
+			commentDtoBuilder.addReply(assemble(reply));
+		return commentDtoBuilder.build();
 	}
 
 	public static PlaceDto assembleCityOrNeighborhood(Place place) {
@@ -432,11 +486,10 @@ public class DtoAssembler {
 				.boundingBox(assemble(place.getBoundingBox()))
 				.externalIdentitifer(place.getExternalIdentitifer())
 				.region(place.getRegion()).name(place.getName())
-				.network(place.getNetwork())
-				.locator(place.getLocator())
+				.network(place.getNetwork()).locator(place.getLocator())
 				.ratingDto(assemble(place.getRating()))
 				.parent(assembleCityOrNeighborhood(place.getParent()));
-		if (place.getThumb()!=null)
+		if (place.getThumb() != null)
 			placeDtoBuilder.thumb(new ImageDto(place.getThumb().getUrl()));
 		return placeDtoBuilder.build();
 	}
@@ -562,7 +615,7 @@ public class DtoAssembler {
 				&& placeDto.getExternalNetworkId() != -1)
 			placeBuilder.externalNetwork(ExternalNetwork
 					.getNetworkById(placeDto.getExternalNetworkId()));
-		if (placeDto.getThumb()!=null)
+		if (placeDto.getThumb() != null)
 			placeBuilder.thumb(new Image(placeDto.getThumb().getUrl()));
 		return placeBuilder.build();
 
