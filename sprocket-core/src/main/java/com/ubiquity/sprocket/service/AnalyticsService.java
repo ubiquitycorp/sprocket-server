@@ -68,7 +68,7 @@ public class AnalyticsService {
 	 * @param configuration
 	 */
 	public AnalyticsService(Configuration configuration) {
-		setUpLily(configuration);
+		//setUpLily(configuration);
 		
 		
 		
