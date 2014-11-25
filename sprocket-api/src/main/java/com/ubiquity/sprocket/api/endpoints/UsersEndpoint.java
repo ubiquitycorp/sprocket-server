@@ -576,7 +576,8 @@ public class UsersEndpoint {
 					media = new AudioTrack.Builder().itemKey(fileName).build();
 				} else if (inputPart.getMediaType().getType().equals("video")) {
 					media = new Video.Builder().itemKey(fileName).build();
-				}
+				} else 
+					throw new IllegalArgumentException("Unsupported media type");
 
 				media.setInputStream(istream);
 				ServiceFactory.getMediaService().create(media);
