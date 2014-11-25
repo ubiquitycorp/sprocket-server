@@ -544,7 +544,7 @@ public class UsersEndpoint {
 	 */
 	@POST
 	@Path("/{userId}/uploaded")
-	@Consumes("multipart/form-data")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.APPLICATION_JSON)
 	// @Secure
 	public Response uploadFile(@PathParam("userId") Long userId,
@@ -562,14 +562,14 @@ public class UsersEndpoint {
 				// Retrieve headers, read the Content-Disposition header to
 				// obtain the original name of the file
 				MultivaluedMap<String, String> headers = inputPart.getHeaders();
-				fileName = parseFileName(headers);
+				//fileName = parseFileName(headers);
+				
 
 				long startTime = System.currentTimeMillis();
 				// Handle the body of that part with an InputStream
 				InputStream istream = inputPart
 						.getBody(InputStream.class, null);
-
-				log.debug(fileName);
+				
 				if (inputPart.getMediaType().getType().equals("image")) {
 					media = new Image.Builder().itemKey(fileName).build();
 				} else if (inputPart.getMediaType().getType().equals("audio")) {
@@ -579,6 +579,8 @@ public class UsersEndpoint {
 				} else 
 					throw new IllegalArgumentException("Unsupported media type");
 
+				fileName = "sprocket_" + System.currentTimeMillis() + "." + inputPart.getMediaType().getSubtype();
+				log.debug(fileName);
 				media.setInputStream(istream);
 				ServiceFactory.getMediaService().create(media);
 				long endTime = System.currentTimeMillis();
