@@ -168,13 +168,13 @@
 		<dependency>
 			<groupId>com.niobium</groupId>
 			<artifactId>niobium-xmpp</artifactId>
-			<version>0.3</version>
+			<version>0.4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.niobium</groupId>
 			<artifactId>niobium-amqp</artifactId>
-			<version>0.2</version>
+			<version>0.2.2</version>
 		</dependency>
         
         <dependency>
