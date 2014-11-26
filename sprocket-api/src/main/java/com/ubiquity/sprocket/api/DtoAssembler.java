@@ -73,6 +73,7 @@ public class DtoAssembler {
 		activityBuilder.body(activityDto.getBody());
 		activityBuilder.link(activityDto.getLink());
 		activityBuilder.ownerVote(activityDto.getOwnerVote());
+		activityBuilder.commentsNum(activityDto.getCommentsNum());
 		// set video / photo urls if we have them
 		VideoDto videoDto = activityDto.getVideo();
 		if (videoDto != null)
@@ -86,9 +87,34 @@ public class DtoAssembler {
 		if (activityDto.getPostedBy() != null)
 			activityBuilder.postedBy(assemble(activityDto.getPostedBy()));
 
+//		if (activityDto.getComments() != null) {
+//			for (CommentDto comment : activityDto.getComments())
+//				activityBuilder.addComment(assemble(comment));
+//		}
+//		if (activityDto.getInterests() != null) {
+//			for (InterestDto interest : activityDto.getInterests())
+//				activityBuilder.addInterest(assemble(interest));
+//		}
+		activityBuilder.rating(assemble(activityDto.getRating()));
 		return activityBuilder.build();
 
 	}
+	
+//	public static Comment assemble(CommentDto commentDto) {
+//		Comment.Builder commentBuilder = new Comment.Builder();
+//		commentBuilder.body(commentDto.getBody())
+//				.commentId(commentDto.getCommentId())
+//				.creationDate(commentDto.getCreationDate())
+//				.externalIdentifier(commentDto.getExternalIdentifier())
+//				.postedBy(assemble(commentDto.getPostedBy()))
+//				.rating(assemble(commentDto.getRating()))
+//				.ownerVote(commentDto.getOwnerVote());
+//		Comment comment = commentBuilder.build();
+//		for (CommentDto reply : commentDto.getReplies())
+//			comment.addReply(assemble(reply));
+//		return commentBuilder.build();
+//	}
+
 
 	public static PostComment assemble(PostCommentDto postCommentDto) {
 		return new PostComment.Builder().body(postCommentDto.getBody())
@@ -224,7 +250,10 @@ public class DtoAssembler {
 								(Integer) fields
 										.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
 						.date((Long) fields.get(SearchKeys.Fields.FIELD_DATE))
-						.ownerId(ownerId);
+						.ownerId(ownerId)
+						.commentsNum((Integer)fields.get(SearchKeys.Fields.FIELD_COMMENTNUM));
+				if (fields.get(SearchKeys.Fields.FIELD_RATING_NUM_RATING) != null)
+					builder.rating(new RatingDto.Builder().numRatings((Integer)fields.get(SearchKeys.Fields.FIELD_RATING_NUM_RATING)).build()); 
 
 				// add in content based on type
 				String activityType = (String) fields
@@ -247,6 +276,9 @@ public class DtoAssembler {
 							.build());
 					builder.photo(new ImageDto((String) fields
 							.get(SearchKeys.Fields.FIELD_THUMBNAIL)));
+				} else if (activityType.equals(ActivityType.EMBEDEDHTML.toString())) {
+					builder.link((String) fields
+							.get(SearchKeys.Fields.FIELD_URL));
 				}
 
 				// now do the contact
@@ -415,7 +447,8 @@ public class DtoAssembler {
 				.externalNetworkId(activity.getExternalNetwork().ordinal())
 				.title(activity.getTitle()).link(activity.getLink())
 				.externalIdentifier(activity.getExternalIdentifier())
-				.ownerVote(activity.getOwnerVote());
+				.ownerVote(activity.getOwnerVote())
+				.commentsNum(activity.getCommentsNum());
 		
 		if (activity.getPostedBy() != null)
 			activityDtoBuilder.postedBy(DtoAssembler.assemble(activity
@@ -620,6 +653,16 @@ public class DtoAssembler {
 		return placeBuilder.build();
 
 	}
+	
+	public static Rating assemble(RatingDto ratingDto) {
+		if (ratingDto == null)
+			return null;
+		Rating.Builder ratingBuilder = new Rating.Builder();
+		ratingBuilder.max(ratingDto.getMax()).min(ratingDto.getMin())
+				.numRatings(ratingDto.getNumRatings()).rating(ratingDto.getRating());
+		return ratingBuilder.build();
+	}
+
 
 	public static Address assemble(AddressDto addressdto) {
 		if (addressdto == null)

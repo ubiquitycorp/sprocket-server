@@ -27,6 +27,8 @@ public class ActivityDto {
 
 	private Integer ownerVote;
 	
+	private Integer commentsNum;
+	
 	@NotNull(groups = { EngagementValidation.class })
 	private String type;
 
@@ -65,6 +67,10 @@ public class ActivityDto {
 
 	public String getLink() {
 		return link;
+	}
+
+	public Integer getCommentsNum() {
+		return commentsNum;
 	}
 
 	public ImageDto getPhoto() {
@@ -137,6 +143,7 @@ public class ActivityDto {
 		private VideoDto video;
 		private Integer externalNetworkId;
 		private String type;
+		private Integer commentsNum;
 		private String link;
 		private String externalIdentifier;
 		private String category;
@@ -194,7 +201,11 @@ public class ActivityDto {
 			this.link = link;
 			return this;
 		}
-
+		
+		public Builder commentsNum(Integer commentsNum){
+			this.commentsNum = commentsNum;
+			return this;
+		}
 		public Builder ownerVote(Integer ownerVote){
 			this.ownerVote = ownerVote;
 			return this;
@@ -245,6 +256,7 @@ public class ActivityDto {
 		this.comments = builder.comments;
 		this.interests = builder.interests;
 		this.ownerVote = builder.ownerVote;
+		this.commentsNum = builder.commentsNum;
 	}
 
 	@Override

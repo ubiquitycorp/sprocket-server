@@ -146,6 +146,8 @@ public class SearchService {
 				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getImage().getUrl());
 			} else if(type == ActivityType.LINK) {
 				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getLink());
+			}	else if(type == ActivityType.EMBEDEDHTML) {
+				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getLink());
 			}
 
 			document.getFields().put(SearchKeys.Fields.FIELD_ACTIVITY_TYPE, activity.getActivityType().toString());
@@ -153,6 +155,8 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, activity.getExternalNetwork().ordinal());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_IDENTIFIER, activity.getExternalIdentifier());
 			document.getFields().put(SearchKeys.Fields.FIELD_DATE, activity.getCreationDate());
+			document.getFields().put(SearchKeys.Fields.FIELD_COMMENTNUM, activity.getCommentsNum());
+			document.getFields().put(SearchKeys.Fields.FIELD_RATING_NUM_RATING, activity.getRating().getNumRatings());
 			
 			if(isEngaged){
 				clicks = searchEngine.findClicksById(id);
