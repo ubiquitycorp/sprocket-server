@@ -23,7 +23,7 @@ ConfigurationRepository {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Configuration> findConfigurationByType(ConfigurationType type) {
-		Query query = getEntityManager().createQuery("select config from Configuration config where config.configurationType = :type and isActive = 1");
+		Query query = getEntityManager().createQuery("select config from Configuration config where config.configurationType = :type and isActive = 1 order by network,name");
 		query.setParameter("type", type);
 		return (List<Configuration>)query.getResultList();
 	}

@@ -8,6 +8,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.ubiquity.integration.domain.ExternalNetwork;
+
 @Entity
 @Table(name = "configuration")
 public class Configuration implements Serializable{
@@ -37,6 +39,9 @@ public class Configuration implements Serializable{
 	@Column(name = "configuration_type", nullable = false)
 	private ConfigurationType configurationType;
 	
+	@Column(name = "external_network", columnDefinition = "int(11) default -1", nullable = false)
+	private Integer network;
+	
 	/**
 	 * Default constructor required by JPA
 	 */
@@ -63,6 +68,12 @@ public class Configuration implements Serializable{
 		return lastUpdated;
 	}
 	
+	public ExternalNetwork getExternalNetwork() {
+		if(network ==-1)
+			return null;
+		return ExternalNetwork.getNetworkById(network);
+	}
+	
 	public ConfigurationType getConfigurationType() {
 		return configurationType;
 	}
@@ -74,6 +85,7 @@ public class Configuration implements Serializable{
 		private Boolean isActive;
 		private Long lastUpdated;
 		private ConfigurationType configurationType;
+		private ExternalNetwork externalNetwork;
 		
 		public Builder configurationId(Long configurationId) {
 			this.configurationId = configurationId;
@@ -100,6 +112,11 @@ public class Configuration implements Serializable{
 			return this;
 		}
 		
+		public Builder externalNetwork(ExternalNetwork externalNetwork){
+			this.externalNetwork = externalNetwork;
+			return this;
+		}
+		
 		public Builder isActive(boolean isActive) {
 			this.isActive = isActive;
 			return this;
@@ -117,5 +134,6 @@ public class Configuration implements Serializable{
 		this.isActive = builder.isActive;
 		this.configurationType = builder.configurationType;
 		this.lastUpdated = builder.lastUpdated;
+		this.network = ExternalNetwork.ordinalOrDefault(builder.externalNetwork);
 	}
 }
