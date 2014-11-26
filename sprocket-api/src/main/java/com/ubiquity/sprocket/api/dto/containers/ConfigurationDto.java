@@ -5,14 +5,18 @@ import java.util.Map;
 
 public class ConfigurationDto {
 	
-	private Map<String, Object> rules = new HashMap<String, Object>();
+	private ConfigurationRulesDto rules ;
 	private Map<String, Object> services = new HashMap<String, Object>();
 	
-	public Map<String, Object> getRules() {
+	public ConfigurationRulesDto getRules() {
 		return rules;
 	}
 	public Map<String, Object> getServices() {
 		return services;
 	}
+	public void setRules(ConfigurationRulesDto rules) {
+		this.rules = rules;
+	}
+	
 
 }

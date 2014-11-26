@@ -1,6 +1,7 @@
 package com.ubiquity.sprocket.service;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,10 +14,10 @@ import com.ubiquity.sprocket.repository.ConfigurationRepositoryJpaImpl;
 public class ClientConfigurationService {
 
 	
-	private Map<String, Object> rules = new HashMap<String, Object>();
+	private List<com.ubiquity.sprocket.domain.Configuration> rules = new LinkedList<com.ubiquity.sprocket.domain.Configuration>();
 	private Map<String, Object> services = new HashMap<String, Object>();
 	
-	public Map<String, Object> getRules() {
+	public List<com.ubiquity.sprocket.domain.Configuration> getRules() {
 		return rules;
 	}
 	public Map<String, Object> getServices() {
@@ -34,9 +35,7 @@ public class ClientConfigurationService {
 
 		configurations = configRepository.findConfigurationByType(ConfigurationType.RULE);
 		
-		for (com.ubiquity.sprocket.domain.Configuration configuration2 : configurations) {
-			rules.put(configuration2.getName(), configuration2.getValue());
-		}
+		rules.addAll(configurations);
 	}
 
 }

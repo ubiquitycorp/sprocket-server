@@ -29,11 +29,13 @@ import com.ubiquity.location.domain.Place;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.domain.factories.ActivityFactory;
+import com.ubiquity.sprocket.api.dto.containers.ConfigurationRulesDto;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.AddressDto;
 import com.ubiquity.sprocket.api.dto.model.CommentDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
+import com.ubiquity.sprocket.api.dto.model.ExternalNetworkConfigurationDto;
 import com.ubiquity.sprocket.api.dto.model.GeoboxDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.dto.model.ImageDto;
@@ -45,6 +47,7 @@ import com.ubiquity.sprocket.api.dto.model.PostCommentDto;
 import com.ubiquity.sprocket.api.dto.model.PostVoteDto;
 import com.ubiquity.sprocket.api.dto.model.RatingDto;
 import com.ubiquity.sprocket.api.dto.model.VideoDto;
+import com.ubiquity.sprocket.domain.Configuration;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchKeys;
 
@@ -691,5 +694,30 @@ public class DtoAssembler {
 		return new Location.Builder().altitude(locationDto.getAltitude())
 				.latitude(locationDto.getLatitude())
 				.longitude(locationDto.getLongitude()).build();
+	}
+	
+	public static ConfigurationRulesDto assembleConfigurationList(List<Configuration> rules) {
+		ConfigurationRulesDto configurationRulesDto = new ConfigurationRulesDto();
+		ExternalNetwork externalNetwork = null;
+		ExternalNetworkConfigurationDto externalNetworkConfigurationDto = null;
+		for (Configuration config : rules){
+			if (config.getExternalNetwork() == null){
+				configurationRulesDto.getGeneralRules().put(config.getName(), config.getValue());
+			}else if (config.getExternalNetwork() == externalNetwork){
+				externalNetworkConfigurationDto.getRules().put(config.getName(), config.getValue());
+			}else{
+				if(externalNetworkConfigurationDto != null){
+					configurationRulesDto.getProviders().add(externalNetworkConfigurationDto);
+				}
+				externalNetworkConfigurationDto = new ExternalNetworkConfigurationDto(config.getExternalNetwork(),ExternalNetwork.ordinalOrDefault(config.getExternalNetwork()));
+				externalNetwork = config.getExternalNetwork();
+				externalNetworkConfigurationDto.getRules().put(config.getName(), config.getValue());
+			}
+		}
+		if(externalNetworkConfigurationDto != null){
+			configurationRulesDto.getProviders().add(externalNetworkConfigurationDto);
+		}
+		return configurationRulesDto;
+		
 	}
 }
