@@ -561,22 +561,13 @@ public class UsersEndpoint {
 	public Response uploadFile(@PathParam("userId") Long userId,
 			@Context HttpServletRequest request) throws IOException {
 		String fileName = "";
-
-		int maxMemorySize = ServiceFactory.getUserService().getMaxMemorySize(); // 50
-																				// MB
-																				// size
-																				// of
-																				// memory
-		long maxRequestSize = ServiceFactory.getUserService().getMaxFileSize(); // 500
-																				// MB
-																				// size
-																				// of
-																				// memory
+		// 50 MB size of memory
+		int maxMemorySize = ServiceFactory.getUserService().getMaxMemorySize(); 
+		// 500 MB size of file
+		long maxRequestSize = ServiceFactory.getUserService().getMaxFileSize();
 
 		String tempDir = ServiceFactory.getUserService().getFileRepository();
 		File tempDirectory = new File(tempDir);
-		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-
 		// Create a factory for disk-based file items
 		// DiskFileItemFactory factory = new
 		// DiskFileItemFactory(maxMemorySize, tempDirectory);;
@@ -585,7 +576,7 @@ public class UsersEndpoint {
 
 		factory.setSizeThreshold(maxMemorySize); // Set the size threshold,
 													// which content will be
-													// stored on disk.
+													// stored on memory.
 		factory.setRepository(tempDirectory); // set the temporary directory
 												// to store the uploaded
 												// files of size above
