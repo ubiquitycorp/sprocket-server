@@ -570,6 +570,9 @@ public class UsersEndpoint {
 				InputStream istream = inputPart
 						.getBody(InputStream.class, null);
 				
+				fileName = "sprocket_" + System.currentTimeMillis() + "." + inputPart.getMediaType().getSubtype();
+				log.debug(fileName);
+				
 				if (inputPart.getMediaType().getType().equals("image")) {
 					media = new Image.Builder().itemKey(fileName).build();
 				} else if (inputPart.getMediaType().getType().equals("audio")) {
@@ -578,9 +581,7 @@ public class UsersEndpoint {
 					media = new Video.Builder().itemKey(fileName).build();
 				} else 
 					throw new IllegalArgumentException("Unsupported media type");
-
-				fileName = "sprocket_" + System.currentTimeMillis() + "." + inputPart.getMediaType().getSubtype();
-				log.debug(fileName);
+				
 				media.setInputStream(istream);
 				ServiceFactory.getMediaService().create(media);
 				long endTime = System.currentTimeMillis();
