@@ -1,26 +1,33 @@
 package com.ubiquity.sprocket.api.endpoints;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.NoResultException;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang.NotImplementedException;
+import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,7 +135,8 @@ public class UsersEndpoint {
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identity.getIdentityId(),user.getUserId());
+					.getBySocialIdentityId(identity.getIdentityId(),
+							user.getUserId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
@@ -169,13 +177,14 @@ public class UsersEndpoint {
 					.createTwitterProvider(identityDto.getRedirectUrl());
 			TwitterAPI twitterApi = (TwitterAPI) socialApi;
 			requestToken = twitterApi.requesttoken();
-		}else if(externalNetwork == ExternalNetwork.Tumblr){
+		} else if (externalNetwork == ExternalNetwork.Tumblr) {
 			SocialAPI socialApi = SocialAPIFactory
 					.createTumblrProvider(identityDto.getRedirectUrl());
 			TumblrAPI tumblrApi = (TumblrAPI) socialApi;
 			requestToken = tumblrApi.requesttoken();
-		}else{
-			throw new NotImplementedException("ExternalNetwork is not supported");
+		} else {
+			throw new NotImplementedException(
+					"ExternalNetwork is not supported");
 		}
 		if (requestToken == null
 				|| requestToken.getAccessToken().equalsIgnoreCase(""))
@@ -343,7 +352,8 @@ public class UsersEndpoint {
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identity.get(0).getIdentityId(),userId);
+					.getBySocialIdentityId(identity.get(0).getIdentityId(),
+							userId);
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
@@ -429,7 +439,8 @@ public class UsersEndpoint {
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identiies.get(0).getIdentityId(),userId);
+					.getBySocialIdentityId(identiies.get(0).getIdentityId(),
+							userId);
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
@@ -548,55 +559,87 @@ public class UsersEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	// @Secure
 	public Response uploadFile(@PathParam("userId") Long userId,
-			MultipartFormDataInput input,
-			@HeaderParam("Content-Length") Long contentLength)
-			throws IOException {
+			@Context HttpServletRequest request) throws IOException {
 		String fileName = "";
 
-		Map<String, List<InputPart>> formParts = input.getFormDataMap();
+		int maxMemorySize = ServiceFactory.getUserService().getMaxMemorySize(); // 50
+																				// MB
+																				// size
+																				// of
+																				// memory
+		long maxRequestSize = ServiceFactory.getUserService().getMaxFileSize(); // 500
+																				// MB
+																				// size
+																				// of
+																				// memory
 
-		List<InputPart> inPart = formParts.get("file");
-		RemoteAsset media = null;
-		for (InputPart inputPart : inPart) {
-			try {
-				// Retrieve headers, read the Content-Disposition header to
-				// obtain the original name of the file
-				MultivaluedMap<String, String> headers = inputPart.getHeaders();
-				//fileName = parseFileName(headers);
-				
+		String tempDir = ServiceFactory.getUserService().getFileRepository();
+		File tempDirectory = new File(tempDir);
+		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 
-				long startTime = System.currentTimeMillis();
-				// Handle the body of that part with an InputStream
-				InputStream istream = inputPart
-						.getBody(InputStream.class, null);
-				
-				fileName = "sprocket_" + System.currentTimeMillis() + "." + inputPart.getMediaType().getSubtype();
-				log.debug(fileName);
-				
-				if (inputPart.getMediaType().getType().equals("image")) {
-					media = new Image.Builder().itemKey(fileName).build();
-				} else if (inputPart.getMediaType().getType().equals("audio")) {
-					media = new AudioTrack.Builder().itemKey(fileName).build();
-				} else if (inputPart.getMediaType().getType().equals("video")) {
-					media = new Video.Builder().itemKey(fileName).build();
-				} else 
-					throw new IllegalArgumentException("Unsupported media type");
-				
-				media.setInputStream(istream);
-				ServiceFactory.getMediaService().create(media);
-				long endTime = System.currentTimeMillis();
-				log.debug("media uploaded successfully:\n url:" + media.getUrl() + "\n upload time: " + (endTime - startTime) / 1000 + " seconds");
-				
+		// Create a factory for disk-based file items
+		// DiskFileItemFactory factory = new
+		// DiskFileItemFactory(maxMemorySize, tempDirectory);;
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+		// Set factory constraints
 
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		factory.setSizeThreshold(maxMemorySize); // Set the size threshold,
+													// which content will be
+													// stored on disk.
+		factory.setRepository(tempDirectory); // set the temporary directory
+												// to store the uploaded
+												// files of size above
+												// threshold.
 
+		ServletFileUpload upload = new ServletFileUpload(factory);
+		upload.setSizeMax(maxRequestSize);
+		List<FileItem> items = null;
+		try {
+			log.debug("Starting parsing file");
+			items = upload.parseRequest(request);
+			log.debug("Ending parsing file");
+		} catch (SizeLimitExceededException e) {
+			log.debug("File size exceeded the maximum limit");
+			throw new IllegalArgumentException(
+					"File size exceeded the maximum limit");
+		} catch (FileUploadException e) {
+			log.debug("Failed to Upload File");
+			throw new RuntimeException("Failed to Upload File");
 		}
 
-		String output = "{\"url\":\"" + media.getUrl() + "\"}";
+		if (items != null) {
+			Iterator<FileItem> iter = items.iterator();
+			while (iter.hasNext()) {
+				FileItem item = iter.next();
+				if (!item.isFormField() && item.getSize() > 0) {
+					fileName = "sprocket_"
+							+ System.currentTimeMillis()
+							+ "."
+							+ item.getName().substring(
+									item.getName().lastIndexOf(".") + 1);
+					log.debug(fileName);
+					/*
+					 * file.name = item.getName(); file.type =
+					 * item.getContentType(); file.size = item.getSize();
+					 * file.print();
+					 */
 
-		return Response.status(200).entity(output).build();
+					try {
+
+						File uploadedFile = new File(tempDir + fileName);
+						item.write(uploadedFile);
+					} catch (Exception e) {
+						throw new RuntimeException("Failed to Upload File");
+					}
+					// resultStatus = "ok";
+					log.debug("File Created Succesfully");
+				}
+			}
+
+			return Response.status(200).build();
+		} else
+			throw new IllegalArgumentException("No file found");
+
 	}
 
 	// Parse Content-Disposition header to get the original file name
