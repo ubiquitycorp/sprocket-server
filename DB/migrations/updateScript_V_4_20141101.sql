@@ -1,5 +1,5 @@
 #change title lenght to 300 
-ALTER TABLE `sprocket`.`activity` CHANGE COLUMN `title` `title` VARCHAR(300) NULL DEFAULT NULL ;
+ALTER TABLE `sprocket`.`activity` CHANGE COLUMN `title` `title` VARCHAR(500) NULL DEFAULT NULL ;
 
 #drop commnet table foreign keys
 ALTER TABLE `sprocket`.`comment` 
