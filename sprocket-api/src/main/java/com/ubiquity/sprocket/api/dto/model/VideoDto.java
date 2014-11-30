@@ -6,6 +6,7 @@ public class VideoDto {
 
 	private String url;
 	private String itemKey;
+	private String embedCode;
 	
 	/***
 	 * Constraints applied when this DTO is used to carry an input payload; these 3 properties are needed to determine
@@ -64,6 +65,10 @@ public class VideoDto {
 		return ownerId;
 	}
 
+	public String getEmbedCode() {
+		return embedCode;
+	}
+
 	public static class Builder {
 		private String url;
 		private String itemKey;
@@ -74,6 +79,7 @@ public class VideoDto {
 		private String category;
 		private ImageDto thumb;
 		private Long ownerId;
+		private String embedCode;
 		
 		public Builder url(String url) {
 			this.url = url;
@@ -99,7 +105,11 @@ public class VideoDto {
 			this.title = title;
 			return this;
 		}
-
+		
+		public Builder embedCode(String embedCode){
+			this.embedCode = embedCode;
+			return this;
+		}
 		public Builder description(String description) {
 			this.description = description;
 			return this;
@@ -135,5 +145,6 @@ public class VideoDto {
 		this.category = builder.category;
 		this.thumb = builder.thumb;
 		this.ownerId = builder.ownerId;
+		this.embedCode = builder.embedCode;
 	}
 }

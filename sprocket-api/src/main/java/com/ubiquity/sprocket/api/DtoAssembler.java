@@ -81,7 +81,8 @@ public class DtoAssembler {
 		VideoDto videoDto = activityDto.getVideo();
 		if (videoDto != null)
 			activityBuilder.video(new Video.Builder().url(videoDto.getUrl())
-					.build());
+					.embedCode(videoDto.getEmbedCode())
+					.itemKey(videoDto.getItemKey()).build());
 
 		ImageDto imageDto = activityDto.getPhoto();
 		if (imageDto != null)
