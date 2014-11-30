@@ -2,6 +2,7 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +56,7 @@ import com.ubiquity.sprocket.api.dto.model.ExchangeTokenDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.dto.model.LocationDto;
 import com.ubiquity.sprocket.api.dto.model.ResetPasswordDto;
+import com.ubiquity.sprocket.api.dto.model.SyncDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
@@ -121,9 +123,9 @@ public class UsersEndpoint {
 
 		ExternalIdentity identity = identities.get(0);
 		IdentityDto result = new IdentityDto.Builder().identifier(
-				identity.getIdentifier()).build();
+				identity.getIdentifier()).clientPlatformId(identity.getClientPlatform().ordinal()).build();
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identities, result);
+		sendActivatedMessage(user, identities, result.getClientPlatformId());
 
 		try {
 
@@ -308,7 +310,7 @@ public class UsersEndpoint {
 	}
 
 	@POST
-	@Path("/{userId}/identities")
+	@Path("/{userId}/providers")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
@@ -336,7 +338,7 @@ public class UsersEndpoint {
 						externalNetwork, identityDto.getExpiresIn());
 
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identity, identityDto);
+		sendActivatedMessage(user, identity, identityDto.getClientPlatformId());
 
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
@@ -421,7 +423,7 @@ public class UsersEndpoint {
 		}
 
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identiies, identityDto);
+		sendActivatedMessage(user, identiies, identityDto.getClientPlatformId());
 
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
@@ -598,33 +600,47 @@ public class UsersEndpoint {
 
 		return Response.status(200).entity(output).build();
 	}
+	
+	/***
+	 * This end point forces synchronization for specific external network
+	 * @param userId
+	 * @param payload
+	 * @return
+	 * @throws IOException
+	 */
+	@POST
+	@Path("/{userId}/synced")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response sync(@PathParam("userId") Long userId,
+			InputStream payload) throws IOException {
 
-	// Parse Content-Disposition header to get the original file name
-	private String parseFileName(MultivaluedMap<String, String> headers) {
+		// convert payload
+		SyncDto syncDto = jsonConverter.convertFromPayload(payload, SyncDto.class);
 
-		String[] contentDispositionHeader = headers.getFirst(
-				"Content-Disposition").split(";");
+		ClientPlatform clientPlatform = ClientPlatform.getEnum(syncDto.getClientPlatformId());
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(syncDto.getExternalNetworkId());
+		
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, externalNetwork);
+		
+		User user = new User(userId);
+		
+		List<ExternalIdentity> identities = new LinkedList<ExternalIdentity>();
+		identities.add(identity);
+		// now send the message activated message to cache invalidate
+		sendActivatedMessage(user, identities, syncDto.getClientPlatformId());
 
-		for (String name : contentDispositionHeader) {
-
-			if ((name.trim().startsWith("filename"))) {
-
-				String[] tmp = name.split("=");
-
-				String fileName = tmp[1].trim().replaceAll("\"", "");
-
-				return fileName;
-			}
-		}
-		return "randomName";
+		return Response.ok().build();
+		
 	}
 
 	private void sendActivatedMessage(User user,
-			List<ExternalIdentity> identities, IdentityDto identityDto)
+			List<ExternalIdentity> identities, Integer clientPlatformId)
 			throws IOException {
 		for (ExternalIdentity identity : identities) {
 			ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
-					.clientPlatformId(identityDto.getClientPlatformId())
+					.clientPlatformId(clientPlatformId)
 					.userId(user.getUserId())
 					.identityId(identity.getIdentityId()).build();
 
