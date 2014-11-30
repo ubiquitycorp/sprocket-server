@@ -35,7 +35,7 @@ public class AuthorizationExceptionMapper implements ExceptionMapper<Authorizati
 		
 		ErrorDto response = new ErrorDto();
 		response.getMessages().add(e.getMessage());
-		if(e.getExternalNetwork() == null){
+		if(e.getExternalNetwork() != null){
 			response.setCode(ServerErrorCode.ExternalAPI.getCode());
 			response.setProviderName(e.getExternalNetwork().toString());
 		}
