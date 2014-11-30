@@ -310,7 +310,7 @@ public class UsersEndpoint {
 	}
 
 	@POST
-	@Path("/{userId}/providers")
+	@Path("/{userId}/identities")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
