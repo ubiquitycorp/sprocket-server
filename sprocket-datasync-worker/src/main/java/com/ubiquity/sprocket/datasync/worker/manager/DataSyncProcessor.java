@@ -15,6 +15,7 @@ import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Network;
@@ -161,6 +162,9 @@ public class DataSyncProcessor extends Thread {
 			ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), synced, false);
 			return synced.size();
 		} catch (Exception e) {
+			if(e instanceof AuthorizationException)
+				ServiceFactory.getSocialService().setActiveNetworkForUser(identity.getUser().getUserId(), socialNetwork, false);
+			
 			log.error("Could not process activities for identity: {}", ExceptionUtils.getRootCauseMessage(e));
 			return -1;
 		}
@@ -172,6 +176,9 @@ public class DataSyncProcessor extends Thread {
 			localActivities = ServiceFactory.getSocialService().syncLocalNewsFeed(identity, socialNetwork);
 			return localActivities.size();
 		} catch (Exception e) {
+			if(e instanceof AuthorizationException)
+				ServiceFactory.getSocialService().setActiveNetworkForUser(identity.getUser().getUserId(), socialNetwork, false);
+			
 			log.error("Unable to sync local activities for identity: {}", identity.getIdentityId(), ExceptionUtils.getRootCauseMessage(e));
 			return -1;
 		}
@@ -195,6 +202,9 @@ public class DataSyncProcessor extends Thread {
 			ServiceFactory.getSearchService().indexVideos(identity.getUser().getUserId(), synced, false);
 			return synced.size();
 		} catch (Exception e) {
+			if(e instanceof AuthorizationException)
+				ServiceFactory.getSocialService().setActiveNetworkForUser(identity.getUser().getUserId(), externalNetwork, false);
+			
 			log.error("Unable to sync for identity: {}", identity.getIdentityId(), ExceptionUtils.getRootCauseMessage(e));
 			return -1;
 		}
@@ -220,6 +230,9 @@ public class DataSyncProcessor extends Thread {
 			ServiceFactory.getSearchService().indexMessages(identity.getUser().getUserId(), messages);
 			return messages.size();
 		} catch (Exception e) {
+			if(e instanceof AuthorizationException)
+				ServiceFactory.getSocialService().setActiveNetworkForUser(identity.getUser().getUserId(), network, false);
+			
 			log.error("Could not process messages for identity: {}", ExceptionUtils.getRootCauseMessage(e));
 			e.printStackTrace();
 			return -1;
