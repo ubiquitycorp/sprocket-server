@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang.NotImplementedException;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.lilyproject.tools.import_.core.IdentificationMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -303,7 +304,9 @@ public class UsersEndpoint {
 
 		ContactsDto contactsDto = new ContactsDto();
 		for (Contact contact : contacts) {
-			contactsDto.getContacts().add(DtoAssembler.assemble(contact));
+			Boolean isActive = ServiceFactory.getSocialService().IsActiveNetworkForUser(userId, ExternalNetwork.getNetworkById(contact.getExternalIdentity().getExternalNetwork()));
+			if(isActive)
+				contactsDto.getContacts().add(DtoAssembler.assemble(contact));
 		}
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(contactsDto)).build();
@@ -340,6 +343,8 @@ public class UsersEndpoint {
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto.getClientPlatformId());
 
+		ServiceFactory.getSocialService().setActiveNetworkForUser(userId, externalNetwork, true);
+		
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
 		try {
@@ -425,6 +430,8 @@ public class UsersEndpoint {
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identiies, identityDto.getClientPlatformId());
 
+		ServiceFactory.getSocialService().setActiveNetworkForUser(userId, externalNetwork, true);
+		
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
 

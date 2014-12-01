@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-integration</artifactId>
-			<version>0.1.37</version>
+			<version>0.1.38</version>
 		</dependency>
 
 		<dependency>
@@ -83,7 +83,7 @@
 		<dependency>
 			<groupId>com.niobium</groupId>
 			<artifactId>niobium-data-access</artifactId>
-			<version>0.9.3</version>
+			<version>0.9.4</version>
 		</dependency>
 
 		<dependency>
