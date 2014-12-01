@@ -127,7 +127,9 @@ public class UsersEndpoint {
 				identity.getIdentifier()).clientPlatformId(identity.getClientPlatform().ordinal()).build();
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identities, result.getClientPlatformId());
-
+		
+		ServiceFactory.getSocialService().setActiveNetworkForUser(userId, ExternalNetwork.LinkedIn, true);
+		
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
