@@ -77,6 +77,9 @@ public class DataSyncProcessor extends Thread {
 	public void processSync(ExternalIdentityActivated activated) {
 		// get identity from message
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().getExternalIdentityById(activated.getIdentityId());
+		if(identity == null){
+			log.error("Can't find identity in DB");
+		}
 		processSync(identity);
 	} 
 
@@ -102,7 +105,7 @@ public class DataSyncProcessor extends Thread {
 		} catch (Exception e) {
 			log.warn("Unable to connect to MQ", backchannel);
 		}
-
+		
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identity.getExternalNetwork());
 
@@ -150,6 +153,7 @@ public class DataSyncProcessor extends Thread {
 		}
 		
 		sendSyncCompletedMessageToIndividual(backchannel, externalNetwork, userId);
+	
 	}
 
 	private int processActivities(ExternalIdentity identity, ExternalNetwork socialNetwork) {
@@ -325,7 +329,31 @@ public class DataSyncProcessor extends Thread {
 		}
 
 	}
-	
+	/***
+	 * 
+	 * @param backchannel
+	 * @param network
+	 * @param message
+	 * @param userId
+	 */
+//	private void sendSyncErrorMessageToIndividual(MessageQueueProducer backchannel, ExternalNetwork network, String message, Long userId)  {
+//
+//		if(backchannel == null)
+//			return;
+//		
+//		Envelope envelope = new Envelope(DestinationType.Individual, String.valueOf(userId), 
+//				new com.ubiquity.messaging.format.Message(new SynchronizationError.Builder()
+//					.message(message)
+//					.timestamp(System.currentTimeMillis())
+//					.externalNetworkId(network.ordinal()).build()));
+//		try {
+//			backchannel.write(messageConverter.serialize(envelope).getBytes());
+//		} catch (IOException e) {
+//			log.warn("Could not send update message to user {}", userId);
+//		}
+//
+//	}
+
 	private void sendSyncStartedMessageToIndividual(
 			MessageQueueProducer backchannel, ExternalNetwork externalNetwork,
 			Long userId) {
