@@ -78,6 +78,7 @@ public class DataSyncWorker {
 	public static void main(String[] args) {
 		final DataSyncWorker worker = new DataSyncWorker();
 		try {
+			log.info("Initializing worker...");
 			worker.initialize(new PropertiesConfiguration("datasyncworker.properties"),  
 					new PropertiesConfiguration("messages.properties"));
 		} catch (ConfigurationException e) {
@@ -127,7 +128,7 @@ public class DataSyncWorker {
 		Trigger trigger = newTrigger() 
 				.withIdentity(triggerKey("dataTrigger", "trigger"))
 				.withSchedule(simpleSchedule()
-						.withIntervalInMinutes(4)
+						.withIntervalInMinutes(8)
 						.repeatForever())
 						.startAt(futureDate(1, IntervalUnit.SECOND))
 						.build();
