@@ -62,13 +62,22 @@ public class ContentRepositoryTest {
 		contentRepository.create(activity);
 		contentRepository.create(video);
 		contentRepository.create(place);
+		
+	}
+	
+	@Test
+	public void testUpdateMediaEngagedContent() {
+		
+		activity.getUserEngagement().add(new UserEngagement.Builder().userId(Math.abs(new java.util.Random().nextLong())).timestamp(System.currentTimeMillis()).build());
+		
+		contentRepository.updateMedianEngagedContent();
 	}
 
 	@Test
 	public void testUpdateContentEngagement() {
-		activity.getUserEngagement().add(new UserEngagement(TestUserFactory.createUserProxy(), System.currentTimeMillis()));
-		activity.getUserEngagement().add(new UserEngagement(TestUserFactory.createUserProxy(), System.currentTimeMillis()));
-		activity.getUserEngagement().add(new UserEngagement(TestUserFactory.createUserProxy(), System.currentTimeMillis()));
+		activity.getUserEngagement().add(new UserEngagement.Builder().userId(Math.abs(new java.util.Random().nextLong())).timestamp(System.currentTimeMillis()).build());
+		activity.getUserEngagement().add(new UserEngagement.Builder().userId(Math.abs(new java.util.Random().nextLong())).timestamp(System.currentTimeMillis()).build());
+		activity.getUserEngagement().add(new UserEngagement.Builder().userId(Math.abs(new java.util.Random().nextLong())).timestamp(System.currentTimeMillis()).build());
 
 		contentRepository.update(activity);
 		
@@ -78,7 +87,7 @@ public class ContentRepositoryTest {
 		
 		log.info("updated content with user engagment content {}", persisted);
 		
-		persisted.getUserEngagement().add(new UserEngagement(TestUserFactory.createUserProxy(), System.currentTimeMillis()));
+		persisted.getUserEngagement().add(new UserEngagement.Builder().userId(Math.abs(new java.util.Random().nextLong())).timestamp(System.currentTimeMillis()).build());
 		contentRepository.update(persisted);
 		
 		persisted = contentRepository.read(activity.getContentId());

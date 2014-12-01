@@ -24,10 +24,12 @@ public class Profile {
 	private AgeRange ageRange;
 	private List<Interest> interests = new LinkedList<Interest>();
 	private List<String> searchHistory = new LinkedList<String>();
+	private List<String> groupMembershipHistory = new LinkedList<String>();
 	private List<Profile> identities = new LinkedList<Profile>();
 	private UserLocation location;
 	private ExternalNetwork externalNetwork;
 	private String externalIdentifier;
+	private String groupMembership;
 
 	public Profile() {
 	}
@@ -38,6 +40,18 @@ public class Profile {
 				return identity;
 		}
 		return null;
+	}
+
+	public String getGroupMembership() {
+		return groupMembership;
+	}
+
+	public void setGroupMembership(String groupMembership) {
+		this.groupMembership = groupMembership;
+	}
+
+	public List<String> getGroupMembershipHistory() {
+		return groupMembershipHistory;
 	}
 
 	public List<Profile> getIdentities() {
@@ -105,6 +119,7 @@ public class Profile {
 		private UserLocation location;
 		private ExternalNetwork externalNetwork;
 		private String externalIdentifier;
+		private String groupMembership;
 
 		public Builder profileId(String profileId) {
 			this.profileId = profileId;
@@ -141,6 +156,11 @@ public class Profile {
 			return this;
 		}
 
+		public Builder groupMembership(String groupMembership) {
+			this.groupMembership = groupMembership;
+			return this;
+		}
+
 		public Profile build() {
 			return new Profile(this);
 		}
@@ -154,5 +174,6 @@ public class Profile {
 		this.location = builder.location;
 		this.externalNetwork = builder.externalNetwork;
 		this.externalIdentifier = builder.externalIdentifier;
+		this.groupMembership = builder.groupMembership;
 	}
 }

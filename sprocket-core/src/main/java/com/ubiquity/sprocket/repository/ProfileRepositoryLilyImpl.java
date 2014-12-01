@@ -1,11 +1,9 @@
 package com.ubiquity.sprocket.repository;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -13,25 +11,21 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import org.lilyproject.repository.api.FieldNotFoundException;
 import org.lilyproject.repository.api.Record;
 import org.lilyproject.repository.api.RecordScan;
 import org.lilyproject.repository.api.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.niobium.repository.cloud.RemoteAsset;
 import com.niobium.repository.lily.BaseRepositoryLilyImpl;
 import com.niobium.repository.lily.LilyRepositoryFactory;
 import com.niobium.repository.mr.MapReduceOutputFile;
 import com.ubiquity.integration.domain.AgeRange;
 import com.ubiquity.integration.domain.Gender;
-import com.ubiquity.media.domain.Image;
 import com.ubiquity.sprocket.domain.Profile;
 import com.ubiquity.sprocket.repository.mapreduce.SearchTermMapper;
 import com.ubiquity.sprocket.repository.mapreduce.SearchTermReducer;
@@ -111,6 +105,11 @@ public class ProfileRepositoryLilyImpl extends BaseRepositoryLilyImpl <Profile> 
 			setFieldValue(record, "max_age", ageRange.getMax());
 		}
 		setFieldValue(record, "search_history", profile.getSearchHistory());
+		
+		if(profile.getGroupMembership() != null)
+			setFieldValue(record, "group_membership", profile.getGroupMembership());
+		
+		setFieldValue(record, "group_membership_history", profile.getGroupMembershipHistory());
 	}
 
 	@Override
@@ -129,14 +128,13 @@ public class ProfileRepositoryLilyImpl extends BaseRepositoryLilyImpl <Profile> 
 		profileBuilder.gender(Gender.getGenderById((Integer)getFieldValue(record, "gender")));
 
 		// look for min or max age; if either one is set, then we'll store an age range value
-		try {
-			Integer minAge = (Integer)getFieldValue(record, "min_age");
-			Integer maxAge = (Integer)getFieldValue(record, "max_age");
-			if(minAge != null || maxAge != null) {
-				profileBuilder.ageRange(new AgeRange(minAge, maxAge));
-			}
-		} catch (FieldNotFoundException e) {}
-
+		Integer minAge = (Integer)getFieldValue(record, "min_age");
+		Integer maxAge = (Integer)getFieldValue(record, "max_age");
+		if(minAge != null || maxAge != null) {
+			profileBuilder.ageRange(new AgeRange(minAge, maxAge));
+		}
+		// group membership
+		profileBuilder.groupMembership((String)getFieldValue(record, "group_membership"));
 
 		Profile profile = profileBuilder.build();
 		// now add collections
@@ -190,7 +188,7 @@ public class ProfileRepositoryLilyImpl extends BaseRepositoryLilyImpl <Profile> 
 		.toString();
 		log.info("Setting job output path to {}", jobOutputPath);
 		try {
-			
+
 			Configuration configuration = new Configuration();
 			int res = ToolRunner.run(configuration, new MostPopularSearchTermJob(jobOutputPath), null);
 			if(res == 0) {
@@ -212,7 +210,7 @@ public class ProfileRepositoryLilyImpl extends BaseRepositoryLilyImpl <Profile> 
 	private class MostPopularSearchTermJob extends Configured implements Tool {
 
 		private String jobOutputPath;
-		
+
 		public MostPopularSearchTermJob(String jobOutputPath) {
 			this.jobOutputPath = jobOutputPath;
 		}
@@ -236,13 +234,6 @@ public class ProfileRepositoryLilyImpl extends BaseRepositoryLilyImpl <Profile> 
 
 			job.setOutputFormatClass(TextOutputFormat.class);
 
-//			String jobOutputPath = new StringBuilder(jobOutputDir)
-//			.append("/")
-//			.append(job.getJobName().toLowerCase())
-//			.append("/")
-//			.append(System.currentTimeMillis())
-//			.toString();
-//			log.info("Setting job output path to {}", jobOutputPath);
 
 			TextOutputFormat.setOutputPath(job, new Path(jobOutputPath));
 
@@ -255,33 +246,14 @@ public class ProfileRepositoryLilyImpl extends BaseRepositoryLilyImpl <Profile> 
 			if (!b) {
 				throw new IOException("error executing job!");
 			}
-			
-			
+
+
 
 			return 0;
 		}
 
 	}
 
-	public static void main(String[] args)throws Exception {
-
-		PropertiesConfiguration config = new PropertiesConfiguration("test.properties");
-		config.setProperty("lily.client.session.timeout", 10);
-		config.setProperty("lily.client.connection", "vm-data:2181");
-		config.setProperty("lily.repository.name", "test");
-		config.setProperty("hbase.sprocket.namespace", "sprocket.schema");
-		config.setProperty("mapreduce.job.output.dir", "mapreduce.job.output.dir");
-
-		String namespace = "sprocket.schema";
-		String jobOutputDir = "/tmp/hadoop";
-		LilyRepositoryFactory.initialize(config);
-
-
-		ProfileRepository profileRepository = new ProfileRepositoryLilyImpl(namespace, 
-				LilyRepositoryFactory.createRepository(), jobOutputDir);
-		MapReduceOutputFile output = profileRepository.getMostPopularSearchTerms();
-
-	}
 
 
 }
