@@ -58,10 +58,10 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 				AuthenticationService authenticationService = ServiceFactory.getAuthenticationService();
 				// get the user id
 				if (!authenticationService.isUserAuthenticated(userId, apiKey)) {
-					throw new AuthorizationException(ServiceFactory.getErrorsConfigurationService().getErrorMessage(ErrorKeys.AUTHORIZATION_ERROR), false);
+					throw new AuthorizationException(ServiceFactory.getErrorsConfigurationService().getErrorMessage(ErrorKeys.AUTHORIZATION_ERROR), null);
 				}
 			} else
-				throw new AuthorizationException(ServiceFactory.getErrorsConfigurationService().getErrorMessage(ErrorKeys.AUTHORIZATION_ERROR), false);
+				throw new AuthorizationException(ServiceFactory.getErrorsConfigurationService().getErrorMessage(ErrorKeys.AUTHORIZATION_ERROR), null);
         }
 	}
 

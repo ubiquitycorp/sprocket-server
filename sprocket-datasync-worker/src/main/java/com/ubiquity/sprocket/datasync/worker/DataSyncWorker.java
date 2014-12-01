@@ -78,6 +78,7 @@ public class DataSyncWorker {
 	public static void main(String[] args) {
 		final DataSyncWorker worker = new DataSyncWorker();
 		try {
+			log.info("Initializing worker...");
 			worker.initialize(new PropertiesConfiguration("datasyncworker.properties"),  
 					new PropertiesConfiguration("messages.properties"));
 		} catch (ConfigurationException e) {
