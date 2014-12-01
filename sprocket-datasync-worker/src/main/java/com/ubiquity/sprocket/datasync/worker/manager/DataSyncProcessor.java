@@ -117,38 +117,38 @@ public class DataSyncProcessor extends Thread {
 		if (externalNetwork.network.equals(Network.Content)) {
 			DateTime start = new DateTime();
 			int n = processVideos(identity, externalNetwork);
-			log.info("Processed {} videos in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			log.info("Processed {} videos in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 			
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized videos", getResoursePath(userId, externalNetwork, ResourceType.videos), n, userId, ResourceType.videos);
 		} 
 		else if (externalNetwork.equals(ExternalNetwork.Google)) {
 			DateTime start = new DateTime();
 			int n = processMessages(identity, externalNetwork, null);
-			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			log.info("Processed {} messages in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId, ResourceType.messages);
 
 
 		}  else if ( externalNetwork.equals(ExternalNetwork.Facebook) || externalNetwork.equals(ExternalNetwork.Twitter)|| externalNetwork.equals(ExternalNetwork.Tumblr)) {
 			DateTime start = new DateTime();
 			int n = processActivities(identity, externalNetwork); 
-			log.info("Processed {} activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			log.info("Processed {} activities in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", getResoursePath(userId, externalNetwork, ResourceType.activities), n, userId, ResourceType.activities);
 
 			if (externalNetwork.equals(ExternalNetwork.Facebook)) {
 				start = new DateTime();
 				n = processLocalActivities(identity, externalNetwork);
-				log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+				log.info("Processed {} local activities in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 				sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized local feed", getResoursePath(userId, externalNetwork, ResourceType.localfeed), n, userId, ResourceType.localfeed);
 			}
 
 			start = new DateTime();
 			n = processMessages(identity, externalNetwork, null);
-			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			log.info("Processed {} messages in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId, ResourceType.messages);
 		}else if(externalNetwork.equals(ExternalNetwork.LinkedIn) || externalNetwork.equals(ExternalNetwork.Reddit)) {			
 			DateTime start = new DateTime();
 			int n = processActivities(identity, externalNetwork);
-			log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			log.info("Processed {} local activities in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", getResoursePath(userId, externalNetwork, ResourceType.activities), n, userId, ResourceType.activities);
 		}
 		
