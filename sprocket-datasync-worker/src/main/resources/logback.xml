@@ -13,7 +13,7 @@
 		<suffixPattern>[%thread] %logger %msg</suffixPattern>
 	</appender>
   
-	<root level="${app.log.level}">
+	<root level="DEBUG">
 		<appender-ref ref="SYSLOG" />
 		<appender-ref ref="STDOUT" />
 	</root>
