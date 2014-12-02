@@ -9,13 +9,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.lilyproject.util.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.niobium.repository.lily.LilyRepositoryFactory;
-import com.niobium.repository.mr.MapReduceOutputFile;
-import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.integration.domain.AgeRange;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Gender;
@@ -28,21 +24,17 @@ public class ProfileRepositoryTest {
 	private Profile profile;
 
 	private Logger log = LoggerFactory.getLogger(getClass());
-	private static String namespace;
-	private static String jobOutputDir;
+
 
 	@BeforeClass
 	public static void setUpServices() throws ConfigurationException {
 		Configuration config = new PropertiesConfiguration("test.properties");
-		namespace = config.getString("hbase.sprocket.namespace");
-		jobOutputDir = config.getString("mapreduce.job.output.dir");
-		LilyRepositoryFactory.initialize(config);
+		HBaseTableConnectionFactory.initialize(config);
 	}
 
 	@Before
 	public void setUp() {
-		profileRepository = new ProfileRepositoryLilyImpl(namespace, 
-				LilyRepositoryFactory.createRepository(), jobOutputDir);
+		profileRepository = new ProfileRepositoryHBaseImpl();
 
 		profile = TestProfileFactory
 				.createProfileAndIdentity(Math.abs(new java.util.Random().nextLong()),
@@ -55,17 +47,13 @@ public class ProfileRepositoryTest {
 		profileRepository.create(profile);
 	}
 
-	@Test
-	public void testGetMostPopularSearchTerm() throws Exception {
-		MapReduceOutputFile output = profileRepository.getMostPopularSearchTerms();
-		Assert.assertTrue(output.getInputStream().available() > 0);
-		IOUtils.closeQuietly(output.getInputStream());
-	}
-
+	
 	@Test
 	public void testCreateProfile() {
 
 		log.info("reading record using id: {}", profile.getProfileId());
+		
+		
 
 		// read back in to validate the write completed
 		Profile persisted = profileRepository.read(profile.getProfileId());
@@ -74,11 +62,6 @@ public class ProfileRepositoryTest {
 		Assert.assertNotNull(persisted.getAgeRange());
 		Assert.assertEquals(persisted.getGender(), profile.getGender());
 		Assert.assertTrue(persisted.getSearchHistory().size() == 3);
-
-		Assert.assertTrue(persisted.getIdentities().size() == 1);
-		Profile identity = profile.getIdentities().get(0);
-		Assert.assertNotNull(identity.getExternalIdentifier());
-		Assert.assertEquals(identity.getExternalNetwork(), ExternalNetwork.Facebook);
 
 	}
 
@@ -91,8 +74,6 @@ public class ProfileRepositoryTest {
 		// also add membership
 		persisted.setGroupMembership(UUID.randomUUID().toString());
 		profileRepository.update(persisted);
-
-
 
 		// read back to see that changes took place
 		persisted = profileRepository.read(profile.getProfileId());

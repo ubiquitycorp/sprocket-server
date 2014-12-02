@@ -174,85 +174,85 @@ public class ProfileRepositoryLilyImpl extends BaseRepositoryLilyImpl <Profile> 
 	}
 
 
-	@Override
-	public MapReduceOutputFile getMostPopularSearchTerms() {
-		if(jobOutputDir == null)
-			throw new IllegalArgumentException("Job output dir is not set");
-
-		// construct the path
-		String jobOutputPath = new StringBuilder(jobOutputDir)
-		.append("/")
-		.append("most-popular-search")
-		.append("/")
-		.append(System.currentTimeMillis())
-		.toString();
-		log.info("Setting job output path to {}", jobOutputPath);
-		try {
-
-			Configuration configuration = new Configuration();
-			int res = ToolRunner.run(configuration, new MostPopularSearchTermJob(jobOutputPath), null);
-			if(res == 0) {
-				log.info("Job completed");
-				FileSystem fs = FileSystem.get(configuration);
-				FSDataInputStream is = fs.open(new Path(jobOutputPath +"/part-r-00000"));
-				MapReduceOutputFile output = new MapReduceOutputFile.Builder().itemKey("most-popular-search.csv").build();
-				output.setInputStream(is);
-				return output;
-			} else {
-				throw new RuntimeException("Job was not successful");
-			}
-
-		} catch (Exception e) {
-			throw new RuntimeException("Unable to run map reduce job", e);
-		}
-	}
-
-	private class MostPopularSearchTermJob extends Configured implements Tool {
-
-		private String jobOutputPath;
-
-		public MostPopularSearchTermJob(String jobOutputPath) {
-			this.jobOutputPath = jobOutputPath;
-		}
-		@Override
-		public int run(String[] args) throws Exception {
-			Configuration config = getConf();
-
-			config.set("mapred.textoutputformat.separator", ","); //Prior to Hadoop 2 (YARN)
-			config.set("mapreduce.output.textoutputformat.separator", ",");
-			config.set("mapreduce.output.key.field.separator", ",");
-			config.set("mapred.textoutputformat.separatorText", ","); // ?
-
-			Job job = new Job(config, "MostPopularSearchTerm");
-			job.setJarByClass(this.getClass());
-
-			job.setMapperClass(SearchTermMapper.class);
-			job.setReducerClass(SearchTermReducer.class);
-			job.setNumReduceTasks(1);
-			job.setOutputKeyClass(Text.class);
-			job.setOutputValueClass(IntWritable.class);
-
-			job.setOutputFormatClass(TextOutputFormat.class);
-
-
-			TextOutputFormat.setOutputPath(job, new Path(jobOutputPath));
-
-			// serialize the record scan
-			RecordScan findAll = createRecordScan();
-			initJob(findAll,  LilyRepositoryFactory.getZookeeperConnectionString(), job);
-
-			// Launch the job
-			boolean b = job.waitForCompletion(true);
-			if (!b) {
-				throw new IOException("error executing job!");
-			}
-
-
-
-			return 0;
-		}
-
-	}
+//	@Override
+//	public MapReduceOutputFile getMostPopularSearchTerms() {
+//		if(jobOutputDir == null)
+//			throw new IllegalArgumentException("Job output dir is not set");
+//
+//		// construct the path
+//		String jobOutputPath = new StringBuilder(jobOutputDir)
+//		.append("/")
+//		.append("most-popular-search")
+//		.append("/")
+//		.append(System.currentTimeMillis())
+//		.toString();
+//		log.info("Setting job output path to {}", jobOutputPath);
+//		try {
+//
+//			Configuration configuration = new Configuration();
+//			int res = ToolRunner.run(configuration, new MostPopularSearchTermJob(jobOutputPath), null);
+//			if(res == 0) {
+//				log.info("Job completed");
+//				FileSystem fs = FileSystem.get(configuration);
+//				FSDataInputStream is = fs.open(new Path(jobOutputPath +"/part-r-00000"));
+//				MapReduceOutputFile output = new MapReduceOutputFile.Builder().itemKey("most-popular-search.csv").build();
+//				output.setInputStream(is);
+//				return output;
+//			} else {
+//				throw new RuntimeException("Job was not successful");
+//			}
+//
+//		} catch (Exception e) {
+//			throw new RuntimeException("Unable to run map reduce job", e);
+//		}
+//	}
+//
+//	private class MostPopularSearchTermJob extends Configured implements Tool {
+//
+//		private String jobOutputPath;
+//
+//		public MostPopularSearchTermJob(String jobOutputPath) {
+//			this.jobOutputPath = jobOutputPath;
+//		}
+//		@Override
+//		public int run(String[] args) throws Exception {
+//			Configuration config = getConf();
+//
+//			config.set("mapred.textoutputformat.separator", ","); //Prior to Hadoop 2 (YARN)
+//			config.set("mapreduce.output.textoutputformat.separator", ",");
+//			config.set("mapreduce.output.key.field.separator", ",");
+//			config.set("mapred.textoutputformat.separatorText", ","); // ?
+//
+//			Job job = new Job(config, "MostPopularSearchTerm");
+//			job.setJarByClass(this.getClass());
+//
+//			job.setMapperClass(SearchTermMapper.class);
+//			job.setReducerClass(SearchTermReducer.class);
+//			job.setNumReduceTasks(1);
+//			job.setOutputKeyClass(Text.class);
+//			job.setOutputValueClass(IntWritable.class);
+//
+//			job.setOutputFormatClass(TextOutputFormat.class);
+//
+//
+//			TextOutputFormat.setOutputPath(job, new Path(jobOutputPath));
+//
+//			// serialize the record scan
+//			RecordScan findAll = createRecordScan();
+//			initJob(findAll,  LilyRepositoryFactory.getZookeeperConnectionString(), job);
+//
+//			// Launch the job
+//			boolean b = job.waitForCompletion(true);
+//			if (!b) {
+//				throw new IOException("error executing job!");
+//			}
+//
+//
+//
+//			return 0;
+//		}
+//
+//	}
 
 
 
