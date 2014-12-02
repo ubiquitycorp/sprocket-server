@@ -110,6 +110,8 @@
 				</recommendation.engine.hadoop.master>
 				<recommendation.engine.alg.kmeans.iterations>5
 				</recommendation.engine.alg.kmeans.iterations>
+				<!--  folder repository for uploaded files -->
+				<repo.files>/usr/etc/files/</repo.files>
 			</properties>
 			<activation>
 				<property>
@@ -227,6 +229,8 @@
 				</recommendation.engine.hadoop.master>
 				<recommendation.engine.alg.kmeans.iterations>5
 				</recommendation.engine.alg.kmeans.iterations>
+				<!--  folder repository for uploaded files -->
+				<repo.files>/usr/etc/files/</repo.files>
 			</properties>
 			<activation>
 				<property>
@@ -343,6 +347,8 @@
 				</recommendation.engine.hadoop.master>
 				<recommendation.engine.alg.kmeans.iterations>5
 				</recommendation.engine.alg.kmeans.iterations>
+				<!--  folder repository for uploaded files -->
+				<repo.files>/usr/etc/files/</repo.files>
 			</properties>
 			<activation>
 				<property>
@@ -458,6 +464,8 @@
 				</recommendation.engine.hadoop.master>
 				<recommendation.engine.alg.kmeans.iterations>5
 				</recommendation.engine.alg.kmeans.iterations>
+				<!--  folder repository for uploaded files -->
+				<repo.files>/usr/etc/files/</repo.files>
 			</properties>
 			<activation>
 				<property>
