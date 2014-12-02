@@ -77,6 +77,9 @@ public class DataSyncProcessor extends Thread {
 	public void processSync(ExternalIdentityActivated activated) {
 		// get identity from message
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().getExternalIdentityById(activated.getIdentityId());
+		if(identity == null){
+			log.error("Can't find identity in DB");
+		}
 		processSync(identity);
 	} 
 
@@ -102,7 +105,7 @@ public class DataSyncProcessor extends Thread {
 		} catch (Exception e) {
 			log.warn("Unable to connect to MQ", backchannel);
 		}
-
+		
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identity.getExternalNetwork());
 
@@ -114,42 +117,43 @@ public class DataSyncProcessor extends Thread {
 		if (externalNetwork.network.equals(Network.Content)) {
 			DateTime start = new DateTime();
 			int n = processVideos(identity, externalNetwork);
-			log.info("Processed {} videos in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			log.info("Processed {} videos in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 			
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized videos", getResoursePath(userId, externalNetwork, ResourceType.videos), n, userId, ResourceType.videos);
 		} 
 		else if (externalNetwork.equals(ExternalNetwork.Google)) {
 			DateTime start = new DateTime();
 			int n = processMessages(identity, externalNetwork, null);
-			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			log.info("Processed {} messages in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId, ResourceType.messages);
 
 
 		}  else if ( externalNetwork.equals(ExternalNetwork.Facebook) || externalNetwork.equals(ExternalNetwork.Twitter)|| externalNetwork.equals(ExternalNetwork.Tumblr)) {
 			DateTime start = new DateTime();
 			int n = processActivities(identity, externalNetwork); 
-			log.info("Processed {} activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			log.info("Processed {} activities in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", getResoursePath(userId, externalNetwork, ResourceType.activities), n, userId, ResourceType.activities);
 
 			if (externalNetwork.equals(ExternalNetwork.Facebook)) {
 				start = new DateTime();
 				n = processLocalActivities(identity, externalNetwork);
-				log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+				log.info("Processed {} local activities in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 				sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized local feed", getResoursePath(userId, externalNetwork, ResourceType.localfeed), n, userId, ResourceType.localfeed);
 			}
 
 			start = new DateTime();
 			n = processMessages(identity, externalNetwork, null);
-			log.info("Processed {} messages in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			log.info("Processed {} messages in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId, ResourceType.messages);
 		}else if(externalNetwork.equals(ExternalNetwork.LinkedIn) || externalNetwork.equals(ExternalNetwork.Reddit)) {			
 			DateTime start = new DateTime();
 			int n = processActivities(identity, externalNetwork);
-			log.info("Processed {} local activities in {} seconds", n, new Period(start, new DateTime()).getSeconds());
+			log.info("Processed {} local activities in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", getResoursePath(userId, externalNetwork, ResourceType.activities), n, userId, ResourceType.activities);
 		}
 		
 		sendSyncCompletedMessageToIndividual(backchannel, externalNetwork, userId);
+	
 	}
 
 	private int processActivities(ExternalIdentity identity, ExternalNetwork socialNetwork) {
@@ -160,6 +164,7 @@ public class DataSyncProcessor extends Thread {
 
 			// index for searching
 			ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), synced, false);
+			log.info("indexing activities for identity {}",identity);
 			return synced.size();
 		} catch (Exception e) {
 			if(e instanceof AuthorizationException)
@@ -228,6 +233,7 @@ public class DataSyncProcessor extends Thread {
 
 			// add messages to search results
 			ServiceFactory.getSearchService().indexMessages(identity.getUser().getUserId(), messages);
+			log.info("indexing messages for identity {}",identity);
 			return messages.size();
 		} catch (Exception e) {
 			if(e instanceof AuthorizationException)
@@ -325,7 +331,31 @@ public class DataSyncProcessor extends Thread {
 		}
 
 	}
-	
+	/***
+	 * 
+	 * @param backchannel
+	 * @param network
+	 * @param message
+	 * @param userId
+	 */
+//	private void sendSyncErrorMessageToIndividual(MessageQueueProducer backchannel, ExternalNetwork network, String message, Long userId)  {
+//
+//		if(backchannel == null)
+//			return;
+//		
+//		Envelope envelope = new Envelope(DestinationType.Individual, String.valueOf(userId), 
+//				new com.ubiquity.messaging.format.Message(new SynchronizationError.Builder()
+//					.message(message)
+//					.timestamp(System.currentTimeMillis())
+//					.externalNetworkId(network.ordinal()).build()));
+//		try {
+//			backchannel.write(messageConverter.serialize(envelope).getBytes());
+//		} catch (IOException e) {
+//			log.warn("Could not send update message to user {}", userId);
+//		}
+//
+//	}
+
 	private void sendSyncStartedMessageToIndividual(
 			MessageQueueProducer backchannel, ExternalNetwork externalNetwork,
 			Long userId) {

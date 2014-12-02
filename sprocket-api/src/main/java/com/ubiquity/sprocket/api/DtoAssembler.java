@@ -474,7 +474,7 @@ public class DtoAssembler {
 			VideoDto.Builder videoDtoBuilder = new VideoDto.Builder();
 			videoDtoBuilder.itemKey(activity.getVideo().getItemKey());
 			if(activity.getVideo().getEmbedCode() != null)
-				videoDtoBuilder.url(activity.getVideo().getEmbedCode());
+				videoDtoBuilder.embedCode(activity.getVideo().getEmbedCode());
 			else 
 				videoDtoBuilder.url(activity.getVideo().getUrl());
 			
