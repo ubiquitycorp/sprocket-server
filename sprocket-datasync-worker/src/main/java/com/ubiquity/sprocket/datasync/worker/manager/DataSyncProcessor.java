@@ -164,6 +164,7 @@ public class DataSyncProcessor extends Thread {
 
 			// index for searching
 			ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), synced, false);
+			log.info("indexing activities for identity {}",identity);
 			return synced.size();
 		} catch (Exception e) {
 			if(e instanceof AuthorizationException)
@@ -232,6 +233,7 @@ public class DataSyncProcessor extends Thread {
 
 			// add messages to search results
 			ServiceFactory.getSearchService().indexMessages(identity.getUser().getUserId(), messages);
+			log.info("indexing messages for identity {}",identity);
 			return messages.size();
 		} catch (Exception e) {
 			if(e instanceof AuthorizationException)
