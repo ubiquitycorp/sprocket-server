@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.NoResultException;
@@ -17,7 +18,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.fileupload.FileItem;
@@ -26,9 +26,6 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang.NotImplementedException;
-import org.bouncycastle.crypto.RuntimeCryptoException;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.lilyproject.tools.import_.core.IdentificationMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -571,6 +568,7 @@ public class UsersEndpoint {
 	public Response uploadFile(@PathParam("userId") Long userId,
 			@Context HttpServletRequest request) throws IOException {
 		String fileName = "";
+		RemoteAsset media = null;
 		// 50 MB size of memory
 		int maxMemorySize = ServiceFactory.getUserService().getMaxMemorySize(); 
 		// 500 MB size of file
@@ -595,6 +593,7 @@ public class UsersEndpoint {
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		upload.setSizeMax(maxRequestSize);
 		List<FileItem> items = null;
+		long startTime = System.currentTimeMillis();
 		try {
 			log.debug("Starting parsing file");
 			items = upload.parseRequest(request);
@@ -624,20 +623,27 @@ public class UsersEndpoint {
 					 * item.getContentType(); file.size = item.getSize();
 					 * file.print();
 					 */
-
-					try {
-
-						File uploadedFile = new File(tempDir + fileName);
-						item.write(uploadedFile);
-					} catch (Exception e) {
-						throw new RuntimeException("Failed to Upload File");
-					}
-					// resultStatus = "ok";
-					log.debug("File Created Succesfully");
+					if (item.getContentType().contains("image")) {
+						media = new Image.Builder().itemKey(fileName).contentLength(item.getSize()).build();
+					} else if (item.getContentType().contains("audio")) {
+						media = new AudioTrack.Builder().itemKey(fileName).contentLength(item.getSize()).build();
+					} else if (item.getContentType().contains("video")) {
+						media = new Video.Builder().itemKey(fileName).contentLength(item.getSize()).build();
+					} else 
+						throw new IllegalArgumentException("Unsupported media type");
+					
+					media.setInputStream(item.getInputStream());
+					ServiceFactory.getMediaService().create(media);
+					long endTime = System.currentTimeMillis();
+					
+					log.info("media uploaded successfully:\n url:" + media.getUrl() + "\n upload time: " + (endTime - startTime) / 1000 + " seconds");
+					
 				}
 			}
 
-			return Response.status(200).build();
+			String output = "{\"url\":\"" + media.getUrl() + "\"}";
+
+			return Response.status(200).entity(output).build();
 		} else
 			throw new IllegalArgumentException("No file found");
 
