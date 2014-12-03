@@ -145,10 +145,10 @@ public class DataSyncProcessor extends Thread {
 			n = processMessages(identity, externalNetwork, null);
 			log.info("Processed {} messages in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId, ResourceType.messages);
-		}else if(externalNetwork.equals(ExternalNetwork.LinkedIn) || externalNetwork.equals(ExternalNetwork.Reddit)) {			
+		} else if(externalNetwork.equals(ExternalNetwork.LinkedIn) || externalNetwork.equals(ExternalNetwork.Reddit)) {			
 			DateTime start = new DateTime();
 			int n = processActivities(identity, externalNetwork);
-			log.info("Processed {} local activities in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
+			log.info("Processed {} activities in {} seconds for user " + userId, n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", getResoursePath(userId, externalNetwork, ResourceType.activities), n, userId, ResourceType.activities);
 		}
 		
@@ -184,7 +184,7 @@ public class DataSyncProcessor extends Thread {
 			if(e instanceof AuthorizationException)
 				ServiceFactory.getSocialService().setActiveNetworkForUser(identity.getUser().getUserId(), socialNetwork, false);
 			
-			log.error("Unable to sync local activities for identity: {}", identity.getIdentityId(), ExceptionUtils.getRootCauseMessage(e));
+			log.error("Unable to sync local activities for identity {}: {}", identity.getIdentityId(), ExceptionUtils.getRootCauseMessage(e));
 			return -1;
 		}
 	}
@@ -283,8 +283,9 @@ public class DataSyncProcessor extends Thread {
 					ExternalIdentity externalIdentity = (ExternalIdentity)identity;
 
 					ServiceFactory.getSocialService().checkValidityOfExternalIdentity(externalIdentity);
-					processSync(externalIdentity);
-
+					Boolean isActive = ServiceFactory.getSocialService().IsActiveNetworkForUser(externalIdentity.getUser().getUserId(), ExternalNetwork.getNetworkById(externalIdentity.getExternalNetwork()));
+					if(isActive)
+						processSync(externalIdentity);
 
 				} catch(Exception ex) {
 					log.error(ex.getMessage());

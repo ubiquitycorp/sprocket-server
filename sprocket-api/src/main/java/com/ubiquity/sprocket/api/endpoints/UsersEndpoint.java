@@ -606,23 +606,21 @@ public class UsersEndpoint {
 			log.debug("Failed to Upload File");
 			throw new RuntimeException("Failed to Upload File");
 		}
-
+		
 		if (items != null) {
 			Iterator<FileItem> iter = items.iterator();
 			while (iter.hasNext()) {
 				FileItem item = iter.next();
 				if (!item.isFormField() && item.getSize() > 0) {
-					fileName = "sprocket_"
-							+ System.currentTimeMillis()
-							+ "."
-							+ item.getName().substring(
-									item.getName().lastIndexOf(".") + 1);
+					String fileExtension = item.getContentType().substring(
+							item.getContentType().lastIndexOf("/") + 1);
+					
+					fileName = new StringBuilder().append("sprocket").append("_")
+							.append(System.currentTimeMillis()).append(".")
+							.append(fileExtension).toString();
+					
 					log.debug(fileName);
-					/*
-					 * file.name = item.getName(); file.type =
-					 * item.getContentType(); file.size = item.getSize();
-					 * file.print();
-					 */
+					
 					if (item.getContentType().contains("image")) {
 						media = new Image.Builder().itemKey(fileName).contentLength(item.getSize()).build();
 					} else if (item.getContentType().contains("audio")) {
