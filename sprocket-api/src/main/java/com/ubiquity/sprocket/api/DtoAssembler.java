@@ -282,6 +282,8 @@ public class DtoAssembler {
 							.itemKey(
 									(String) fields
 											.get(SearchKeys.Fields.FIELD_ITEM_KEY))
+							.embedCode((String) fields
+											.get(SearchKeys.Fields.FIELD_EMBED_CODE))
 							.build());
 					builder.photo(new ImageDto((String) fields
 							.get(SearchKeys.Fields.FIELD_THUMBNAIL)));
