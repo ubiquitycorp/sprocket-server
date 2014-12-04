@@ -145,7 +145,7 @@ public class DataSyncProcessor extends Thread {
 			n = processMessages(identity, externalNetwork, null);
 			log.info("Processed {} messages in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId, ResourceType.messages);
-		} else if(externalNetwork.equals(ExternalNetwork.LinkedIn)) {			
+		} else if(externalNetwork.equals(ExternalNetwork.LinkedIn) || (externalNetwork.equals(ExternalNetwork.Reddit))) {			
 			DateTime start = new DateTime();
 			int n = processActivities(identity, externalNetwork);
 			log.info("Processed {} activities in {} seconds for user " + userId, n, new Period(start, new DateTime()).getSeconds());
@@ -163,14 +163,15 @@ public class DataSyncProcessor extends Thread {
 			synced = socialService.syncActivities(identity, socialNetwork);
 
 			// index for searching
+			
 			ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), synced, false);
-			log.info("indexing activities for identity {}",identity);
+			log.info("Thread {}: indexing activities for identity {}",Thread.currentThread().getName(), identity);
 			return synced.size();
 		} catch (Exception e) {
 			if(e instanceof AuthorizationException)
 				ServiceFactory.getSocialService().setActiveNetworkForUser(identity.getUser().getUserId(), socialNetwork, false);
 			
-			log.error("Could not process activities for identity: {}", ExceptionUtils.getRootCauseMessage(e));
+			log.error("Thread {}: Could not process activities for identity: {}", Thread.currentThread().getName(), ExceptionUtils.getRootCauseMessage(e));
 			return -1;
 		}
 	}
@@ -179,12 +180,13 @@ public class DataSyncProcessor extends Thread {
 		List<Activity> localActivities;
 		try {
 			localActivities = ServiceFactory.getSocialService().syncLocalNewsFeed(identity, socialNetwork);
+			log.info("Thread {}: indexing local activities for identity {}",Thread.currentThread().getName(), identity);
 			return localActivities.size();
 		} catch (Exception e) {
 			if(e instanceof AuthorizationException)
 				ServiceFactory.getSocialService().setActiveNetworkForUser(identity.getUser().getUserId(), socialNetwork, false);
 			
-			log.error("Unable to sync local activities for identity {}: {}", identity.getIdentityId(), ExceptionUtils.getRootCauseMessage(e));
+			log.error("Unable to sync local activities for identity {}: {}", identity, ExceptionUtils.getRootCauseMessage(e));
 			return -1;
 		}
 	}
@@ -253,10 +255,14 @@ public class DataSyncProcessor extends Thread {
 		int numRefreshed = 0;
 
 		try {	
+			Long startTime, endTime;
+			startTime = System.currentTimeMillis();
 			List<User> subList = users.subList(from, to);
 			for(User user : subList) {
 				numRefreshed += syncDataForUser(user);
 			}
+			endTime = System.currentTimeMillis();
+			log.info("Thread {}: Periodic Sync completed in {} seconds", Thread.currentThread().getName(), (endTime - startTime) / 1000);
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
