@@ -675,7 +675,7 @@ public class UsersEndpoint {
 		List<ExternalIdentity> identities = new LinkedList<ExternalIdentity>();
 		identities.add(identity);
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identities, syncDto.getClientPlatformId());
+		sendActivatedMessage(user, identities, clientPlatform.ordinal());
 
 		return Response.ok().build();
 		

@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.lily.LilyRepositoryFactory;
 import com.niobium.repository.mr.MapReduceOutputFile;
-import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.integration.domain.AgeRange;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Gender;

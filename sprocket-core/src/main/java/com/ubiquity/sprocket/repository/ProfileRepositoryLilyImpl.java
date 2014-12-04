@@ -1,7 +1,6 @@
 package com.ubiquity.sprocket.repository;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,7 +12,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
@@ -25,13 +23,11 @@ import org.lilyproject.repository.api.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.niobium.repository.cloud.RemoteAsset;
 import com.niobium.repository.lily.BaseRepositoryLilyImpl;
 import com.niobium.repository.lily.LilyRepositoryFactory;
 import com.niobium.repository.mr.MapReduceOutputFile;
 import com.ubiquity.integration.domain.AgeRange;
 import com.ubiquity.integration.domain.Gender;
-import com.ubiquity.media.domain.Image;
 import com.ubiquity.sprocket.domain.Profile;
 import com.ubiquity.sprocket.repository.mapreduce.SearchTermMapper;
 import com.ubiquity.sprocket.repository.mapreduce.SearchTermReducer;
