@@ -8,27 +8,40 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 
+import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.client.coprocessor.AggregationClient;
+import org.apache.hadoop.hbase.filter.ColumnPrefixFilter;
+import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.WritableUtils;
 
 public class BaseRepositoryHBaseImpl<T> {
 
 	private HTable table;
-	private Class<T> type;
-	
+	private AggregationClient client;
+
+	private String tableName;
+
 	protected HTable getTable() {
 		if(table == null) {
-			table = HBaseTableConnectionFactory.getTable(type);
+			table = HBaseTableConnectionFactory.getTable(tableName);
 		}
 		return table;
 	}
 
+	private AggregationClient getAggregationClient() {
+		if(client == null)
+			client = HBaseTableConnectionFactory.createAggregationClient();
+		return client;
+	}
+
 	public BaseRepositoryHBaseImpl(Class<T> type)  {
-		 this.type = type;
+		tableName = type.getSimpleName().toLowerCase();
 	}
 
 	protected void put(Put put) {
@@ -40,6 +53,16 @@ public class BaseRepositoryHBaseImpl<T> {
 			throw new RuntimeException("Could not create profile", e);
 		} 
 	}
+
+	protected void median(String family, Scan scan) {
+		try {
+			getAggregationClient().median(TableName.valueOf(tableName), null, scan);
+		} catch (Throwable e) {
+			throw new RuntimeException("Could not execute median scan", e);
+		}
+
+	}
+
 	protected Result getResult(Get get) {
 		HTable table = getTable();
 		try {
@@ -70,6 +93,41 @@ public class BaseRepositoryHBaseImpl<T> {
 		put.add(keys[0], keys[1], Bytes.toBytes(value));
 	}
 
+	protected void incrementValue(String row, String family, String qualifier, long amount) {
+		byte[][] keys = getFamilyAndQualifier(family, qualifier);
+		try {
+			getTable().incrementColumnValue(row.getBytes(), keys[0], keys[1], amount);
+		} catch (IOException e) {
+			throw new RuntimeException("Could not increment column value", e);
+		}
+
+	}
+
+	protected Scan createScanWithPrefixFilter(String rowKey, String family, String prefix) {
+		byte[][] keys = getFamilyAndQualifier(family, prefix);
+		byte[] row = rowKey.getBytes();
+		Scan scan = new Scan(row, row); // single row
+		scan.addFamily(Bytes.toBytes(HBaseSchema.ColumnFamilies.HISTORY));
+
+		Filter f = new ColumnPrefixFilter(keys[1]);
+		scan.setFilter(f);
+		scan.setBatch(10);
+
+		return scan;
+	}
+
+	protected Scan createScanWithPrefixFilter(String family, String prefix) {
+		byte[][] keys = getFamilyAndQualifier(family, prefix);
+		Scan scan = new Scan(); // all rows
+		scan.addFamily(Bytes.toBytes(family));
+
+		Filter f = new ColumnPrefixFilter(keys[1]);
+		scan.setFilter(f);
+		scan.setBatch(10);
+
+		return scan;
+	}
+
 	protected void addValue(Put put, String family, String qualifier, List<String> values) {
 		byte[][] keys = getFamilyAndQualifier(family, qualifier);
 		try {
@@ -87,7 +145,7 @@ public class BaseRepositoryHBaseImpl<T> {
 			return null;
 		try {
 			return WritableUtils.readStringArray(new DataInputStream(new ByteArrayInputStream(value)));
-		
+
 		} catch (IOException e) {
 			throw new RuntimeException("Unable to read array", e);
 		}
@@ -105,12 +163,12 @@ public class BaseRepositoryHBaseImpl<T> {
 
 	protected Double getDoubleValue(Result result, String family, String qualifier) {
 		byte[] value = getValue(result, family, qualifier);
-		return new BigInteger(value).doubleValue();
+		return value == null ? null : new BigInteger(value).doubleValue();
 	}
 
-	protected double getLongValue(Result result, String family, String qualifier) {
+	protected Long getLongValue(Result result, String family, String qualifier) {
 		byte[] value = getValue(result, family, qualifier);
-		return new BigInteger(value).longValue();
+		return value == null ? null : new BigInteger(value).longValue();
 	}
 
 	private byte[] getValue(Result result, String family, String qualifier) {
@@ -126,11 +184,13 @@ public class BaseRepositoryHBaseImpl<T> {
 
 	protected void close() {
 		try {
-			table.close();
-			table = null;
+			if(table != null) {
+				table.close();
+				table = null;
+			}
 		} catch (IOException e) {
 			throw new RuntimeException("Unable to close table", e);
-		}
+		} 
 	}
 
 

@@ -1,5 +1,7 @@
 package com.ubiquity.sprocket.domain;
 
+import com.ubiquity.sprocket.repository.hbase.ContentPK;
+
 /***
  * An entity tracking user engagement
  * 
@@ -8,8 +10,12 @@ package com.ubiquity.sprocket.domain;
  */
 public class UserEngagement {
 
+	private static final String DEFAULT_GROUP_MEMBERSHIP = "unassigned";
+	
 	private Long userId;
 	private Long timestamp;
+	private ContentPK contentId;
+	
 	private String groupMembership;
 
 	public Long getUserId() {
@@ -20,6 +26,11 @@ public class UserEngagement {
 		return timestamp;
 	}
 
+	public ContentPK getContentId() {
+		return contentId;
+	}
+
+
 	public String getGroupMembership() {
 		return groupMembership;
 	}
@@ -27,6 +38,7 @@ public class UserEngagement {
 	public static class Builder {
 		private Long userId;
 		private Long timestamp;
+		private ContentPK contentId;
 		private String groupMembership;
 
 		public Builder userId(Long userId) {
@@ -36,6 +48,11 @@ public class UserEngagement {
 
 		public Builder timestamp(Long timestamp) {
 			this.timestamp = timestamp;
+			return this;
+		}
+
+		public Builder contentId(ContentPK contentId) {
+			this.contentId = contentId;
 			return this;
 		}
 
@@ -52,6 +69,7 @@ public class UserEngagement {
 	private UserEngagement(Builder builder) {
 		this.userId = builder.userId;
 		this.timestamp = builder.timestamp;
-		this.groupMembership = builder.groupMembership;
+		this.contentId = builder.contentId;
+		this.groupMembership = builder.groupMembership == null ? DEFAULT_GROUP_MEMBERSHIP : builder.groupMembership;
 	}
 }

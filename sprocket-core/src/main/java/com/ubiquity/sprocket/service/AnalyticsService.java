@@ -36,12 +36,8 @@ import com.ubiquity.sprocket.domain.GroupMembership;
 import com.ubiquity.sprocket.domain.Profile;
 import com.ubiquity.sprocket.domain.RecommendedActivity;
 import com.ubiquity.sprocket.domain.RecommendedVideo;
-import com.ubiquity.sprocket.repository.ContentRepository;
-import com.ubiquity.sprocket.repository.ContentRepositoryLilyImpl;
 import com.ubiquity.sprocket.repository.GroupMembershipRepository;
 import com.ubiquity.sprocket.repository.GroupMembershipRepositoryJpaImpl;
-import com.ubiquity.sprocket.repository.ProfileRepository;
-import com.ubiquity.sprocket.repository.ProfileRepositoryLilyImpl;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepository;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedVideoRepository;
@@ -92,22 +88,22 @@ public class AnalyticsService {
 	}
 
 	public Profile createProfile(User user) {
-		ProfileRepository profileRepository = new ProfileRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
-		Profile profile = new Profile.Builder().profileId(user.getUserId().toString()).build();
-		profileRepository.create(profile);
-		return profile;
+//		ProfileRepository profileRepository = new ProfileRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
+//		Profile profile = new Profile.Builder().profileId(user.getUserId().toString()).build();
+//		profileRepository.create(profile);
+		return null;
 	}
 	
 	public void create(Profile profile) {
-		ProfileRepository profileRepository = new ProfileRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
-		profileRepository.create(profile);
+//		ProfileRepository profileRepository = new ProfileRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
+//		profileRepository.create(profile);
 	}
 	
 	public void track(String searchTerm, User user) {
-		ProfileRepository profileRepository = new ProfileRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
-		Profile profile = profileRepository.read(user.getUserId().toString());
-		profile.getSearchHistory().add(searchTerm);
-		profileRepository.update(profile);
+//		ProfileRepository profileRepository = new ProfileRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
+//		Profile profile = profileRepository.read(user.getUserId().toString());
+//		profile.getSearchHistory().add(searchTerm);
+//		profileRepository.update(profile);
 	}
 	
 	/***
@@ -116,8 +112,8 @@ public class AnalyticsService {
 	 * @param content
 	 */
 	public void track(Content content) {
-		ContentRepository contentRepository = new ContentRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
-		contentRepository.create(content);
+//		ContentRepository contentRepository = new ContentRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
+//		contentRepository.create(content);
 	}
 	
 	public void track(Content content, Long userId, Long timestamp) {

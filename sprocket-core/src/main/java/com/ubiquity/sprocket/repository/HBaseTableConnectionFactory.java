@@ -5,14 +5,16 @@ import java.io.IOException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.coprocessor.AggregationClient;
 
 public class HBaseTableConnectionFactory {
 	
 	private static HBaseSchema schema;
+	private static org.apache.hadoop.conf.Configuration conf;
 	
 	public static void initialize(Configuration configuration) {
 		
-		org.apache.hadoop.conf.Configuration conf = HBaseConfiguration.create();
+		conf = HBaseConfiguration.create();
 		conf.set("hbase.zookeeper.property.clientPort", "2181");
 		conf.set("hbase.zookeeper.quorum", "vm-data");
 		conf.set("hbase.master", "vm-data:600000");
@@ -30,10 +32,14 @@ public class HBaseTableConnectionFactory {
 		
 	}
 	
-	public static synchronized HTable getTable(Class<?> clazz) {
+	public static AggregationClient createAggregationClient() {
+		return new AggregationClient(conf);
+	}
+	
+	public static synchronized HTable getTable(String tableName) {
 		try {
 			// TODO: here's where we check closed, or not...perhaps add in threading
-			return schema.getTable(clazz);
+			return schema.getTable(tableName);
 		} catch (IOException e) {
 			throw new RuntimeException("Could not connect to hbase table", e);
 		}

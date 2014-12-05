@@ -14,6 +14,11 @@ import org.apache.hadoop.hbase.client.HTable;
 
 public class HBaseSchema {
 		
+	public static final class Tables {
+		public static final String PROFILE = "profile";
+		public static final String CONTENT = "content";
+	}
+	
 	public static final class ColumnFamilies {
 		public static final String ATTRIBUTES = "a";
 		public static final String INTERESTS = "i";
@@ -26,6 +31,11 @@ public class HBaseSchema {
 		public static final String MAX_AGE = "max_age";
 		public static final String SEARCH  = "search";
 		public static final String GROUP_MEMBERSHIP = "group_membership";
+		public static final String TYPE 			= "type";
+		public static final String OWNER_ID 		= "owner_id";
+		public static final String NAME 			= "name";
+		public static final String DESCRIPTION 		= "body";
+		public static final String PREFIX_ENGAGED 	= "engaged";
 	}
 	
 	private HBaseAdmin admin;
@@ -38,20 +48,35 @@ public class HBaseSchema {
 	
 	public void createTableIfNotExists(String name) throws IOException {
 		
-		HTableDescriptor tableDescriptor;
-		try  {
-			tableDescriptor = admin.getTableDescriptor(TableName.valueOf(name));
-		} catch (TableNotFoundException e) {
-			tableDescriptor = new HTableDescriptor(TableName.valueOf(name));
-			tableDescriptor.addFamily(new HColumnDescriptor(ColumnFamilies.ATTRIBUTES));
-			tableDescriptor.addFamily(new HColumnDescriptor(ColumnFamilies.HISTORY));
-			tableDescriptor.addFamily(new HColumnDescriptor(ColumnFamilies.INTERESTS));
-			admin.createTable(tableDescriptor);
+		if(name.equals(HBaseSchema.Tables.PROFILE)) {
+		
+			HTableDescriptor tableDescriptor;
+			try  {
+				tableDescriptor = admin.getTableDescriptor(TableName.valueOf(name));
+			} catch (TableNotFoundException e) {
+				tableDescriptor = new HTableDescriptor(TableName.valueOf(name));
+				tableDescriptor.addFamily(new HColumnDescriptor(ColumnFamilies.ATTRIBUTES));
+				tableDescriptor.addFamily(new HColumnDescriptor(ColumnFamilies.HISTORY));
+				tableDescriptor.addFamily(new HColumnDescriptor(ColumnFamilies.INTERESTS));
+				admin.createTable(tableDescriptor);
+			}
+		} else if(name.equals(HBaseSchema.Tables.CONTENT)) {
+			HTableDescriptor tableDescriptor;
+			try  {
+				tableDescriptor = admin.getTableDescriptor(TableName.valueOf(name));
+			} catch (TableNotFoundException e) {
+				tableDescriptor = new HTableDescriptor(TableName.valueOf(name));
+				tableDescriptor.addFamily(new HColumnDescriptor(ColumnFamilies.ATTRIBUTES));
+				tableDescriptor.addFamily(new HColumnDescriptor(ColumnFamilies.HISTORY));
+				tableDescriptor.addFamily(new HColumnDescriptor(ColumnFamilies.INTERESTS));
+				admin.createTable(tableDescriptor);
+			}
+		} else {
+			throw new IllegalArgumentException("Unrecongized table: " + name);
 		}
 	}
 
-	public HTable getTable(Class<?> entity) throws IOException {
-		String name = entity.getSimpleName().toLowerCase();
+	public HTable getTable(String name) throws IOException {
 		createTableIfNotExists(name);
 		return new HTable(conf, name);		
 	}
