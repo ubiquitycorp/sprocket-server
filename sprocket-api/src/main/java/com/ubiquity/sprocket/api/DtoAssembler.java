@@ -32,6 +32,7 @@ import com.ubiquity.social.domain.factories.ActivityFactory;
 import com.ubiquity.sprocket.api.dto.containers.ConfigurationRulesDto;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.AddressDto;
+import com.ubiquity.sprocket.api.dto.model.AudioDto;
 import com.ubiquity.sprocket.api.dto.model.CommentDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
@@ -481,6 +482,16 @@ public class DtoAssembler {
 				videoDtoBuilder.url(activity.getVideo().getUrl());
 			
 			activityDtoBuilder.video(videoDtoBuilder.build());			
+		}
+		
+		if(activity.getAudio() != null){
+			AudioDto.Builder audioDtoBuilder = new AudioDto.Builder();
+			if(activity.getAudio().getEmbedCode() != null)
+				audioDtoBuilder.embedCode(activity.getAudio().getEmbedCode());
+			else 
+				audioDtoBuilder.url(activity.getAudio().getUrl());
+			
+			activityDtoBuilder.audio(audioDtoBuilder.build());	
 		}
 		if (activity.getComments() != null) {
 			for (Comment comment : activity.getComments())
