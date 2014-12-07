@@ -42,7 +42,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		// Currently just automatically fan these out to all parties
 		try {
 			Message message = messageConverter.deserialize(msg, Message.class);
-			log.info("message received: {}", message);
+			log.info(Thread.currentThread().getName() + " message received: {}", message);
 			if(message.getType().equals(
 					ExternalIdentityActivated.class.getSimpleName())) {
 				DataSyncProcessor dataSyncManager = new DataSyncProcessor();
@@ -57,13 +57,13 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			else if(message.getType().equals(UserFavoritePlace.class.getSimpleName()))
 				process((UserFavoritePlace)message.getContent());
 		} catch (Exception e) {
-			log.error("Could not process, message: {}, root cause message: {}",ExceptionUtils.getMessage(e), ExceptionUtils.getRootCauseMessage(e));
+			log.error(Thread.currentThread().getName() + " Could not process, message: {}, root cause message: {}",ExceptionUtils.getMessage(e), ExceptionUtils.getRootCauseMessage(e));
 			e.printStackTrace();
 		}
 	}
 	private void process(UserFavoritePlace favoritePlace) {
 		// persist it or update the activity if it exists already
-		log.debug("indexing this favorite place to db...");
+		log.debug(Thread.currentThread().getName() + " indexing this favorite place to db...");
 		Place place = favoritePlace.getPlace();
 		place = ServiceFactory.getLocationService().findOrCreate(place);
 		User user = ServiceFactory.getUserService().getUserById(favoritePlace.getUserId());
@@ -84,7 +84,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		String dataType = engagedDocument.getDataType();
 		if(dataType.equalsIgnoreCase(Activity.class.getSimpleName())) {
 			// persist it or update the activity if it exists already
-			log.debug("saving the activity to db...");
+			log.debug(Thread.currentThread().getName() + " saving the activity to db...");
 			Activity activity = engagedDocument.getActivity();
 			activity = ServiceFactory.getSocialService().findOrCreate(activity);
 
@@ -94,7 +94,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			
 		} else if(dataType.equalsIgnoreCase(VideoContent.class.getSimpleName())) {
 			// persist it or update the activity if it exists already
-			log.debug("saving the video to db...");
+			log.debug(Thread.currentThread().getName() + " saving the video to db...");
 			VideoContent videoContent = engagedDocument.getVideoContent();
 			videoContent = ServiceFactory.getContentService().findOrCreate(videoContent);
 
@@ -107,7 +107,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 
 	private void process(UserEngagedVideo engagedVideo) {
 		// persist it or update the activity if it exists already
-		log.debug("indexing this video to db...");
+		log.debug(Thread.currentThread().getName() + " indexing this video to db...");
 		VideoContent videoContent = engagedVideo.getVideoContent();
 		videoContent = ServiceFactory.getContentService().findOrCreate(videoContent);
 
