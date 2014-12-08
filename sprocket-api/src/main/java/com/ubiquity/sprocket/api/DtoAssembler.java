@@ -118,7 +118,10 @@ public class DtoAssembler {
 	// comment.addReply(assemble(reply));
 	// return commentBuilder.build();
 	// }
-
+	// public static Captcha assemble(CaptchaDto captchaDto) {
+	// return new Captcha.Builder().captchaAnswer(captchaDto.getCaptchaAnswer())
+	// .identifier(captchaDto.getIdentifier()).build();
+	// }
 	public static PostComment assemble(PostCommentDto postCommentDto) {
 		return new PostComment.Builder().body(postCommentDto.getBody())
 				.parentId(postCommentDto.getParentId()).build();
@@ -282,7 +285,8 @@ public class DtoAssembler {
 							.itemKey(
 									(String) fields
 											.get(SearchKeys.Fields.FIELD_ITEM_KEY))
-							.embedCode((String) fields
+							.embedCode(
+									(String) fields
 											.get(SearchKeys.Fields.FIELD_EMBED_CODE))
 							.build());
 					builder.photo(new ImageDto((String) fields
@@ -340,6 +344,11 @@ public class DtoAssembler {
 		return new IdentityDto.Builder().identifier(identity.getIdentifier())
 				.externalNetworkId(identity.getExternalNetwork()).build();
 	}
+
+	// public static CaptchaDto assemble(Captcha captcha) {
+	// return new CaptchaDto.Builder().imageType(captcha.getImageType())
+	// .identifier(captcha.getIdentifier()).build();
+	// }
 
 	public static ContactDto assemble(Contact contact) {
 		ContactDto.Builder contactDtoBuilder = new ContactDto.Builder()
@@ -461,7 +470,7 @@ public class DtoAssembler {
 				.externalIdentifier(activity.getExternalIdentifier())
 				.ownerVote(activity.getOwnerVote())
 				.commentsNum(activity.getCommentsNum());
-		
+
 		if (activity.getPostedBy() != null)
 			activityDtoBuilder.postedBy(DtoAssembler.assemble(activity
 					.getPostedBy()));
@@ -472,15 +481,15 @@ public class DtoAssembler {
 		if (activity.getImage() != null)
 			activityDtoBuilder
 					.photo(new ImageDto(activity.getImage().getUrl()));
-		if (activity.getVideo() != null){
+		if (activity.getVideo() != null) {
 			VideoDto.Builder videoDtoBuilder = new VideoDto.Builder();
 			videoDtoBuilder.itemKey(activity.getVideo().getItemKey());
-			if(activity.getVideo().getEmbedCode() != null)
+			if (activity.getVideo().getEmbedCode() != null)
 				videoDtoBuilder.embedCode(activity.getVideo().getEmbedCode());
-			else 
+			else
 				videoDtoBuilder.url(activity.getVideo().getUrl());
-			
-			activityDtoBuilder.video(videoDtoBuilder.build());			
+
+			activityDtoBuilder.video(videoDtoBuilder.build());
 		}
 		if (activity.getComments() != null) {
 			for (Comment comment : activity.getComments())
@@ -489,9 +498,10 @@ public class DtoAssembler {
 		if (activity.getInterests() != null) {
 			for (Interest interest : activity.getInterests())
 				activityDtoBuilder.addInterest(assemble(interest));
-			
-			if(activity.getInterests().size() == 0){
-				if(activity.getExternalNetwork().equals(ExternalNetwork.Tumblr)){
+
+			if (activity.getInterests().size() == 0) {
+				if (activity.getExternalNetwork()
+						.equals(ExternalNetwork.Tumblr)) {
 					activityDtoBuilder.addInterest(new InterestDto(1L,
 							"tumblr interest 1"));
 					activityDtoBuilder.addInterest(new InterestDto(2L,

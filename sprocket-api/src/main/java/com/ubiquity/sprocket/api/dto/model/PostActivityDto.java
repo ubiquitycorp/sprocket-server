@@ -11,6 +11,8 @@ public class PostActivityDto {
 	private String[] data; // (photo, video)
 	private String embed; // (video)
 	private String pageId; // (page to be posted into)
+	private String captcha;
+	private String captchaIden;
 
 	public String getTitle() {
 		return title;
@@ -35,6 +37,13 @@ public class PostActivityDto {
 	public String getPageId() {
 		return pageId;
 	}
+	
+	public String getCaptcha() {
+		return captcha;
+	}
+	public String getCaptchaIden() {
+		return captchaIden;
+	}
 
 	public Integer getActivityTypeId() {
 		return activityTypeId;
@@ -52,6 +61,8 @@ public class PostActivityDto {
 		private String[] data;
 		private String embed;
 		private String pageId;
+		private String captcha;
+		private String captchaIden;
 
 		public Builder title(String title) {
 			this.title = title;
@@ -82,12 +93,21 @@ public class PostActivityDto {
 			this.activityTypeId = activityTypeId;
 			return this;
 		}
-
+		
 		public Builder pageId(String pageId) {
 			this.pageId = pageId;
 			return this;
 		}
-
+		
+		public Builder captcha(String captcha) {
+			this.captcha = captcha;
+			return this;
+		}
+		public Builder captchaIden(String captchaIden) {
+			this.captchaIden = captchaIden;
+			return this;
+		}
+		
 		public PostActivityDto build() {
 			return new PostActivityDto(this);
 		}
@@ -101,6 +121,8 @@ public class PostActivityDto {
 		this.embed = builder.embed;
 		this.activityTypeId = builder.activityTypeId;
 		this.pageId = builder.pageId;
+		this.captcha = builder.captcha;
+		this.captchaIden = builder.captchaIden;
 	}
 
 	public void validate() {

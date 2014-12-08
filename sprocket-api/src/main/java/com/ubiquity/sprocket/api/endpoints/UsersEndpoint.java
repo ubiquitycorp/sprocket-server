@@ -680,7 +680,7 @@ public class UsersEndpoint {
 		return Response.ok().build();
 		
 	}
-
+	
 	private void sendActivatedMessage(User user,
 			List<ExternalIdentity> identities, Integer clientPlatformId)
 			throws IOException {
