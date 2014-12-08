@@ -50,7 +50,8 @@ public class ActivityDto {
 
 	private ImageDto photo;
 	private VideoDto video;
-
+	private AudioDto audio;
+	
 	private String link;
 
 	private String category;
@@ -79,6 +80,10 @@ public class ActivityDto {
 
 	public VideoDto getVideo() {
 		return video;
+	}
+
+	public AudioDto getAudio() {
+		return audio;
 	}
 
 	public String getType() {
@@ -141,6 +146,7 @@ public class ActivityDto {
 		private ContactDto postedBy;
 		private ImageDto photo;
 		private VideoDto video;
+		private AudioDto audio;
 		private Integer externalNetworkId;
 		private String type;
 		private Integer commentsNum;
@@ -179,6 +185,11 @@ public class ActivityDto {
 
 		public Builder video(VideoDto video) {
 			this.video = video;
+			return this;
+		}
+		
+		public Builder audio(AudioDto audio) {
+			this.audio = audio;
 			return this;
 		}
 
@@ -246,6 +257,7 @@ public class ActivityDto {
 		this.postedBy = builder.postedBy;
 		this.photo = builder.photo;
 		this.video = builder.video;
+		this.audio = builder.audio;
 		this.externalNetworkId = builder.externalNetworkId;
 		this.type = builder.type;
 		this.link = builder.link;

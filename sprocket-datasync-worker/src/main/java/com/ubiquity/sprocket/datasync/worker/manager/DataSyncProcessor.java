@@ -78,7 +78,7 @@ public class DataSyncProcessor extends Thread {
 		// get identity from message
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().getExternalIdentityById(activated.getIdentityId());
 		if(identity == null){
-			log.error("Can't find identity in DB");
+			log.error(Thread.currentThread().getName() + " Can't find identity in DB");
 		}
 		processSync(identity);
 	} 
@@ -86,7 +86,7 @@ public class DataSyncProcessor extends Thread {
 
 
 	public void run() {
-		log.info("Synchronizing data from {} to {}", from, to);
+		log.info(Thread.currentThread().getName() + " Synchronizing data from {} to {}", from, to);
 		syncData();
 	}
 
@@ -117,38 +117,38 @@ public class DataSyncProcessor extends Thread {
 		if (externalNetwork.network.equals(Network.Content)) {
 			DateTime start = new DateTime();
 			int n = processVideos(identity, externalNetwork);
-			log.info("Processed {} videos in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
+			log.info(Thread.currentThread().getName() + " Processed {} videos in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 			
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized videos", getResoursePath(userId, externalNetwork, ResourceType.videos), n, userId, ResourceType.videos);
 		} 
 		else if (externalNetwork.equals(ExternalNetwork.Google)) {
 			DateTime start = new DateTime();
 			int n = processMessages(identity, externalNetwork, null);
-			log.info("Processed {} messages in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
+			log.info(Thread.currentThread().getName() + " Processed {} messages in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId, ResourceType.messages);
 
 
 		}  else if ( externalNetwork.equals(ExternalNetwork.Facebook) || externalNetwork.equals(ExternalNetwork.Twitter)|| externalNetwork.equals(ExternalNetwork.Tumblr)) {
 			DateTime start = new DateTime();
 			int n = processActivities(identity, externalNetwork); 
-			log.info("Processed {} activities in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
+			log.info(Thread.currentThread().getName() + " Processed {} activities in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", getResoursePath(userId, externalNetwork, ResourceType.activities), n, userId, ResourceType.activities);
 
 			if (externalNetwork.equals(ExternalNetwork.Facebook)) {
 				start = new DateTime();
 				n = processLocalActivities(identity, externalNetwork);
-				log.info("Processed {} local activities in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
+				log.info(Thread.currentThread().getName() + " Processed {} local activities in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 				sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized local feed", getResoursePath(userId, externalNetwork, ResourceType.localfeed), n, userId, ResourceType.localfeed);
 			}
 
 			start = new DateTime();
 			n = processMessages(identity, externalNetwork, null);
-			log.info("Processed {} messages in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
+			log.info(Thread.currentThread().getName() + " Processed {} messages in {} seconds for user "+ userId, n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized messages", getResoursePath(userId, externalNetwork, ResourceType.messages), n, userId, ResourceType.messages);
 		} else if(externalNetwork.equals(ExternalNetwork.LinkedIn) || (externalNetwork.equals(ExternalNetwork.Reddit))) {			
 			DateTime start = new DateTime();
 			int n = processActivities(identity, externalNetwork);
-			log.info("Processed {} activities in {} seconds for user " + userId, n, new Period(start, new DateTime()).getSeconds());
+			log.info(Thread.currentThread().getName() + " Processed {} activities in {} seconds for user " + userId, n, new Period(start, new DateTime()).getSeconds());
 			sendStepCompletedMessageToIndividual(backchannel, externalNetwork, "Synchronized feed", getResoursePath(userId, externalNetwork, ResourceType.activities), n, userId, ResourceType.activities);
 		}
 		
@@ -165,13 +165,13 @@ public class DataSyncProcessor extends Thread {
 			// index for searching
 			
 			ServiceFactory.getSearchService().indexActivities(identity.getUser().getUserId(), synced, false);
-			log.info("Thread {}: indexing activities for identity {}",Thread.currentThread().getName(), identity);
+			log.info("{}: indexing activities for identity {}",Thread.currentThread().getName(), identity);
 			return synced.size();
 		} catch (Exception e) {
 			if(e instanceof AuthorizationException)
 				ServiceFactory.getSocialService().setActiveNetworkForUser(identity.getUser().getUserId(), socialNetwork, false);
 			
-			log.error("Thread {}: Could not process activities for identity: {}", Thread.currentThread().getName(), ExceptionUtils.getRootCauseMessage(e));
+			log.error("{}: Could not process activities for identity: {}", Thread.currentThread().getName(), ExceptionUtils.getRootCauseMessage(e));
 			return -1;
 		}
 	}
@@ -180,13 +180,13 @@ public class DataSyncProcessor extends Thread {
 		List<Activity> localActivities;
 		try {
 			localActivities = ServiceFactory.getSocialService().syncLocalNewsFeed(identity, socialNetwork);
-			log.info("Thread {}: indexing local activities for identity {}",Thread.currentThread().getName(), identity);
+			log.info("{}: indexing local activities for identity {}",Thread.currentThread().getName(), identity);
 			return localActivities.size();
 		} catch (Exception e) {
 			if(e instanceof AuthorizationException)
 				ServiceFactory.getSocialService().setActiveNetworkForUser(identity.getUser().getUserId(), socialNetwork, false);
 			
-			log.error("Unable to sync local activities for identity {}: {}", identity, ExceptionUtils.getRootCauseMessage(e));
+			log.error(Thread.currentThread().getName() + " Unable to sync local activities for identity {}: {}", identity, ExceptionUtils.getRootCauseMessage(e));
 			return -1;
 		}
 	}
@@ -212,7 +212,7 @@ public class DataSyncProcessor extends Thread {
 			if(e instanceof AuthorizationException)
 				ServiceFactory.getSocialService().setActiveNetworkForUser(identity.getUser().getUserId(), externalNetwork, false);
 			
-			log.error("Unable to sync for identity: {}", identity.getIdentityId(), ExceptionUtils.getRootCauseMessage(e));
+			log.error(Thread.currentThread().getName() + " Unable to sync for identity: {}", identity.getIdentityId(), ExceptionUtils.getRootCauseMessage(e));
 			return -1;
 		}
 	}
@@ -235,13 +235,13 @@ public class DataSyncProcessor extends Thread {
 
 			// add messages to search results
 			ServiceFactory.getSearchService().indexMessages(identity.getUser().getUserId(), messages);
-			log.info("indexing messages for identity {}",identity);
+			log.info(Thread.currentThread().getName() + " indexing messages for identity {}",identity);
 			return messages.size();
 		} catch (Exception e) {
 			if(e instanceof AuthorizationException)
 				ServiceFactory.getSocialService().setActiveNetworkForUser(identity.getUser().getUserId(), network, false);
 			
-			log.error("Could not process messages for identity: {}", ExceptionUtils.getRootCauseMessage(e));
+			log.error(Thread.currentThread().getName() + " Could not process messages for identity: {}", ExceptionUtils.getRootCauseMessage(e));
 			e.printStackTrace();
 			return -1;
 		}
@@ -262,7 +262,7 @@ public class DataSyncProcessor extends Thread {
 				numRefreshed += syncDataForUser(user);
 			}
 			endTime = System.currentTimeMillis();
-			log.info("Thread {}: Periodic Sync completed in {} seconds", Thread.currentThread().getName(), (endTime - startTime) / 1000);
+			log.info("{}: Periodic Sync completed in {} seconds", Thread.currentThread().getName(), (endTime - startTime) / 1000);
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
@@ -302,7 +302,7 @@ public class DataSyncProcessor extends Thread {
 
 		}
 
-		log.info("Full sync for user: {} in {} seconds", user.getUserId(), new Period(start, new DateTime()).getSeconds());
+		log.info(Thread.currentThread().getName() + " Full sync for user: {} in {} seconds", user.getUserId(), new Period(start, new DateTime()).getSeconds());
 
 		return 0;
 	}
