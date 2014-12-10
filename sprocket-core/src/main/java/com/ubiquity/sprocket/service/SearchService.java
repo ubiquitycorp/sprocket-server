@@ -139,6 +139,7 @@ public class SearchService {
 			// if it's a video, set the url and thumbnail to the video url and image respectively
 			if(type == ActivityType.VIDEO) {
 				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getVideo().getUrl());
+				document.getFields().put(SearchKeys.Fields.FIELD_EMBED_CODE, activity.getVideo().getEmbedCode());
 				// use image as thumb
 				if(activity.getImage() != null)
 					document.getFields().put(SearchKeys.Fields.FIELD_THUMBNAIL, activity.getImage().getUrl());

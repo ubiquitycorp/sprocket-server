@@ -32,6 +32,7 @@ import com.ubiquity.social.domain.factories.ActivityFactory;
 import com.ubiquity.sprocket.api.dto.containers.ConfigurationRulesDto;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.AddressDto;
+import com.ubiquity.sprocket.api.dto.model.AudioDto;
 import com.ubiquity.sprocket.api.dto.model.CommentDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
@@ -81,7 +82,8 @@ public class DtoAssembler {
 		VideoDto videoDto = activityDto.getVideo();
 		if (videoDto != null)
 			activityBuilder.video(new Video.Builder().url(videoDto.getUrl())
-					.build());
+					.embedCode(videoDto.getEmbedCode())
+					.itemKey(videoDto.getItemKey()).build());
 
 		ImageDto imageDto = activityDto.getPhoto();
 		if (imageDto != null)
@@ -90,40 +92,42 @@ public class DtoAssembler {
 		if (activityDto.getPostedBy() != null)
 			activityBuilder.postedBy(assemble(activityDto.getPostedBy()));
 
-//		if (activityDto.getComments() != null) {
-//			for (CommentDto comment : activityDto.getComments())
-//				activityBuilder.addComment(assemble(comment));
-//		}
-//		if (activityDto.getInterests() != null) {
-//			for (InterestDto interest : activityDto.getInterests())
-//				activityBuilder.addInterest(assemble(interest));
-//		}
+		// if (activityDto.getComments() != null) {
+		// for (CommentDto comment : activityDto.getComments())
+		// activityBuilder.addComment(assemble(comment));
+		// }
+		// if (activityDto.getInterests() != null) {
+		// for (InterestDto interest : activityDto.getInterests())
+		// activityBuilder.addInterest(assemble(interest));
+		// }
 		activityBuilder.rating(assemble(activityDto.getRating()));
 		return activityBuilder.build();
 
 	}
-	
-//	public static Comment assemble(CommentDto commentDto) {
-//		Comment.Builder commentBuilder = new Comment.Builder();
-//		commentBuilder.body(commentDto.getBody())
-//				.commentId(commentDto.getCommentId())
-//				.creationDate(commentDto.getCreationDate())
-//				.externalIdentifier(commentDto.getExternalIdentifier())
-//				.postedBy(assemble(commentDto.getPostedBy()))
-//				.rating(assemble(commentDto.getRating()))
-//				.ownerVote(commentDto.getOwnerVote());
-//		Comment comment = commentBuilder.build();
-//		for (CommentDto reply : commentDto.getReplies())
-//			comment.addReply(assemble(reply));
-//		return commentBuilder.build();
-//	}
 
-
+	// public static Comment assemble(CommentDto commentDto) {
+	// Comment.Builder commentBuilder = new Comment.Builder();
+	// commentBuilder.body(commentDto.getBody())
+	// .commentId(commentDto.getCommentId())
+	// .creationDate(commentDto.getCreationDate())
+	// .externalIdentifier(commentDto.getExternalIdentifier())
+	// .postedBy(assemble(commentDto.getPostedBy()))
+	// .rating(assemble(commentDto.getRating()))
+	// .ownerVote(commentDto.getOwnerVote());
+	// Comment comment = commentBuilder.build();
+	// for (CommentDto reply : commentDto.getReplies())
+	// comment.addReply(assemble(reply));
+	// return commentBuilder.build();
+	// }
+	// public static Captcha assemble(CaptchaDto captchaDto) {
+	// return new Captcha.Builder().captchaAnswer(captchaDto.getCaptchaAnswer())
+	// .identifier(captchaDto.getIdentifier()).build();
+	// }
 	public static PostComment assemble(PostCommentDto postCommentDto) {
 		return new PostComment.Builder().body(postCommentDto.getBody())
 				.parentId(postCommentDto.getParentId()).build();
 	}
-	
+
 	public static PostVote assemble(PostVoteDto postVoteDto) {
 		return new PostVote.Builder().direction(postVoteDto.getDirection())
 				.stars(postVoteDto.getStars())
@@ -254,9 +258,15 @@ public class DtoAssembler {
 										.get(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID))
 						.date((Long) fields.get(SearchKeys.Fields.FIELD_DATE))
 						.ownerId(ownerId)
-						.commentsNum((Integer)fields.get(SearchKeys.Fields.FIELD_COMMENTNUM));
+						.commentsNum(
+								(Integer) fields
+										.get(SearchKeys.Fields.FIELD_COMMENTNUM));
 				if (fields.get(SearchKeys.Fields.FIELD_RATING_NUM_RATING) != null)
-					builder.rating(new RatingDto.Builder().numRatings((Integer)fields.get(SearchKeys.Fields.FIELD_RATING_NUM_RATING)).build()); 
+					builder.rating(new RatingDto.Builder()
+							.numRatings(
+									(Integer) fields
+											.get(SearchKeys.Fields.FIELD_RATING_NUM_RATING))
+							.build());
 
 				// add in content based on type
 				String activityType = (String) fields
@@ -276,10 +286,14 @@ public class DtoAssembler {
 							.itemKey(
 									(String) fields
 											.get(SearchKeys.Fields.FIELD_ITEM_KEY))
+							.embedCode(
+									(String) fields
+											.get(SearchKeys.Fields.FIELD_EMBED_CODE))
 							.build());
 					builder.photo(new ImageDto((String) fields
 							.get(SearchKeys.Fields.FIELD_THUMBNAIL)));
-				} else if (activityType.equals(ActivityType.EMBEDEDHTML.toString())) {
+				} else if (activityType.equals(ActivityType.EMBEDEDHTML
+						.toString())) {
 					builder.link((String) fields
 							.get(SearchKeys.Fields.FIELD_URL));
 				}
@@ -331,6 +345,11 @@ public class DtoAssembler {
 		return new IdentityDto.Builder().identifier(identity.getIdentifier())
 				.externalNetworkId(identity.getExternalNetwork()).build();
 	}
+
+	// public static CaptchaDto assemble(Captcha captcha) {
+	// return new CaptchaDto.Builder().imageType(captcha.getImageType())
+	// .identifier(captcha.getIdentifier()).build();
+	// }
 
 	public static ContactDto assemble(Contact contact) {
 		ContactDto.Builder contactDtoBuilder = new ContactDto.Builder()
@@ -452,7 +471,7 @@ public class DtoAssembler {
 				.externalIdentifier(activity.getExternalIdentifier())
 				.ownerVote(activity.getOwnerVote())
 				.commentsNum(activity.getCommentsNum());
-		
+
 		if (activity.getPostedBy() != null)
 			activityDtoBuilder.postedBy(DtoAssembler.assemble(activity
 					.getPostedBy()));
@@ -463,15 +482,25 @@ public class DtoAssembler {
 		if (activity.getImage() != null)
 			activityDtoBuilder
 					.photo(new ImageDto(activity.getImage().getUrl()));
-		if (activity.getVideo() != null){
+		if (activity.getVideo() != null) {
 			VideoDto.Builder videoDtoBuilder = new VideoDto.Builder();
 			videoDtoBuilder.itemKey(activity.getVideo().getItemKey());
-			if(activity.getVideo().getEmbedCode() != null)
-				videoDtoBuilder.url(activity.getVideo().getEmbedCode());
-			else 
+			if (activity.getVideo().getEmbedCode() != null)
+				videoDtoBuilder.embedCode(activity.getVideo().getEmbedCode());
+			else
 				videoDtoBuilder.url(activity.getVideo().getUrl());
+
+			activityDtoBuilder.video(videoDtoBuilder.build());
+		}
+		
+		if(activity.getAudio() != null){
+			AudioDto.Builder audioDtoBuilder = new AudioDto.Builder();
+			if(activity.getAudio().getEmbedCode() != null)
+				audioDtoBuilder.embedCode(activity.getAudio().getEmbedCode());
+			else 
+				audioDtoBuilder.url(activity.getAudio().getUrl());
 			
-			activityDtoBuilder.video(videoDtoBuilder.build());			
+			activityDtoBuilder.audio(audioDtoBuilder.build());	
 		}
 		if (activity.getComments() != null) {
 			for (Comment comment : activity.getComments())
@@ -480,6 +509,16 @@ public class DtoAssembler {
 		if (activity.getInterests() != null) {
 			for (Interest interest : activity.getInterests())
 				activityDtoBuilder.addInterest(assemble(interest));
+
+			if (activity.getInterests().size() == 0) {
+				if (activity.getExternalNetwork()
+						.equals(ExternalNetwork.Tumblr)) {
+					activityDtoBuilder.addInterest(new InterestDto(1L,
+							"tumblr interest 1"));
+					activityDtoBuilder.addInterest(new InterestDto(2L,
+							"tumblr interest 2"));
+				}
+			}
 		}
 		activityDtoBuilder.rating(assemble(activity.getRating()));
 		return activityDtoBuilder.build();
@@ -656,16 +695,16 @@ public class DtoAssembler {
 		return placeBuilder.build();
 
 	}
-	
+
 	public static Rating assemble(RatingDto ratingDto) {
 		if (ratingDto == null)
 			return null;
 		Rating.Builder ratingBuilder = new Rating.Builder();
 		ratingBuilder.max(ratingDto.getMax()).min(ratingDto.getMin())
-				.numRatings(ratingDto.getNumRatings()).rating(ratingDto.getRating());
+				.numRatings(ratingDto.getNumRatings())
+				.rating(ratingDto.getRating());
 		return ratingBuilder.build();
 	}
-
 
 	public static Address assemble(AddressDto addressdto) {
 		if (addressdto == null)
@@ -695,29 +734,38 @@ public class DtoAssembler {
 				.latitude(locationDto.getLatitude())
 				.longitude(locationDto.getLongitude()).build();
 	}
-	
-	public static ConfigurationRulesDto assembleConfigurationList(List<Configuration> rules) {
+
+	public static ConfigurationRulesDto assembleConfigurationList(
+			List<Configuration> rules) {
 		ConfigurationRulesDto configurationRulesDto = new ConfigurationRulesDto();
 		ExternalNetwork externalNetwork = null;
 		ExternalNetworkConfigurationDto externalNetworkConfigurationDto = null;
-		for (Configuration config : rules){
-			if (config.getExternalNetwork() == null){
-				configurationRulesDto.getGeneralRules().put(config.getName(), config.getValue());
-			}else if (config.getExternalNetwork() == externalNetwork){
-				externalNetworkConfigurationDto.getRules().put(config.getName(), config.getValue());
-			}else{
-				if(externalNetworkConfigurationDto != null){
-					configurationRulesDto.getProviders().add(externalNetworkConfigurationDto);
+		for (Configuration config : rules) {
+			if (config.getExternalNetwork() == null) {
+				configurationRulesDto.getGeneralRules().put(config.getName(),
+						config.getValue());
+			} else if (config.getExternalNetwork() == externalNetwork) {
+				externalNetworkConfigurationDto.getRules().put(
+						config.getName(), config.getValue());
+			} else {
+				if (externalNetworkConfigurationDto != null) {
+					configurationRulesDto.getProviders().add(
+							externalNetworkConfigurationDto);
 				}
-				externalNetworkConfigurationDto = new ExternalNetworkConfigurationDto(config.getExternalNetwork(),ExternalNetwork.ordinalOrDefault(config.getExternalNetwork()));
+				externalNetworkConfigurationDto = new ExternalNetworkConfigurationDto(
+						config.getExternalNetwork(),
+						ExternalNetwork.ordinalOrDefault(config
+								.getExternalNetwork()));
 				externalNetwork = config.getExternalNetwork();
-				externalNetworkConfigurationDto.getRules().put(config.getName(), config.getValue());
+				externalNetworkConfigurationDto.getRules().put(
+						config.getName(), config.getValue());
 			}
 		}
-		if(externalNetworkConfigurationDto != null){
-			configurationRulesDto.getProviders().add(externalNetworkConfigurationDto);
+		if (externalNetworkConfigurationDto != null) {
+			configurationRulesDto.getProviders().add(
+					externalNetworkConfigurationDto);
 		}
 		return configurationRulesDto;
-		
+
 	}
 }

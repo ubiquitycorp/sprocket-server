@@ -1,8 +1,12 @@
 package com.ubiquity.sprocket.api.dto.model;
 
 import javax.validation.constraints.NotNull;
-
-public class VideoDto {
+/***
+ * 
+ * @author peter.tadros
+ *
+ */
+public class AudioDto {
 
 	private String url;
 	private String itemKey;
@@ -130,12 +134,12 @@ public class VideoDto {
 			return this;
 		}
 
-		public VideoDto build() {
-			return new VideoDto(this);
+		public AudioDto build() {
+			return new AudioDto(this);
 		}
 	}
 
-	private VideoDto(Builder builder) {
+	private AudioDto(Builder builder) {
 		this.url = builder.url;
 		this.itemKey = builder.itemKey;
 		this.externalNetworkId = builder.externalNetworkId;

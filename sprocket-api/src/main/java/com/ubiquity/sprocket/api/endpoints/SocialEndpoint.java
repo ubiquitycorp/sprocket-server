@@ -2,18 +2,22 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.http.HttpException;
 import org.slf4j.Logger;
@@ -24,6 +28,7 @@ import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.Captcha;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Message;
@@ -247,7 +252,7 @@ public class SocialEndpoint {
 	@Path("users/{userId}/providers/{externalNetworkId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response postactivity(@PathParam("userId") Long userId,
+	public Response postActivity(@PathParam("userId") Long userId,
 			@PathParam("externalNetworkId") Integer externalNetworkId,
 			InputStream payload) throws HttpException {
 
@@ -256,7 +261,7 @@ public class SocialEndpoint {
 
 		// Validate request parameters dependent on activity type
 		postActivityDto.validate();
-		
+
 		// get social network
 		ExternalNetwork socialNetwork = ExternalNetwork
 				.getNetworkById(externalNetworkId);
@@ -278,72 +283,151 @@ public class SocialEndpoint {
 				.body(postActivityDto.getBody())
 				.link(postActivityDto.getLink())
 				.embed(postActivityDto.getEmbed())
-				.pageId(postActivityDto.getPageId()).build();
-		
+				.pageId(postActivityDto.getPageId())
+				.captcha(postActivityDto.getCaptcha())
+				.captchaIden(postActivityDto.getCaptchaIden()).build();
+
 		ServiceFactory.getSocialService().postActivity(identity, socialNetwork,
 				postActivity);
 
 		return Response.ok().build();
 
 	}
+
 	/***
 	 * This method post comment to specific user in social network
+	 * 
 	 * @param userId
 	 * @param socialProviderId
 	 * @return
-	 * @throws org.jets3t.service.impl.rest.HttpException 
+	 * @throws org.jets3t.service.impl.rest.HttpException
 	 */
 	@POST
 	@Path("users/{userId}/providers/{socialNetworkId}/comment")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response postComment(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
+	public Response postComment(@PathParam("userId") Long userId,
+			@PathParam("socialNetworkId") Integer socialProviderId,
+			InputStream payload)
+			throws org.jets3t.service.impl.rest.HttpException {
 
-		//Cast the input into SendMessageObject
-		PostCommentDto postCommentDto = jsonConverter.convertFromPayload(payload, PostCommentDto.class);
-				
+		// Cast the input into SendMessageObject
+		PostCommentDto postCommentDto = jsonConverter.convertFromPayload(
+				payload, PostCommentDto.class);
+
 		// load user
 		ServiceFactory.getUserService().getUserById(userId);
-		// get social network 
-		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
+		// get social network
+		ExternalNetwork socialNetwork = ExternalNetwork
+				.getNetworkById(socialProviderId);
 		// get the identity from DB
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
-		
-		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
-		
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+				.findExternalIdentity(userId, socialNetwork);
+
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
+				identity);
+
 		PostComment postComment = DtoAssembler.assemble(postCommentDto);
-		ServiceFactory.getSocialService().postComment(identity, socialNetwork, postComment);
+		ServiceFactory.getSocialService().postComment(identity, socialNetwork,
+				postComment);
 
 		return Response.ok().build();
-			
+
 	}
-	
+
 	@POST
 	@Path("users/{userId}/providers/{socialNetworkId}/vote")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response postVote(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
+	public Response postVote(@PathParam("userId") Long userId,
+			@PathParam("socialNetworkId") Integer socialProviderId,
+			InputStream payload)
+			throws org.jets3t.service.impl.rest.HttpException {
 
-		//Cast the input into SendMessageObject
-		PostVoteDto postVoteDto = jsonConverter.convertFromPayload(payload, PostVoteDto.class);
-				
+		// Cast the input into SendMessageObject
+		PostVoteDto postVoteDto = jsonConverter.convertFromPayload(payload,
+				PostVoteDto.class);
+
 		// load user
 		ServiceFactory.getUserService().getUserById(userId);
-		// get social network 
-		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
+		// get social network
+		ExternalNetwork socialNetwork = ExternalNetwork
+				.getNetworkById(socialProviderId);
 		// get the identity from DB
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
-		
-		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
-		
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+				.findExternalIdentity(userId, socialNetwork);
+
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
+				identity);
+
 		PostVote postComment = DtoAssembler.assemble(postVoteDto);
-		
-		ServiceFactory.getSocialService().postVote(identity, socialNetwork, postComment);
+
+		ServiceFactory.getSocialService().postVote(identity, socialNetwork,
+				postComment);
 
 		return Response.ok().build();
-			
+
 	}
-	
+
+	/***
+	 * This end point forces synchronization for specific external network
+	 * 
+	 * @param userId
+	 * @param payload
+	 * @return
+	 * @throws IOException
+	 */
+	@GET
+	@Path("users/{userId}/providers/{socialNetworkId}/captcha")
+	@Consumes(MediaType.APPLICATION_JSON)
+	// /@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	@Secure
+	public Response requestCaptcha(@PathParam("userId") Long userId,
+			@PathParam("socialNetworkId") Integer socialProviderId)
+			throws IOException {
+
+		ExternalNetwork externalNetwork = ExternalNetwork
+				.getNetworkById(socialProviderId);
+
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+				.findExternalIdentity(userId, externalNetwork);
+
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
+				identity);
+
+		Captcha captcha = ServiceFactory.getSocialService().requestCaptcha(
+				identity, externalNetwork);
+
+		
+		final byte[] image = captcha.getImage();
+
+		if (image != null) {
+			StreamingOutput stream = new StreamingOutput() {
+
+				public void write(OutputStream output) throws IOException,
+						WebApplicationException {
+					try {
+
+						output.write(image);
+					} catch (Exception e) {
+						throw new WebApplicationException(e);
+					}
+				}
+
+			};
+			return Response
+					.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
+					.header("content-disposition",
+							"attachment; filename=\"captcha."
+									+ captcha.getImageType() + "\"")
+					.header("captcha-identifier", captcha.getIdentifier())
+					.build();
+		}
+
+		return Response.ok().build();
+
+	}
+
 	/**
 	 * Drops a message for tracking this event
 	 * 

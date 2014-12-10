@@ -1,26 +1,31 @@
 package com.ubiquity.sprocket.api.endpoints;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.NoResultException;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang.NotImplementedException;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +60,7 @@ import com.ubiquity.sprocket.api.dto.model.ExchangeTokenDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
 import com.ubiquity.sprocket.api.dto.model.LocationDto;
 import com.ubiquity.sprocket.api.dto.model.ResetPasswordDto;
+import com.ubiquity.sprocket.api.dto.model.SyncDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
@@ -121,14 +127,17 @@ public class UsersEndpoint {
 
 		ExternalIdentity identity = identities.get(0);
 		IdentityDto result = new IdentityDto.Builder().identifier(
-				identity.getIdentifier()).build();
+				identity.getIdentifier()).clientPlatformId(identity.getClientPlatform().ordinal()).build();
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identities, result);
-
+		sendActivatedMessage(user, identities, result.getClientPlatformId());
+		
+		ServiceFactory.getSocialService().setActiveNetworkForUser(userId, ExternalNetwork.LinkedIn, true);
+		
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identity.getIdentityId(),user.getUserId());
+					.getBySocialIdentityId(identity.getIdentityId(),
+							user.getUserId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
@@ -169,13 +178,14 @@ public class UsersEndpoint {
 					.createTwitterProvider(identityDto.getRedirectUrl());
 			TwitterAPI twitterApi = (TwitterAPI) socialApi;
 			requestToken = twitterApi.requesttoken();
-		}else if(externalNetwork == ExternalNetwork.Tumblr){
+		} else if (externalNetwork == ExternalNetwork.Tumblr) {
 			SocialAPI socialApi = SocialAPIFactory
 					.createTumblrProvider(identityDto.getRedirectUrl());
 			TumblrAPI tumblrApi = (TumblrAPI) socialApi;
 			requestToken = tumblrApi.requesttoken();
-		}else{
-			throw new NotImplementedException("ExternalNetwork is not supported");
+		} else {
+			throw new NotImplementedException(
+					"ExternalNetwork is not supported");
 		}
 		if (requestToken == null
 				|| requestToken.getAccessToken().equalsIgnoreCase(""))
@@ -301,7 +311,9 @@ public class UsersEndpoint {
 
 		ContactsDto contactsDto = new ContactsDto();
 		for (Contact contact : contacts) {
-			contactsDto.getContacts().add(DtoAssembler.assemble(contact));
+			Boolean isActive = ServiceFactory.getSocialService().IsActiveNetworkForUser(userId, ExternalNetwork.getNetworkById(contact.getExternalIdentity().getExternalNetwork()));
+			if(isActive)
+				contactsDto.getContacts().add(DtoAssembler.assemble(contact));
 		}
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(contactsDto)).build();
@@ -336,14 +348,17 @@ public class UsersEndpoint {
 						externalNetwork, identityDto.getExpiresIn());
 
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identity, identityDto);
+		sendActivatedMessage(user, identity, identityDto.getClientPlatformId());
 
+		ServiceFactory.getSocialService().setActiveNetworkForUser(userId, externalNetwork, true);
+		
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identity.get(0).getIdentityId(),userId);
+					.getBySocialIdentityId(identity.get(0).getIdentityId(),
+							userId);
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
@@ -421,15 +436,18 @@ public class UsersEndpoint {
 		}
 
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identiies, identityDto);
+		sendActivatedMessage(user, identiies, identityDto.getClientPlatformId());
 
+		ServiceFactory.getSocialService().setActiveNetworkForUser(userId, externalNetwork, true);
+		
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
 
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identiies.get(0).getIdentityId(),userId);
+					.getBySocialIdentityId(identiies.get(0).getIdentityId(),
+							userId);
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
@@ -548,83 +566,127 @@ public class UsersEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	// @Secure
 	public Response uploadFile(@PathParam("userId") Long userId,
-			MultipartFormDataInput input,
-			@HeaderParam("Content-Length") Long contentLength)
-			throws IOException {
+			@Context HttpServletRequest request) throws IOException {
 		String fileName = "";
-
-		Map<String, List<InputPart>> formParts = input.getFormDataMap();
-
-		List<InputPart> inPart = formParts.get("file");
 		RemoteAsset media = null;
-		for (InputPart inputPart : inPart) {
-			try {
-				// Retrieve headers, read the Content-Disposition header to
-				// obtain the original name of the file
-				MultivaluedMap<String, String> headers = inputPart.getHeaders();
-				//fileName = parseFileName(headers);
-				
+		// 50 MB size of memory
+		int maxMemorySize = ServiceFactory.getUserService().getMaxMemorySize(); 
+		// 500 MB size of file
+		long maxRequestSize = ServiceFactory.getUserService().getMaxFileSize();
 
-				long startTime = System.currentTimeMillis();
-				// Handle the body of that part with an InputStream
-				InputStream istream = inputPart
-						.getBody(InputStream.class, null);
-				
-				fileName = "sprocket_" + System.currentTimeMillis() + "." + inputPart.getMediaType().getSubtype();
-				log.debug(fileName);
-				
-				if (inputPart.getMediaType().getType().equals("image")) {
-					media = new Image.Builder().itemKey(fileName).build();
-				} else if (inputPart.getMediaType().getType().equals("audio")) {
-					media = new AudioTrack.Builder().itemKey(fileName).build();
-				} else if (inputPart.getMediaType().getType().equals("video")) {
-					media = new Video.Builder().itemKey(fileName).build();
-				} else 
-					throw new IllegalArgumentException("Unsupported media type");
-				
-				media.setInputStream(istream);
-				ServiceFactory.getMediaService().create(media);
-				long endTime = System.currentTimeMillis();
-				log.debug("media uploaded successfully:\n url:" + media.getUrl() + "\n upload time: " + (endTime - startTime) / 1000 + " seconds");
-				
+		String tempDir = ServiceFactory.getUserService().getFileRepository();
+		File tempDirectory = new File(tempDir);
+		// Create a factory for disk-based file items
+		// DiskFileItemFactory factory = new
+		// DiskFileItemFactory(maxMemorySize, tempDirectory);;
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+		// Set factory constraints
 
-			} catch (IOException e) {
-				e.printStackTrace();
+		factory.setSizeThreshold(maxMemorySize); // Set the size threshold,
+													// which content will be
+													// stored on memory.
+		factory.setRepository(tempDirectory); // set the temporary directory
+												// to store the uploaded
+												// files of size above
+												// threshold.
+
+		ServletFileUpload upload = new ServletFileUpload(factory);
+		upload.setSizeMax(maxRequestSize);
+		List<FileItem> items = null;
+		long startTime = System.currentTimeMillis();
+		try {
+			log.debug("Starting parsing file");
+			items = upload.parseRequest(request);
+			log.debug("Ending parsing file");
+		} catch (SizeLimitExceededException e) {
+			log.debug("File size exceeded the maximum limit");
+			throw new IllegalArgumentException(
+					"File size exceeded the maximum limit");
+		} catch (FileUploadException e) {
+			log.debug("Failed to Upload File");
+			throw new RuntimeException("Failed to Upload File");
+		}
+		
+		if (items != null) {
+			Iterator<FileItem> iter = items.iterator();
+			while (iter.hasNext()) {
+				FileItem item = iter.next();
+				if (!item.isFormField() && item.getSize() > 0) {
+					String fileExtension = item.getContentType().substring(
+							item.getContentType().lastIndexOf("/") + 1);
+					
+					fileName = new StringBuilder().append("sprocket").append("_")
+							.append(System.currentTimeMillis()).append(".")
+							.append(fileExtension).toString();
+					
+					log.debug(fileName);
+					
+					if (item.getContentType().contains("image")) {
+						media = new Image.Builder().itemKey(fileName).contentLength(item.getSize()).build();
+					} else if (item.getContentType().contains("audio")) {
+						media = new AudioTrack.Builder().itemKey(fileName).contentLength(item.getSize()).build();
+					} else if (item.getContentType().contains("video")) {
+						media = new Video.Builder().itemKey(fileName).contentLength(item.getSize()).build();
+					} else 
+						throw new IllegalArgumentException("Unsupported media type");
+					
+					media.setInputStream(item.getInputStream());
+					ServiceFactory.getMediaService().create(media);
+					long endTime = System.currentTimeMillis();
+					
+					log.info("media uploaded successfully:\n url:" + media.getUrl() + "\n upload time: " + (endTime - startTime) / 1000 + " seconds");
+					
+				}
 			}
 
-		}
+			String output = "{\"url\":\"" + media.getUrl() + "\"}";
 
-		String output = "{\"url\":\"" + media.getUrl() + "\"}";
+			return Response.status(200).entity(output).build();
+		} else
+			throw new IllegalArgumentException("No file found");
 
-		return Response.status(200).entity(output).build();
 	}
+	
+	/***
+	 * This end point forces synchronization for specific external network
+	 * @param userId
+	 * @param payload
+	 * @return
+	 * @throws IOException
+	 */
+	@POST
+	@Path("/{userId}/synced")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response sync(@PathParam("userId") Long userId,
+			InputStream payload) throws IOException {
 
-	// Parse Content-Disposition header to get the original file name
-	private String parseFileName(MultivaluedMap<String, String> headers) {
+		// convert payload
+		SyncDto syncDto = jsonConverter.convertFromPayload(payload, SyncDto.class);
 
-		String[] contentDispositionHeader = headers.getFirst(
-				"Content-Disposition").split(";");
+		ClientPlatform clientPlatform = ClientPlatform.getEnum(syncDto.getClientPlatformId());
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(syncDto.getExternalNetworkId());
+		
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, externalNetwork);
+		
+		User user = new User(userId);
+		
+		List<ExternalIdentity> identities = new LinkedList<ExternalIdentity>();
+		identities.add(identity);
+		// now send the message activated message to cache invalidate
+		sendActivatedMessage(user, identities, clientPlatform.ordinal());
 
-		for (String name : contentDispositionHeader) {
-
-			if ((name.trim().startsWith("filename"))) {
-
-				String[] tmp = name.split("=");
-
-				String fileName = tmp[1].trim().replaceAll("\"", "");
-
-				return fileName;
-			}
-		}
-		return "randomName";
+		return Response.ok().build();
+		
 	}
-
+	
 	private void sendActivatedMessage(User user,
-			List<ExternalIdentity> identities, IdentityDto identityDto)
+			List<ExternalIdentity> identities, Integer clientPlatformId)
 			throws IOException {
 		for (ExternalIdentity identity : identities) {
 			ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
-					.clientPlatformId(identityDto.getClientPlatformId())
+					.clientPlatformId(clientPlatformId)
 					.userId(user.getUserId())
 					.identityId(identity.getIdentityId()).build();
 
