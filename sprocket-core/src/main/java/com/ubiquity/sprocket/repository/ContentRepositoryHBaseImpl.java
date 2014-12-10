@@ -51,8 +51,6 @@ public class ContentRepositoryHBaseImpl extends BaseRepositoryHBaseImpl <Content
 		try {
 			Get get = new Get(Bytes.toBytes(key.toString()));
 			get.addFamily(Bytes.toBytes(HBaseSchema.ColumnFamilies.ATTRIBUTES));
-			get.addFamily(Bytes.toBytes(HBaseSchema.ColumnFamilies.HISTORY));
-
 			return assembleContentFromGet(key, get);
 
 		} finally {
