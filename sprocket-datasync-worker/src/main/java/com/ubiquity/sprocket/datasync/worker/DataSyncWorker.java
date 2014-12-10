@@ -34,6 +34,7 @@ import com.ubiquity.sprocket.service.ServiceFactory;
 
 public class DataSyncWorker {
 
+	
 	private static final int DEFAULT_NUM_CONSUMERS = 10;
 	protected static Logger log = LoggerFactory.getLogger(DataSyncWorker.class);
 

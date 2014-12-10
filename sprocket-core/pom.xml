@@ -10,7 +10,7 @@
 	<artifactId>sprocket-core</artifactId>
 	<name>Sprocket Core</name>
 
-	<version>0.2.3</version>
+	<version>0.2.4</version>
 
 	<build>
 
@@ -65,9 +65,9 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-integration</artifactId>
-			<version>0.1.50</version>
+			<version>0.1.51</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.hbase</groupId>
 			<artifactId>hbase-client</artifactId>
@@ -84,12 +84,24 @@
 			<groupId>com.niobium</groupId>
 			<artifactId>niobium-amqp</artifactId>
 			<version>0.2.3</version>
+			<exclusions>
+			   <exclusion>
+			    <artifactId>logback-classic</artifactId>
+			    <groupId>ch.qos.logback</groupId>
+			   </exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
 			<groupId>com.niobium</groupId>
 			<artifactId>niobium-data-access</artifactId>
 			<version>0.9.4</version>
+			<exclusions>
+			   <exclusion>
+			    <artifactId>logback-classic</artifactId>
+			    <groupId>ch.qos.logback</groupId>
+			   </exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -122,10 +134,10 @@
 			<artifactId>spark-core_2.10</artifactId>
 			<version>1.0.1</version>
 			<exclusions>
-			  <exclusion>
-			    <artifactId>hadoop-client</artifactId>
-			    <groupId>org.apache.hadoop</groupId>
-			  </exclusion>
+				<exclusion>
+					<artifactId>hadoop-client</artifactId>
+					<groupId>org.apache.hadoop</groupId>
+				</exclusion>
 				<exclusion>
 					<artifactId>jets3t</artifactId>
 					<groupId>net.java.dev.jets3t</groupId>
@@ -138,10 +150,6 @@
 			<artifactId>spark-mllib_2.10</artifactId>
 			<version>1.0.1</version>
 		</dependency>
-
-	
-
-
 
 
 		<!-- testing -->
