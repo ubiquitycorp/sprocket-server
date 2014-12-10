@@ -11,6 +11,7 @@
 				<hibernate.debug>true</hibernate.debug>
 				<solr.api.host>localhost</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
+				<sprocket.network.api.host>http://localhost/sprocket-network-api</sprocket.network.api.host>
 				<social.twitter.app.consumerKey>eIxhGVt1wo8yNs7cTq0mNHsi0
 				</social.twitter.app.consumerKey>
 				<social.twitter.app.consumerSecret>qBTsSTelIlh0Lq4ILPlxgeTfhKk1GR8uetrlgaGExNulfxx37n
@@ -131,6 +132,7 @@
 				<hibernate.debug>false</hibernate.debug>
 				<solr.api.host>localhost</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
+				<sprocket.network.api.host>http://localhost/sprocket-network-api</sprocket.network.api.host>
 				<social.twitter.app.consumerKey>eIxhGVt1wo8yNs7cTq0mNHsi0
 				</social.twitter.app.consumerKey>
 				<social.twitter.app.consumerSecret>qBTsSTelIlh0Lq4ILPlxgeTfhKk1GR8uetrlgaGExNulfxx37n
@@ -249,6 +251,7 @@
 				<hibernate.debug>false</hibernate.debug>
 				<solr.api.host>54.219.144.172</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
+				<sprocket.network.api.host>http://localhost/sprocket-network-api</sprocket.network.api.host>
 				<social.twitter.app.consumerKey>f5cMrdDfL4mxP1eaUOwAvUtfJ
 				</social.twitter.app.consumerKey>
 				<social.twitter.app.consumerSecret>Z7Q61m3kHejh09muK0aX97Ed1baamdF70svowkM2nKLYvh6EYp
