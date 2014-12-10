@@ -121,7 +121,7 @@ public class DatabaseSeed {
 		LocationService locationService = ServiceFactory.getLocationService();
 
 		List<String> neighborhoods = IOUtils.readLines(this.getClass()
-				.getResourceAsStream("/neighborhoods.txt"), "UTF-8");
+				.getResourceAsStream("/neighborhoods_swiss.txt"), "UTF-8");
 
 		// strip
 		Place currentCity = null;
@@ -146,7 +146,7 @@ public class DatabaseSeed {
 						e1.printStackTrace();
 					}
 					currentCity = locationService.getOrCreatePlaceByName(city,
-							locator, null, "locality");
+							locator, "ca", null, "locality");
 
 				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
@@ -158,8 +158,6 @@ public class DatabaseSeed {
 					if (currentCity == null)
 						continue;
 
-					
-
 					try {
 						Thread.sleep(200l);
 					} catch (InterruptedException e1) {
@@ -170,7 +168,7 @@ public class DatabaseSeed {
 					// if place is not null, get the neighborhood
 					String description = neighborhood + ", " + locator;
 					Place place = locationService.getOrCreatePlaceByName(
-							neighborhood, description, null, new String[] {
+							neighborhood, description, "ch", null, new String[] {
 									"neighborhood", "locality" });
 					if (place == null) {
 						log.info(

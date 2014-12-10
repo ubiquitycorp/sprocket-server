@@ -16,11 +16,6 @@
 		
 		<class>com.ubiquity.sprocket.domain.RecommendedActivity</class>
 		<class>com.ubiquity.sprocket.domain.RecommendedVideo</class>
-
-		<class>com.ubiquity.sprocket.domain.EngagedVideo</class>
-		<class>com.ubiquity.sprocket.domain.EngagedActivity</class>
-		<class>com.ubiquity.sprocket.domain.EngagedDocument</class>
-		<class>com.ubiquity.sprocket.domain.EngagedItem</class>
 		
 		<class>com.ubiquity.sprocket.domain.FavoritePlace</class>
 		<class>com.ubiquity.sprocket.domain.FavoriteItem</class>
@@ -37,7 +32,11 @@
 		<class>com.ubiquity.integration.domain.Interest</class>
 		<class>com.ubiquity.integration.domain.Activity</class>
 		<class>com.ubiquity.integration.domain.Event</class>
+		<class>com.ubiquity.integration.domain.Comment</class>
+		<class>com.ubiquity.integration.domain.UnmappedInterest</class>
 
+		<class>com.ubiquity.sprocket.domain.Configuration</class>
+		
 		<properties>
 
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
@@ -50,18 +49,11 @@
 			<property name="hibernate.transaction.flush_before_completion"
 				value="true" />
 
-
 			<!-- Connection Pooling settings -->
-			
-		
-			
-		<property name="hibernate.connection.provider_class"
+			<property name="hibernate.connection.provider_class"
 				value="com.niobium.repository.jpa.provider.BoneCPConnectionProvider" />
-			<property name="bonecp.idleConnectionTestPeriodInMinutes"
-				value="2" />
-			<property name="bonecp.maxConnectionAgeInSeconds" value="25000" />
-			<property name="bonecp.connectionTimeoutInMs" value="3000" />
-
+			<property name="bonecp.idleConnectionTestPeriodInMinutes" value="1" />
+			<property name="bonecp.connectionTestStatement" value="select 1"/>
 			<property name="bonecp.partitionCount" value="3" />
 			<property name="bonecp.maxConnectionsPerPartition" value="10" />
 			<property name="bonecp.minConnectionsPerPartition" value="5" />
@@ -70,7 +62,7 @@
 			<property name="bonecp.closedConnectionWatch" value="true" />
 			
 			<property name="bonecp.statementsCacheSize" value="100" />
-
+			
 			<property name="hibernate.hbm2ddl.auto" value="${hibernate.schema.auto}" />
  
 

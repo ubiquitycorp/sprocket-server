@@ -1,0 +1,47 @@
+DE619: We had an issue with the build server that was due to the repositories
+getting too large and unwieldy, causing the createrepo to take forever. In
+addition, rather than running createrepo every 5-10-20 minutes, we modified
+the jenkins configuration to have it run automatically on demand at the end
+of a jenkins build.
+
+I have a defect filed in addition that requests a two week pruning of the build
+server.  I will work on that today.
+
+US528:TA2035: This is a general "catch-all" that covers getting the sprocket
+environment up and running in the swisscom cloud.
+
+US528:TA2036: I will work on this tonight. This is a howto showing start
+to finish how to get the swisscom cloud up and running to its current state,
+which is slightly off nominal but may be small application-related issues that
+I am not an expert on.
+
+US528:TA2139 and TA2140: I branched the repo from develop last week, so we 
+have a modified settings.xml for both sprocket-server and sprocket-web that
+point to the servers.  These do not take advantage of load balancing at this
+time but we can work on that later, after the demo.
+
+US528:TA2141: Each instance in the swisscom cloud is now aware of the RDS
+instance and can reference the database at mysql://sprocket-rds:3306.  There
+appear to be issues with jdbc that are beyond the realm of my knowledge that
+are affecting its ability to connect, but that may be an app issue.
+
+US528:TA2142: This is complete.
+
+US528:TA2143: Sprocket-web definitely works but there are issues with the
+application connection that manifest as timeouts.  I sent these to Chris to
+get his help
+
+US528:TA2156: This is waiting for Chris to parameterize the build_server module
+and there are still some other items that I have to back into the puppet
+configuration for the build server.
+
+US528:TA2157: This is complete.  Ping tests work and respond with the pong
+message.
+
+US528:TA2159: I work on this and TA2036 tonight and have them into the wiki
+soon.
+
+US528:TA2160: This is complete.  The database now gets its sprocketusr
+account created and permissions granted from a puppet script that runs.
+
+US528:TA2188: This is waiting for Chris

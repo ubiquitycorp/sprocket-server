@@ -11,12 +11,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
-import com.ubiquity.social.repository.ActivityRepositoryTest;
-import com.ubiquity.social.repository.MessageRepositoryTest;
-import com.ubiquity.sprocket.repository.EngagedItemRepositoryTest;
-import com.ubiquity.sprocket.repository.SocialRepositoryTest;
-import com.ubiquity.sprocket.repository.UserRepositoryTest;
-import com.ubiquity.sprocket.repository.VideoContentRepositoryTest;
+import com.ubiquity.sprocket.service.AnalyticsServiceTest;
 
 /***
  * Test suite will ensure that the integration tests have their dependencies met and cleaned up
@@ -24,16 +19,10 @@ import com.ubiquity.sprocket.repository.VideoContentRepositoryTest;
  * @author chris
  *
  */
-@RunWith(Suite.class)
 @Ignore
+@RunWith(Suite.class)
 @SuiteClasses({ 
-	SocialRepositoryTest.class, 
-	UserRepositoryTest.class, 
-	ActivityRepositoryTest.class, 
-	MessageRepositoryTest.class,
-	VideoContentRepositoryTest.class,
-	EngagedItemRepositoryTest.class,
-	VideoContentRepositoryTest.class
+	AnalyticsServiceTest.class
 	})
 public class IntegrationTestSuite {
 	

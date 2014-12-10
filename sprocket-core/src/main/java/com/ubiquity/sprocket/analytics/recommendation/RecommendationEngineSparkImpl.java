@@ -11,18 +11,18 @@ import java.util.UUID;
 import org.apache.commons.configuration.Configuration;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.mllib.clustering.KMeans;
 import org.apache.spark.mllib.clustering.KMeansModel;
 import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.mllib.linalg.Vectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ubiquity.sprocket.domain.GroupMembership;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.location.domain.UserLocation;
+import com.ubiquity.sprocket.domain.GroupMembership;
+import com.ubiquity.sprocket.domain.Profile;
 
 public class RecommendationEngineSparkImpl implements RecommendationEngine {
 
@@ -62,31 +62,31 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 	@Override
 	public void updateProfileRecords(List<Profile> profiles) {
 
-		// divide up the profiles by context; this will serve as the sharding strategy moving forward;
-		// each context will have easy access to the main profile data
-		for(Profile profile : profiles) {
-			for(Contact contact : profile.getContacts()) {
-				ExternalNetwork network = ExternalNetwork.getNetworkById(contact.getExternalIdentity().getExternalNetwork());
-				ExecutionContext context = contextMap.get(network.toString());
-				if(context == null)
-					continue;
-				context.bufferProfileRecord(profile);
-				
-				// now duplicate for global context (we'll be changing this soon)
-				context = contextMap.get(GLOBAL_CONTEXT_IDENTIFIER);
-				context.bufferProfileRecord(profile);
-				
-			}
-		}
-		
-		// now commit all buffers
-		for(String key : contextMap.keySet()) {
-			ExecutionContext context = contextMap.get(key);
-			context.commitProfileBufferToDataStore();
-		}
-		// now duplicate for root
-		ExecutionContext context = contextMap.get(GLOBAL_CONTEXT_IDENTIFIER);
-		context.commitProfileBufferToDataStore();
+//		// divide up the profiles by context; this will serve as the sharding strategy moving forward;
+//		// each context will have easy access to the main profile data
+//		for(Profile profile : profiles) {
+//			for(Contact contact : profile.getContacts()) {
+//				ExternalNetwork network = ExternalNetwork.getNetworkById(contact.getExternalIdentity().getExternalNetwork());
+//				ExecutionContext context = contextMap.get(network.toString());
+//				if(context == null)
+//					continue;
+//				context.bufferProfileRecord(profile);
+//				
+//				// now duplicate for global context (we'll be changing this soon)
+//				context = contextMap.get(GLOBAL_CONTEXT_IDENTIFIER);
+//				context.bufferProfileRecord(profile);
+//				
+//			}
+//		}
+//		
+//		// now commit all buffers
+//		for(String key : contextMap.keySet()) {
+//			ExecutionContext context = contextMap.get(key);
+//			context.commitProfileBufferToDataStore();
+//		}
+//		// now duplicate for root
+//		ExecutionContext context = contextMap.get(GLOBAL_CONTEXT_IDENTIFIER);
+//		context.commitProfileBufferToDataStore();
 	}
 
 	@Override
@@ -202,7 +202,8 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 			String groupIdentifier = String.valueOf(idx);
 
 			// only create a membership assignment for a registered user
-			return new GroupMembership(profile.getUser(), groupIdentifier);
+			//return new GroupMembership(profile.getUser(), groupIdentifier);
+			return null;
 		}
 
 		
@@ -232,24 +233,24 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 
 		protected void train() {
 			
-			if(context != null)
-				points = distData.map(new ContactFunction(context, dimensions));
-			else 
-				points = distData.map(new ProfileFunction(dimensions));
-
-			log.info("points {} for context {},", points.count(), context);
-			
-			// build model based on what's in the instance space now, with k
-			// determined as the rule of thumb
-			long k = Math.round(Math.sqrt(points.count() / (double) 2));
-
-			if(points.count() < k)
-				throw new IllegalArgumentException("Cannot train a model with number of points less than or equal to value k, context: " + context);
-			
-			model = KMeans.train(points.rdd(), (int) k, kMeansMaxIterations, 1,
-					KMeans.K_MEANS_PARALLEL());
-			
-			log.info("cluster centers {},", model.clusterCenters());
+//			if(context != null)
+//				points = distData.map(new ContactFunction(context, dimensions));
+//			else 
+//				points = distData.map(new ProfileFunction(dimensions));
+//
+//			log.info("points {} for context {},", points.count(), context);
+//			
+//			// build model based on what's in the instance space now, with k
+//			// determined as the rule of thumb
+//			long k = Math.round(Math.sqrt(points.count() / (double) 2));
+//
+//			if(points.count() < k)
+//				throw new IllegalArgumentException("Cannot train a model with number of points less than or equal to value k, context: " + context);
+//			
+//			model = KMeans.train(points.rdd(), (int) k, kMeansMaxIterations, 1,
+//					KMeans.K_MEANS_PARALLEL());
+//			
+//			log.info("cluster centers {},", model.clusterCenters());
 
 
 			
@@ -296,15 +297,16 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 
 	@Override
 	public List<GroupMembership> assign(Profile profile, ExternalNetwork context) {
-		ExecutionContext executionContext = getExecutionContext(context);
-		if (executionContext == null)
-			throw new IllegalArgumentException("No context: " + context);
-		// make sure the user has a profile for this context; if not, return an empty assignment list
-		Contact contact = profile.getContactForExternalNetwork(context);
-		if(contact == null)
-			return new LinkedList<GroupMembership>();
-		return Arrays.asList(new GroupMembership[] { executionContext.assign(contact,
-				profile.getUser(), profile.getLocation()) });
+//		ExecutionContext executionContext = getExecutionContext(context);
+//		if (executionContext == null)
+//			throw new IllegalArgumentException("No context: " + context);
+//		// make sure the user has a profile for this context; if not, return an empty assignment list
+//		Profile identity = profile.getIdentityForExternalNetwork(context);
+//		if(identity == null)
+//			return new LinkedList<GroupMembership>();
+//		return Arrays.asList(new GroupMembership[] { executionContext.assign(profile,
+//				profile.getUser(), profile.getLocation()) });
+		return null;
 	}
 
 }

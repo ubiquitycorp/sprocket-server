@@ -9,6 +9,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ConfigurationDto;
 import com.ubiquity.sprocket.service.ClientConfigurationService;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -26,8 +27,7 @@ public class ClientEndpoint {
 		ClientConfigurationService configurationService = ServiceFactory.getClientConfigurationService();
 		results.getServices().putAll(
 				configurationService.getServices());
-		results.getRules().putAll(
-				configurationService.getRules());
+		results.setRules(DtoAssembler.assembleConfigurationList(configurationService.getRules()));
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(results))
 				.build();

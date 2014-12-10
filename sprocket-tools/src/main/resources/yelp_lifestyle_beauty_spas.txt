@@ -1,0 +1,29 @@
+Hair Salons
+	barbers
+	hair_extensions
+	hair
+	blowoutservices
+	hairstylists
+	menshair
+	othersalons
+Spas
+	spas
+	eroticmassage
+	hairremoval
+	laser_hair_removal
+	waxing
+	massage
+	medicalspa
+	rolfing
+	tanning
+	spraytanning
+	tanningbeds
+Skin
+	cosmetics
+	eyelashservice
+	makeupartists
+	perfume
+	permanentmakeup
+	piercing
+	skincare
+	tattoo

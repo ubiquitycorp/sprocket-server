@@ -16,12 +16,6 @@
 		
 		<class>com.ubiquity.sprocket.domain.RecommendedActivity</class>
 		<class>com.ubiquity.sprocket.domain.RecommendedVideo</class>
-
-		<class>com.ubiquity.sprocket.domain.EngagedVideo</class>
-		<class>com.ubiquity.sprocket.domain.EngagedActivity</class>
-		<class>com.ubiquity.sprocket.domain.EngagedDocument</class>
-		<class>com.ubiquity.sprocket.domain.EngagedItem</class>
-		
 		<class>com.ubiquity.sprocket.domain.FavoritePlace</class>
 		<class>com.ubiquity.sprocket.domain.FavoriteItem</class>
 		
@@ -37,6 +31,8 @@
 		<class>com.ubiquity.integration.domain.Interest</class>
 		<class>com.ubiquity.integration.domain.Activity</class>
 		<class>com.ubiquity.integration.domain.Event</class>
+		<class>com.ubiquity.integration.domain.Comment</class>
+		<class>com.ubiquity.integration.domain.UnmappedInterest</class>
 
 		<properties>
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />

@@ -58,6 +58,30 @@ public class AnalyticsEndpoint {
 				.entity(jsonConverter.convertToPayload(interestsDto))
 				.build();
 	}
+
+	@GET
+	@Path("users/{userId}/providers/{externalNetworkId}/externalinterests")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response externalInterests(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+
+		InterestsDto interestsDto = new InterestsDto();
+		
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
+		CollectionVariant<Interest> variant = ServiceFactory.getAnalyticsService().findInterestsByExternalNetworkId(externalNetwork, ifModifiedSince);
+		// Throw a 304 if if there is no variant (no change)
+//		if (variant == null)
+//			return Response.notModified().build();
+		
+		
+		for(Interest interest : variant.getCollection())
+			interestsDto.getInterests().add(DtoAssembler.assemble(interest));
+		
+		return Response.ok()
+				//.header("Last-Modified", variant.getLastModified())
+				.entity(jsonConverter.convertToPayload(interestsDto))
+				.build();
+	}
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/activities/recommended")
 	@Produces(MediaType.APPLICATION_JSON)

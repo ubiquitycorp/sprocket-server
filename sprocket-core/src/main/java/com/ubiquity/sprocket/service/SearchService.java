@@ -1,5 +1,6 @@
 package com.ubiquity.sprocket.service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,9 +27,6 @@ import com.ubiquity.integration.domain.Network;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.integration.service.ExternalIdentityService;
 import com.ubiquity.location.domain.Place;
-import com.ubiquity.location.domain.UserLocation;
-import com.ubiquity.location.repository.UserLocationRepository;
-import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchEngine;
@@ -126,12 +124,13 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_OWNER_ID, ownerId); 
 
 			// contact, add image if we have one
-			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_DISPLAY_NAME, activity.getPostedBy().getDisplayName());
-			document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_IDENTIFIER, activity.getPostedBy().getExternalIdentity().getIdentifier());
-			Image thumb = activity.getPostedBy().getImage();
-			if(thumb != null)
-				document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_THUMBNAIL, activity.getPostedBy().getImage().getUrl());
-			
+			if(activity.getPostedBy() != null){
+				document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_DISPLAY_NAME, activity.getPostedBy().getDisplayName());
+				document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_IDENTIFIER, activity.getPostedBy().getExternalIdentity().getIdentifier());
+				Image thumb = activity.getPostedBy().getImage();
+				if(thumb != null)
+					document.getFields().put(SearchKeys.Fields.FIELD_CONTACT_THUMBNAIL, thumb.getUrl());
+			}
 			// content fields
 			document.getFields().put(SearchKeys.Fields.FIELD_BODY, activity.getBody());
 			document.getFields().put(SearchKeys.Fields.FIELD_TITLE, activity.getTitle());
@@ -140,12 +139,15 @@ public class SearchService {
 			// if it's a video, set the url and thumbnail to the video url and image respectively
 			if(type == ActivityType.VIDEO) {
 				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getVideo().getUrl());
+				document.getFields().put(SearchKeys.Fields.FIELD_EMBED_CODE, activity.getVideo().getEmbedCode());
 				// use image as thumb
 				if(activity.getImage() != null)
 					document.getFields().put(SearchKeys.Fields.FIELD_THUMBNAIL, activity.getImage().getUrl());
 			} else if(type == ActivityType.PHOTO) {
 				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getImage().getUrl());
 			} else if(type == ActivityType.LINK) {
+				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getLink());
+			}	else if(type == ActivityType.EMBEDEDHTML) {
 				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getLink());
 			}
 
@@ -154,6 +156,9 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, activity.getExternalNetwork().ordinal());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_IDENTIFIER, activity.getExternalIdentifier());
 			document.getFields().put(SearchKeys.Fields.FIELD_DATE, activity.getCreationDate());
+			document.getFields().put(SearchKeys.Fields.FIELD_COMMENTNUM, activity.getCommentsNum());
+			if(activity.getRating() !=null)
+				document.getFields().put(SearchKeys.Fields.FIELD_RATING_NUM_RATING, activity.getRating().getNumRatings());
 			
 			if(isEngaged){
 				clicks = searchEngine.findClicksById(id);
@@ -241,7 +246,7 @@ public class SearchService {
 	 * @param externalNetwork
 	 * @return
 	 */
-	public List<Document> searchLiveDocuments(String searchTerm, User user, ExternalNetwork externalNetwork, Integer page) {
+	public List<Document> searchLiveDocuments(String searchTerm, User user, ExternalNetwork externalNetwork, Integer page,BigDecimal longitude, BigDecimal latitude,String locator) {
 
 		// normalize page
 		page = page == null ? 1 : page;
@@ -271,16 +276,19 @@ public class SearchService {
 			documents = wrapEntitiesInDocuments(videoContent);
 		}else {
 			// if content, search videos
+			
 			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(externalNetwork, ClientPlatform.WEB);
-			UserLocationRepository repo = new UserLocationRepositoryJpaImpl();
-			UserLocation location = repo.findByUserId(user.getUserId());
-			if(location!= null)
+//			UserLocationRepository repo = new UserLocationRepositoryJpaImpl();
+//			UserLocation location = repo.findByUserId(user.getUserId());
+//			if(location!= null)
+//			{
+			if(longitude != null && latitude != null)
 			{
-				List<Place> places = placeAPI.searchPlacesWithinPlace(searchTerm, location.getNearestPlace(), null, page, resultsLimit>20?20:resultsLimit);			
+				List<Place> places = placeAPI.searchPlacesWithLongAndLatAndLocator(searchTerm, longitude,latitude,locator, null, page, resultsLimit>20?20:resultsLimit);			
 				documents = wrapEntitiesInDocuments(places);
 			}
 			else{
-				throw new IllegalArgumentException("User doesn't set his location yet");
+				throw new IllegalArgumentException("longitude/latitude can't be null");
 			}
 		}
 

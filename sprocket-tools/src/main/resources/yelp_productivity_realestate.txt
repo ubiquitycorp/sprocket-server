@@ -1,0 +1,12 @@
+Housing
+	apartments
+	realestateagents
+	mortgagebrokers
+	realestatesvcs
+	university_housing
+Commercial
+	homestaging
+	commercialrealestate
+	kitchenincubators
+	propertymgmt
+	sharedofficespaces

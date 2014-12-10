@@ -2,19 +2,24 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
+import org.apache.http.HttpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,16 +28,22 @@ import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.Captcha;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Message;
 import com.ubiquity.integration.domain.PostActivity;
+import com.ubiquity.integration.domain.PostComment;
+import com.ubiquity.integration.domain.PostVote;
 import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
+import com.ubiquity.sprocket.api.dto.model.PostActivityDto;
+import com.ubiquity.sprocket.api.dto.model.PostCommentDto;
+import com.ubiquity.sprocket.api.dto.model.PostVoteDto;
 import com.ubiquity.sprocket.api.dto.model.SendMessageDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
@@ -47,51 +58,58 @@ public class SocialEndpoint {
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
-	
+
 	@POST
 	@Path("/users/{userId}/activities/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response engaged(@PathParam("userId") Long userId, InputStream payload) throws IOException {
+	public Response engaged(@PathParam("userId") Long userId,
+			InputStream payload) throws IOException {
 
 		// convert payload
-		ActivitiesDto activitiesDto = jsonConverter.convertFromPayload(payload, ActivitiesDto.class, EngagementValidation.class);
-		
-		for(ActivityDto activityDto : activitiesDto.getActivities()) {
+		ActivitiesDto activitiesDto = jsonConverter.convertFromPayload(payload,
+				ActivitiesDto.class, EngagementValidation.class);
+
+		for (ActivityDto activityDto : activitiesDto.getActivities()) {
 			log.debug("tracking activity {}", activityDto);
-			sendTrackAndSyncMessage(userId, activityDto);			
+			sendTrackAndSyncMessage(userId, activityDto);
 		}
 		return Response.ok().build();
 	}
-	
+
 	@GET
 	@Path("users/{userId}/providers/{socialNetworkId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response activities(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("delta") Boolean delta, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+	public Response activities(@PathParam("userId") Long userId,
+			@PathParam("socialNetworkId") Integer socialProviderId,
+			@HeaderParam("delta") Boolean delta,
+			@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		ActivitiesDto results = new ActivitiesDto();
 
-		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
+		ExternalNetwork socialNetwork = ExternalNetwork
+				.getNetworkById(socialProviderId);
 
-		CollectionVariant<Activity> variant = ServiceFactory.getSocialService().findActivityByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince,delta);
+		CollectionVariant<Activity> variant = ServiceFactory.getSocialService()
+				.findActivityByOwnerIdAndSocialNetwork(userId, socialNetwork,
+						ifModifiedSince, delta);
 
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
 			return Response.notModified().build();
-		
-		for(Activity activity : variant.getCollection()) {
+
+		for (Activity activity : variant.getCollection()) {
 			results.getActivities().add(DtoAssembler.assemble(activity));
 		}
 
-		return Response.ok()
-				.header("Last-Modified", variant.lastModified)
-				.entity(jsonConverter.convertToPayload(results))
-				.build();
+		return Response.ok().header("Last-Modified", variant.lastModified)
+				.entity(jsonConverter.convertToPayload(results)).build();
 	}
-	
+
 	/***
-	 * Returns list of activities which represents local news feed in specific provider 
-	 * based on last updated user's location in the system
+	 * Returns list of activities which represents local news feed in specific
+	 * provider based on last updated user's location in the system
+	 * 
 	 * @param userId
 	 * @param socialProviderId
 	 * @param ifModifiedSince
@@ -101,34 +119,42 @@ public class SocialEndpoint {
 	@Path("users/{userId}/providers/{socialNetworkId}/localfeed")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response getLocalFeed(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+	public Response getLocalFeed(@PathParam("userId") Long userId,
+			@PathParam("socialNetworkId") Integer socialProviderId,
+			@HeaderParam("If-Modified-Since") Long ifModifiedSince,
+			@HeaderParam("delta") Boolean delta) {
 		ActivitiesDto results = new ActivitiesDto();
 
-		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
+		ExternalNetwork socialNetwork = ExternalNetwork
+				.getNetworkById(socialProviderId);
 
-		UserLocation userLocation = ServiceFactory.getLocationService().getLocation(userId);
+		UserLocation userLocation = ServiceFactory.getLocationService()
+				.getLocation(userId);
 		// returns empty list if user has not set his location yet
-		if(userLocation == null)
-			return Response.ok().entity(jsonConverter.convertToPayload(results)).build();
-		
-		CollectionVariant<Activity> variant = ServiceFactory.getSocialService().findActivityByPlaceIdAndSocialNetwork(userLocation.getNearestPlace().getPlaceId(), socialNetwork, ifModifiedSince);
+		if (userLocation == null)
+			return Response.ok()
+					.entity(jsonConverter.convertToPayload(results)).build();
+
+		CollectionVariant<Activity> variant = ServiceFactory.getSocialService()
+				.findActivityByPlaceIdAndSocialNetwork(
+						userLocation.getNearestPlace().getPlaceId(),
+						socialNetwork, ifModifiedSince, delta);
 
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
 			return Response.notModified().build();
-		
-		for(Activity activity : variant.getCollection()) {
+
+		for (Activity activity : variant.getCollection()) {
 			results.getActivities().add(DtoAssembler.assemble(activity));
 		}
-		
-		return Response.ok()
-				.header("Last-Modified", variant.lastModified)
-				.entity(jsonConverter.convertToPayload(results))
-				.build();
+
+		return Response.ok().header("Last-Modified", variant.lastModified)
+				.entity(jsonConverter.convertToPayload(results)).build();
 	}
 
 	/***
 	 * This method returns messages of specific social network
+	 * 
 	 * @param userId
 	 * @param socialProviderId
 	 * @return
@@ -137,102 +163,271 @@ public class SocialEndpoint {
 	@Path("users/{userId}/providers/{socialNetworkId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response messages(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId, @HeaderParam("delta") Boolean delta, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
-		try
-		{
+	public Response messages(@PathParam("userId") Long userId,
+			@PathParam("socialNetworkId") Integer socialProviderId,
+			@HeaderParam("delta") Boolean delta,
+			@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+		try {
 			MessagesDto result = new MessagesDto();
-	
-			ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
-						 
-			CollectionVariant<Message> variant = ServiceFactory.getSocialService().findMessagesByOwnerIdAndSocialNetwork(userId, socialNetwork, ifModifiedSince, delta);
-			
-			
+
+			ExternalNetwork socialNetwork = ExternalNetwork
+					.getNetworkById(socialProviderId);
+
+			CollectionVariant<Message> variant = ServiceFactory
+					.getSocialService().findMessagesByOwnerIdAndSocialNetwork(
+							userId, socialNetwork, ifModifiedSince, delta);
+
 			// Throw a 304 if if there is no variant (no change)
 			if (variant == null)
 				return Response.notModified().build();
-			
-			
+
 			List<Message> messages = new LinkedList<Message>();
 			messages.addAll(variant.getCollection());
-			
-			// Assemble into message dto, constructing conversations if they are inherent in the data
+
+			// Assemble into message dto, constructing conversations if they are
+			// inherent in the data
 			List<MessageDto> conversations = DtoAssembler.assemble(messages);
 			Collections.sort(conversations, Collections.reverseOrder());
 			result.getMessages().addAll(conversations);
-			
+
 			return Response.ok()
 					.header("Last-Modified", variant.getLastModified())
-					.entity(jsonConverter.convertToPayload(result))
-					.build();
-		}finally 
-		{
+					.entity(jsonConverter.convertToPayload(result)).build();
+		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
 	}
+
 	/***
 	 * This method send message to specific user in social network
+	 * 
 	 * @param userId
 	 * @param externalNetworkId
 	 * @return
-	 * @throws org.jets3t.service.impl.rest.HttpException 
+	 * @throws org.apache.http.HttpException
 	 */
 	@POST
 	@Path("users/{userId}/providers/{externalNetworkId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response sendmessage(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
+	public Response sendmessage(@PathParam("userId") Long userId,
+			@PathParam("externalNetworkId") Integer externalNetworkId,
+			InputStream payload) throws org.apache.http.HttpException {
 
-		//Cast the input into SendMessageObject
-		SendMessageDto sendMessageDto = jsonConverter.convertFromPayload(payload, SendMessageDto.class);
-			
+		// Cast the input into SendMessageObject
+		SendMessageDto sendMessageDto = jsonConverter.convertFromPayload(
+				payload, SendMessageDto.class);
+
 		// load user
 		ServiceFactory.getUserService().getUserById(userId);
-		// get social network 
-		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
+		// get social network
+		ExternalNetwork socialNetwork = ExternalNetwork
+				.getNetworkById(externalNetworkId);
 		// get the identity from DB
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
-		
-		Contact contact = ServiceFactory.getContactService().getByContactId(sendMessageDto.getReceiverId());
-		
-		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
-		
-		ServiceFactory.getSocialService().sendMessage(identity,socialNetwork, contact, sendMessageDto.getReceiverName(), sendMessageDto.getText(), sendMessageDto.getSubject());
-	
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+				.findExternalIdentity(userId, socialNetwork);
+
+		Contact contact = ServiceFactory.getContactService().getByContactId(
+				sendMessageDto.getReceiverId());
+
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
+				identity);
+
+		ServiceFactory.getSocialService().sendMessage(identity, socialNetwork,
+				contact, sendMessageDto.getReceiverName(),
+				sendMessageDto.getText(), sendMessageDto.getSubject());
+
 		return Response.ok().build();
-			
+
 	}
-	
+
 	/***
 	 * This method send message to specific user in social network
+	 * 
+	 * @param userId
+	 * @param externalNetworkId
+	 * @return
+	 */
+	@POST
+	@Path("users/{userId}/providers/{externalNetworkId}/activities")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response postActivity(@PathParam("userId") Long userId,
+			@PathParam("externalNetworkId") Integer externalNetworkId,
+			InputStream payload) throws HttpException {
+
+		PostActivityDto postActivityDto = jsonConverter.convertFromPayload(
+				payload, PostActivityDto.class);
+
+		// Validate request parameters dependent on activity type
+		postActivityDto.validate();
+
+		// get social network
+		ExternalNetwork socialNetwork = ExternalNetwork
+				.getNetworkById(externalNetworkId);
+		// get the identity from DB
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+				.findExternalIdentity(userId, socialNetwork);
+
+		if (identity == null)
+			throw new IllegalArgumentException(
+					"User has no identity for this network");
+
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
+				identity);
+
+		// Prepare post activity object
+		PostActivity postActivity = new PostActivity.Builder()
+				.activityTypeId(postActivityDto.getActivityTypeId())
+				.title(postActivityDto.getTitle())
+				.body(postActivityDto.getBody())
+				.link(postActivityDto.getLink())
+				.embed(postActivityDto.getEmbed())
+				.pageId(postActivityDto.getPageId())
+				.captcha(postActivityDto.getCaptcha())
+				.captchaIden(postActivityDto.getCaptchaIden()).build();
+
+		ServiceFactory.getSocialService().postActivity(identity, socialNetwork,
+				postActivity);
+
+		return Response.ok().build();
+
+	}
+
+	/***
+	 * This method post comment to specific user in social network
+	 * 
 	 * @param userId
 	 * @param socialProviderId
 	 * @return
-	 * @throws org.jets3t.service.impl.rest.HttpException 
+	 * @throws org.jets3t.service.impl.rest.HttpException
 	 */
 	@POST
-	@Path("users/{userId}/providers/{socialNetworkId}/activities")
+	@Path("users/{userId}/providers/{socialNetworkId}/comment")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response postactivity(@PathParam("userId") Long userId, @PathParam("socialNetworkId") Integer socialProviderId,InputStream payload) throws org.jets3t.service.impl.rest.HttpException {
+	public Response postComment(@PathParam("userId") Long userId,
+			@PathParam("socialNetworkId") Integer socialProviderId,
+			InputStream payload)
+			throws org.jets3t.service.impl.rest.HttpException {
 
-		//Cast the input into SendMessageObject
-		PostActivity postActivity = jsonConverter.convertFromPayload(payload, PostActivity.class);
-				
+		// Cast the input into SendMessageObject
+		PostCommentDto postCommentDto = jsonConverter.convertFromPayload(
+				payload, PostCommentDto.class);
+
 		// load user
 		ServiceFactory.getUserService().getUserById(userId);
-		// get social network 
-		ExternalNetwork socialNetwork = ExternalNetwork.getNetworkById(socialProviderId);
+		// get social network
+		ExternalNetwork socialNetwork = ExternalNetwork
+				.getNetworkById(socialProviderId);
 		// get the identity from DB
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, socialNetwork);
-		
-		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
-		
-		ServiceFactory.getSocialService().PostActivity(identity, socialNetwork, postActivity);
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+				.findExternalIdentity(userId, socialNetwork);
+
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
+				identity);
+
+		PostComment postComment = DtoAssembler.assemble(postCommentDto);
+		ServiceFactory.getSocialService().postComment(identity, socialNetwork,
+				postComment);
 
 		return Response.ok().build();
-			
+
 	}
-	
+
+	@POST
+	@Path("users/{userId}/providers/{socialNetworkId}/vote")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response postVote(@PathParam("userId") Long userId,
+			@PathParam("socialNetworkId") Integer socialProviderId,
+			InputStream payload)
+			throws org.jets3t.service.impl.rest.HttpException {
+
+		// Cast the input into SendMessageObject
+		PostVoteDto postVoteDto = jsonConverter.convertFromPayload(payload,
+				PostVoteDto.class);
+
+		// load user
+		ServiceFactory.getUserService().getUserById(userId);
+		// get social network
+		ExternalNetwork socialNetwork = ExternalNetwork
+				.getNetworkById(socialProviderId);
+		// get the identity from DB
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+				.findExternalIdentity(userId, socialNetwork);
+
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
+				identity);
+
+		PostVote postComment = DtoAssembler.assemble(postVoteDto);
+
+		ServiceFactory.getSocialService().postVote(identity, socialNetwork,
+				postComment);
+
+		return Response.ok().build();
+
+	}
+
+	/***
+	 * This end point forces synchronization for specific external network
+	 * 
+	 * @param userId
+	 * @param payload
+	 * @return
+	 * @throws IOException
+	 */
+	@GET
+	@Path("users/{userId}/providers/{socialNetworkId}/captcha")
+	@Consumes(MediaType.APPLICATION_JSON)
+	// /@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	@Secure
+	public Response requestCaptcha(@PathParam("userId") Long userId,
+			@PathParam("socialNetworkId") Integer socialProviderId)
+			throws IOException {
+
+		ExternalNetwork externalNetwork = ExternalNetwork
+				.getNetworkById(socialProviderId);
+
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+				.findExternalIdentity(userId, externalNetwork);
+
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
+				identity);
+
+		Captcha captcha = ServiceFactory.getSocialService().requestCaptcha(
+				identity, externalNetwork);
+
+		
+		final byte[] image = captcha.getImage();
+
+		if (image != null) {
+			StreamingOutput stream = new StreamingOutput() {
+
+				public void write(OutputStream output) throws IOException,
+						WebApplicationException {
+					try {
+
+						output.write(image);
+					} catch (Exception e) {
+						throw new WebApplicationException(e);
+					}
+				}
+
+			};
+			return Response
+					.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
+					.header("content-disposition",
+							"attachment; filename=\"captcha."
+									+ captcha.getImageType() + "\"")
+					.header("captcha-identifier", captcha.getIdentifier())
+					.build();
+		}
+
+		return Response.ok().build();
+
+	}
+
 	/**
 	 * Drops a message for tracking this event
 	 * 
@@ -240,12 +435,17 @@ public class SocialEndpoint {
 	 * @param activityDto
 	 * @throws IOException
 	 */
-	private void sendTrackAndSyncMessage(Long userId, ActivityDto activityDto) throws IOException {
-		
+	private void sendTrackAndSyncMessage(Long userId, ActivityDto activityDto)
+			throws IOException {
+
 		Activity activity = DtoAssembler.assemble(activityDto);
-				
-		UserEngagedActivity messageContent = new UserEngagedActivity(userId, activity);
-		String message = MessageConverterFactory.getMessageConverter().serialize(new com.ubiquity.messaging.format.Message(messageContent));
+
+		UserEngagedActivity messageContent = new UserEngagedActivity(userId,
+				activity);
+		String message = MessageConverterFactory.getMessageConverter()
+				.serialize(
+						new com.ubiquity.messaging.format.Message(
+								messageContent));
 		byte[] bytes = message.getBytes();
 		MessageQueueFactory.getCacheInvalidationQueueProducer().write(bytes);
 	}

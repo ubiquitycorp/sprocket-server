@@ -6,9 +6,9 @@ import java.util.List;
 import javax.persistence.NoResultException;
 
 import org.apache.commons.configuration.Configuration;
+import org.gavaghan.geodesy.DistanceCalculator;
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
-import org.gavaghan.geodesy.DistanceCalculator;
 import org.gavaghan.geodesy.GlobalPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +17,8 @@ import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.cache.DataCacheKeys;
 import com.niobium.repository.cache.DataModificationCache;
 import com.niobium.repository.cache.DataModificationCacheRedisImpl;
+import com.niobium.repository.cache.UserDataModificationCache;
+import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.integration.api.PlaceAPI;
 import com.ubiquity.integration.api.PlaceAPIFactory;
@@ -49,9 +51,14 @@ public class LocationService {
 
 	private GeodeticCalculator geoCalculator;
 	private DataModificationCache dataModificationCache;
+	private UserDataModificationCache userLocationModificationCache;
 	
 	public LocationService(Configuration configuration) {
 		geoCalculator = new GeodeticCalculator();
+		
+		userLocationModificationCache = new UserDataModificationCacheRedisImpl(
+				configuration
+						.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_USER));
 		dataModificationCache = new DataModificationCacheRedisImpl(
 				configuration
 						.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GENERAL));
@@ -74,6 +81,8 @@ public class LocationService {
 	 */
 	public void updatePlace(Place place) {
 		try {
+			place.setLastUpdated(System.currentTimeMillis());
+			///place.ensureDefaults(); // needed when updating
 			EntityManagerSupport.beginTransaction();
 			new PlaceRepositoryJpaImpl().update(place);
 			EntityManagerSupport.commit();
@@ -139,7 +148,7 @@ public class LocationService {
 	 *             result
 	 * 
 	 */
-	public Place getOrCreatePlaceByName(String name, String locator, ExternalNetwork network, String[] granularity) {
+	public Place getOrCreatePlaceByName(String name, String locator, String region, ExternalNetwork network, String[] granularity) {
 		Place place = null;
 		try {
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
@@ -147,7 +156,7 @@ public class LocationService {
 			if(place == null) {
 				try {
 					List<Geobox> geobox = LocationConverter.getInstance()
-							.convertFromLocationDescription(locator, "en", granularity);
+							.convertFromLocationDescription(locator, region, granularity);
 					if (geobox.isEmpty())
 						return null;
 
@@ -156,7 +165,7 @@ public class LocationService {
 								"Unable to disambiguate input: " + name);
 
 					Geobox box = geobox.get(0);
-					place = new Place.Builder().locator(locator).name(name).boundingBox(box).region("us").lastUpdated(System.currentTimeMillis()).build();
+					place = new Place.Builder().externalNetwork(null).locator(locator).name(name).boundingBox(box).region(region).lastUpdated(System.currentTimeMillis()).build();
 
 					EntityManagerSupport.beginTransaction();
 					placeRepository.create(place);
@@ -191,8 +200,8 @@ public class LocationService {
 	 *             result
 	 * 
 	 */
-	public Place getOrCreatePlaceByName(String name, String description, ExternalNetwork network, String granularity) {
-		return getOrCreatePlaceByName(name, description, network, new String[] { granularity });
+	public Place getOrCreatePlaceByName(String name, String description, String region, ExternalNetwork network, String granularity) {
+		return getOrCreatePlaceByName(name, description, region, network, new String[] { granularity });
 	}
 
 
@@ -204,56 +213,64 @@ public class LocationService {
 
 			try {
 
+				int processed = 0;
 				PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
 				List<Place> places = placeRepository.findLastLevelWithoutNetwork(); // gets all neighborhoods
 				for(Place neighborhood : places) {
 					
-					// make sure we don't already have children
+					log.info("Synchronizing neighborhood {}", neighborhood.getName());
+					if(neighborhood.getLocator().contains(", CA")) 
+						continue;
+					
+					// check to see if we have something in the db already for this neighborhood....
 					if(!placeRepository.findChildrenForPlace(neighborhood).isEmpty()) {
-						log.info("skipping {} because we already processed it", neighborhood);
+						log.info("Found businsesses for neighborhood {}, skipping", neighborhood);
 						continue;
 					}
-					log.info("looking for yelp stuff in {}", neighborhood);
-
-					// skip cities
-					Place city = neighborhood.getParent();
-					if(city == null)
-						continue;
-
-					List<Place> businesses;
-
-					Integer page = 0;
+					
+					int page = 0;
 					Boolean paging = Boolean.TRUE;
-					try {
-						do {
+					do {
+						
+						List<Place> results =  null;
+						try {
 							page++;
-							businesses = placeAPI.searchPlacesWithinPlace("", neighborhood, null, page, 20);
-							for(Place business : businesses) {
-								log.info("business {}", business.getName());
-								Place persisted = placeRepository.getByLocatorAndExternalNetwork(business.getLocator(), network);
-								if(persisted == null) {
-
-									// for now just set city
-									business.setBoundingBox(city.getBoundingBox());
-									business.setParent(neighborhood);
-									if(!business.getTags().isEmpty()) {
-										List<ExternalInterest> mappings = new ExternalInterestRepositoryJpaImpl().findByNamesAndExternalNetwork(business.getTags(), network);
-										for(ExternalInterest mapping : mappings) {
-											business.getInterests().add(mapping.getInterest());
-										}
-									}
-
-									create(business);
-
-								} else {
-									log.info("we already have this business {}, skipping...", persisted.getName());
+							results = placeAPI.searchPlacesWithinPlace("", neighborhood, null, page, 20);
+						} catch (ExternalNetworkException e) {
+							paging = Boolean.FALSE;
+							continue;
+						}
+						// set paging control
+						for(Place business : results) {
+							
+							// check to see if we have a dupe
+							Place persisted = placeRepository.getByLocatorAndExternalNetwork(business.getLocator(), network);
+							if(persisted != null) {
+								log.info("already have this business {}, skipping persist...", persisted.getName());
+								continue;
+							}
+							
+							processed++;
+							if(!business.getTags().isEmpty()) {
+								// clear out tags in business
+								List<ExternalInterest> mappings = new ExternalInterestRepositoryJpaImpl().findByNamesAndExternalNetwork(business.getTags(), network);
+								for(ExternalInterest mapping : mappings) {
+									// interests hashcode/equals is set to interest id, so dupes won't be added, but this will effectively update the interest collection
+									business.getInterests().add(mapping.getInterest());
 								}
 							}
-						} while (paging);
-					} catch (ExternalNetworkException e) {
-						log.warn("Search produced an error", null, e);
-						paging = Boolean.FALSE;
-					}
+							
+							// update the place with location data that we've derived or augmented
+							business.setBoundingBox(null);
+							business.setParent(neighborhood);
+							business.setLastUpdated(System.currentTimeMillis());
+							create(business);
+						}
+					} while (paging);
+				
+
+					log.info("processed {}", processed);
+
 				}
 
 			} finally {
@@ -465,6 +482,20 @@ public class LocationService {
 	 */
 	public Place getPlaceByID(long placeID){
 		return new PlaceRepositoryJpaImpl().read(placeID);
+	}
+
+	public Boolean addUpdateLocationInCache(Long userId) {
+		String key = CacheKeys
+				.generateCacheKeyForPlaces(CacheKeys.UserProperties.LOCATION);
+		userLocationModificationCache.put(userId, key, System.currentTimeMillis());
+		return true;
+	}
+	
+	public Long checkUpdateLocationInProgress(Long userId) {
+		String key = CacheKeys
+				.generateCacheKeyForPlaces(CacheKeys.UserProperties.LOCATION);
+		return userLocationModificationCache.getLastModified(userId, key,null);
+		
 	}
 
 }
