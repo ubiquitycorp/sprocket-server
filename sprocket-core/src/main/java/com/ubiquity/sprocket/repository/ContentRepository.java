@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.niobium.repository.Repository;
 import com.ubiquity.sprocket.domain.Content;
+import com.ubiquity.sprocket.domain.ContentPK;
 import com.ubiquity.sprocket.domain.UserEngagement;
-import com.ubiquity.sprocket.repository.hbase.ContentPK;
 
 public interface ContentRepository extends Repository <ContentPK, Content>  {
 	

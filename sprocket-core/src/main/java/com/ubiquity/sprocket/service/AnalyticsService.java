@@ -16,6 +16,7 @@ import com.niobium.repository.cache.UserDataModificationCache;
 import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.lily.LilyRepositoryFactory;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.Contact;
@@ -36,8 +37,11 @@ import com.ubiquity.sprocket.domain.GroupMembership;
 import com.ubiquity.sprocket.domain.Profile;
 import com.ubiquity.sprocket.domain.RecommendedActivity;
 import com.ubiquity.sprocket.domain.RecommendedVideo;
+import com.ubiquity.sprocket.domain.factory.ProfileFactory;
 import com.ubiquity.sprocket.repository.GroupMembershipRepository;
 import com.ubiquity.sprocket.repository.GroupMembershipRepositoryJpaImpl;
+import com.ubiquity.sprocket.repository.ProfileRepository;
+import com.ubiquity.sprocket.repository.ProfileRepositoryHBaseImpl;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepository;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedVideoRepository;
@@ -56,7 +60,7 @@ public class AnalyticsService {
 	private UserDataModificationCache userDataModificationCache;
 	private DataModificationCache dataModificationCache;
 	private RecommendationEngine recommendationEngine;
-    private String namespace;
+   
 	
 	/***
 	 * Sets up repositories and data modification cache
@@ -87,19 +91,22 @@ public class AnalyticsService {
 		}
 	}
 
-	public Profile createProfile(User user) {
-//		ProfileRepository profileRepository = new ProfileRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
-//		Profile profile = new Profile.Builder().profileId(user.getUserId().toString()).build();
-//		profileRepository.create(profile);
-		return null;
+	public void createOrUpdateProfileIdentity(User user, ExternalIdentity identity) {
+		
 	}
 	
-	public void create(Profile profile) {
-//		ProfileRepository profileRepository = new ProfileRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
-//		profileRepository.create(profile);
+	public void createProfile(Profile profile) {
+		ProfileRepository profileRepository = new ProfileRepositoryHBaseImpl();
+		profileRepository.create(profile);
 	}
-	
+	public void createProfile(User user) {
+		ProfileRepository profileRepository = new ProfileRepositoryHBaseImpl();
+		Profile profile = ProfileFactory.createProfile(user);
+		profileRepository.create(profile);
+	}
+		
 	public void track(String searchTerm, User user) {
+		
 //		ProfileRepository profileRepository = new ProfileRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
 //		Profile profile = profileRepository.read(user.getUserId().toString());
 //		profile.getSearchHistory().add(searchTerm);
@@ -645,11 +652,7 @@ public class AnalyticsService {
 				-180.0, 180.0), 0.5));
 
 	}
-	
-	private void setUpLily(Configuration configuration) {
-		namespace = configuration.getString("hbase.sprocket.namespace");
-		LilyRepositoryFactory.initialize(configuration);
-	}
+
 	
 	public void resetInterestsLastModifiedCache() {
 		String key = CacheKeys

@@ -9,6 +9,7 @@ import com.ubiquity.integration.domain.Gender;
 import com.ubiquity.location.domain.Location;
 import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.sprocket.domain.Profile;
+import com.ubiquity.sprocket.domain.ProfilePK;
 
 public class TestProfileFactory {
 
@@ -27,7 +28,7 @@ public class TestProfileFactory {
 		
 		
 		Profile profile = new Profile.Builder()
-		.profileId("sprocket"+"-"+userId.toString())
+		.profileId(new ProfilePK(userId))
 		.gender(gender)
 		.userId(userId)
 		.ageRange(ageRange)
@@ -36,7 +37,7 @@ public class TestProfileFactory {
 
 		// build the profile with location
 		Profile identity = new Profile.Builder()
-		.profileId(network.name()+"-"+userId.toString())
+		.profileId(new ProfilePK(network, userId))
 		.gender(gender)
 		.userId(userId)
 		.externalIdentifier(UUID.randomUUID().toString())

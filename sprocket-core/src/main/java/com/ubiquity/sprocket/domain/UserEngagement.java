@@ -1,6 +1,5 @@
 package com.ubiquity.sprocket.domain;
 
-import com.ubiquity.sprocket.repository.hbase.ContentPK;
 
 /***
  * An entity tracking user engagement

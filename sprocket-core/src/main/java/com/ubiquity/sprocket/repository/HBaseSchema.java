@@ -36,6 +36,7 @@ public class HBaseSchema {
 		public static final String NAME 			= "name";
 		public static final String DESCRIPTION 		= "body";
 		public static final String PREFIX_ENGAGED 	= "engaged";
+		public static final String PREFIX_SEARCH_TERM = "search";
 	}
 	
 	private HBaseAdmin admin;

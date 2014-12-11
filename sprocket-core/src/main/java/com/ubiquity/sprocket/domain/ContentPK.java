@@ -1,4 +1,4 @@
-package com.ubiquity.sprocket.repository.hbase;
+package com.ubiquity.sprocket.domain;
 
 import java.io.Serializable;
 
@@ -8,7 +8,7 @@ public class ContentPK implements Serializable {
 	
 	private static final long serialVersionUID = -7198418161983794398L;
 
-	private static final String INTERNAL_NETWORK_NAME = "sprocket";
+	private static final String COMPOSITE_KEY_PREFIX_INTERNAL_NETWORK = "sprocket";
 
 	private ExternalNetwork externalNetwork;
 	private String identifier;
@@ -32,14 +32,14 @@ public class ContentPK implements Serializable {
 	
 	@Override
 	public String toString() {
-		return externalNetwork == null ? INTERNAL_NETWORK_NAME + "-" + identifier : externalNetwork.name() + "-" + identifier;
+		return externalNetwork == null ? COMPOSITE_KEY_PREFIX_INTERNAL_NETWORK + "-" + identifier : externalNetwork.name() + "-" + identifier;
 	}
 	
 	public static ContentPK fromString(String pk) {
 		String[] tokens = pk.split("-", 2); // take the first, the rest is the content
 		String network = tokens[0];
 		String identifier = tokens[1];
-		ExternalNetwork externalNetwork = network.equals(INTERNAL_NETWORK_NAME) ? null : ExternalNetwork.valueOfIgnoreCase(network);
+		ExternalNetwork externalNetwork = network.equals(COMPOSITE_KEY_PREFIX_INTERNAL_NETWORK) ? null : ExternalNetwork.valueOfIgnoreCase(network);
 		
 		return new ContentPK(externalNetwork, identifier);
 		

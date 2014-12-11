@@ -22,8 +22,8 @@ import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.location.domain.Place;
 import com.ubiquity.media.domain.Video;
 import com.ubiquity.sprocket.domain.Content;
+import com.ubiquity.sprocket.domain.ContentPK;
 import com.ubiquity.sprocket.domain.UserEngagement;
-import com.ubiquity.sprocket.repository.hbase.ContentPK;
 
 public class ContentRepositoryHBaseImpl extends BaseRepositoryHBaseImpl <Content> implements ContentRepository {
 

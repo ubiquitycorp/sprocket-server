@@ -78,11 +78,11 @@ public class AnalyticsServiceTest {
 				ExternalNetwork.Facebook, Gender.Female, new AgeRange(55, 65), -34.6131500, -58.3772300);
 		
 		// persist all of these records
-		analyticsService.create(jack);
-		analyticsService.create(john);
-		analyticsService.create(joe);
-		analyticsService.create(jill);
-		analyticsService.create(jane);
+		analyticsService.createProfile(jack);
+		analyticsService.createProfile(john);
+		analyticsService.createProfile(joe);
+		analyticsService.createProfile(jill);
+		analyticsService.createProfile(jane);
 
 		// create some public content
 		Content content = new Content.Builder()

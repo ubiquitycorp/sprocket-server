@@ -7,7 +7,6 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.location.domain.Place;
-import com.ubiquity.sprocket.repository.hbase.ContentPK;
 
 public class Content {
 
