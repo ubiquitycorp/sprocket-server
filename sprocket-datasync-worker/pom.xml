@@ -29,10 +29,6 @@
 				<filtering>true</filtering>
 			</resource>
 			<resource>
-                         <delimiters>
-                          <delimiter>${*}</delimiter>
-                          <delimiter>%{*}</delimiter>
-                         </delimiters>
 				<directory>rpm/bin</directory>
 				<filtering>true</filtering>
 			</resource>
