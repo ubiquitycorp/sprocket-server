@@ -11,7 +11,7 @@ SPROCKET_SMALL=1024
 SPROCKET_LARGE=2048
 SPROCKET_WORKER_MINFREE=4095
 SPROCKET_WORKER_NAME=/var/lib/java-services/sprocket-datasync-worker.jar
-NUM_PROCESSES=${datasyncworkerprocesses}
+NUM_PROCESSES=@datasyncworkerprocesses@
 if [ ! "${NUM_PROCESSES}" ]
 then
  NUM_PROCESSES=1
