@@ -51,9 +51,9 @@ public class MessageHandler extends Handler {
 		String threadName = Thread.currentThread().getName();
 		try {
 			SocialService socialService = ServiceFactory.getSocialService();
-
+			
 			synced = socialService.syncMessages(identity, network,
-					lastMessageIdentifier);
+					lastMessageIdentifier, processedMessages);
 
 			// add messages to search results
 			ServiceFactory.getSearchService().indexMessages(

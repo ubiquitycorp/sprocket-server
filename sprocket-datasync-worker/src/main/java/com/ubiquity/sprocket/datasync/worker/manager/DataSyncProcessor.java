@@ -47,8 +47,12 @@ public class DataSyncProcessor extends Thread {
 	private MessageConverter messageConverter = MessageConverterFactory
 			.getMessageConverter();
 
+	NotificationProcessor notificationProcessor;
+
+	private Logger log = LoggerFactory.getLogger(getClass());
+
 	Handler activityHandler;
-	
+
 	Set<ExternalNetwork> networksSupportActivities = EnumSet.of(
 			ExternalNetwork.Twitter, ExternalNetwork.Facebook,
 			ExternalNetwork.LinkedIn, ExternalNetwork.Tumblr,
@@ -72,32 +76,36 @@ public class DataSyncProcessor extends Thread {
 	 * @param to
 	 */
 	public DataSyncProcessor(List<User> users, int from, int to) {
+		log.info("Created DataSycnProcessor from {} to {}", from, to);
 		this.from = from;
 		this.to = to;
 		this.users = users;
-		
+
 		createChainHandelrs();
+		notificationProcessor = new NotificationProcessor(activityHandler.getNext().getProcessedMessages());
 	}
 
 	/***
 	 * Creates a data sync processor that operate
 	 */
 	public DataSyncProcessor() {
+		log.info("Created DataSycnProcessor");
 		createChainHandelrs();
+		notificationProcessor = new NotificationProcessor(activityHandler.getNext().getProcessedMessages());
 	}
-	
-	private void createChainHandelrs(){
+
+	private void createChainHandelrs() {
 		activityHandler = new ActivityHandler(this, networksSupportActivities);
-		Handler messageHandler = new MessageHandler(this, networksSupportMessages);
-		Handler localActivityHandler = new LocalActivityHandler(this, networksSupportLocalActivities);
+		Handler messageHandler = new MessageHandler(this,
+				networksSupportMessages);
+		Handler localActivityHandler = new LocalActivityHandler(this,
+				networksSupportLocalActivities);
 		Handler videoHandler = new VideoHandler(this, networksSupportVideos);
 
 		activityHandler.setNext(messageHandler);
 		messageHandler.setNext(localActivityHandler);
 		localActivityHandler.setNext(videoHandler);
 	}
-
-	private Logger log = LoggerFactory.getLogger(getClass());
 
 	/**
 	 * If an identity has been activated, process all available content;
@@ -119,7 +127,10 @@ public class DataSyncProcessor extends Thread {
 	public void run() {
 		log.info(Thread.currentThread().getName()
 				+ " Synchronizing data from {} to {}", from, to);
+		
+		notificationProcessor.start();
 		syncData();
+		notificationProcessor.setTerminate();
 	}
 
 	/**

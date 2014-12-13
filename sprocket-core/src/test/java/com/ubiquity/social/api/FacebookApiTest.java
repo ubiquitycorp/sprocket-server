@@ -52,7 +52,7 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 	public void testGetMessages() {
 		
 		SocialAPI facebookAPI = SocialAPIFactory.createProvider(ExternalNetwork.Facebook, ClientPlatform.WEB);
-		List<Message> messages = facebookAPI.listMessages(identity,null);
+		List<Message> messages = facebookAPI.listMessages(identity,null, null);
 		Assert.assertFalse(messages.isEmpty());
 		// all fb messages will have conversations
 		for(Message message : messages) {
