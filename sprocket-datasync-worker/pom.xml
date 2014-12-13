@@ -24,15 +24,15 @@
 	<build>
 		<finalName>sprocket-datasync-worker</finalName>
 		<resources>
-                         <delimiters>
-                          <delimiter>${*}</delimiter>
-                          <delimiter>%{*}</delimiter>
-                         </delimiters>
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
 			<resource>
+                         <delimiters>
+                          <delimiter>${*}</delimiter>
+                          <delimiter>%{*}</delimiter>
+                         </delimiters>
 				<directory>rpm/bin</directory>
 				<filtering>true</filtering>
 			</resource>
