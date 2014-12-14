@@ -123,7 +123,7 @@
 							<filemode>755</filemode>
 							<sources>
 								<source>
-								<location>rpm/bin</location>
+								<location>target/classes/sprocket-datasync-worker</location>
 								</source>
 							</sources>
 						</mapping>
