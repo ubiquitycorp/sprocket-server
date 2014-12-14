@@ -17,6 +17,8 @@ public class Conversation {
 
 	private Set<Contact> receivers = new HashSet<Contact>();
 	
+	private Set<Message> messages = new HashSet<Message>();
+	
 	public String getConversationIdentifier() {
 		return conversationIdentifier;
 	}
@@ -27,6 +29,10 @@ public class Conversation {
 
 	public Set<Contact> getReceivers() {
 		return receivers;
+	}
+	
+	public Set<Message> getMessages() {
+		return messages;
 	}
 	
 	public static class Builder {

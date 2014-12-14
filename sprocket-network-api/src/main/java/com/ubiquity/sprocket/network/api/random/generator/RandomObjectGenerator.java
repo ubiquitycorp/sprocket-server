@@ -12,6 +12,7 @@ import com.ubiquity.sprocket.network.api.dto.model.Comment;
 import com.ubiquity.sprocket.network.api.dto.model.Contact;
 import com.ubiquity.sprocket.network.api.dto.model.Conversation;
 import com.ubiquity.sprocket.network.api.dto.model.ExternalIdentity;
+import com.ubiquity.sprocket.network.api.dto.model.Gender;
 import com.ubiquity.sprocket.network.api.dto.model.Image;
 import com.ubiquity.sprocket.network.api.dto.model.Message;
 import com.ubiquity.sprocket.network.api.dto.model.Rating;
@@ -42,7 +43,7 @@ public class RandomObjectGenerator {
 				.lastUpdated(System.currentTimeMillis())
 				.description(UUID.randomUUID().toString()).build();
 	}
-	public static List<Message> generateConvesation(Long userID,Long lastRequest, int index) {
+	public static Conversation generateConvesationObject(Long userID,Long lastRequest, int index) {
 		String conversationIdentifier = generateIdentifier(userID, ResourceType.conversation, lastRequest,
 				index, null);
 		Conversation conversation = new Conversation.Builder()
@@ -50,17 +51,13 @@ public class RandomObjectGenerator {
 		for(int i =0; i<10;i++){
 			conversation.getReceivers().add(generateContact(userID, index));
 		}
-		List<Message> messages = new LinkedList<Message>();
-		for(int i =0; i<25;i++){
-			//TODO 
-		}
-		return messages;
+		
+		return conversation;
 	}
-	public static Message generateMessage(Long userID,Long lastRequest, int index,Conversation conversation){
+	public static Message generateMessage(Long userID,Long lastRequest, int index){
 		return new Message.Builder()
 		.title(UUID.randomUUID().toString())
 		.body(UUID.randomUUID().toString())
-		.conversation(conversation)
 		.sentDate(System.currentTimeMillis())
 		.lastUpdated(System.currentTimeMillis())
 		//TODO .sender(get)
@@ -85,8 +82,9 @@ public class RandomObjectGenerator {
 
 		switch (activityType) {
 		case 0:
-			activityBuilder.video(GenerateVideo(null)).activityType(
-					ActivityType.VIDEO);
+			activityBuilder.video(GenerateVideo(null))
+					.activityType(ActivityType.VIDEO)
+					.image(GeneratePhoto());
 			break;
 		case 1:
 			activityBuilder.image(GeneratePhoto()).activityType(
@@ -123,9 +121,12 @@ public class RandomObjectGenerator {
 			externalIdentity = new ExternalIdentity.Builder().identifier(
 					(userId + index % 10 )+ "").build();
 		}
+		int genderInt = random.nextInt(3);
+		Gender gender = Gender.getGenderById(genderInt);
 		Contact.Builder contactBuilder = new Contact.Builder();
 		contactBuilder.externalIdentity(externalIdentity)
 				.firstName(UUID.randomUUID().toString())
+				.gender(gender)
 				.lastName(UUID.randomUUID().toString())
 				.displayName(UUID.randomUUID().toString())
 				.lastUpdated(System.currentTimeMillis()).image(GeneratePhoto());

@@ -125,6 +125,11 @@ public class Contact {
 			this.firstName = firstName;
 			return this;
 		}
+		
+		public Builder gender(Gender gender){
+			this.gender = gender;
+			return this;
+		}
 
 		public Builder lastName(String lastName) {
 			this.lastName = lastName;
