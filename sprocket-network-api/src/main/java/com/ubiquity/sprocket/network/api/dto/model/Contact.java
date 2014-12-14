@@ -2,8 +2,6 @@ package com.ubiquity.sprocket.network.api.dto.model;
 
 public class Contact {
 
-	private Long contactId;
-
 	private String displayName;
 
 	private String firstName;
@@ -22,14 +20,6 @@ public class Contact {
 	
 	
 	private ExternalIdentity externalIdentity;
-
-	public Long getContactId() {
-		return contactId;
-	}
-
-	public void setContactId(Long contactId) {
-		this.contactId = contactId;
-	}
 
 	public String getDisplayName() {
 		return displayName;
@@ -100,7 +90,6 @@ public class Contact {
 
 
 	public static class Builder {
-		private Long contactId;
 		private String displayName;
 		private String firstName;
 		private String lastName;
@@ -110,11 +99,6 @@ public class Contact {
 		private String profileUrl;
 		private Long lastUpdated;
 		private ExternalIdentity externalIdentity;
-		
-		public Builder contactId(Long contactId) {
-			this.contactId = contactId;
-			return this;
-		}
 
 		public Builder displayName(String displayName) {
 			this.displayName = displayName;
@@ -167,7 +151,6 @@ public class Contact {
 	}
 
 	private Contact(Builder builder) {
-		this.contactId = builder.contactId;
 		this.displayName = builder.displayName;
 		this.firstName = builder.firstName;
 		this.lastName = builder.lastName;

@@ -12,27 +12,28 @@ public class RandomListGenerator {
 	private static Random random = new Random();
 
 	public static List<Activity> GenerateActivityList(Long userId,
-			Long lastRequest, Long thisRequest) {
+			Long lastRequest, Long thisRequest,boolean withComments,boolean withTags) {
 		List<Activity> activities = new LinkedList<Activity>();
 		for (int i = 1; i <= 10; i++) {
 			activities.add(RandomObjectGenerator.generateActivity(userId,
-					lastRequest, i, random.nextInt(6)));
+					lastRequest, i, random.nextInt(6),withComments,withTags));
 		}
 		for (int i = 11; i <= 20; i++) {
 			activities.add(RandomObjectGenerator.generateActivity(userId,
-					thisRequest, i, random.nextInt(6)));
+					thisRequest, i, random.nextInt(6),withComments,withTags));
 		}
 		return activities;
 	}
 
 	public static List<VideoContent> GenerateVideoList(Long userId,
-			Long lastRequest, Long thisRequest) {
+			Long lastRequest, Long thisRequest,Integer maxResults) {
+		int mid = (maxResults/2)+1;
 		List<VideoContent> videos = new LinkedList<VideoContent>();
-		for (int i = 1; i <= 10; i++) {
+		for (int i = 1; i <= mid; i++) {
 			videos.add(RandomObjectGenerator.generateVideoContent(userId,
 					lastRequest, i));
 		}
-		for (int i = 11; i <= 20; i++) {
+		for (int i = mid; i <= maxResults; i++) {
 			videos.add(RandomObjectGenerator.generateVideoContent(userId,
 					thisRequest, i));
 		}

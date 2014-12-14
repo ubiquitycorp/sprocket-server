@@ -34,38 +34,43 @@ public class RandomObjectGenerator {
 					+ convertToString(index);
 	}
 
-	public static VideoContent generateVideoContent(Long userID,Long lastRequest, int index) {
-		String vedioKey = generateIdentifier(userID, ResourceType.videos, lastRequest,
-				index, null);
+	public static VideoContent generateVideoContent(Long userID,
+			Long lastRequest, int index) {
+		String vedioKey = generateIdentifier(userID, ResourceType.videos,
+				lastRequest, index, null);
 		return new VideoContent.Builder().title(UUID.randomUUID().toString())
 				.categoryExternalIdentifier(UUID.randomUUID().toString())
 				.video(GenerateVideo(vedioKey)).thumb(GeneratePhoto())
 				.lastUpdated(System.currentTimeMillis())
+				.publishedAt(System.currentTimeMillis())
 				.description(UUID.randomUUID().toString()).build();
 	}
-	public static Conversation generateConvesationObject(Long userID,Long lastRequest, int index) {
-		String conversationIdentifier = generateIdentifier(userID, ResourceType.conversation, lastRequest,
-				index, null);
+
+	public static Conversation generateConvesationObject(Long userID,
+			Long lastRequest, int index) {
+		String conversationIdentifier = generateIdentifier(userID,
+				ResourceType.conversation, lastRequest, index, null);
 		Conversation conversation = new Conversation.Builder()
 				.conversationIdentifier(conversationIdentifier).build();
-		for(int i =0; i<10;i++){
+		for (int i = 0; i < 10; i++) {
 			conversation.getReceivers().add(generateContact(userID, index));
 		}
-		
+
 		return conversation;
 	}
-	public static Message generateMessage(Long userID,Long lastRequest, int index){
-		return new Message.Builder()
-		.title(UUID.randomUUID().toString())
-		.body(UUID.randomUUID().toString())
-		.sentDate(System.currentTimeMillis())
-		.lastUpdated(System.currentTimeMillis())
-		//TODO .sender(get)
-		.externalIdentifier(UUID.randomUUID().toString())
-		.build();
+
+	public static Message generateMessage(Long userID, Long lastRequest,
+			int index) {
+		return new Message.Builder().title(UUID.randomUUID().toString())
+				.body(UUID.randomUUID().toString())
+				.sentDate(System.currentTimeMillis())
+				.lastUpdated(System.currentTimeMillis())
+				.sender(generateContact(userID, index))
+				.externalIdentifier(UUID.randomUUID().toString()).build();
 	}
+
 	public static Activity generateActivity(Long userID, Long lastRequest,
-			int index, int activityType) {
+			int index, int activityType, boolean withComments,boolean withTags) {
 		Activity.Builder activityBuilder = new Activity.Builder();
 		activityBuilder
 				.title(UUID.randomUUID().toString())
@@ -83,8 +88,7 @@ public class RandomObjectGenerator {
 		switch (activityType) {
 		case 0:
 			activityBuilder.video(GenerateVideo(null))
-					.activityType(ActivityType.VIDEO)
-					.image(GeneratePhoto());
+					.activityType(ActivityType.VIDEO).image(GeneratePhoto());
 			break;
 		case 1:
 			activityBuilder.image(GeneratePhoto()).activityType(
@@ -95,6 +99,7 @@ public class RandomObjectGenerator {
 					ActivityType.LINK);
 			break;
 		case 3:
+			activityBuilder.activityType(ActivityType.STATUS);
 			break;
 		case 4:
 			activityBuilder.audio(GenerateAudio()).activityType(
@@ -106,8 +111,9 @@ public class RandomObjectGenerator {
 		}
 
 		Activity activity = activityBuilder.build();
-		activity.getComments().addAll(
-				GenerateCommentList(userID, lastRequest, index));
+		if (withComments)
+			activity.getComments().addAll(
+					GenerateCommentList(userID, lastRequest, index));
 		activity.getTags().addAll(GenerateTagList());
 		return activity;
 	}
@@ -119,14 +125,13 @@ public class RandomObjectGenerator {
 					(userId + "")).build();
 		} else {
 			externalIdentity = new ExternalIdentity.Builder().identifier(
-					(userId + index % 10 )+ "").build();
+					(userId + index % 10) + "").build();
 		}
 		int genderInt = random.nextInt(3);
 		Gender gender = Gender.getGenderById(genderInt);
 		Contact.Builder contactBuilder = new Contact.Builder();
 		contactBuilder.externalIdentity(externalIdentity)
-				.firstName(UUID.randomUUID().toString())
-				.gender(gender)
+				.firstName(UUID.randomUUID().toString()).gender(gender)
 				.lastName(UUID.randomUUID().toString())
 				.displayName(UUID.randomUUID().toString())
 				.lastUpdated(System.currentTimeMillis()).image(GeneratePhoto());
@@ -192,7 +197,8 @@ public class RandomObjectGenerator {
 	}
 
 	public static Image GeneratePhoto() {
-		return new Image.Builder().url(UUID.randomUUID().toString()).build();
+		return new Image.Builder().url(UUID.randomUUID().toString())
+				.itemKey(UUID.randomUUID().toString()).build();
 	}
 
 	public static AudioTrack GenerateAudio() {
