@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.ubiquity.sprocket.network.api.dto.model.Activity;
+import com.ubiquity.sprocket.network.api.dto.model.Comment;
 import com.ubiquity.sprocket.network.api.dto.model.Conversation;
 import com.ubiquity.sprocket.network.api.dto.model.VideoContent;
 
@@ -12,13 +13,14 @@ public class RandomListGenerator {
 	private static Random random = new Random();
 
 	public static List<Activity> GenerateActivityList(Long userId,
-			Long lastRequest, Long thisRequest,boolean withComments,boolean withTags) {
+			Long lastRequest, Long thisRequest,boolean withComments,boolean withTags,Integer maxResults) {
 		List<Activity> activities = new LinkedList<Activity>();
-		for (int i = 1; i <= 10; i++) {
+		int mid = (maxResults/2)+1;
+		for (int i = 1; i <= mid; i++) {
 			activities.add(RandomObjectGenerator.generateActivity(userId,
 					lastRequest, i, random.nextInt(6),withComments,withTags));
 		}
-		for (int i = 11; i <= 20; i++) {
+		for (int i = mid; i <= maxResults; i++) {
 			activities.add(RandomObjectGenerator.generateActivity(userId,
 					thisRequest, i, random.nextInt(6),withComments,withTags));
 		}
@@ -63,5 +65,9 @@ public class RandomListGenerator {
 			conversations.add(conversation);
 		}
 		return conversations;
+	}
+	public static List<Comment> GenerateCommentList(Long userId,Long thisRequest,String ActivityId) {
+		
+		return RandomObjectGenerator.GenerateCommentList(userId,thisRequest,ActivityId);
 	}
 }

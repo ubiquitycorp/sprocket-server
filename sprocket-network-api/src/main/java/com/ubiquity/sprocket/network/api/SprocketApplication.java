@@ -8,6 +8,7 @@ import javax.ws.rs.core.Application;
 
 import com.ubiquity.sprocket.network.api.endpoints.FacebookEndPoint;
 import com.ubiquity.sprocket.network.api.endpoints.GooglePlusEndPoint;
+import com.ubiquity.sprocket.network.api.endpoints.RedditEndPoint;
 import com.ubiquity.sprocket.network.api.endpoints.YoutubeEndPoint;
 
 @ApplicationPath("services")
@@ -19,6 +20,7 @@ public class SprocketApplication extends Application {
 	    singletons.add(new YoutubeEndPoint());
 	    singletons.add(new FacebookEndPoint());
 	    singletons.add(new GooglePlusEndPoint());
+	    singletons.add(new RedditEndPoint());
 	  }
 
 	  @Override

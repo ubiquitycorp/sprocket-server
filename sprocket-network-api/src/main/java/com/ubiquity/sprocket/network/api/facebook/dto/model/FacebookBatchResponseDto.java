@@ -15,4 +15,12 @@ public class FacebookBatchResponseDto {
 		return body;
 	}
 
+	public void setCode(Integer code) {
+		this.code = code;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
+	}
+	
 }

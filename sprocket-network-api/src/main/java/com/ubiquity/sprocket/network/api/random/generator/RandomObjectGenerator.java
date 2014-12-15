@@ -70,7 +70,7 @@ public class RandomObjectGenerator {
 	}
 
 	public static Activity generateActivity(Long userID, Long lastRequest,
-			int index, int activityType, boolean withComments,boolean withTags) {
+			int index, int activityType, boolean withComments, boolean withTags) {
 		Activity.Builder activityBuilder = new Activity.Builder();
 		activityBuilder
 				.title(UUID.randomUUID().toString())
@@ -113,7 +113,7 @@ public class RandomObjectGenerator {
 		Activity activity = activityBuilder.build();
 		if (withComments)
 			activity.getComments().addAll(
-					GenerateCommentList(userID, lastRequest, index));
+					GenerateCommentList(userID, lastRequest, activity.getExternalIdentifier()));
 		activity.getTags().addAll(GenerateTagList());
 		return activity;
 	}
@@ -125,7 +125,7 @@ public class RandomObjectGenerator {
 					(userId + "")).build();
 		} else {
 			externalIdentity = new ExternalIdentity.Builder().identifier(
-					(userId + index % 10) + "").build();
+					(userId + index + random.nextInt(100)) + "").build();
 		}
 		int genderInt = random.nextInt(3);
 		Gender gender = Gender.getGenderById(genderInt);
@@ -149,19 +149,19 @@ public class RandomObjectGenerator {
 	}
 
 	public static List<Comment> GenerateCommentList(Long userID,
-			Long lastRequest, int index) {
+			Long lastRequest, String index) {
 		int commentIndex = 1;
 		List<Comment> comments = new LinkedList<Comment>();
 		for (int i = 0; i < 4; i++) {
 			Comment comment = GenerateComment(userID, lastRequest,
-					commentIndex, index);
+					index,commentIndex);
 			commentIndex++;
 			for (int j = 0; j < 2; j++) {
 				Comment childReply = GenerateComment(userID, lastRequest,
-						commentIndex, index);
+						index,commentIndex);
 				commentIndex++;
 				childReply.addReply(GenerateComment(userID, lastRequest,
-						commentIndex, index));
+						index,commentIndex));
 				commentIndex++;
 				comment.addReply(childReply);
 				commentIndex++;
@@ -173,7 +173,7 @@ public class RandomObjectGenerator {
 	}
 
 	public static Comment GenerateComment(Long userID, Long lastRequest,
-			int activityIndex, int index) {
+			String activityIndex, int index) {
 		Comment.Builder commentBuilder = new Comment.Builder();
 
 		return commentBuilder
@@ -183,8 +183,8 @@ public class RandomObjectGenerator {
 				.ownerVote(random.nextInt(3) - 1)
 				.postedBy(generateContact(userID, index))
 				.externalIdentifier(
-						generateIdentifier(userID, ResourceType.comment,
-								lastRequest, index, activityIndex)).build();
+						activityIndex + "-" + ResourceType.comment + "-"
+								+ index).build();
 	}
 
 	public static Rating GenerateRating() {

@@ -1,5 +1,7 @@
 package com.ubiquity.sprocket.network.api.endpoints;
 
+import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -12,6 +14,7 @@ import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.sprocket.network.api.cache.CacheFactory;
 import com.ubiquity.sprocket.network.api.facebook.FacebookMockNetwork;
 import com.ubiquity.sprocket.network.api.facebook.dto.container.FacebookDataDto;
+import com.ubiquity.sprocket.network.api.facebook.dto.model.FacebookBatchResponseDto;
 import com.ubiquity.sprocket.network.api.facebook.dto.model.FacebookContactDto;
 
 @Path("/1.0/facebook/")
@@ -104,7 +107,7 @@ public class FacebookEndPoint {
 				lastRequestTime = thisRequestTime;
 				CacheFactory.setLastRequestTime(userId, lastRequestTime);
 			}
-			FacebookDataDto facebookData = FacebookMockNetwork.getNewsFeed(userId, lastRequestTime, thisRequestTime);
+			FacebookDataDto facebookData = FacebookMockNetwork.getNewsFeed(userId, lastRequestTime, thisRequestTime,20);
 			CacheFactory.checkUpdatedRequestTime(userId,lastRequestTime,thisRequestTime);
 			return Response.ok().entity(jsonConverter.convertToPayload(facebookData)).build();
 		}else{
@@ -123,7 +126,8 @@ public class FacebookEndPoint {
 			@QueryParam("limit") Integer limit,
 			@QueryParam("offset") Integer offset,
 			@QueryParam("date_format") String dateFormat) {
-		return null;
+		FacebookDataDto facebookData = FacebookMockNetwork.search(10);
+		return Response.ok().entity(jsonConverter.convertToPayload(facebookData)).build();
 	}
 
 	@POST
@@ -133,7 +137,20 @@ public class FacebookEndPoint {
 			@QueryParam("batch") String batch,
 			@QueryParam("include_headers") Boolean includeHeaders,
 			@QueryParam("date_format") String dateFormat) {
-		return null;
+		if(accessToken !=null){
+			Long userId = CacheFactory.findOrCreateUser(accessToken);
+			Long lastRequestTime = CacheFactory.getLastRequestTime(userId);
+			Long thisRequestTime = System.currentTimeMillis();
+			if(lastRequestTime == null){
+				lastRequestTime = thisRequestTime;
+				CacheFactory.setLastRequestTime(userId, lastRequestTime);
+			}
+			List<FacebookBatchResponseDto> facebookData = FacebookMockNetwork.getbatchActivity(userId, lastRequestTime, thisRequestTime,10);
+			CacheFactory.checkUpdatedRequestTime(userId,lastRequestTime,thisRequestTime);
+			return Response.ok().entity(jsonConverter.convertToPayload(facebookData)).build();
+		}else{
+			throw new IllegalArgumentException("accessToken could not be null");
+		}
 	}
 
 	@GET
