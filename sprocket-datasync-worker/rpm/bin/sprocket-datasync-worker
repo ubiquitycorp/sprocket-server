@@ -11,7 +11,7 @@ SPROCKET_SMALL=1024
 SPROCKET_LARGE=2048
 SPROCKET_WORKER_MINFREE=4095
 SPROCKET_WORKER_NAME=/var/lib/java-services/sprocket-datasync-worker.jar
-NUM_PROCESSES=${datasyncworkerprocesses}
+NUM_PROCESSES=${datasync.worker.processes}
 if [ ! "${NUM_PROCESSES}" ]
 then
  NUM_PROCESSES=1
@@ -26,11 +26,14 @@ then
  SPROCKET_WORKER_SIZE=$SPROCKET_LARGE
 fi
 
-SPROCKET_WORKER_INDIVIDUAL=`expr ${SPROCKET_WORKER_SIZE} / ${NUM_PROCESSES}`
+SPROCKET_WORKER_INDIVIDUAL=${datasync.worker.size}
+if [ ! "$SPROCKET_WORKER_INDIVIDUAL" ]
+then
+ SPROCKET_WORKER_INDIVIDUAL=`expr ${SPROCKET_WORKER_SIZE} / ${NUM_PROCESSES}`
+fi
 
 echo "Available Memory: ${AVAILMEM}MB"
 echo "Running ${NUM_PROCESSES} workers each ${SPROCKET_WORKER_INDIVIDUAL}MB."
-echo "Sprocket Worker Aggregate Size: ${SPROCKET_WORKER_SIZE}MB"
 while [ $NUM_PROCESSES -gt 0 ]
 do
  echo "Launching worker ${NUM_PROCESSES} at `date`"

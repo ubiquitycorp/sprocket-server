@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>sprocket-datasync-worker</artifactId>
 	<name>Sprocket Data Sync Worker</name>
-	<version>0.4.75</version>
+	<version>0.4.76</version>
 
 	<parent>
 		<groupId>com.ubiquity</groupId>
