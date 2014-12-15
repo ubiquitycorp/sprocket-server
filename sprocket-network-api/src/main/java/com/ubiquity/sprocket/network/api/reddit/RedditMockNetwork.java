@@ -9,6 +9,7 @@ import com.ubiquity.sprocket.network.api.dto.model.Contact;
 import com.ubiquity.sprocket.network.api.random.generator.RandomListGenerator;
 import com.ubiquity.sprocket.network.api.random.generator.RandomObjectGenerator;
 import com.ubiquity.sprocket.network.api.reddit.dto.container.RedditCommentDataContainerDto;
+import com.ubiquity.sprocket.network.api.reddit.dto.container.RedditJsonResponseContainerDto;
 import com.ubiquity.sprocket.network.api.reddit.dto.container.RedditPostDataContainerDto;
 import com.ubiquity.sprocket.network.api.reddit.dto.model.RedditCommentDataDto;
 import com.ubiquity.sprocket.network.api.reddit.dto.model.RedditContactDto;
@@ -29,7 +30,10 @@ public class RedditMockNetwork {
 		}
 		return redditPostDataContainerDto;
 	}
-	
+	public static RedditJsonResponseContainerDto getjsonResponse(){
+		RedditJsonResponseContainerDto json = new RedditJsonResponseContainerDto();
+		return json;
+	}
 	public static List<RedditCommentDataContainerDto> getComments(Long userId,
 			Long lastRequest, Long thisRequest, int maxResults,String article) {
 		List<RedditCommentDataContainerDto> redditCommentDataContainerDtos = new LinkedList<RedditCommentDataContainerDto>();

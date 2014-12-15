@@ -1,6 +1,7 @@
 package com.ubiquity.sprocket.network.api.endpoints;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -15,6 +16,7 @@ import javax.ws.rs.core.Response;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.sprocket.network.api.cache.CacheFactory;
+import com.ubiquity.sprocket.network.api.googleplus.model.RefreshTokenResponseDto;
 import com.ubiquity.sprocket.network.api.reddit.RedditMockNetwork;
 import com.ubiquity.sprocket.network.api.reddit.dto.container.RedditCommentDataContainerDto;
 import com.ubiquity.sprocket.network.api.reddit.dto.container.RedditPostDataContainerDto;
@@ -117,8 +119,8 @@ public class RedditEndPoint {
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response postActivity(@HeaderParam("Authorization") String accessToken,@HeaderParam("User-Agent") String userAgent,@QueryParam("sr") String subReddit ,@QueryParam("text") String text,@QueryParam("title") String title,@QueryParam("url") String url,@QueryParam("kind") String kind ,@QueryParam("captcha") String captcha,@QueryParam("iden") String captchaIden,@QueryParam("api_type") String apiType){
-		// TODO Auto-generated method stub
-		return null;
+		return Response.ok()
+				.entity(jsonConverter.convertToPayload(RedditMockNetwork.getjsonResponse())).build();
 	}
 	
 	@POST
@@ -126,8 +128,8 @@ public class RedditEndPoint {
     @Produces("application/json")
 	@Consumes("application/json")
     public Response postComment(@HeaderParam("Authorization") String accessToken,@HeaderParam("User-Agent") String userAgent,@QueryParam("thing_id") String thing_id ,@QueryParam("text") String text,@QueryParam("api_type") String apiType){
-		// TODO Auto-generated method stub
-		return null;
+		return Response.ok()
+				.entity(jsonConverter.convertToPayload(RedditMockNetwork.getjsonResponse())).build();
 	}
 	
 	@POST
@@ -135,8 +137,8 @@ public class RedditEndPoint {
     @Produces("application/json")
 	@Consumes("application/json")
     public Response postVote(@HeaderParam("Authorization") String accessToken,@HeaderParam("User-Agent") String userAgent,@QueryParam("id") String thing_id ,@QueryParam("dir") int direction,@QueryParam("api_type") String apiType){
-		// TODO Auto-generated method stub
-		return null;
+		return Response.ok()
+				.entity(jsonConverter.convertToPayload(RedditMockNetwork.getjsonResponse())).build();
 	}
 	
 	@POST
@@ -169,8 +171,9 @@ public class RedditEndPoint {
     @Path("/api/v1/access_token")
     @Produces("application/json")
     public Response refreshToken(@HeaderParam("Authorization") String authorization,@HeaderParam("User-Agent") String userAgent,@FormParam("grant_type") String grantType,  @FormParam("refresh_token") String refreshToken){
-		// TODO Auto-generated method stub
-				return null;
+		RefreshTokenResponseDto refreshTokenResponseDto =new RefreshTokenResponseDto.Builder().access_token(refreshToken).expires_in(3600L).scope(UUID.randomUUID().toString()).token_type(UUID.randomUUID().toString()).build();
+		return Response.ok()
+				.entity(jsonConverter.convertToPayload(refreshTokenResponseDto)).build();
 	}
 	
 }
