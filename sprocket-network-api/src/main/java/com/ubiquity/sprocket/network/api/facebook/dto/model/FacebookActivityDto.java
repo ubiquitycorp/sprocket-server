@@ -15,11 +15,10 @@ public class FacebookActivityDto {
 	private String picture;
 	private String source;
 
-	@SerializedName("created_time")
-	private Long createdTime;
+	private Long created_time;
 
 	@SerializedName("status_type")
-	private String statusType;
+	private String status_type;
 
 	public String getSource() {
 		return source;
@@ -46,7 +45,7 @@ public class FacebookActivityDto {
 	}
 
 	public Long getCreatedTime() {
-		return createdTime;
+		return created_time;
 	}
 
 	public FacebookContactDto getFrom() {
@@ -66,7 +65,7 @@ public class FacebookActivityDto {
 	}
 
 	public String getStatusType() {
-		return statusType;
+		return status_type;
 	}
 
 	public static class Builder {
@@ -80,6 +79,7 @@ public class FacebookActivityDto {
 		private String link;
 		private String picture;
 		private String source;
+		private Long createdTime;
 
 		public Builder id(String id) {
 			this.id = id;
@@ -90,7 +90,10 @@ public class FacebookActivityDto {
 			this.name = name;
 			return this;
 		}
-
+		public Builder createdTime(Long createdTime){
+			this.createdTime = createdTime;
+			return this;
+		}
 		public Builder from(FacebookContactDto from) {
 			this.from = from;
 			return this;
@@ -147,6 +150,7 @@ public class FacebookActivityDto {
 		this.story = builder.story;
 		this.picture = builder.picture;
 		this.source = builder.source;
+		this.created_time = builder.createdTime;
 	}
 
 }

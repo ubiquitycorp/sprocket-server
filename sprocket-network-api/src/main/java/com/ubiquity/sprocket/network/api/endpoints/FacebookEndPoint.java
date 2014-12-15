@@ -61,7 +61,7 @@ public class FacebookEndPoint {
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contact)).build();
 		} else {
-			throw new IllegalArgumentException("userId could not be null");
+			throw new IllegalArgumentException("access_token could not be null");
 		}
 	}
 

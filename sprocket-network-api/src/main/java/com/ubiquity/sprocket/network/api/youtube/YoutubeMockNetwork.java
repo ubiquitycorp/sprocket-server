@@ -22,6 +22,7 @@ public class YoutubeMockNetwork {
 			youTubeItemsDto.getItems().add(
 					YouTubeApiDtoAssembler
 							.assembleVideo(videoContent, category));
+		youTubeItemsDto.setEtag("sdkjasldjks");
 		return youTubeItemsDto;
 	}
 	
@@ -35,6 +36,7 @@ public class YoutubeMockNetwork {
 					YouTubeApiDtoAssembler
 							.assembleVideo(videoContent));
 		youTubeItemsDto.setPaging("testEtag", "NextPageToken", "PrevPageToken");
+		youTubeItemsDto.setEtag("sdkjasldjks");
 		return youTubeItemsDto;
 	}
 	
@@ -54,6 +56,7 @@ public class YoutubeMockNetwork {
 		for (int i = 0; i < num; i++) {
 			youTubeItemsDto.getItems().add(getSubscription());
 		}
+		youTubeItemsDto.setEtag("sdkjasldjks");
 		return youTubeItemsDto;
 	}
 

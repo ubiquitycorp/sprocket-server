@@ -7,7 +7,7 @@ public class FacebookMessageDto {
 	private String id;
 	private String message;
 	private Map<String, Object> from;
-	private Long createdTime;
+	private Long created_time;
 
 	public String getMessage() {
 		return message;
@@ -20,7 +20,7 @@ public class FacebookMessageDto {
 
 
 	public Long getCreatedTime() {
-		return createdTime;
+		return created_time;
 	}
 
 	public Map<String, Object> getFrom() {
@@ -61,7 +61,7 @@ public class FacebookMessageDto {
 		this.id = builder.id;
 		this.message = builder.message;
 		this.from= builder.from;
-		this.createdTime= builder.createdTime;
+		this.created_time= builder.createdTime;
 	}
 	
 	

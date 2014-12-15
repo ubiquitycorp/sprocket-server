@@ -24,13 +24,13 @@ import com.ubiquity.sprocket.network.api.facebook.dto.model.FacebookMessageDto;
  */
 public class FacebookGraphApiDtoAssembler {
 
-	public static FacebookConversationDto assembleConversation(Conversation conversation) {
-		
+	public static FacebookConversationDto assembleConversation(
+			Conversation conversation) {
+
 		FacebookConversationDto.Builder facebookConversationDtoBuilder = new FacebookConversationDto.Builder();
 		FacebookDataDto to = new FacebookDataDto();
 		FacebookDataDto comments = new FacebookDataDto();
-		
-		
+
 		if (conversation.getMessages() == null) {
 			return facebookConversationDtoBuilder.build();
 		}
@@ -39,32 +39,33 @@ public class FacebookGraphApiDtoAssembler {
 
 			Map<String, Object> senderDto = new HashMap<String, Object>();
 			senderDto.put("name", message.getSender().getDisplayName());
-			senderDto.put("id", message.getSender().getExternalIdentity().getIdentifier());
-			
+			senderDto.put("id", message.getSender().getExternalIdentity()
+					.getIdentifier());
+
 			FacebookMessageDto fbmessage = new FacebookMessageDto.Builder()
 					.id(message.getExternalIdentifier())
 					.message(message.getBody())
 					.createdTime(message.getSentDate() / 1000)
 					// Converts Facebook time to milliseconds
-					.from(senderDto)
-					.build();
+					.from(senderDto).build();
 
 			comments.getData().add(fbmessage);
 		}
 		// assemble receivers
 
-		if (conversation.getReceivers().size() > 0)  // unknown contact
+		if (conversation.getReceivers().size() > 0) // unknown contact
 		{
-			for (Contact contact : conversation.getReceivers()) 
-			{
+			for (Contact contact : conversation.getReceivers()) {
 
 				Map<String, Object> senderDto = new HashMap<String, Object>();
 				senderDto.put("name", contact.getDisplayName());
-				senderDto.put("id", contact.getExternalIdentity().getIdentifier());
+				senderDto.put("id", contact.getExternalIdentity()
+						.getIdentifier());
 				to.getData().add(senderDto);
 			}
 		}
-		return facebookConversationDtoBuilder.to(to).comments(comments).id(conversation.getConversationIdentifier()).build();
+		return facebookConversationDtoBuilder.to(to).comments(comments)
+				.id(conversation.getConversationIdentifier()).build();
 	}
 
 	// private static Contact createContact(String identifier, String name,
@@ -103,6 +104,7 @@ public class FacebookGraphApiDtoAssembler {
 		contactBuilder.gender(fbgender).firstName(result.getFirstName())
 				.lastName(result.getLastName())
 				.displayName(result.getDisplayName()).email(result.getEmail())
+				.id(result.getExternalIdentity().getIdentifier())
 				.link(result.getProfileUrl());
 		return contactBuilder.build();
 	}
@@ -194,13 +196,16 @@ public class FacebookGraphApiDtoAssembler {
 			activityBuilder.type("link").link(activity.getLink())
 					.description(activity.getBody());
 		} else {
+			activityBuilder.type("status");
 			if (random.nextBoolean())
 				activityBuilder.message(activity.getBody());
 			else
 				activityBuilder.story(activity.getBody());
 		}
 		// fill out the rest
-		activityBuilder.name(activity.getTitle());
+		activityBuilder.name(activity.getTitle())
+				.createdTime(activity.getCreationDate())
+				.id(activity.getExternalIdentifier());
 
 		return activityBuilder.build();
 

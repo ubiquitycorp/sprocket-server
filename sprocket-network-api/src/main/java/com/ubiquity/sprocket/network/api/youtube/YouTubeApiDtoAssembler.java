@@ -16,7 +16,7 @@ public class YouTubeApiDtoAssembler {
 
 	public static YouTubeVideoDto assembleVideo(VideoContent videoContent,
 			Category category) {
-		YouTubeVideoDto.Builder youTubeVideoDto = new YouTubeVideoDto.Builder();
+		YouTubeVideoDto.Builder youTubeVideoDtoBuilder = new YouTubeVideoDto.Builder();
 		YouTubeVideoSnippetDto.Builder youTubeVideoSnippetDto = new YouTubeVideoSnippetDto.Builder();
 
 		if (category == Category.MyHistory) {
@@ -26,24 +26,28 @@ public class YouTubeApiDtoAssembler {
 		} else if (category == Category.Subscriptions) {
 			Map<String, String> resourceId = new HashMap<String, String>();
 			resourceId.put("videoId", videoContent.getVideo().getItemKey());
-
+			
 			youTubeVideoSnippetDto.resourceId(resourceId).publishedAt(
 					ConvertDateToString(videoContent.getPublishedAt()));
 		} else {
-			youTubeVideoDto.id(videoContent.getVideo().getItemKey());
+			youTubeVideoDtoBuilder.id(videoContent.getVideo().getItemKey());
 		}
 		Map<String, Map<String, String>> thumbnails = new HashMap<String, Map<String, String>>();
 		Map<String, String> url = new HashMap<String, String>();
 		url.put("url", videoContent.getThumb().getItemKey());
 		thumbnails.put("default", url);
-		return youTubeVideoDto.snippet(
+		YouTubeVideoDto youTubeVideoDto = youTubeVideoDtoBuilder.snippet(
 				youTubeVideoSnippetDto
 						.title(videoContent.getTitle())
 						.categoryId(
 								videoContent.getCategoryExternalIdentifier())
+						.type("upload")
 						.thumbnails(thumbnails)
 						.description(videoContent.getDescription()).build())
 				.build();
+		
+		youTubeVideoDto.getContentDetails().getUpload().put("videoId", videoContent.getVideo().getItemKey());
+		return youTubeVideoDto;
 
 	}
 
@@ -60,6 +64,7 @@ public class YouTubeApiDtoAssembler {
 
 		YouTubeVideoSnippetDto snippet = new YouTubeVideoSnippetDto.Builder()
 				.title(videoContent.getTitle())
+				.thumbnails(thumbnails)
 				.categoryId(videoContent.getCategoryExternalIdentifier())
 				.description(videoContent.getDescription()).build();
 		return youTubeSearchResultDto.snippet(snippet).build();

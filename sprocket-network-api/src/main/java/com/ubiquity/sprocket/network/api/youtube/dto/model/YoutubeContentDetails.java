@@ -1,10 +1,11 @@
 package com.ubiquity.sprocket.network.api.youtube.dto.model;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class YoutubeContentDetails {
 	private YoutubeRelatedPlaylists relatedPlaylists = new YoutubeRelatedPlaylists();
-	private Map<String, String> upload;
+	private Map<String, String> upload = new HashMap<String, String>();
 
 	public YoutubeRelatedPlaylists getRelatedPlaylists() {
 		return relatedPlaylists;
