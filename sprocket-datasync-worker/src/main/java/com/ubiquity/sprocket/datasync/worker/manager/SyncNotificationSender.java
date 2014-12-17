@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.amqp.MessageQueueProducer;
 import com.ubiquity.integration.domain.ExternalNetwork;
-import com.ubiquity.integration.domain.UpdateMessage;
+import com.ubiquity.integration.domain.SyncStatusMessage;
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.DestinationType;
 import com.ubiquity.messaging.format.Envelope;
@@ -22,7 +22,7 @@ import com.ubiquity.sprocket.messaging.definition.SynchronizationStepNotificatio
  * @author peter.tadros
  * 
  */
-public class NotificationProcessor extends Thread {
+public class SyncNotificationSender extends Thread {
 
 	private MessageConverter messageConverter = MessageConverterFactory
 			.getMessageConverter();
@@ -30,12 +30,12 @@ public class NotificationProcessor extends Thread {
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private boolean runnable = true;
-	Map<String, UpdateMessage> processedMessages;
+	private Map<String, SyncStatusMessage> processedMessages;
 
 	/***
 	 * Creates a data sync processor that operate
 	 */
-	public NotificationProcessor(Map<String, UpdateMessage> processedMessages) {
+	public SyncNotificationSender(Map<String, SyncStatusMessage> processedMessages) {
 		this.processedMessages = processedMessages;
 	}
 
@@ -45,13 +45,13 @@ public class NotificationProcessor extends Thread {
 		// send an update notification
 		try {
 			while (runnable) {
-				log.info(Thread.currentThread().getName()
+				log.debug(Thread.currentThread().getName()
 						+ " Notification thread started");
 				backchannel = MessageQueueFactory.getBackChannelQueueProducer();
 
-				for (Map.Entry<String, UpdateMessage> entry : processedMessages.entrySet()) {
-					UpdateMessage message = entry.getValue();
-					log.info(entry.getKey() + "/" + message);
+				for (Map.Entry<String, SyncStatusMessage> entry : processedMessages.entrySet()) {
+					SyncStatusMessage message = entry.getValue();
+					log.debug(entry.getKey() + "/" + message);
 					if(message.isUpdated())
 					{
 						sendStepNotificationMessageToIndividual(backchannel, message.getNetwork(),

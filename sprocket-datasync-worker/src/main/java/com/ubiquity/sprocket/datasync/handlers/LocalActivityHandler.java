@@ -1,7 +1,7 @@
 package com.ubiquity.sprocket.datasync.handlers;
 
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
@@ -21,8 +21,9 @@ import com.ubiquity.sprocket.service.ServiceFactory;
  */
 public class LocalActivityHandler extends Handler {
 
-	public LocalActivityHandler(DataSyncProcessor processor, Set<ExternalNetwork> network) {
-		super(processor, network);
+	public LocalActivityHandler(DataSyncProcessor processor) {
+		super(processor);
+		 networks = EnumSet.of(ExternalNetwork.Facebook);
 	}
 
 	@Override
@@ -45,7 +46,7 @@ public class LocalActivityHandler extends Handler {
 		try {
 			synced = ServiceFactory.getSocialService().syncLocalNewsFeed(
 					identity, network);
-			log.info("{}: indexing local activities for identity {}",
+			log.debug("{}: indexing local activities for identity {}",
 					threadName, identity);
 			return synced.size();
 		} catch (AuthorizationException e) {
@@ -62,7 +63,7 @@ public class LocalActivityHandler extends Handler {
 			return -1;
 		} finally {
 			int n = (synced == null) ? -1 : synced.size();
-			log.info(threadName
+			log.debug(threadName
 					+ " Processed {} local activities in {} seconds for user "
 					+ userId, n, new Period(start, new DateTime()).getSeconds());
 		}

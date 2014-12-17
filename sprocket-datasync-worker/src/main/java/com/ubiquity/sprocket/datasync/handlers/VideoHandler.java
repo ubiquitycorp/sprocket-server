@@ -1,7 +1,7 @@
 package com.ubiquity.sprocket.datasync.handlers;
 
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
@@ -22,8 +22,9 @@ import com.ubiquity.sprocket.service.ServiceFactory;
  */
 public class VideoHandler extends Handler {
 
-	public VideoHandler(DataSyncProcessor processor, Set<ExternalNetwork> network) {
-		super(processor, network);
+	public VideoHandler(DataSyncProcessor processor) {
+		super(processor);
+		networks = EnumSet.of(ExternalNetwork.YouTube, ExternalNetwork.Vimeo);
 	}
 
 	@Override
@@ -73,7 +74,7 @@ public class VideoHandler extends Handler {
 			return -1;
 		} finally {
 			int n = (synced == null) ? -1 : synced.size();
-			log.info(threadName
+			log.debug(threadName
 					+ " Processed {} videos in {} seconds for user " + userId,
 					n, new Period(start, new DateTime()).getSeconds());
 		}

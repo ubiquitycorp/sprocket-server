@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.niobium.amqp.MessageQueueProducer;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.domain.ExternalNetwork;
-import com.ubiquity.integration.domain.UpdateMessage;
+import com.ubiquity.integration.domain.SyncStatusMessage;
 import com.ubiquity.sprocket.datasync.worker.manager.DataSyncProcessor;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 
@@ -28,14 +28,13 @@ public abstract class Handler {
 
 	protected DataSyncProcessor processor;
 	protected MessageQueueProducer backchannel = null;
-	protected Map<String, UpdateMessage> processedMessages = null;
+	protected Map<String, SyncStatusMessage> processedMessages = null;
 
-	public Handler(DataSyncProcessor processor, Set<ExternalNetwork> network) {
-		this.networks = network;
+	public Handler(DataSyncProcessor processor) {
 		this.processor = processor;
-		processedMessages = new HashMap<String, UpdateMessage>();
+		processedMessages = new HashMap<String, SyncStatusMessage>();
 		// get the back channel mq; we don't want to skip sync because we can't
-		// send an update notificaiton
+		// send an update notification
 		try {
 			backchannel = MessageQueueFactory.getBackChannelQueueProducer();
 		} catch (Exception e) {
@@ -60,7 +59,7 @@ public abstract class Handler {
 		return next;
 	}
 	
-	public Map<String, UpdateMessage> getProcessedMessages() {
+	public Map<String, SyncStatusMessage> getProcessedMessages() {
 		return processedMessages;
 	}
 
