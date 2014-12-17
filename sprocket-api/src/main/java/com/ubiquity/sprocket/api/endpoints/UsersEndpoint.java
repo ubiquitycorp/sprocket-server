@@ -564,7 +564,7 @@ public class UsersEndpoint {
 	@Path("/{userId}/uploaded")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.APPLICATION_JSON)
-	// @Secure
+	@Secure
 	public Response uploadFile(@PathParam("userId") Long userId,
 			@Context HttpServletRequest request) throws IOException {
 		String fileName = "";
