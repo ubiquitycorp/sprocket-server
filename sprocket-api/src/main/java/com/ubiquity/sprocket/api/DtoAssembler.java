@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
 
+
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.domain.Activity;
@@ -801,9 +802,7 @@ public class DtoAssembler {
 							externalNetworkConfigurationDto);
 				}
 				externalNetworkConfigurationDto = new ExternalNetworkConfigurationDto(
-						config.getExternalNetwork(),
-						ExternalNetwork.ordinalOrDefault(config
-								.getExternalNetwork()));
+						config.getExternalNetwork());
 				externalNetwork = config.getExternalNetwork();
 				externalNetworkConfigurationDto.getRules().put(
 						config.getName(), config.getValue());
@@ -815,5 +814,14 @@ public class DtoAssembler {
 		}
 		return configurationRulesDto;
 
+	}
+	
+	public static List<ExternalNetworkConfigurationDto> getNetworks()
+	{
+		List<ExternalNetworkConfigurationDto> networks = new LinkedList<ExternalNetworkConfigurationDto>();
+		for (ExternalNetwork externalNetwork : ExternalNetwork.values()) {
+			networks.add(new ExternalNetworkConfigurationDto(externalNetwork, null));
+		}
+		return networks;
 	}
 }
