@@ -16,12 +16,14 @@ import com.ubiquity.integration.domain.Address;
 import com.ubiquity.integration.domain.Category;
 import com.ubiquity.integration.domain.Comment;
 import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalInterest;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Interest;
 import com.ubiquity.integration.domain.Message;
 import com.ubiquity.integration.domain.PostComment;
 import com.ubiquity.integration.domain.PostVote;
 import com.ubiquity.integration.domain.Rating;
+import com.ubiquity.integration.domain.UnmappedInterest;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.location.domain.Geobox;
 import com.ubiquity.location.domain.Location;
@@ -36,6 +38,7 @@ import com.ubiquity.sprocket.api.dto.model.AudioDto;
 import com.ubiquity.sprocket.api.dto.model.CommentDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
+import com.ubiquity.sprocket.api.dto.model.ExternalInterestDto;
 import com.ubiquity.sprocket.api.dto.model.ExternalNetworkConfigurationDto;
 import com.ubiquity.sprocket.api.dto.model.GeoboxDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
@@ -377,6 +380,20 @@ public class DtoAssembler {
 		InterestDto interestDto = new InterestDto(interest.getInterestId(),
 				interest.getName());
 		return interestDto;
+	}
+	
+	public static ExternalInterestDto assemble(ExternalInterest interest) {
+
+		ExternalInterestDto externalInterestDto = new ExternalInterestDto(interest.getName(),assemble(interest.getInterest()),
+				interest.getExternalNetwork());
+		return externalInterestDto;
+	}
+	
+	public static ExternalInterestDto assemble(UnmappedInterest interest) {
+
+		ExternalInterestDto externalInterestDto = new ExternalInterestDto(interest.getName(),null,
+				interest.getExternalNetwork());
+		return externalInterestDto;
 	}
 
 	public static VideoDto assemble(VideoContent videoContent) {

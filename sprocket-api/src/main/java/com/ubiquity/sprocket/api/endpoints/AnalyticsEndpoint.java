@@ -1,6 +1,8 @@
 package com.ubiquity.sprocket.api.endpoints;
 
+import java.util.List;
 import java.util.Collection;
+import java.util.LinkedList;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -13,12 +15,15 @@ import javax.ws.rs.core.Response;
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
 import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.ExternalInterest;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Interest;
+import com.ubiquity.integration.domain.UnmappedInterest;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.InterestsDto;
 import com.ubiquity.sprocket.api.dto.containers.RecommendationsDto;
+import com.ubiquity.sprocket.api.dto.model.ExternalInterestDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.service.AnalyticsService;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -60,10 +65,10 @@ public class AnalyticsEndpoint {
 	}
 
 	@GET
-	@Path("users/{userId}/providers/{externalNetworkId}/externalinterests")
+	@Path("users/{userId}/providers/{externalNetworkId}/interests")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response externalInterests(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+	public Response networkInterests(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		InterestsDto interestsDto = new InterestsDto();
 		
@@ -76,6 +81,54 @@ public class AnalyticsEndpoint {
 		
 		for(Interest interest : variant.getCollection())
 			interestsDto.getInterests().add(DtoAssembler.assemble(interest));
+		
+		return Response.ok()
+				//.header("Last-Modified", variant.getLastModified())
+				.entity(jsonConverter.convertToPayload(interestsDto))
+				.build();
+	}
+	
+	@GET
+	@Path("users/{userId}/providers/{externalNetworkId}/externalinterests")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response networkExternalInterests(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+
+		List<ExternalInterestDto> interestsDto = new LinkedList<ExternalInterestDto>();
+		
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
+		CollectionVariant<ExternalInterest> variant = ServiceFactory.getAnalyticsService().findExternalInterestsByExternalNetworkId(externalNetwork);
+		// Throw a 304 if if there is no variant (no change)
+//		if (variant == null)
+//			return Response.notModified().build();
+		
+		
+		for(ExternalInterest interest : variant.getCollection())
+			interestsDto.add(DtoAssembler.assemble(interest));
+		
+		return Response.ok()
+				//.header("Last-Modified", variant.getLastModified())
+				.entity(jsonConverter.convertToPayload(interestsDto))
+				.build();
+	}
+	
+	@GET
+	@Path("users/{userId}/providers/{externalNetworkId}/unmappedinterests")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response networkUnmappedInterests(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+
+		List<ExternalInterestDto> interestsDto = new LinkedList<ExternalInterestDto>();
+		
+		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
+		CollectionVariant<UnmappedInterest> variant = ServiceFactory.getAnalyticsService().findUnmappedInterestByExternalNetworkId(externalNetwork);
+		// Throw a 304 if if there is no variant (no change)
+//		if (variant == null)
+//			return Response.notModified().build();
+		
+		
+		for(UnmappedInterest unmappedInterest : variant.getCollection())
+			interestsDto.add(DtoAssembler.assemble(unmappedInterest));
 		
 		return Response.ok()
 				//.header("Last-Modified", variant.getLastModified())
