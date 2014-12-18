@@ -1,7 +1,7 @@
 package com.ubiquity.sprocket.datasync.handlers;
 
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
@@ -21,8 +21,11 @@ import com.ubiquity.sprocket.service.ServiceFactory;
  */
 public class MessageHandler extends Handler {
 
-	public MessageHandler(DataSyncProcessor processor, Set<ExternalNetwork> network) {
-		super(processor, network);
+	public MessageHandler(DataSyncProcessor processor) {
+		super(processor);
+		networks = EnumSet.of(
+				ExternalNetwork.Twitter, ExternalNetwork.Facebook,
+				ExternalNetwork.Google, ExternalNetwork.Tumblr);
 	}
 
 	@Override
@@ -51,14 +54,14 @@ public class MessageHandler extends Handler {
 		String threadName = Thread.currentThread().getName();
 		try {
 			SocialService socialService = ServiceFactory.getSocialService();
-
+			
 			synced = socialService.syncMessages(identity, network,
-					lastMessageIdentifier);
+					lastMessageIdentifier, processedMessages);
 
 			// add messages to search results
 			ServiceFactory.getSearchService().indexMessages(
 					identity.getUser().getUserId(), synced);
-			log.info(threadName + " indexing messages for identity {}",
+			log.debug(threadName + " indexing messages for identity {}",
 					identity);
 			return synced.size();
 		} catch (AuthorizationException e) {
@@ -75,7 +78,7 @@ public class MessageHandler extends Handler {
 			return -1;
 		} finally {
 			int n = (synced == null) ? -1 : synced.size();
-			log.info(
+			log.debug(
 					threadName
 							+ " Processed {} messages in {} seconds for user "
 							+ userId, n,

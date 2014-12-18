@@ -78,7 +78,7 @@ private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 	public void listMessages() {
 		
 		SocialAPI twitterAPI = SocialAPIFactory.createProvider(ExternalNetwork.Twitter, ClientPlatform.WEB);
-		List<Message> messages = twitterAPI.listMessages(identity,null);
+		List<Message> messages = twitterAPI.listMessages(identity,null, null);
 		Assert.assertFalse(messages.isEmpty());
 		// all fb messages will have conversations
 		for(Message message : messages) {
