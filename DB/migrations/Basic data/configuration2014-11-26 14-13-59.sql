@@ -1,6 +1,6 @@
 USE sprocket;
 
-insert into `configuration` (`configuration_id`,`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) (`configuration_id`,`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,0,1,1415285840335,'message.service.host','localhost',-1);
+insert into `configuration` (`configuration_id`,`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,0,1,1415285840335,'message.service.host','localhost',-1);
 insert into `configuration` (`configuration_id`,`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (2,0,1,1415285845693,'message.service.port','5222',-1);
 insert into `configuration` (`configuration_id`,`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (3,0,1,1415285845698,'message.service.protocol','xmpp',-1);
 insert into `configuration` (`configuration_id`,`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (4,1,1,1415285845703,'http.connnection.timeout','5',-1);
