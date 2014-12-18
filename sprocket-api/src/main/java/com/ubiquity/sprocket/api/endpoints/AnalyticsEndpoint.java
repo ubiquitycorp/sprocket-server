@@ -1,8 +1,6 @@
 package com.ubiquity.sprocket.api.endpoints;
 
-import java.util.List;
 import java.util.Collection;
-import java.util.LinkedList;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -21,9 +19,9 @@ import com.ubiquity.integration.domain.Interest;
 import com.ubiquity.integration.domain.UnmappedInterest;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.sprocket.api.DtoAssembler;
+import com.ubiquity.sprocket.api.dto.containers.AdminInterestsDto;
 import com.ubiquity.sprocket.api.dto.containers.InterestsDto;
 import com.ubiquity.sprocket.api.dto.containers.RecommendationsDto;
-import com.ubiquity.sprocket.api.dto.model.ExternalInterestDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.service.AnalyticsService;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -94,7 +92,7 @@ public class AnalyticsEndpoint {
 	@Secure
 	public Response networkExternalInterests(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
-		List<ExternalInterestDto> interestsDto = new LinkedList<ExternalInterestDto>();
+		AdminInterestsDto interestsDto = new AdminInterestsDto();
 		
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		CollectionVariant<ExternalInterest> variant = ServiceFactory.getAnalyticsService().findExternalInterestsByExternalNetworkId(externalNetwork);
@@ -104,7 +102,7 @@ public class AnalyticsEndpoint {
 		
 		
 		for(ExternalInterest interest : variant.getCollection())
-			interestsDto.add(DtoAssembler.assemble(interest));
+			interestsDto.getInterests().add(DtoAssembler.assemble(interest));
 		
 		return Response.ok()
 				//.header("Last-Modified", variant.getLastModified())
@@ -118,7 +116,7 @@ public class AnalyticsEndpoint {
 	@Secure
 	public Response networkUnmappedInterests(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
-		List<ExternalInterestDto> interestsDto = new LinkedList<ExternalInterestDto>();
+		AdminInterestsDto interestsDto = new AdminInterestsDto();
 		
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 		CollectionVariant<UnmappedInterest> variant = ServiceFactory.getAnalyticsService().findUnmappedInterestByExternalNetworkId(externalNetwork);
@@ -128,7 +126,7 @@ public class AnalyticsEndpoint {
 		
 		
 		for(UnmappedInterest unmappedInterest : variant.getCollection())
-			interestsDto.add(DtoAssembler.assemble(unmappedInterest));
+			interestsDto.getInterests().add(DtoAssembler.assemble(unmappedInterest));
 		
 		return Response.ok()
 				//.header("Last-Modified", variant.getLastModified())
