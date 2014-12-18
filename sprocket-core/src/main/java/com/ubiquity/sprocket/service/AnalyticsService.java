@@ -23,10 +23,12 @@ import com.ubiquity.integration.domain.ExternalInterest;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Gender;
 import com.ubiquity.integration.domain.Interest;
+import com.ubiquity.integration.domain.UnmappedInterest;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.integration.repository.ContactRepositoryJpaImpl;
 import com.ubiquity.integration.repository.ExternalInterestRepositoryJpaImpl;
 import com.ubiquity.integration.repository.InterestRepositoryJpaImpl;
+import com.ubiquity.integration.repository.UnmappedInterestRepositoryJpaImpl;
 import com.ubiquity.integration.repository.cache.CacheKeys;
 import com.ubiquity.sprocket.analytics.recommendation.Dimension;
 import com.ubiquity.sprocket.analytics.recommendation.RecommendationEngine;
@@ -184,8 +186,24 @@ public class AnalyticsService {
 		}
 
 	}
+	
+	public CollectionVariant<ExternalInterest> findExternalInterestsByExternalNetworkId(ExternalNetwork network) {
+		try {
+			return new CollectionVariant<ExternalInterest>(new ExternalInterestRepositoryJpaImpl().getExternalInterestByExternalNetwork(network),null);
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
 
+	}
+	
+	public CollectionVariant<UnmappedInterest> findUnmappedInterestByExternalNetworkId(ExternalNetwork network) {
+		try {
+			return new CollectionVariant<UnmappedInterest>(new UnmappedInterestRepositoryJpaImpl().getUnmappedInterestByExternalNetwork(network),null);
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
 
+	}
 
 	/***
 	 * Returns video content or null if there is no entry for this user in the
