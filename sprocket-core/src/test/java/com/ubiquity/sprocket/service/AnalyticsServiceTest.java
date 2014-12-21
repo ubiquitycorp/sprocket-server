@@ -5,12 +5,10 @@ import java.util.Map;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.service.UserService;
 import com.ubiquity.integration.domain.AgeRange;
 import com.ubiquity.integration.domain.ExternalNetwork;
@@ -20,10 +18,10 @@ import com.ubiquity.integration.service.ContactService;
 import com.ubiquity.sprocket.analytics.recommendation.factory.TestProfileFactory;
 import com.ubiquity.sprocket.domain.Content;
 import com.ubiquity.sprocket.domain.Profile;
+import com.ubiquity.sprocket.domain.factory.ContentFactory;
 import com.ubiquity.sprocket.repository.GroupMembershipRepository;
 import com.ubiquity.sprocket.repository.GroupMembershipRepositoryJpaImpl;
 
-@Ignore
 public class AnalyticsServiceTest {
 
 	private static AnalyticsService analyticsService;
@@ -51,14 +49,6 @@ public class AnalyticsServiceTest {
 //			persist(profile);
 //		}
 	}
-
-	@Test
-	public void testTrackContent() {
-		Content content = new Content.Builder()
-		.activity(TestActivityFactory.createActivityWithMininumRequirements(TestUserFactory.createUserProxy(), ExternalNetwork.Facebook))
-		.build();
-		analyticsService.track(content);
-	}
 	
 	public void testMapReduce() {
 		
@@ -84,12 +74,13 @@ public class AnalyticsServiceTest {
 		analyticsService.createProfile(jill);
 		analyticsService.createProfile(jane);
 
+		
 		// create some public content
-		Content content = new Content.Builder()
-			.activity(TestActivityFactory.createActivityWithMininumRequirements(null, ExternalNetwork.Facebook))
-			.build();
-		analyticsService.track(content, jack.getUserId(), System.currentTimeMillis());
-		analyticsService.track(content, john.getUserId(), System.currentTimeMillis());
+		Content content = ContentFactory.createContent(TestActivityFactory.createActivityWithMininumRequirements(null, ExternalNetwork.Facebook));
+		analyticsService.track(content, jack.getUserId(), System.currentTimeMillis(), null);
+		analyticsService.track(content, john.getUserId(), System.currentTimeMillis(), null);
+		
+		analyticsService.assignGroupsAndCreateRecommendedContent();
 
 
 //		analyticsService.refreshProfileRecords();

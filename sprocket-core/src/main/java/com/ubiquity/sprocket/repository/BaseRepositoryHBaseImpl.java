@@ -8,13 +8,11 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 
-import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.client.coprocessor.AggregationClient;
 import org.apache.hadoop.hbase.filter.ColumnPrefixFilter;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -23,21 +21,13 @@ import org.apache.hadoop.io.WritableUtils;
 public class BaseRepositoryHBaseImpl<T> {
 
 	private HTable table;
-	private AggregationClient client;
-
 	private String tableName;
 
 	protected HTable getTable() {
 		if(table == null) {
-			table = HBaseTableConnectionFactory.getTable(tableName);
+			table = HBaseConnectionFactory.getTable(tableName);
 		}
 		return table;
-	}
-
-	private AggregationClient getAggregationClient() {
-		if(client == null)
-			client = HBaseTableConnectionFactory.createAggregationClient();
-		return client;
 	}
 
 	public BaseRepositoryHBaseImpl(Class<T> type)  {
@@ -54,14 +44,6 @@ public class BaseRepositoryHBaseImpl<T> {
 		} 
 	}
 
-	protected void median(String family, Scan scan) {
-		try {
-			getAggregationClient().median(TableName.valueOf(tableName), null, scan);
-		} catch (Throwable e) {
-			throw new RuntimeException("Could not execute median scan", e);
-		}
-
-	}
 
 	protected Result getResult(Get get) {
 		HTable table = getTable();

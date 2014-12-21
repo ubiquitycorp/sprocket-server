@@ -15,8 +15,6 @@ import com.niobium.repository.cache.DataModificationCacheRedisImpl;
 import com.niobium.repository.cache.UserDataModificationCache;
 import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.niobium.repository.lily.LilyRepositoryFactory;
-import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.Contact;
@@ -35,9 +33,13 @@ import com.ubiquity.sprocket.analytics.recommendation.RecommendationEngineSparkI
 import com.ubiquity.sprocket.domain.Content;
 import com.ubiquity.sprocket.domain.GroupMembership;
 import com.ubiquity.sprocket.domain.Profile;
+import com.ubiquity.sprocket.domain.ProfilePK;
 import com.ubiquity.sprocket.domain.RecommendedActivity;
 import com.ubiquity.sprocket.domain.RecommendedVideo;
+import com.ubiquity.sprocket.domain.UserEngagement;
 import com.ubiquity.sprocket.domain.factory.ProfileFactory;
+import com.ubiquity.sprocket.repository.ContentRepository;
+import com.ubiquity.sprocket.repository.ContentRepositoryHBaseImpl;
 import com.ubiquity.sprocket.repository.GroupMembershipRepository;
 import com.ubiquity.sprocket.repository.GroupMembershipRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.ProfileRepository;
@@ -71,8 +73,7 @@ public class AnalyticsService {
 		//setUpLily(configuration);
 		
 		
-		
-//		setUpRecommendationEngine(configuration);
+		setUpRecommendationEngine(configuration);
 
 		userDataModificationCache = new UserDataModificationCacheRedisImpl(
 				configuration
@@ -91,42 +92,47 @@ public class AnalyticsService {
 		}
 	}
 
-	public void createOrUpdateProfileIdentity(User user, ExternalIdentity identity) {
-		
+	public void createOrUpdateProfileIdentity(User user, Contact contact) {
+		ProfileRepository profileRepository = new ProfileRepositoryHBaseImpl();
+		Profile profile = ProfileFactory.createProfile(user.getUserId(), contact);
+		profileRepository.create(profile);
+	}
+	
+	public Profile getProfile(User user) {
+		return new ProfileRepositoryHBaseImpl().read(new ProfilePK(user.getUserId()));
 	}
 	
 	public void createProfile(Profile profile) {
 		ProfileRepository profileRepository = new ProfileRepositoryHBaseImpl();
 		profileRepository.create(profile);
 	}
+	
 	public void createProfile(User user) {
 		ProfileRepository profileRepository = new ProfileRepositoryHBaseImpl();
 		Profile profile = ProfileFactory.createProfile(user);
 		profileRepository.create(profile);
 	}
 		
-	public void track(String searchTerm, User user) {
-		
-//		ProfileRepository profileRepository = new ProfileRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
-//		Profile profile = profileRepository.read(user.getUserId().toString());
-//		profile.getSearchHistory().add(searchTerm);
-//		profileRepository.update(profile);
+	public void track(String searchTerm, Long userId, ExternalNetwork network) {
+		ProfileRepository profileRepository = new ProfileRepositoryHBaseImpl();
+		profileRepository.addToSearchHistory(new ProfilePK(network, userId), searchTerm);
 	}
 	
-	/***
-	 * Tracks content by persisting it to the underlying data store
-	 * 
-	 * @param content
-	 */
-	public void track(Content content) {
-//		ContentRepository contentRepository = new ContentRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
-//		contentRepository.create(content);
+	public void track(String searchTerm, Long userId) {
+		ProfileRepository profileRepository = new ProfileRepositoryHBaseImpl();
+		profileRepository.addToSearchHistory(new ProfilePK(userId), searchTerm);
 	}
 	
-	public void track(Content content, Long userId, Long timestamp) {
-		
+	public void track(Content content, Long userId, Long timestamp, String groupMembership) {
+		ContentRepository contentRepository = new ContentRepositoryHBaseImpl();
+		contentRepository.create(content); // should update existing records
+		contentRepository.addUserEngagement(new UserEngagement.Builder()
+			.contentId(content.getContentId())
+			.groupMembership(groupMembership)
+			.userId(userId)
+			.timestamp(timestamp)
+			.build());
 	}
-	
 	
 	/**
 	 * Save a user's search term to the data warehouse
@@ -313,14 +319,14 @@ public class AnalyticsService {
 	private void train(ExternalNetwork context) {
 		try {
 			
-			// check to see if there is any data for this context; if not,return
-			if (new ContactRepositoryJpaImpl()
-			.countAllByExternalNetwork(context) == 0) {
-				log.warn("Skipping train on context: {} because no users have signed in yet for it");
-				return;
-			}
+//			// check to see if there is any data for this context; if not,return
+//			if (new ContactRepositoryJpaImpl()
+//			.countAllByExternalNetwork(context) == 0) {
+//				log.warn("Skipping train on context: {} because no users have signed in yet for it");
+//				return;
+//			}
 
-			recommendationEngine.train(context);
+			recommendationEngine.train();
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
@@ -343,6 +349,7 @@ public class AnalyticsService {
 	 **/
 	public void assignGroupsAndCreateRecommendedContent() {
 
+		
 		train(ExternalNetwork.Facebook);
 //		Set<String> groups = assignGroups(ExternalNetwork.Facebook);
 //		createRecommendedActivities(groups, ExternalNetwork.Facebook);

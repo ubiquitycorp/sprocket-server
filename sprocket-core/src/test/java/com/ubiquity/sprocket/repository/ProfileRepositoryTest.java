@@ -30,7 +30,7 @@ public class ProfileRepositoryTest {
 	@BeforeClass
 	public static void setUpServices() throws ConfigurationException {
 		Configuration config = new PropertiesConfiguration("test.properties");
-		HBaseTableConnectionFactory.initialize(config);
+		HBaseConnectionFactory.initialize(config);
 	}
 
 	@Before

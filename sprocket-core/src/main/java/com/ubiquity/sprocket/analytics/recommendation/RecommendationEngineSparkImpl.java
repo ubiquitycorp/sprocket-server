@@ -9,6 +9,11 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
+import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.mllib.clustering.KMeansModel;
@@ -23,6 +28,8 @@ import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.sprocket.domain.GroupMembership;
 import com.ubiquity.sprocket.domain.Profile;
+import com.ubiquity.sprocket.repository.HBaseConnectionFactory;
+import com.ubiquity.sprocket.repository.ProfileRepository;
 
 public class RecommendationEngineSparkImpl implements RecommendationEngine {
 
@@ -34,13 +41,17 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 	private Map<String, ExecutionContext> contextMap = new HashMap<String, ExecutionContext>();
 
 	private JavaSparkContext sparkContext;
+	
+	private ProfileRepository profileRepository;
+	
 
 
 	public RecommendationEngineSparkImpl(Configuration configuration) {
 		
+		
 		sparkContext = new JavaSparkContext(
-				configuration.getString("recommendation.engine.hadoop.master"),
-				configuration.getString("recommendation.engine.appname"));
+				new SparkConf().setMaster(configuration.getString("recommendation.engine.hadoop.master"))
+							   .setAppName(configuration.getString("recommendation.engine.appname")));
 
 		// create the global context
 		contextMap.put(GLOBAL_CONTEXT_IDENTIFIER, new ExecutionContext(null,
@@ -55,8 +66,17 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 
 	@Override
 	public void train() {
-		ExecutionContext context = contextMap.get(GLOBAL_CONTEXT_IDENTIFIER);
-		context.train();
+		
+		
+		org.apache.hadoop.conf.Configuration conf = HBaseConnectionFactory.getConfiguration();	
+		//conf.set(TableInputFormat., "profile");
+		JavaPairRDD<ImmutableBytesWritable, Result> data = 
+		sparkContext.newAPIHadoopRDD(conf, TableInputFormat.class, ImmutableBytesWritable.class, Result.class);
+		sparkContext.env();
+		log.info("data {}", sparkContext.env());
+		
+//		ExecutionContext context = contextMap.get(GLOBAL_CONTEXT_IDENTIFIER);
+//		context.train();
 	}
 
 	@Override
@@ -232,6 +252,8 @@ public class RecommendationEngineSparkImpl implements RecommendationEngine {
 		}
 
 		protected void train() {
+			
+			log.info("SUP");
 			
 //			if(context != null)
 //				points = distData.map(new ContactFunction(context, dimensions));

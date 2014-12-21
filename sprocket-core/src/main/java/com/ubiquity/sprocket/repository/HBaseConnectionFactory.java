@@ -5,12 +5,17 @@ import java.io.IOException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.coprocessor.AggregationClient;
 
-public class HBaseTableConnectionFactory {
+public class HBaseConnectionFactory {
 	
 	private static HBaseSchema schema;
 	private static org.apache.hadoop.conf.Configuration conf;
+	
+	public static org.apache.hadoop.conf.Configuration getConfiguration() {
+		if(conf == null)
+			throw new IllegalArgumentException("HBase not initialized");
+		return conf;
+	}
 	
 	public static void initialize(Configuration configuration) {
 		
@@ -31,10 +36,7 @@ public class HBaseTableConnectionFactory {
 		}
 		
 	}
-	
-	public static AggregationClient createAggregationClient() {
-		return new AggregationClient(conf);
-	}
+
 	
 	public static synchronized HTable getTable(String tableName) {
 		try {

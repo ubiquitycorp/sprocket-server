@@ -4,13 +4,13 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.sprocket.repository.HBaseConnectionFactory;
 import com.ubiquity.sprocket.service.AnalyticsServiceTest;
 
 /***
@@ -19,7 +19,6 @@ import com.ubiquity.sprocket.service.AnalyticsServiceTest;
  * @author chris
  *
  */
-@Ignore
 @RunWith(Suite.class)
 @SuiteClasses({ 
 	AnalyticsServiceTest.class
@@ -38,5 +37,7 @@ public class IntegrationTestSuite {
 		Configuration configuration = new PropertiesConfiguration("test.properties");
 		// Start a connection pool to redis
 		JedisConnectionFactory.initialize(configuration);
+		HBaseConnectionFactory.initialize(configuration);;
+
 	}
 }
