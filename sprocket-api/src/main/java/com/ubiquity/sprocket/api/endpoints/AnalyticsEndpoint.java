@@ -63,7 +63,7 @@ public class AnalyticsEndpoint {
 	}
 
 	@GET
-	@Path("users/{userId}/providers/{externalNetworkId}/interests")
+	@Path("users/{userId}/providers/{externalNetworkId}/externalinterests")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response networkInterests(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
@@ -87,7 +87,7 @@ public class AnalyticsEndpoint {
 	}
 	
 	@GET
-	@Path("users/{userId}/providers/{externalNetworkId}/externalinterests")
+	@Path("users/{userId}/providers/{externalNetworkId}/interests")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response networkExternalInterests(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
