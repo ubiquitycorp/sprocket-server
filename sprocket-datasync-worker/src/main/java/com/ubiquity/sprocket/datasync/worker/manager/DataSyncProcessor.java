@@ -1,7 +1,6 @@
 package com.ubiquity.sprocket.datasync.worker.manager;
 
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -47,22 +46,11 @@ public class DataSyncProcessor extends Thread {
 	private MessageConverter messageConverter = MessageConverterFactory
 			.getMessageConverter();
 
+	SyncNotificationSender notificationProcessor;
+
+	private Logger log = LoggerFactory.getLogger(getClass());
+
 	Handler activityHandler;
-	
-	Set<ExternalNetwork> networksSupportActivities = EnumSet.of(
-			ExternalNetwork.Twitter, ExternalNetwork.Facebook,
-			ExternalNetwork.LinkedIn, ExternalNetwork.Tumblr,
-			ExternalNetwork.Reddit);
-
-	Set<ExternalNetwork> networksSupportMessages = EnumSet.of(
-			ExternalNetwork.Twitter, ExternalNetwork.Facebook,
-			ExternalNetwork.Google, ExternalNetwork.Tumblr);
-
-	Set<ExternalNetwork> networksSupportLocalActivities = EnumSet
-			.of(ExternalNetwork.Facebook);
-
-	Set<ExternalNetwork> networksSupportVideos = EnumSet.of(
-			ExternalNetwork.YouTube, ExternalNetwork.Vimeo);
 
 	/**
 	 * Starts a processor with the underlying list
@@ -72,32 +60,34 @@ public class DataSyncProcessor extends Thread {
 	 * @param to
 	 */
 	public DataSyncProcessor(List<User> users, int from, int to) {
+		log.info("Created DataSycnProcessor from {} to {}", from, to);
 		this.from = from;
 		this.to = to;
 		this.users = users;
-		
+
 		createChainHandelrs();
+		notificationProcessor = new SyncNotificationSender(activityHandler.getNext().getProcessedMessages());
 	}
 
 	/***
 	 * Creates a data sync processor that operate
 	 */
 	public DataSyncProcessor() {
+		log.info("Created DataSycnProcessor");
 		createChainHandelrs();
+		notificationProcessor = new SyncNotificationSender(activityHandler.getNext().getProcessedMessages());
 	}
-	
-	private void createChainHandelrs(){
-		activityHandler = new ActivityHandler(this, networksSupportActivities);
-		Handler messageHandler = new MessageHandler(this, networksSupportMessages);
-		Handler localActivityHandler = new LocalActivityHandler(this, networksSupportLocalActivities);
-		Handler videoHandler = new VideoHandler(this, networksSupportVideos);
+
+	private void createChainHandelrs() {
+		activityHandler = new ActivityHandler(this);
+		Handler messageHandler = new MessageHandler(this);
+		Handler localActivityHandler = new LocalActivityHandler(this);
+		Handler videoHandler = new VideoHandler(this);
 
 		activityHandler.setNext(messageHandler);
 		messageHandler.setNext(localActivityHandler);
 		localActivityHandler.setNext(videoHandler);
 	}
-
-	private Logger log = LoggerFactory.getLogger(getClass());
 
 	/**
 	 * If an identity has been activated, process all available content;
@@ -119,7 +109,10 @@ public class DataSyncProcessor extends Thread {
 	public void run() {
 		log.info(Thread.currentThread().getName()
 				+ " Synchronizing data from {} to {}", from, to);
+		
+		notificationProcessor.start();
 		syncData();
+		notificationProcessor.setTerminate();
 	}
 
 	/**

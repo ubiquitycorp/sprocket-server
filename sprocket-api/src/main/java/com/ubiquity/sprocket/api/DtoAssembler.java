@@ -8,20 +8,25 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
 
+
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ActivityType;
 import com.ubiquity.integration.domain.Address;
+import com.ubiquity.integration.domain.AdminInterest;
+import com.ubiquity.integration.domain.AdminInterestType;
 import com.ubiquity.integration.domain.Category;
 import com.ubiquity.integration.domain.Comment;
 import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalInterest;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Interest;
 import com.ubiquity.integration.domain.Message;
 import com.ubiquity.integration.domain.PostComment;
 import com.ubiquity.integration.domain.PostVote;
 import com.ubiquity.integration.domain.Rating;
+import com.ubiquity.integration.domain.UnmappedInterest;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.location.domain.Geobox;
 import com.ubiquity.location.domain.Location;
@@ -36,6 +41,7 @@ import com.ubiquity.sprocket.api.dto.model.AudioDto;
 import com.ubiquity.sprocket.api.dto.model.CommentDto;
 import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
+import com.ubiquity.sprocket.api.dto.model.AdminInterestDto;
 import com.ubiquity.sprocket.api.dto.model.ExternalNetworkConfigurationDto;
 import com.ubiquity.sprocket.api.dto.model.GeoboxDto;
 import com.ubiquity.sprocket.api.dto.model.IdentityDto;
@@ -379,6 +385,24 @@ public class DtoAssembler {
 		return interestDto;
 	}
 
+	public static AdminInterestDto assemble(ExternalInterest externalInterest) {
+		return new AdminInterestDto.Builder()
+				.id(externalInterest.getExternalInterestId())
+				.name(externalInterest.getName())
+				.interestId(externalInterest.getInterest().getInterestId())
+				.externalNetworkId(externalInterest.getExternalNetwork())
+				.build();
+	}
+
+	public static AdminInterestDto assemble(UnmappedInterest unmappedInterest) {
+		return new AdminInterestDto.Builder()
+				.id(unmappedInterest.getUnmappedId())
+				.name(unmappedInterest.getName())
+				.externalNetworkId(unmappedInterest.getExternalNetwork())
+				.build();
+
+	}
+
 	public static VideoDto assemble(VideoContent videoContent) {
 		VideoDto.Builder videoBuilder = new VideoDto.Builder()
 				.externalNetworkId(videoContent.getExternalNetwork().ordinal());
@@ -492,15 +516,15 @@ public class DtoAssembler {
 
 			activityDtoBuilder.video(videoDtoBuilder.build());
 		}
-		
-		if(activity.getAudio() != null){
+
+		if (activity.getAudio() != null) {
 			AudioDto.Builder audioDtoBuilder = new AudioDto.Builder();
-			if(activity.getAudio().getEmbedCode() != null)
+			if (activity.getAudio().getEmbedCode() != null)
 				audioDtoBuilder.embedCode(activity.getAudio().getEmbedCode());
-			else 
+			else
 				audioDtoBuilder.url(activity.getAudio().getUrl());
-			
-			activityDtoBuilder.audio(audioDtoBuilder.build());	
+
+			activityDtoBuilder.audio(audioDtoBuilder.build());
 		}
 		if (activity.getComments() != null) {
 			for (Comment comment : activity.getComments())
@@ -735,6 +759,31 @@ public class DtoAssembler {
 				.longitude(locationDto.getLongitude()).build();
 	}
 
+	public static AdminInterest assemble(AdminInterestDto adminInterestDto) {
+
+		AdminInterest adminInterest = null;
+		AdminInterestType adminInterestType = AdminInterestType
+				.getAdminInterestTypeFromId(adminInterestDto.getInterestType());
+		if (adminInterestType.equals(AdminInterestType.INTEREST)) {
+			adminInterest = new Interest(adminInterestDto.getId(),adminInterestDto.getName(),
+					adminInterestDto.getParentInterestId());
+		} else if (adminInterestType
+				.equals(AdminInterestType.EXTERNAL_INTEREST)) {
+			adminInterest = new ExternalInterest(adminInterestDto.getId(),
+					adminInterestDto.getName(),
+					adminInterestDto.getInterestId(),
+					adminInterestDto.getExternalNetwork());
+		} else if (adminInterestType
+				.equals(AdminInterestType.UNMAPPED_INTEREST)) {
+			adminInterest = new UnmappedInterest.Builder()
+			.externalNetwork(adminInterestDto.getExternalNetwork())
+			.unmappedId(adminInterestDto.getId())
+			.name(adminInterestDto.getName())
+			.build();
+		}
+		return adminInterest;
+	}
+
 	public static ConfigurationRulesDto assembleConfigurationList(
 			List<Configuration> rules) {
 		ConfigurationRulesDto configurationRulesDto = new ConfigurationRulesDto();
@@ -753,9 +802,7 @@ public class DtoAssembler {
 							externalNetworkConfigurationDto);
 				}
 				externalNetworkConfigurationDto = new ExternalNetworkConfigurationDto(
-						config.getExternalNetwork(),
-						ExternalNetwork.ordinalOrDefault(config
-								.getExternalNetwork()));
+						config.getExternalNetwork());
 				externalNetwork = config.getExternalNetwork();
 				externalNetworkConfigurationDto.getRules().put(
 						config.getName(), config.getValue());
@@ -767,5 +814,14 @@ public class DtoAssembler {
 		}
 		return configurationRulesDto;
 
+	}
+	
+	public static List<ExternalNetworkConfigurationDto> getNetworks()
+	{
+		List<ExternalNetworkConfigurationDto> networks = new LinkedList<ExternalNetworkConfigurationDto>();
+		for (ExternalNetwork externalNetwork : ExternalNetwork.values()) {
+			networks.add(new ExternalNetworkConfigurationDto(externalNetwork, null));
+		}
+		return networks;
 	}
 }

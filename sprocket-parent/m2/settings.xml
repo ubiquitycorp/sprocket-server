@@ -9,6 +9,8 @@
 				<loggly.customer.token>4ed5a2fe-f74b-47f8-ba62-ab0ac09e7505
 				</loggly.customer.token>
 
+				<datasync.worker.processes>1</datasync.worker.processes>
+				<datasync.worker.size>1024</datasync.worker.size>
 				<syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
 				<redis.host>localhost</redis.host>
 				<hibernate.debug>true</hibernate.debug>
@@ -141,6 +143,9 @@
 				<loggly.customer.token>4ed5a2fe-f74b-47f8-ba62-ab0ac09e7505
 				</loggly.customer.token>
 
+				<datasync.worker.processes>1</datasync.worker.processes>
+				<datasync.worker.size>1024</datasync.worker.size>
+
 				<redis.host>localhost</redis.host>
 				<hibernate.debug>false</hibernate.debug>
 				<solr.api.host>localhost</solr.api.host>
@@ -269,6 +274,10 @@
 				<syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
 				<loggly.customer.token>4ed5a2fe-f74b-47f8-ba62-ab0ac09e7505
 				</loggly.customer.token>
+
+				<datasync.worker.processes>2</datasync.worker.processes>
+				<datasync.worker.size>2048</datasync.worker.size>
+
 				<redis.host>54.183.115.14</redis.host>
 				<hibernate.debug>false</hibernate.debug>
 				<solr.api.host>54.219.144.172</solr.api.host>
@@ -397,6 +406,8 @@
 				<syslog.host>ubiquity-build.ubiquitybc.net</syslog.host>
 				<loggly.customer.token>4ed5a2fe-f74b-47f8-ba62-ab0ac09e7505
 				</loggly.customer.token>
+				<datasync.worker.processes>2</datasync.worker.processes>
+				<datasync.worker.size>2048</datasync.worker.size>
 
 				<redis.host>sprocket-redis</redis.host>
 				<hibernate.debug>false</hibernate.debug>

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>sprocket-datasync-worker</artifactId>
 	<name>Sprocket Data Sync Worker</name>
-	<version>0.4.69</version>
+	<version>0.4.77</version>
 
 	<parent>
 		<groupId>com.ubiquity</groupId>
@@ -26,6 +26,10 @@
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>rpm/bin</directory>
 				<filtering>true</filtering>
 			</resource>
 		</resources>
@@ -117,7 +121,7 @@
 							<filemode>755</filemode>
 							<sources>
 								<source>
-									<location>rpm/bin</location>
+								<location>target/classes/sprocket-datasync-worker</location>
 								</source>
 							</sources>
 						</mapping>

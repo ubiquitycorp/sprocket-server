@@ -1,6 +1,8 @@
 package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -11,6 +13,7 @@ import javax.ws.rs.core.Response;
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ConfigurationDto;
+import com.ubiquity.sprocket.api.dto.model.ExternalNetworkConfigurationDto;
 import com.ubiquity.sprocket.service.ClientConfigurationService;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
@@ -30,6 +33,18 @@ public class ClientEndpoint {
 		results.setRules(DtoAssembler.assembleConfigurationList(configurationService.getRules()));
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(results))
+				.build();
+	}
+	
+	@GET
+	@Path("/networks")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getActiveNetworks() throws IOException {
+		
+		List<ExternalNetworkConfigurationDto> networks = DtoAssembler.getNetworks();
+		
+		return Response.ok()
+				.entity(jsonConverter.convertToPayload(networks))
 				.build();
 	}
 }
