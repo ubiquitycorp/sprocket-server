@@ -3,8 +3,6 @@ package com.ubiquity.sprocket.api.dto.model;
 import javax.validation.constraints.Size;
 
 import com.esotericsoftware.kryo.NotNull;
-import com.ubiquity.identity.domain.Admin;
-import com.ubiquity.sprocket.api.dto.model.IdentityDto.Builder;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 
 public class AdminDto {
