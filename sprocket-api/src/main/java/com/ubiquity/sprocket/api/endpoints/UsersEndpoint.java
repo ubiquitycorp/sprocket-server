@@ -715,7 +715,7 @@ public class UsersEndpoint {
 
 		MessageQueueFactory.getLocationQueueProducer()
 				.write(message.getBytes());
-		log.info("message sent: {}", message);
+		log.debug("message sent: {}", message);
 	}
 
 }
