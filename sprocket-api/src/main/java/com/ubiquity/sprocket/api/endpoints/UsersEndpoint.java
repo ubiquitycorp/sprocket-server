@@ -41,6 +41,7 @@ import com.ubiquity.integration.api.ContentAPI;
 import com.ubiquity.integration.api.ContentAPIFactory;
 import com.ubiquity.integration.api.SocialAPI;
 import com.ubiquity.integration.api.SocialAPIFactory;
+import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.integration.api.linkedin.ExchangeService;
 import com.ubiquity.integration.api.tumblr.TumblrAPI;
 import com.ubiquity.integration.api.twitter.TwitterAPI;
@@ -108,16 +109,13 @@ public class UsersEndpoint {
 
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
-		if (user == null)
-			throw new HttpException("Username / password incorrect", 401);
 
 		String cookieString = java.net.URLDecoder.decode(cookie, "UTF-8");
 		ExchangeService exchangservice = new ExchangeService();
 		String[] accesstokens = exchangservice.exchangeToken(cookieString);
 
 		if (accesstokens[0] == null || accesstokens[0].equalsIgnoreCase(""))
-			throw new HttpException(
-					"Autontication Failed no oAuth_token_returned", 401);
+			throw new AuthorizationException("Autontication Failed no oAuth_token_returned", null);
 
 		// create the identity if it does not exist; or use the existing one
 		List<ExternalIdentity> identities = ServiceFactory
@@ -223,7 +221,7 @@ public class UsersEndpoint {
 		User user = authenticationService.authenticate(
 				identityDto.getUsername(), identityDto.getPassword());
 		if (user == null)
-			throw new HttpException("Username / password incorrect", 401);
+			throw new AuthorizationException("Username / password incorrect", null);
 
 		// update user last login
 		user.setLastLogin(System.currentTimeMillis());
