@@ -34,7 +34,7 @@
 	<logger name="org.hibernate" level="WARN" />
 		
 	<root level="${app.log.level}">
-<!--  		<appender-ref ref="LOGGLY" /> -->
+ 		<appender-ref ref="LOGGLY" />
 		<appender-ref ref="STDOUT" />
 	</root>
 	
