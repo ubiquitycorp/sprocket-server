@@ -13,14 +13,13 @@ import java.util.List;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.log4j.Logger;
 import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.niobium.common.thread.ThreadPool;
 import com.niobium.repository.jpa.EntityManagerSupport;
@@ -36,7 +35,7 @@ public class DataSyncWorker {
 
 	
 	private static final int DEFAULT_NUM_CONSUMERS = 10;
-	protected static Logger log = LoggerFactory.getLogger(DataSyncWorker.class);
+	protected static Logger log = Logger.getLogger(DataSyncWorker.class);
 
 	public void destroy() {
 		stopServices();
@@ -60,7 +59,7 @@ public class DataSyncWorker {
 		
 		
 		startScheduler(configuration.getInt("rules.sync.blockSize", 20));
-		log.info("Initialized {} version: {}", configuration.getProperty("application.name"),
+		log.info("Initialized {} version: {}"+ configuration.getProperty("application.name") +"  "+
 				configuration.getProperty("application.version"));
 		
 				
