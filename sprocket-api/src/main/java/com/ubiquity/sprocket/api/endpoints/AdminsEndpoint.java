@@ -36,7 +36,7 @@ public class AdminsEndpoint {
 	@POST
 	@Path("/{adminId}/externalInterest")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response register(InputStream payload) throws IOException {
+	public Response getExternalInterests(InputStream payload) throws IOException {
 		AdminInterestsDto externalInterests = jsonConverter.convertFromPayload(
 				payload, AdminInterestsDto.class);
 
