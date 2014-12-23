@@ -139,7 +139,7 @@
 			<id>env-qa</id>
 			<properties>
 				<app.log.level>INFO</app.log.level>
-				<syslog.host>localhost</syslog.host>
+				<syslog.host>172-31-2-175</syslog.host>
 				<loggly.customer.token>4ed5a2fe-f74b-47f8-ba62-ab0ac09e7505
 				</loggly.customer.token>
 
