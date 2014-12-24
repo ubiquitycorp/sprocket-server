@@ -11,7 +11,6 @@ import org.junit.runners.Suite.SuiteClasses;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.sprocket.repository.HBaseConnectionFactory;
-import com.ubiquity.sprocket.service.AnalyticsServiceTest;
 
 /***
  * Test suite will ensure that the integration tests have their dependencies met and cleaned up
@@ -21,7 +20,7 @@ import com.ubiquity.sprocket.service.AnalyticsServiceTest;
  */
 @RunWith(Suite.class)
 @SuiteClasses({ 
-	AnalyticsServiceTest.class
+	
 	})
 public class IntegrationTestSuite {
 	
