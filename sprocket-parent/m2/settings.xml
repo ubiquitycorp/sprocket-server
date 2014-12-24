@@ -643,6 +643,12 @@
 				<mail.username>AKIAIBIMFN7QRWAVFV2A</mail.username>
 				<mail.password>AjJEA/pBTFxolvU0bO1ivVpRNeLoJM0KTh7yC7cBMTWA
 				</mail.password>
+				
+				<mq.host>192.168.130.242</mq.host>
+				<mq.port>5672</mq.port>
+				<mq.username>netappusr</mq.username>
+				<mq.password>blackdeer</mq.password>
+				
 				<!-- recommendation engine -->
 				<recommendation.engine.appname>Sprocket
 				</recommendation.engine.appname>
