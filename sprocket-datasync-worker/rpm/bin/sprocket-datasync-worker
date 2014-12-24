@@ -37,6 +37,6 @@ echo "Running ${NUM_PROCESSES} workers each ${SPROCKET_WORKER_INDIVIDUAL}MB."
 while [ $NUM_PROCESSES -gt 0 ]
 do
  echo "Launching worker ${NUM_PROCESSES} at `date`"
- $JAVA -Xmx${SPROCKET_WORKER_INDIVIDUAL}m -jar ${SPROCKET_WORKER_NAME} &
+ $JAVA -Xmx${SPROCKET_WORKER_INDIVIDUAL}m -cp ${SPROCKET_WORKER_NAME} com.ubiquity.sprocket.datasync.worker.DataSyncWorker &
  NUM_PROCESSES=`expr ${NUM_PROCESSES} - 1`
 done

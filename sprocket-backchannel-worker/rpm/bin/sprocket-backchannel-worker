@@ -23,4 +23,4 @@ fi
 
 echo "Available Memory: ${AVAILMEM}MB"
 echo "Sprocket Worker Size: ${SPROCKET_WORKER_SIZE}MB"
-$JAVA -Xmx${SPROCKET_WORKER_SIZE}m -jar ${SPROCKET_WORKER_NAME}
+$JAVA -Xmx${SPROCKET_WORKER_SIZE}m -cp ${SPROCKET_WORKER_NAME} com.ubiquity.sprocket.backchannel.worker.BackChannelWorker
