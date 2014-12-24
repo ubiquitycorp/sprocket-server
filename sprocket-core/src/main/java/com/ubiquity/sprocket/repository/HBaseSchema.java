@@ -81,5 +81,11 @@ public class HBaseSchema {
 		createTableIfNotExists(name);
 		return new HTable(conf, name);		
 	}
+	
+	public void cleanup() {
+		try {
+			admin.close();
+		} catch (IOException e) {}
+	}
 
 }

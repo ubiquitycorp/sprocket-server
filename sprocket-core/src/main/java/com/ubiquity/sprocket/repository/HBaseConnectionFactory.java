@@ -47,4 +47,8 @@ public class HBaseConnectionFactory {
 		}
 	}
 
+	public static void close() {
+		schema.cleanup();
+	}
+
 }

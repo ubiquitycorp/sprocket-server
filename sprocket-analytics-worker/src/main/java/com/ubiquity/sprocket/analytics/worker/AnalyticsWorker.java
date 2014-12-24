@@ -7,6 +7,8 @@ import static org.quartz.TriggerBuilder.newTrigger;
 import static org.quartz.TriggerKey.triggerKey;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -20,16 +22,20 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.common.thread.ThreadPool;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.sprocket.analytics.worker.jobs.AssignmentSyncJob;
 import com.ubiquity.sprocket.analytics.worker.jobs.RecommendationSyncJob;
+import com.ubiquity.sprocket.analytics.worker.mq.consumer.TrackConsumer;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
+import com.ubiquity.sprocket.repository.HBaseConnectionFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 
 public class AnalyticsWorker {
 
+	private static final int DEFAULT_NUM_CONSUMERS = 2;
 	protected static Logger log = LoggerFactory.getLogger(AnalyticsWorker.class);
 
 	public void destroy() {
@@ -42,8 +48,22 @@ public class AnalyticsWorker {
 
 		log.info("Service initialized.");
 
-		startScheduler();
+		//startScheduler();
+		
 
+		List<TrackConsumer> consumers = new LinkedList<TrackConsumer>();
+		try {			
+			for(int i = 0; i < DEFAULT_NUM_CONSUMERS; i++)
+				consumers.add(new TrackConsumer(MessageQueueFactory.createTrackConsumerChannel()));
+		} catch (IOException e) {
+			log.error("Unable to start service", e);
+			System.exit(0);
+		}
+
+		// start the thread pool, 10 consumer threads
+		ThreadPool<TrackConsumer> threadPool = new ThreadPool<TrackConsumer>();
+		threadPool.start(consumers);
+		
 		while (true) {
 			try {
 				Thread.sleep(1000);
@@ -84,11 +104,13 @@ public class AnalyticsWorker {
 		ServiceFactory.initialize(configuration, errorsConfiguration);
 		JedisConnectionFactory.initialize(configuration);
 		MessageQueueFactory.initialize(configuration);
+		HBaseConnectionFactory.initialize(configuration);
 	}
 
 	private void stopServices() {
 		JedisConnectionFactory.destroyPool();
 		EntityManagerSupport.closeEntityManagerFactory();
+		HBaseConnectionFactory.close();
 		// TODO: we need an mq disconnect
 	}
 	

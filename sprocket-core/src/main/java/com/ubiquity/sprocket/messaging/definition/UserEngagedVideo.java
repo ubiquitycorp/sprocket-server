@@ -6,12 +6,25 @@ public class UserEngagedVideo {
 
 	private Long userId;
 	private VideoContent videoContent;
+	private Long timestamp;
 
 	public UserEngagedVideo(Long userId, VideoContent videoContent) {
-		super();
 		this.userId = userId;
 		this.videoContent = videoContent;
 	}
+	
+
+	public UserEngagedVideo(Long userId, VideoContent videoContent,
+			Long timestamp) {
+		this.userId = userId;
+		this.videoContent = videoContent;
+		this.timestamp = timestamp;
+	}
+
+	public Long getTimestamp() {
+		return timestamp;
+	}
+
 
 	public Long getUserId() {
 		return userId;

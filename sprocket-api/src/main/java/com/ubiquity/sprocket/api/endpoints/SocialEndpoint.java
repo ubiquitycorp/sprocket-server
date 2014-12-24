@@ -447,7 +447,7 @@ public class SocialEndpoint {
 						new com.ubiquity.messaging.format.Message(
 								messageContent));
 		byte[] bytes = message.getBytes();
-		MessageQueueFactory.getCacheInvalidationQueueProducer().write(bytes);
+		MessageQueueFactory.getTrackQueueProducer().write(bytes);
 	}
 
 }

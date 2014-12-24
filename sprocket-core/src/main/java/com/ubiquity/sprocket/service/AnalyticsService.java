@@ -717,45 +717,45 @@ public class AnalyticsService {
 			log.info("Skipping recommendation engine");
 			return;
 		}
-		recommendationEngine = new RecommendationEngineSparkImpl(configuration);
-
-		// add dimension to global context with all weight values at 1
-		recommendationEngine.addDimension(Dimension.createFromEnum("gender",
-				Gender.class, 0.0));
-		recommendationEngine.addDimension(new Dimension("ageRange", Range
-				.between(0.0, 100.0), 0.0));
-		recommendationEngine.addDimension(new Dimension("lat", Range.between(
-				-90.0, 90.0), 1.0)); // only location important
-		recommendationEngine.addDimension(new Dimension("lon", Range.between(
-				-180.0, 180.0), 1.0));
-
-		// create fb specific context, with dimensions where
-		recommendationEngine
-				.addContext(ExternalNetwork.Facebook, configuration);
-		recommendationEngine.addDimension(
-				Dimension.createFromEnum("gender", Gender.class, 1.0),
-				ExternalNetwork.Facebook);
-		recommendationEngine.addDimension(
-				new Dimension("ageRange", Range.between(0.0, 100.0), 1.0),
-				ExternalNetwork.Facebook);
-		recommendationEngine.addDimension(new Dimension("lat", Range.between(
-				-90.0, 90.0), 0.0)); // location we don't care about because we
-		// have location filter
-		recommendationEngine.addDimension(new Dimension("lon", Range.between(
-				-180.0, 180.0), 0.0));
-
-		// create google specific context, with dimensions where
-		recommendationEngine.addContext(ExternalNetwork.Google, configuration);
-		recommendationEngine.addDimension(
-				Dimension.createFromEnum("gender", Gender.class, 1.0),
-				ExternalNetwork.Google);
-		recommendationEngine.addDimension(
-				new Dimension("ageRange", Range.between(0.0, 100.0), 1.0),
-				ExternalNetwork.Google);
-		recommendationEngine.addDimension(new Dimension("lat", Range.between(
-				-90.0, 90.0), 0.5)); // location so / so
-		recommendationEngine.addDimension(new Dimension("lon", Range.between(
-				-180.0, 180.0), 0.5));
+//		recommendationEngine = new RecommendationEngineSparkImpl(configuration);
+//
+//		// add dimension to global context with all weight values at 1
+//		recommendationEngine.addDimension(Dimension.createFromEnum("gender",
+//				Gender.class, 0.0));
+//		recommendationEngine.addDimension(new Dimension("ageRange", Range
+//				.between(0.0, 100.0), 0.0));
+//		recommendationEngine.addDimension(new Dimension("lat", Range.between(
+//				-90.0, 90.0), 1.0)); // only location important
+//		recommendationEngine.addDimension(new Dimension("lon", Range.between(
+//				-180.0, 180.0), 1.0));
+//
+//		// create fb specific context, with dimensions where
+//		recommendationEngine
+//				.addContext(ExternalNetwork.Facebook, configuration);
+//		recommendationEngine.addDimension(
+//				Dimension.createFromEnum("gender", Gender.class, 1.0),
+//				ExternalNetwork.Facebook);
+//		recommendationEngine.addDimension(
+//				new Dimension("ageRange", Range.between(0.0, 100.0), 1.0),
+//				ExternalNetwork.Facebook);
+//		recommendationEngine.addDimension(new Dimension("lat", Range.between(
+//				-90.0, 90.0), 0.0)); // location we don't care about because we
+//		// have location filter
+//		recommendationEngine.addDimension(new Dimension("lon", Range.between(
+//				-180.0, 180.0), 0.0));
+//
+//		// create google specific context, with dimensions where
+//		recommendationEngine.addContext(ExternalNetwork.Google, configuration);
+//		recommendationEngine.addDimension(
+//				Dimension.createFromEnum("gender", Gender.class, 1.0),
+//				ExternalNetwork.Google);
+//		recommendationEngine.addDimension(
+//				new Dimension("ageRange", Range.between(0.0, 100.0), 1.0),
+//				ExternalNetwork.Google);
+//		recommendationEngine.addDimension(new Dimension("lat", Range.between(
+//				-90.0, 90.0), 0.5)); // location so / so
+//		recommendationEngine.addDimension(new Dimension("lon", Range.between(
+//				-180.0, 180.0), 0.5));
 
 	}
 

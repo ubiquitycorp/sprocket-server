@@ -36,7 +36,7 @@ public class ContentEndpoint {
 	@POST
 	@Path("/users/{userId}/videos/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Secure
+//	@Secure
 	public Response engaged(@PathParam("userId") Long userId, InputStream payload) throws IOException {
 
 		// convert payload
@@ -102,9 +102,7 @@ public class ContentEndpoint {
 		byte[] bytes = message.getBytes();
 		
 		// will ensure the domain entity gets saved to the store if it does not exist and indexed for faster search
-		MessageQueueFactory.getCacheInvalidationQueueProducer().write(bytes);
-
-
+		MessageQueueFactory.getTrackQueueProducer().write(bytes);
 	}
 
 }

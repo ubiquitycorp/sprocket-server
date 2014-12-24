@@ -48,12 +48,6 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 				DataSyncProcessor dataSyncManager = new DataSyncProcessor();
 				dataSyncManager.processSync((ExternalIdentityActivated)message.getContent());
 			}
-			else if(message.getType().equals(UserEngagedDocument.class.getSimpleName()))
-				process((UserEngagedDocument)message.getContent());
-			else if(message.getType().equals(UserEngagedVideo.class.getSimpleName()))
-				process((UserEngagedVideo)message.getContent());
-			else if(message.getType().equals(UserEngagedActivity.class.getSimpleName()))
-				process((UserEngagedActivity)message.getContent());
 			else if(message.getType().equals(UserFavoritePlace.class.getSimpleName()))
 				process((UserFavoritePlace)message.getContent());
 		} catch (Exception e) {

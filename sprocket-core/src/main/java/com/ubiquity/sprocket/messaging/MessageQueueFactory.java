@@ -14,10 +14,13 @@ public class MessageQueueFactory {
 	private static MessageQueueConnection cacheInvalidateQueueConsumerConnection;
 	private static MessageQueueConnection locationQueueConsumerConnection;
 	private static MessageQueueConnection backChannelQueueConnection;
+	private static MessageQueueConnection trackQueueConsumerConnection;
 
 	private static MessageQueueProducer cacheInvalidateQueueProducer;
 	private static MessageQueueProducer locationQueueProducer;
 	private static MessageQueueProducer backChannelQueueProducer;
+	private static MessageQueueProducer trackQueueProducer;
+
 
 	private static Configuration configuration;
 
@@ -26,9 +29,38 @@ public class MessageQueueFactory {
 	}
 
 	/***
-	 * Override default routing key
-	 * @param routeKey
-	 * @return
+	 * Retrieves the producer for the track exchange
+	 * 
+	 * @return MessageQueueProducer
+	 * 
+	 * @throws IOException
+	 */
+	public static MessageQueueProducer getTrackQueueProducer() throws IOException {
+		if(trackQueueProducer == null) {
+			MessageQueueConnection connection = new MessageQueueConnection.Builder()
+			.host(configuration.getString("mq.host"))
+			.username(configuration.getString("mq.username"))
+			.password(configuration.getString("mq.password"))
+			.port(configuration.getInt("mq.port"))
+			.queueName(configuration.getString("mq.queue.track.name"))
+			.virtualHost(configuration.getString("mq.queue.track.vhost"))
+			.exchange(configuration.getString("mq.queue.track.exchange"))
+			.exchangeType(configuration.getString("mq.queue.track.exchangeType"))
+			.routeKey(configuration.getString("mq.queue.track.routeKey"))
+			.heartBeat(configuration.getInt("mq.queue.track.heartbeat"))
+			.autoAck(configuration.getBoolean("mq.queue.track.autoAck")).build();
+			trackQueueProducer = new MessageQueueProducer(connection.createProducerChannel());
+		}
+		return trackQueueProducer;
+	}
+
+	
+	
+	/***
+	 * Retrieves the producer for the backchannel exchange
+	 * 
+	 * @return MessageQueueProducer
+	 * 
 	 * @throws IOException
 	 */
 	public static MessageQueueProducer getBackChannelQueueProducer() throws IOException {
@@ -62,6 +94,12 @@ public class MessageQueueFactory {
 		return getBackChannelQueueConnection().createConsumerChannel();
 	}
 	
+	public static MessageQueueChannel createTrackConsumerChannel() throws IOException {
+		return getTrackQueueConnection().createConsumerChannel();
+	}
+	
+
+
 	public static MessageQueueProducer getCacheInvalidationQueueProducer() throws IOException {
 		if(cacheInvalidateQueueProducer == null) {
 			MessageQueueConnection connection = new MessageQueueConnection.Builder()
@@ -156,6 +194,26 @@ public class MessageQueueFactory {
 		}
 		return cacheInvalidateQueueConsumerConnection;
 	}
+	
+	private static MessageQueueConnection getTrackQueueConnection() {
+		if(trackQueueConsumerConnection == null) {
+			trackQueueConsumerConnection = new MessageQueueConnection.Builder()
+			.queueName(configuration.getString("mq.queue.track.name"))
+			.host(configuration.getString("mq.host"))
+			.username(configuration.getString("mq.username"))
+			.password(configuration.getString("mq.password"))
+			.virtualHost(configuration.getString("mq.queue.track.vhost"))
+			.port(configuration.getInt("mq.port"))
+			.exchange(configuration.getString("mq.queue.track.exchange"))
+			.exchangeType(configuration.getString("mq.queue.track.exchangeType"))
+			.routeKey(configuration.getString("mq.queue.track.routeKey"))
+			.heartBeat(configuration.getInt("mq.queue.track.heartbeat"))
+			.autoAck(configuration.getBoolean("mq.queue.track.autoAck")).build();
+		}
+		return trackQueueConsumerConnection;
+	}
+
+	
 
 
 }
