@@ -13,13 +13,10 @@ import javax.ws.rs.core.Response;
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
 import com.ubiquity.integration.domain.Activity;
-import com.ubiquity.integration.domain.ExternalInterest;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Interest;
-import com.ubiquity.integration.domain.UnmappedInterest;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.sprocket.api.DtoAssembler;
-import com.ubiquity.sprocket.api.dto.containers.AdminInterestsDto;
 import com.ubiquity.sprocket.api.dto.containers.InterestsDto;
 import com.ubiquity.sprocket.api.dto.containers.RecommendationsDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
@@ -86,53 +83,7 @@ public class AnalyticsEndpoint {
 				.build();
 	}
 	
-	@GET
-	@Path("users/{userId}/providers/{externalNetworkId}/interests")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Secure
-	public Response networkExternalInterests(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
-
-		AdminInterestsDto interestsDto = new AdminInterestsDto();
-		
-		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
-		CollectionVariant<ExternalInterest> variant = ServiceFactory.getAnalyticsService().findExternalInterestsByExternalNetworkId(externalNetwork);
-		// Throw a 304 if if there is no variant (no change)
-//		if (variant == null)
-//			return Response.notModified().build();
-		
-		
-		for(ExternalInterest interest : variant.getCollection())
-			interestsDto.getInterests().add(DtoAssembler.assemble(interest));
-		
-		return Response.ok()
-				//.header("Last-Modified", variant.getLastModified())
-				.entity(jsonConverter.convertToPayload(interestsDto))
-				.build();
-	}
 	
-	@GET
-	@Path("users/{userId}/providers/{externalNetworkId}/unmappedinterests")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Secure
-	public Response networkUnmappedInterests(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
-
-		AdminInterestsDto interestsDto = new AdminInterestsDto();
-		
-		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
-		CollectionVariant<UnmappedInterest> variant = ServiceFactory.getAnalyticsService().findUnmappedInterestByExternalNetworkId(externalNetwork);
-		// Throw a 304 if if there is no variant (no change)
-//		if (variant == null)
-//			return Response.notModified().build();
-		
-		
-		for(UnmappedInterest unmappedInterest : variant.getCollection())
-			interestsDto.getInterests().add(DtoAssembler.assemble(unmappedInterest));
-		
-		return Response.ok()
-				//.header("Last-Modified", variant.getLastModified())
-				.entity(jsonConverter.convertToPayload(interestsDto))
-				.build();
-	}
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/activities/recommended")
 	@Produces(MediaType.APPLICATION_JSON)

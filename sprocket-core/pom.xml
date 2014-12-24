@@ -84,24 +84,12 @@
 			<groupId>com.niobium</groupId>
 			<artifactId>niobium-amqp</artifactId>
 			<version>0.2.3</version>
-			<exclusions>
-			   <exclusion>
-			    <artifactId>logback-classic</artifactId>
-			    <groupId>ch.qos.logback</groupId>
-			   </exclusion>
-			</exclusions>
 		</dependency>
 
 		<dependency>
 			<groupId>com.niobium</groupId>
 			<artifactId>niobium-data-access</artifactId>
 			<version>0.9.5</version>
-			<exclusions>
-			   <exclusion>
-			    <artifactId>logback-classic</artifactId>
-			    <groupId>ch.qos.logback</groupId>
-			   </exclusion>
-			</exclusions>
 		</dependency>
 
 		<dependency>
