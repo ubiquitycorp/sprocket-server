@@ -42,7 +42,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		// Currently just automatically fan these out to all parties
 		try {
 			Message message = messageConverter.deserialize(msg, Message.class);
-			log.info(Thread.currentThread().getName() + " message received: {}", message);
+			log.info("Message received: {}", message);
 			if(message.getType().equals(
 					ExternalIdentityActivated.class.getSimpleName())) {
 				DataSyncProcessor dataSyncManager = new DataSyncProcessor();

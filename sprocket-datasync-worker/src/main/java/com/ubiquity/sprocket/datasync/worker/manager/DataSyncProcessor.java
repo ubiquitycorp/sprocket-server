@@ -107,8 +107,7 @@ public class DataSyncProcessor extends Thread {
 	}
 
 	public void run() {
-		log.info(Thread.currentThread().getName()
-				+ " Synchronizing data from {} to {}", from, to);
+		log.info("Synchronizing data from {} to {}", from, to);
 		
 		notificationProcessor.start();
 		syncData();
@@ -207,8 +206,7 @@ public class DataSyncProcessor extends Thread {
 
 		}
 
-		log.info(Thread.currentThread().getName()
-				+ " Full sync for user: {} in {} seconds", user.getUserId(),
+		log.info("Full sync for user: {} in {} seconds", user.getUserId(),
 				new Period(start, new DateTime()).getSeconds());
 
 		return 0;
