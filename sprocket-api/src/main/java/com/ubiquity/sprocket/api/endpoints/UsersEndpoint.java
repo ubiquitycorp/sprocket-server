@@ -236,12 +236,14 @@ public class UsersEndpoint {
 
 		for (Identity identity : user.getIdentities()) {
 			if (identity instanceof ExternalIdentity) {
-				ExternalIdentity socialIdentity = (ExternalIdentity) identity;
+				ExternalIdentity externalIdentity = (ExternalIdentity) identity;
 				IdentityDto associatedIdentityDto = new IdentityDto.Builder()
-						.identifier(socialIdentity.getIdentifier())
-						.externalNetworkId(socialIdentity.getExternalNetwork())
+						.identifier(externalIdentity.getIdentifier())
+						.externalNetworkId(externalIdentity.getExternalNetwork())
 						.build();
-				accountDto.getIdentities().add(associatedIdentityDto);
+				Boolean isActive = ServiceFactory.getSocialService().IsActiveNetworkForUser(user.getUserId(), ExternalNetwork.getNetworkById(externalIdentity.getExternalNetwork()));
+				if(isActive)
+					accountDto.getIdentities().add(associatedIdentityDto);
 			}
 		}
 

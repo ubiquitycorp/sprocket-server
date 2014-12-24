@@ -19,7 +19,6 @@ import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 public class LocationWorker {
-
 	private static final int DEFAULT_NUM_CONSUMERS = 10;
 	protected static Logger log = LoggerFactory.getLogger(LocationWorker.class);
 
