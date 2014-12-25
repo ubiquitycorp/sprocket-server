@@ -37,10 +37,8 @@ import com.ubiquity.sprocket.service.ServiceFactory;
  * @author mina
  * 
  */
-public class DataSyncProcessor extends Thread {
+public class DataSyncProcessor {
 
-	private int from;
-	private int to;
 	private List<User> users;
 
 	private MessageConverter messageConverter = MessageConverterFactory
@@ -59,12 +57,9 @@ public class DataSyncProcessor extends Thread {
 	 * @param from
 	 * @param to
 	 */
-	public DataSyncProcessor(List<User> users, int from, int to) {
-		log.info("Created DataSycnProcessor from {} to {}", from, to);
-		this.from = from;
-		this.to = to;
+	public DataSyncProcessor(List<User> users) {
+		log.info("Created DataSycnProcessor for users {}", users);
 		this.users = users;
-
 		createChainHandelrs();
 		notificationProcessor = new SyncNotificationSender(activityHandler.getNext().getProcessedMessages());
 	}
@@ -73,7 +68,7 @@ public class DataSyncProcessor extends Thread {
 	 * Creates a data sync processor that operate
 	 */
 	public DataSyncProcessor() {
-		log.info("Created DataSycnProcessor");
+		log.info("Created DataSyncProcessor");
 		createChainHandelrs();
 		notificationProcessor = new SyncNotificationSender(activityHandler.getNext().getProcessedMessages());
 	}
@@ -88,7 +83,7 @@ public class DataSyncProcessor extends Thread {
 		messageHandler.setNext(localActivityHandler);
 		localActivityHandler.setNext(videoHandler);
 	}
-
+	
 	/**
 	 * If an identity has been activated, process all available content;
 	 * 
@@ -100,18 +95,9 @@ public class DataSyncProcessor extends Thread {
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.getExternalIdentityById(activated.getIdentityId());
 		if (identity == null) {
-			log.error(Thread.currentThread().getName()
-					+ " Can't find identity in DB");
+			log.error(" Can't find identity in DB");
 		}
 		processSync(identity);
-	}
-
-	public void run() {
-		log.info("Synchronizing data from {} to {}", from, to);
-		
-		notificationProcessor.start();
-		syncData();
-		notificationProcessor.setTerminate();
 	}
 
 	/**
@@ -154,10 +140,10 @@ public class DataSyncProcessor extends Thread {
 		int numRefreshed = 0;
 
 		try {
+			notificationProcessor.start();
 			Long startTime, endTime;
 			startTime = System.currentTimeMillis();
-			List<User> subList = users.subList(from, to);
-			for (User user : subList) {
+			for (User user : users) {
 				numRefreshed += syncDataForUser(user);
 			}
 			endTime = System.currentTimeMillis();
@@ -165,6 +151,7 @@ public class DataSyncProcessor extends Thread {
 					.currentThread().getName(), (endTime - startTime) / 1000);
 		} finally {
 			EntityManagerSupport.closeEntityManager();
+			notificationProcessor.setTerminate();
 		}
 
 		return numRefreshed;
