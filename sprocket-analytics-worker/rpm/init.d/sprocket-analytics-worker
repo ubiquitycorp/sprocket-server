@@ -76,7 +76,15 @@ case "$1" in
         $1
         ;;
     status)
-        status sprocket-analytics-worker 
+        PIDS=`pgrep -f ${name}.jar | xargs`
+        if [ "$PIDS" ]
+        then
+         echo "$name (pid $PIDS) is running..."
+         exit 0
+        else
+         echo $name is stopped
+         exit 3
+        fi
         ;;
     *)
         echo $"Usage: $0 {start|stop|status|restart}"
