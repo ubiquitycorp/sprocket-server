@@ -1,4 +1,5 @@
 sleep 5
+echo "This installation has ${tomcat.processes} extra tomcat processes"
 EXTRA_TOMCAT=`expr ${tomcat.processes} - 1`
 EXTRA_TOMCAT=3
 service tomcat7 start
@@ -17,3 +18,4 @@ do
  service tomcat7-${EXTRA_TOMCAT} start
  EXTRA_TOMCAT=`expr ${EXTRA_TOMCAT} - 1`
 done
+exit 0
