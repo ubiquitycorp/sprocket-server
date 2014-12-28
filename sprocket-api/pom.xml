@@ -20,6 +20,11 @@
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
+                       <resource>
+                                <directory>rpm</directory>
+                                <filtering>true</filtering>
+                        </resource>
+
 		</resources>
 		<testResources>
 			<testResource>
@@ -119,7 +124,7 @@
 						<scriptFile>rpm/undeploy.sh</scriptFile>
 					</preinstallScriptlet>
 					<postinstallScriptlet>
-						<scriptFile>rpm/deploy.sh</scriptFile>
+						<scriptFile>target/classes/deploy.sh</scriptFile>
 					</postinstallScriptlet>
 
 				</configuration>
