@@ -121,7 +121,7 @@
                                                 </mapping>
 					</mappings>
 					<preinstallScriptlet>
-						<scriptFile>rpm/undeploy.sh</scriptFile>
+						<scriptFile>target/classes/undeploy.sh</scriptFile>
 					</preinstallScriptlet>
 					<postinstallScriptlet>
 						<scriptFile>target/classes/deploy.sh</scriptFile>

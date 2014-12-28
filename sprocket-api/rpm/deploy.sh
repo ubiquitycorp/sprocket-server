@@ -17,5 +17,3 @@ do
  service tomcat7-${EXTRA_TOMCAT} start
  EXTRA_TOMCAT=`expr ${EXTRA_TOMCAT} - 1`
 done
-
-exit 0
