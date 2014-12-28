@@ -9,6 +9,7 @@
 	<properties>
 		<app.home>/var/lib/tomcat7/webapps/sprocket-api</app.home>
                 <init.home>/etc/init.d</init.home>
+                <sysconfig.home>/etc/sysconfig</sysconfig.home>
 	</properties>
 
 	<!-- turns on resource filtering -->
@@ -101,7 +102,18 @@
                                                                 </source>
                                                         </sources>
                                                 </mapping>
-
+                                                <mapping>
+                                                        <directory>${sysconfig.home}</directory>
+                                                        <username>root</username>
+                                                        <groupname>root</groupname>
+                                                        <filemode>755</filemode>
+                                                        <directoryIncluded>false</directoryIncluded>
+                                                        <sources>
+                                                                <source>
+                                                                        <location>rpm/sysconfig</location>
+                                                                </source>
+                                                        </sources>
+                                                </mapping>
 					</mappings>
 					<preinstallScriptlet>
 						<scriptFile>rpm/undeploy.sh</scriptFile>
