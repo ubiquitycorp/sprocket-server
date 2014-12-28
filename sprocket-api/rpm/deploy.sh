@@ -1,7 +1,11 @@
 sleep 5
-echo "This installation has ${tomcat.processes} extra tomcat processes"
+echo "This installation has ${tomcat.processes} tomcat processes"
 EXTRA_TOMCAT=`expr ${tomcat.processes} - 1`
-EXTRA_TOMCAT=3
+if [ -f /etc/sysconfig/tomcat-local ]
+then
+ . /etc/sysconfig/tomcat-local
+fi
+
 service tomcat7 start
 
 if [ ! "$EXTRA_TOMCAT" ]

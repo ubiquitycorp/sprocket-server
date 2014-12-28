@@ -126,6 +126,9 @@
 					<postinstallScriptlet>
 						<scriptFile>target/classes/deploy.sh</scriptFile>
 					</postinstallScriptlet>
+					<preuninstallScriptlet>
+						<scriptFile>target/classes/undeploy.sh</scriptFile>
+					</preuninstallScriptlet>
 
 				</configuration>
 			</plugin>
