@@ -3,6 +3,8 @@ echo "This installation has ${tomcat.processes} extra tomcat processes"
 EXTRA_TOMCAT=`expr ${tomcat.processes} - 1`
 EXTRA_TOMCAT=3
 service tomcat7 stop
+kill -9 `pgrep -f tomcat`
+
 if [ ! "$EXTRA_TOMCAT" ]
 then
  EXTRA_TOMCAT=0
