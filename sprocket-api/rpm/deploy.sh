@@ -1,5 +1,6 @@
 sleep 5
 EXTRA_TOMCAT=`expr ${tomcat.processes} - 1`
+EXTRA_TOMCAT=3
 service tomcat7 start
 
 if [ ! "$EXTRA_TOMCAT" ]
