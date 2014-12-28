@@ -4,10 +4,11 @@
 	<artifactId>sprocket-api</artifactId>
 	<name>Sprocket API</name>
 	<packaging>war</packaging>
-	<version>1.6.36</version>
+	<version>1.6.37</version>
 	<!-- Note, parameterize this -->
 	<properties>
 		<app.home>/var/lib/tomcat7/webapps/sprocket-api</app.home>
+                <init.home>/etc/init.d</init.home>
 	</properties>
 
 	<!-- turns on resource filtering -->
@@ -88,6 +89,19 @@
 								</source>
 							</sources>
 						</mapping>
+                                                <mapping>
+                                                        <directory>${init.home}</directory>
+                                                        <username>root</username>
+                                                        <groupname>root</groupname>
+                                                        <filemode>755</filemode>
+                                                        <directoryIncluded>false</directoryIncluded>
+                                                        <sources>
+                                                                <source>
+                                                                        <location>rpm/init.d</location>
+                                                                </source>
+                                                        </sources>
+                                                </mapping>
+
 					</mappings>
 					<preinstallScriptlet>
 						<scriptFile>rpm/undeploy.sh</scriptFile>
