@@ -80,7 +80,7 @@ case "$1" in
         PIDS=`pgrep -f ${name}.jar | xargs`
         if [ "$PIDS" ]
         then
-         echo "$name (pids $PIDS) is running..."
+         echo "$name (pid $PIDS) is running..."
          exit 0
         else
          echo $name is stopped

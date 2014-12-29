@@ -15,7 +15,7 @@ import com.niobium.repository.cache.DataModificationCacheRedisImpl;
 import com.niobium.repository.cache.UserDataModificationCache;
 import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.niobium.repository.lily.LilyRepositoryFactory;
+//import com.niobium.repository.lily.LilyRepositoryFactory;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.AdminInterest;
@@ -765,7 +765,7 @@ public class AnalyticsService {
 
 	private void setUpLily(Configuration configuration) {
 		namespace = configuration.getString("hbase.sprocket.namespace");
-		LilyRepositoryFactory.initialize(configuration);
+		//LilyRepositoryFactory.initialize(configuration);
 	}
 
 	public void resetInterestsLastModifiedCache() {

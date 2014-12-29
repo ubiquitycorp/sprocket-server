@@ -1,4 +1,4 @@
-package com.ubiquity.sprocket.repository.mapreduce;
+/*package com.ubiquity.sprocket.repository.mapreduce;
 
 import java.io.IOException;
 import java.util.List;
@@ -44,3 +44,4 @@ public class SearchHistoryMapper extends RecordMapper<Text, IntWritable> {
     }
 
 }
+*/

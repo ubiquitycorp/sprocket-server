@@ -8,6 +8,7 @@
 				<app.log.level>DEBUG</app.log.level>
 				<loggly.customer.token>4ed5a2fe-f74b-47f8-ba62-ab0ac09e7505
 				</loggly.customer.token>
+				<tomcat.processes>1</tomcat.processes>
 
 				<datasync.worker.processes>1</datasync.worker.processes>
 				<datasync.worker.size>1024</datasync.worker.size>
@@ -142,6 +143,7 @@
 				<syslog.host>localhost</syslog.host>
 				<loggly.customer.token>4ed5a2fe-f74b-47f8-ba62-ab0ac09e7505
 				</loggly.customer.token>
+				<tomcat.processes>1</tomcat.processes>
 
 				<datasync.worker.processes>1</datasync.worker.processes>
 				<datasync.worker.size>1024</datasync.worker.size>
@@ -274,6 +276,7 @@
 				<syslog.host>localhost</syslog.host>
 				<loggly.customer.token>4ed5a2fe-f74b-47f8-ba62-ab0ac09e7505
 				</loggly.customer.token>
+				<tomcat.processes>4</tomcat.processes>
 
 				<datasync.worker.processes>2</datasync.worker.processes>
 				<datasync.worker.size>2048</datasync.worker.size>
@@ -406,6 +409,7 @@
 				<syslog.host>localhost</syslog.host>
 				<loggly.customer.token>4ed5a2fe-f74b-47f8-ba62-ab0ac09e7505
 				</loggly.customer.token>
+				<tomcat.processes>4</tomcat.processes>
 				<datasync.worker.processes>2</datasync.worker.processes>
 				<datasync.worker.size>2048</datasync.worker.size>
 
