@@ -6,8 +6,8 @@ then
  . /etc/sysconfig/tomcat-local
 fi
 
-service tomcat7 stop
-kill -9 `pgrep -f tomcat`
+kill -9 `pgrep -f tomcat` 2>&1 > /dev/null
+service tomcat7 stop 2>&1 > /dev/null
 
 if [ ! "$EXTRA_TOMCAT" ]
 then
