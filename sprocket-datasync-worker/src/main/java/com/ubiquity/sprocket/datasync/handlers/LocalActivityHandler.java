@@ -14,16 +14,17 @@ import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.sprocket.datasync.worker.manager.DataSyncProcessor;
 import com.ubiquity.sprocket.datasync.worker.manager.ResourceType;
 import com.ubiquity.sprocket.service.ServiceFactory;
+
 /***
  * 
  * @author peter.tadros
- *
+ * 
  */
 public class LocalActivityHandler extends Handler {
 
 	public LocalActivityHandler(DataSyncProcessor processor) {
 		super(processor);
-		 networks = EnumSet.of(ExternalNetwork.Facebook);
+		networks = EnumSet.of(ExternalNetwork.Facebook);
 	}
 
 	@Override
@@ -36,35 +37,30 @@ public class LocalActivityHandler extends Handler {
 						network, ResourceType.localfeed), n, userId,
 				ResourceType.localfeed);
 	}
-	
+
 	private int processLocalActivities(ExternalIdentity identity,
 			ExternalNetwork network) {
 		List<Activity> synced = null;
 		DateTime start = new DateTime();
 		Long userId = identity.getUser().getUserId();
-		String threadName = Thread.currentThread().getName();
 		try {
 			synced = ServiceFactory.getSocialService().syncLocalNewsFeed(
 					identity, network);
-			log.debug("{}: indexing local activities for identity {}",
-					threadName, identity);
+			log.debug(" indexing local activities for identity {}", identity);
 			return synced.size();
 		} catch (AuthorizationException e) {
 			ServiceFactory.getSocialService().setActiveNetworkForUser(userId,
 					network, false);
-			log.error(threadName
-					+ " Unable to sync local activities for identity {}: {}",
-					identity, ExceptionUtils.getRootCauseMessage(e));
+			log.error(" Unable to sync local activities for identity {}: {}",
+					identity, ExceptionUtils.getStackTrace(e));
 			return -1;
 		} catch (Exception e) {
-			log.error(threadName
-					+ " Unable to sync local activities for identity {}: {}",
-					identity, ExceptionUtils.getRootCauseMessage(e));
+			log.error(" Unable to sync local activities for identity {}: {}",
+					identity, ExceptionUtils.getStackTrace(e));
 			return -1;
 		} finally {
 			int n = (synced == null) ? -1 : synced.size();
-			log.debug(threadName
-					+ " Processed {} local activities in {} seconds for user "
+			log.debug(" Processed {} local activities in {} seconds for user "
 					+ userId, n, new Period(start, new DateTime()).getSeconds());
 		}
 	}
