@@ -59,7 +59,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			else if(message.getType().equals(UserFavoritePlace.class.getSimpleName()))
 				process((UserFavoritePlace)message.getContent());
 		} catch (Exception e) {
-			log.error(Thread.currentThread().getName() + " Could not process, message: {}, root cause message: {}",ExceptionUtils.getMessage(e), ExceptionUtils.getRootCauseMessage(e));
+			log.error(Thread.currentThread().getName() + " Could not process, message: {}, root cause message: {}",ExceptionUtils.getMessage(e), ExceptionUtils.getFullStackTrace(e));
 			e.printStackTrace();
 		}
 	}
