@@ -35,6 +35,7 @@ public class DataSyncWorker {
 
 	private static final int DEFAULT_NUM_CONSUMERS = 10;
 	protected static Logger log = Logger.getLogger(DataSyncWorker.class);
+	private static Boolean isMaster;
 
 	public void destroy() {
 		stopServices();
@@ -44,12 +45,9 @@ public class DataSyncWorker {
 			Configuration errorsConfiguration) throws IOException, SchedulerException {
 
 		startServices(configuration, errorsConfiguration);
-
-		Boolean isMaster = false;
-
 		if (isMaster) {
 			// start scheduler in the master worker
-			startScheduler(configuration.getInt("rules.sync.blockSize", 20));
+			startScheduler(configuration.getInt("rules.sync.blockSize", 10), configuration.getInt("rules.sync.period", 8));
 		} else {
 			// creates N threads to consume messages in a slave worker
 			List<CacheInvalidateConsumer> consumers = new LinkedList<CacheInvalidateConsumer>();
@@ -84,6 +82,9 @@ public class DataSyncWorker {
 		final DataSyncWorker worker = new DataSyncWorker();
 		try {
 			log.info("Initializing worker...");
+			// args[0] represents is worker is master or slave
+			isMaster = args[0].equalsIgnoreCase("master") ? true : false;
+			
 			worker.initialize(new PropertiesConfiguration(
 					"datasyncworker.properties"), new PropertiesConfiguration(
 					"messages.properties"));
@@ -120,7 +121,7 @@ public class DataSyncWorker {
 		// TODO: we need an mq disconnect
 	}
 
-	private void startScheduler(int blockSize) throws SchedulerException {
+	private void startScheduler(int blockSize, int syncPeriod) throws SchedulerException {
 		Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
 		scheduler.start();
 
@@ -131,7 +132,7 @@ public class DataSyncWorker {
 		Trigger trigger = newTrigger()
 				.withIdentity(triggerKey("dataTrigger", "trigger"))
 				.withSchedule(
-						simpleSchedule().withIntervalInMinutes(8)
+						simpleSchedule().withIntervalInMinutes(syncPeriod)
 								.repeatForever())
 				.startAt(futureDate(1, IntervalUnit.SECOND)).build();
 
