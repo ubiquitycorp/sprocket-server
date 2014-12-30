@@ -81,7 +81,7 @@ public class DataSyncWorker {
 	public static void main(String[] args) throws SchedulerException {
 		final DataSyncWorker worker = new DataSyncWorker();
 		try {
-			log.info("Initializing worker...");
+			log.info("Initializing " + args[0] + " worker...");
 			// args[0] represents is worker is master or slave
 			isMaster = args[0].equalsIgnoreCase("master") ? true : false;
 			
