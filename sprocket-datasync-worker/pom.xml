@@ -117,17 +117,6 @@
 							</sources>
 						</mapping>
 						<mapping>
-							<directory>${bin.home}</directory>
-							<username>jserviceusr</username>
-							<groupname>jserviceusr</groupname>
-							<filemode>755</filemode>
-							<sources>
-								<source>
-								<location>target/classes/sprocket-datasync-worker</location>
-								</source>
-							</sources>
-						</mapping>
-						<mapping>
 							<directory>${init.home}</directory>
 							<username>root</username>
 							<groupname>root</groupname>
