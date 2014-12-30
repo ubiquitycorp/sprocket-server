@@ -26,6 +26,14 @@ public class AdminDto {
 		return password;
 	}
 
+	public Long getAdminId() {
+		return adminId;
+	}
+
+	public String getApiKey() {
+		return apiKey;
+	}
+
 	public static class Builder {
 		private Long adminId;
 		private String username;
