@@ -46,7 +46,8 @@ stop() {
 	return 0	
     fi    
 
-    killproc $name 
+    #killproc $name 
+    kill `/usr/bin/pgrep -f ${name}.jar | xargs` > /dev/null 2>&1
     retval=$?
     echo
     [ $retval -eq 0 ] && rm -f $lockfile
@@ -76,7 +77,15 @@ case "$1" in
         $1
         ;;
     status)
-        status sprocket-backchannel-worker 
+        PIDS=`pgrep -f ${name}.jar | xargs`
+        if [ "$PIDS" ]
+        then
+         echo "$name (pid $PIDS) is running..."
+         exit 0
+        else
+         echo $name is stopped
+         exit 3
+        fi
         ;;
     *)
         echo $"Usage: $0 {start|stop|status|restart}"

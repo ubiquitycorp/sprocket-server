@@ -63,7 +63,7 @@ public class AnalyticsEndpoint {
 	@Path("users/{userId}/providers/{externalNetworkId}/externalinterests")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response externalInterests(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+	public Response networkInterests(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId,@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		InterestsDto interestsDto = new InterestsDto();
 		
@@ -82,6 +82,8 @@ public class AnalyticsEndpoint {
 				.entity(jsonConverter.convertToPayload(interestsDto))
 				.build();
 	}
+	
+	
 	@GET
 	@Path("users/{userId}/providers/{externalNetworkId}/activities/recommended")
 	@Produces(MediaType.APPLICATION_JSON)

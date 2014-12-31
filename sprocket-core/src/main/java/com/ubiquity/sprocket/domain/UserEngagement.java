@@ -1,6 +1,6 @@
 package com.ubiquity.sprocket.domain;
 
-import com.ubiquity.identity.domain.User;
+import com.ubiquity.sprocket.repository.hbase.ContentPK;
 
 /***
  * An entity tracking user engagement
@@ -9,28 +9,67 @@ import com.ubiquity.identity.domain.User;
  *
  */
 public class UserEngagement {
+
+	private static final String DEFAULT_GROUP_MEMBERSHIP = "unassigned";
 	
-	private User user;
+	private Long userId;
 	private Long timestamp;
+	private ContentPK contentId;
 	
-	/***
-	 * Default constructor initializes with required properties
-	 * 
-	 * @param user
-	 * @param timestamp
-	 */
-	public UserEngagement(User user, Long timestamp) {
-		this.user = user;
-		this.timestamp = timestamp;
+	private String groupMembership;
+
+	public Long getUserId() {
+		return userId;
 	}
-	public User getUser() {
-		return user;
-	}
+
 	public Long getTimestamp() {
 		return timestamp;
 	}
-	
-	
-	
 
+	public ContentPK getContentId() {
+		return contentId;
+	}
+
+
+	public String getGroupMembership() {
+		return groupMembership;
+	}
+
+	public static class Builder {
+		private Long userId;
+		private Long timestamp;
+		private ContentPK contentId;
+		private String groupMembership;
+
+		public Builder userId(Long userId) {
+			this.userId = userId;
+			return this;
+		}
+
+		public Builder timestamp(Long timestamp) {
+			this.timestamp = timestamp;
+			return this;
+		}
+
+		public Builder contentId(ContentPK contentId) {
+			this.contentId = contentId;
+			return this;
+		}
+
+		public Builder groupMembership(String groupMembership) {
+			this.groupMembership = groupMembership;
+			return this;
+		}
+
+		public UserEngagement build() {
+			return new UserEngagement(this);
+		}
+	}
+
+	private UserEngagement(Builder builder) {
+		this.userId = builder.userId;
+		this.timestamp = builder.timestamp;
+		this.contentId = builder.contentId;
+		this.groupMembership = builder.groupMembership == null ? DEFAULT_GROUP_MEMBERSHIP : builder.groupMembership;
+	}
 }

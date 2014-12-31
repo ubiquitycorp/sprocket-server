@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>sprocket-datasync-worker</artifactId>
 	<name>Sprocket Data Sync Worker</name>
-	<version>0.4.67</version>
+	<version>0.4.91</version>
 
 	<parent>
 		<groupId>com.ubiquity</groupId>
@@ -26,6 +26,10 @@
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>rpm/bin</directory>
 				<filtering>true</filtering>
 			</resource>
 		</resources>
@@ -113,17 +117,6 @@
 							</sources>
 						</mapping>
 						<mapping>
-							<directory>${bin.home}</directory>
-							<username>jserviceusr</username>
-							<groupname>jserviceusr</groupname>
-							<filemode>755</filemode>
-							<sources>
-								<source>
-									<location>rpm/bin</location>
-								</source>
-							</sources>
-						</mapping>
-						<mapping>
 							<directory>${init.home}</directory>
 							<username>root</username>
 							<groupname>root</groupname>
@@ -170,7 +163,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>sprocket-core</artifactId>
-			<version>0.2.3</version>
+			<version>0.2.4</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.jboss.resteasy</groupId>
@@ -180,15 +173,15 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz</artifactId>
-			<version>2.1.1</version>
-		</dependency>
-		
-		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>2.1.1</version>
 		</dependency>
 	</dependencies>
 </project>

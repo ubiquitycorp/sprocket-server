@@ -24,7 +24,10 @@ public class TestProfileFactory {
 	 * @return
 	 */
 	public static Profile createProfileAndIdentity(Long userId, ExternalNetwork network, Gender gender, AgeRange ageRange, Double lat, Double lon) {		
+		
+		
 		Profile profile = new Profile.Builder()
+		.profileId("sprocket"+"-"+userId.toString())
 		.gender(gender)
 		.userId(userId)
 		.ageRange(ageRange)
@@ -33,6 +36,7 @@ public class TestProfileFactory {
 
 		// build the profile with location
 		Profile identity = new Profile.Builder()
+		.profileId(network.name()+"-"+userId.toString())
 		.gender(gender)
 		.userId(userId)
 		.externalIdentifier(UUID.randomUUID().toString())

@@ -1,6 +1,7 @@
 package com.ubiquity.sprocket.datasync.worker.mq.consumer;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import com.ubiquity.messaging.format.Message;
 import com.ubiquity.sprocket.datasync.worker.manager.DataSyncProcessor;
 import com.ubiquity.sprocket.domain.FavoritePlace;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
+import com.ubiquity.sprocket.messaging.definition.ActiveUsersFound;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedDocument;
@@ -42,13 +44,13 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		// Currently just automatically fan these out to all parties
 		try {
 			Message message = messageConverter.deserialize(msg, Message.class);
-			log.info(Thread.currentThread().getName() + " message received: {}", message);
-			if(message.getType().equals(
-					ExternalIdentityActivated.class.getSimpleName())) {
+			log.info("Message received: {}", message);
+			if(message.getType().equals(ExternalIdentityActivated.class.getSimpleName())) {
 				DataSyncProcessor dataSyncManager = new DataSyncProcessor();
-				dataSyncManager.processSync((ExternalIdentityActivated)message.getContent());
-			}
-			else if(message.getType().equals(UserEngagedDocument.class.getSimpleName()))
+				dataSyncManager.processSync((ExternalIdentityActivated)message.getContent());	
+			} if(message.getType().equals(ActiveUsersFound.class.getSimpleName())) {
+				process((ActiveUsersFound)message.getContent());
+			} else if(message.getType().equals(UserEngagedDocument.class.getSimpleName()))
 				process((UserEngagedDocument)message.getContent());
 			else if(message.getType().equals(UserEngagedVideo.class.getSimpleName()))
 				process((UserEngagedVideo)message.getContent());
@@ -57,7 +59,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			else if(message.getType().equals(UserFavoritePlace.class.getSimpleName()))
 				process((UserFavoritePlace)message.getContent());
 		} catch (Exception e) {
-			log.error(Thread.currentThread().getName() + " Could not process, message: {}, root cause message: {}",ExceptionUtils.getMessage(e), ExceptionUtils.getRootCauseMessage(e));
+			log.error(Thread.currentThread().getName() + " Could not process, message: {}, root cause message: {}",ExceptionUtils.getMessage(e), ExceptionUtils.getFullStackTrace(e));
 			e.printStackTrace();
 		}
 	}
@@ -128,5 +130,12 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		ServiceFactory.getSearchService().indexActivities(
 				engagedActivity.getUserId(), 
 				Arrays.asList(new Activity[] { activity }), true);		
+	}
+	
+	private void process(ActiveUsersFound activeUsersFound) {
+		List<Long> userIds = activeUsersFound.getUserIds();
+		List<User> users = ServiceFactory.getUserService().findUsersInRange(userIds);
+		DataSyncProcessor dataSyncManager = new DataSyncProcessor(users);
+		dataSyncManager.syncData();
 	}
 }

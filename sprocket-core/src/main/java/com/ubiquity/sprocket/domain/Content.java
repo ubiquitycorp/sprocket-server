@@ -7,10 +7,11 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.location.domain.Place;
+import com.ubiquity.sprocket.repository.hbase.ContentPK;
 
 public class Content {
 
-	private String contentId;
+	private ContentPK contentId;
 	private Activity activity;
 	private Place place;
 	private Document document;
@@ -31,11 +32,11 @@ public class Content {
 	}
 	
 	
-	public String getContentId() {
+	public ContentPK getContentId() {
 		return contentId;
 	}
 	
-	public void setContentId(String contentId) {
+	public void setContentId(ContentPK contentId) {
 		this.contentId = contentId;
 	}
 
@@ -62,13 +63,13 @@ public class Content {
 
 
 	public static class Builder {
-		private String contentId;
+		private ContentPK contentId;
 		private Activity activity;
 		private Place place;
 		private Document document;
 		private VideoContent videoContent;
 
-		public Builder contentId(String contentId) {
+		public Builder contentId(ContentPK contentId) {
 			this.contentId = contentId;
 			return this;
 		}

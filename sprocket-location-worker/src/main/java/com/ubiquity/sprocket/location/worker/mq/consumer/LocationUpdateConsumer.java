@@ -33,7 +33,7 @@ public class LocationUpdateConsumer extends AbstractConsumerThread {
 		// Currently just automatically fan these out to all parties
 		try {
 			Message message = messageConverter.deserialize(msg, Message.class);
-			log.info("message received: {}", message);
+			log.debug("message received: {}", message);
 			if(message.getType().equals(
 					LocationUpdated.class.getSimpleName()))
 				process((LocationUpdated) message.getContent());

@@ -15,18 +15,24 @@ import com.niobium.repository.cache.DataModificationCacheRedisImpl;
 import com.niobium.repository.cache.UserDataModificationCache;
 import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.niobium.repository.lily.LilyRepositoryFactory;
+//import com.niobium.repository.lily.LilyRepositoryFactory;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.AdminInterest;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalInterest;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Gender;
 import com.ubiquity.integration.domain.Interest;
+import com.ubiquity.integration.domain.UnmappedInterest;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.integration.repository.ContactRepositoryJpaImpl;
+import com.ubiquity.integration.repository.ExternalInterestRepository;
 import com.ubiquity.integration.repository.ExternalInterestRepositoryJpaImpl;
+import com.ubiquity.integration.repository.InterestRepository;
 import com.ubiquity.integration.repository.InterestRepositoryJpaImpl;
+import com.ubiquity.integration.repository.UnmappedInterestRepository;
+import com.ubiquity.integration.repository.UnmappedInterestRepositoryJpaImpl;
 import com.ubiquity.integration.repository.cache.CacheKeys;
 import com.ubiquity.sprocket.analytics.recommendation.Dimension;
 import com.ubiquity.sprocket.analytics.recommendation.RecommendationEngine;
@@ -36,12 +42,8 @@ import com.ubiquity.sprocket.domain.GroupMembership;
 import com.ubiquity.sprocket.domain.Profile;
 import com.ubiquity.sprocket.domain.RecommendedActivity;
 import com.ubiquity.sprocket.domain.RecommendedVideo;
-import com.ubiquity.sprocket.repository.ContentRepository;
-import com.ubiquity.sprocket.repository.ContentRepositoryLilyImpl;
 import com.ubiquity.sprocket.repository.GroupMembershipRepository;
 import com.ubiquity.sprocket.repository.GroupMembershipRepositoryJpaImpl;
-import com.ubiquity.sprocket.repository.ProfileRepository;
-import com.ubiquity.sprocket.repository.ProfileRepositoryLilyImpl;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepository;
 import com.ubiquity.sprocket.repository.RecommendedActivityRepositoryJpaImpl;
 import com.ubiquity.sprocket.repository.RecommendedVideoRepository;
@@ -60,71 +62,79 @@ public class AnalyticsService {
 	private UserDataModificationCache userDataModificationCache;
 	private DataModificationCache dataModificationCache;
 	private RecommendationEngine recommendationEngine;
-    private String namespace;
-	
+	private String namespace;
+
 	/***
 	 * Sets up repositories and data modification cache
 	 * 
 	 * @param configuration
 	 */
 	public AnalyticsService(Configuration configuration) {
-		//setUpLily(configuration);
-		
-		
-		
-//		setUpRecommendationEngine(configuration);
+		// setUpLily(configuration);
+
+		// setUpRecommendationEngine(configuration);
 
 		userDataModificationCache = new UserDataModificationCacheRedisImpl(
 				configuration
-				.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GROUP));
+						.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GROUP));
 		dataModificationCache = new DataModificationCacheRedisImpl(
-				configuration.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GENERAL));
+				configuration
+						.getInt(DataCacheKeys.Databases.ENDPOINT_MODIFICATION_DATABASE_GENERAL));
 		String key = CacheKeys
 				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.INTERESTS);
 		Long lastModified = dataModificationCache.getLastModified(key, 0L);
 
 		// If there is no cache entry
 		if (lastModified == null) {
-			if(new InterestRepositoryJpaImpl().countAllInterests()>0){
+			if (new InterestRepositoryJpaImpl().countAllInterests() > 0) {
 				resetInterestsLastModifiedCache();
 			}
 		}
 	}
 
 	public Profile createProfile(User user) {
-		ProfileRepository profileRepository = new ProfileRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
-		Profile profile = new Profile.Builder().profileId(user.getUserId().toString()).build();
-		profileRepository.create(profile);
-		return profile;
+		// ProfileRepository profileRepository = new
+		// ProfileRepositoryLilyImpl(namespace,
+		// LilyRepositoryFactory.createRepository());
+		// Profile profile = new
+		// Profile.Builder().profileId(user.getUserId().toString()).build();
+		// profileRepository.create(profile);
+		return null;
 	}
-	
+
 	public void create(Profile profile) {
-		ProfileRepository profileRepository = new ProfileRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
-		profileRepository.create(profile);
+		// ProfileRepository profileRepository = new
+		// ProfileRepositoryLilyImpl(namespace,
+		// LilyRepositoryFactory.createRepository());
+		// profileRepository.create(profile);
 	}
-	
+
 	public void track(String searchTerm, User user) {
-		ProfileRepository profileRepository = new ProfileRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
-		Profile profile = profileRepository.read(user.getUserId().toString());
-		profile.getSearchHistory().add(searchTerm);
-		profileRepository.update(profile);
+		// ProfileRepository profileRepository = new
+		// ProfileRepositoryLilyImpl(namespace,
+		// LilyRepositoryFactory.createRepository());
+		// Profile profile =
+		// profileRepository.read(user.getUserId().toString());
+		// profile.getSearchHistory().add(searchTerm);
+		// profileRepository.update(profile);
 	}
-	
+
 	/***
 	 * Tracks content by persisting it to the underlying data store
 	 * 
 	 * @param content
 	 */
 	public void track(Content content) {
-		ContentRepository contentRepository = new ContentRepositoryLilyImpl(namespace, LilyRepositoryFactory.createRepository());
-		contentRepository.create(content);
+		// ContentRepository contentRepository = new
+		// ContentRepositoryLilyImpl(namespace,
+		// LilyRepositoryFactory.createRepository());
+		// contentRepository.create(content);
 	}
-	
+
 	public void track(Content content, Long userId, Long timestamp) {
-		
+
 	}
-	
-	
+
 	/**
 	 * Save a user's search term to the data warehouse
 	 * 
@@ -132,10 +142,9 @@ public class AnalyticsService {
 	 * @param searchTerm
 	 */
 	public void track(User user, String searchTerm) {
-		
+
 	}
 
-	
 	public void create(Interest interest) {
 		try {
 			EntityManagerSupport.beginTransaction();
@@ -145,6 +154,7 @@ public class AnalyticsService {
 			EntityManagerSupport.closeEntityManager();
 		}
 	}
+
 	public void create(ExternalInterest externalInterest) {
 		try {
 			EntityManagerSupport.beginTransaction();
@@ -154,9 +164,11 @@ public class AnalyticsService {
 			EntityManagerSupport.closeEntityManager();
 		}
 	}
+
 	public CollectionVariant<Interest> findInterests(Long ifModifiedSince) {
 
-		Long lastModified = dataModificationCache.getLastModified(CacheKeys.GlobalProperties.INTERESTS, ifModifiedSince);
+		Long lastModified = dataModificationCache.getLastModified(
+				CacheKeys.GlobalProperties.INTERESTS, ifModifiedSince);
 
 		// If there is no cache entry, there is no data
 		if (lastModified == null) {
@@ -164,32 +176,126 @@ public class AnalyticsService {
 		}
 
 		try {
-			return new CollectionVariant<Interest>(new InterestRepositoryJpaImpl().findTopLevel(), lastModified);
+			return new CollectionVariant<Interest>(
+					new InterestRepositoryJpaImpl().findTopLevel(),
+					lastModified);
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
 
 	}
-	
-	
-	public CollectionVariant<Interest> findInterestsByExternalNetworkId(ExternalNetwork network, Long ifModifiedSince ) {
 
-//		Long lastModified = dataModificationCache.getLastModified(CacheKeys.GlobalProperties.INTERESTS, ifModifiedSince);
+	public CollectionVariant<Interest> findInterestsByExternalNetworkId(
+			ExternalNetwork network, Long ifModifiedSince) {
+
+		// Long lastModified =
+		// dataModificationCache.getLastModified(CacheKeys.GlobalProperties.INTERESTS,
+		// ifModifiedSince);
 
 		// If there is no cache entry, there is no data
-//		if (lastModified == null) {
-//			return null;
-//		}
+		// if (lastModified == null) {
+		// return null;
+		// }
 
 		try {
-			return new CollectionVariant<Interest>(new ExternalInterestRepositoryJpaImpl().getByDistinctInterestByExternalNetwork(network),null);
+			return new CollectionVariant<Interest>(
+					new ExternalInterestRepositoryJpaImpl()
+							.getByDistinctInterestByExternalNetwork(network),
+					null);
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
 
 	}
 
+	public CollectionVariant<ExternalInterest> findExternalInterestsByExternalNetworkId(
+			ExternalNetwork network) {
+		try {
+			return new CollectionVariant<ExternalInterest>(
+					new ExternalInterestRepositoryJpaImpl()
+							.getExternalInterestByExternalNetwork(network),
+					null);
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
 
+	}
+
+	public CollectionVariant<UnmappedInterest> findUnmappedInterestByExternalNetworkId(
+			ExternalNetwork network) {
+		try {
+			return new CollectionVariant<UnmappedInterest>(
+					new UnmappedInterestRepositoryJpaImpl()
+							.getUnmappedInterestByExternalNetwork(network),
+					null);
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+
+	}
+
+	public Boolean updateAdminInterests(List<AdminInterest> deletedInterests,
+			List<AdminInterest> newInterests) {
+		try {
+			EntityManagerSupport.beginTransaction();
+			 InterestRepository interestRepo = new InterestRepositoryJpaImpl();
+			ExternalInterestRepository externalInterestRepo = new ExternalInterestRepositoryJpaImpl();
+			UnmappedInterestRepository unmappedInterestRepo = new UnmappedInterestRepositoryJpaImpl();
+			// delete list
+			for (AdminInterest adminInterest : deletedInterests) {
+				if (adminInterest instanceof Interest) {
+
+					// interestRepo.delete((Interest)adminInterest);
+				} else if (adminInterest instanceof UnmappedInterest) {
+					UnmappedInterest unmappedInterest = unmappedInterestRepo
+							.read(((UnmappedInterest) adminInterest)
+									.getUnmappedId());
+					if (unmappedInterest != null)
+						unmappedInterestRepo.delete(unmappedInterest);
+				} else if (adminInterest instanceof ExternalInterest) {
+					ExternalInterest externalInterest = externalInterestRepo
+							.read(((ExternalInterest) adminInterest)
+									.getExternalInterestId());
+					if (externalInterest != null)
+						externalInterestRepo
+								.delete((ExternalInterest) externalInterest);
+				}
+			}
+			// insert list
+			for (AdminInterest adminInterest : newInterests) {
+				if (adminInterest instanceof Interest) {
+
+					// interestRepo.delete((Interest)adminInterest);
+				} else if (adminInterest instanceof UnmappedInterest) {
+					UnmappedInterest unmappedinterest = (UnmappedInterest) adminInterest;
+					UnmappedInterest presistdUnmappedinterest = unmappedInterestRepo
+							.getByNameAndExternalNetwork(
+									unmappedinterest.getName(),
+									unmappedinterest.getExternalNetwork());
+					if (presistdUnmappedinterest == null)
+						unmappedInterestRepo.create(unmappedinterest);
+				} else if (adminInterest instanceof ExternalInterest) {
+					ExternalInterest externalInterest = (ExternalInterest) adminInterest;
+					ExternalInterest presistdExternalInterest = externalInterestRepo
+							.getByNameAndExternalNetworkAndInterestId(
+									externalInterest.getName(),
+									externalInterest.getExternalNetwork(),
+									externalInterest.getExternalInterestId());
+					
+					if (presistdExternalInterest == null){
+						Interest interest = interestRepo.read(externalInterest.getInterest_id());
+						externalInterest.setInterest(interest);
+						externalInterestRepo.create(externalInterest);
+					}
+				}
+			}
+			EntityManagerSupport.commit();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+		return true;
+
+	}
 
 	/***
 	 * Returns video content or null if there is no entry for this user in the
@@ -246,31 +352,32 @@ public class AnalyticsService {
 	 */
 	public void assignAll() {
 
-//		try {
-//			UserRepository userRepository = new UserRepositoryJpaImpl();
-//			UserLocationRepository locationRepository = new UserLocationRepositoryJpaImpl();
-//			ContactRepository contactRepository = new ContactRepositoryJpaImpl();
-//
-//			List<User> allUsers = userRepository.findAll();
-//			for (User user : allUsers) {
-//				Profile profile = new Profile(user,
-//						locationRepository.findByUserId(user.getUserId()));
-//				profile.getContacts().addAll(
-//						contactRepository.findByOwnerId(user.getUserId(),
-//								Boolean.TRUE));
-//				// just assign contexts we have built so far
-//				for (Contact contact : profile.getContacts()) {
-//					ExternalNetwork network = ExternalNetwork
-//							.getNetworkById(contact.getExternalIdentity()
-//									.getExternalNetwork());
-//					if (network == ExternalNetwork.Facebook
-//							|| network == ExternalNetwork.Google)
-//						recommendationEngine.assign(profile, network);
-//				}
-//			}
-//		} finally {
-//			EntityManagerSupport.closeEntityManager();
-//		}
+		// try {
+		// UserRepository userRepository = new UserRepositoryJpaImpl();
+		// UserLocationRepository locationRepository = new
+		// UserLocationRepositoryJpaImpl();
+		// ContactRepository contactRepository = new ContactRepositoryJpaImpl();
+		//
+		// List<User> allUsers = userRepository.findAll();
+		// for (User user : allUsers) {
+		// Profile profile = new Profile(user,
+		// locationRepository.findByUserId(user.getUserId()));
+		// profile.getContacts().addAll(
+		// contactRepository.findByOwnerId(user.getUserId(),
+		// Boolean.TRUE));
+		// // just assign contexts we have built so far
+		// for (Contact contact : profile.getContacts()) {
+		// ExternalNetwork network = ExternalNetwork
+		// .getNetworkById(contact.getExternalIdentity()
+		// .getExternalNetwork());
+		// if (network == ExternalNetwork.Facebook
+		// || network == ExternalNetwork.Google)
+		// recommendationEngine.assign(profile, network);
+		// }
+		// }
+		// } finally {
+		// EntityManagerSupport.closeEntityManager();
+		// }
 	}
 
 	/***
@@ -309,10 +416,10 @@ public class AnalyticsService {
 	 */
 	private void train(ExternalNetwork context) {
 		try {
-			
+
 			// check to see if there is any data for this context; if not,return
 			if (new ContactRepositoryJpaImpl()
-			.countAllByExternalNetwork(context) == 0) {
+					.countAllByExternalNetwork(context) == 0) {
 				log.warn("Skipping train on context: {} because no users have signed in yet for it");
 				return;
 			}
@@ -341,18 +448,15 @@ public class AnalyticsService {
 	public void assignGroupsAndCreateRecommendedContent() {
 
 		train(ExternalNetwork.Facebook);
-//		Set<String> groups = assignGroups(ExternalNetwork.Facebook);
-//		createRecommendedActivities(groups, ExternalNetwork.Facebook);
-//
-//		train(ExternalNetwork.Google);
-//		groups = assignGroups(ExternalNetwork.Google);
-//		createRecommendedVideos(groups, ExternalNetwork.YouTube);
+		// Set<String> groups = assignGroups(ExternalNetwork.Facebook);
+		// createRecommendedActivities(groups, ExternalNetwork.Facebook);
+		//
+		// train(ExternalNetwork.Google);
+		// groups = assignGroups(ExternalNetwork.Google);
+		// createRecommendedVideos(groups, ExternalNetwork.YouTube);
 
 	}
 
-	
-	
-	
 	/***
 	 * Creates an assignment (or re-assign) for this and external network
 	 * 
@@ -361,7 +465,7 @@ public class AnalyticsService {
 	public void assign(Long userId, ExternalNetwork network) {
 		try {
 			List<Contact> contacts = new ContactRepositoryJpaImpl()
-			.findByOwnerIdExternalNetwork(userId, network);
+					.findByOwnerIdExternalNetwork(userId, network);
 			// TODO: do we have multiple contacts? we should not allow this any
 			// more
 			for (Contact contact : contacts) {
@@ -379,31 +483,32 @@ public class AnalyticsService {
 	 */
 	public void assign(Contact contact) {
 
-//		try {
-//			User user = contact.getOwner();
-//			Profile profile = new Profile(user,
-//					new UserLocationRepositoryJpaImpl().findByUserId(user
-//							.getUserId()));
-//			profile.getContacts().add(contact);
-//			ExternalNetwork network = ExternalNetwork.getNetworkById(contact
-//					.getExternalIdentity().getExternalNetwork());
-//			List<GroupMembership> membershipList = recommendationEngine.assign(
-//					profile, network);
-//
-//			log.info("assigning emembership: {}", membershipList);
-//			// save to DB
-//
-//			GroupMembershipRepository groupMembershipRepository = new GroupMembershipRepositoryJpaImpl();
-//			EntityManagerSupport.beginTransaction();
-//			groupMembershipRepository.deleteByExternalNetworkAndUserId(network,
-//					user.getUserId());
-//			for (GroupMembership membership : membershipList) {
-//				groupMembershipRepository.create(membership);
-//			}
-//			EntityManagerSupport.commit();
-//		} finally {
-//			EntityManagerSupport.closeEntityManager();
-//		}
+		// try {
+		// User user = contact.getOwner();
+		// Profile profile = new Profile(user,
+		// new UserLocationRepositoryJpaImpl().findByUserId(user
+		// .getUserId()));
+		// profile.getContacts().add(contact);
+		// ExternalNetwork network = ExternalNetwork.getNetworkById(contact
+		// .getExternalIdentity().getExternalNetwork());
+		// List<GroupMembership> membershipList = recommendationEngine.assign(
+		// profile, network);
+		//
+		// log.info("assigning emembership: {}", membershipList);
+		// // save to DB
+		//
+		// GroupMembershipRepository groupMembershipRepository = new
+		// GroupMembershipRepositoryJpaImpl();
+		// EntityManagerSupport.beginTransaction();
+		// groupMembershipRepository.deleteByExternalNetworkAndUserId(network,
+		// user.getUserId());
+		// for (GroupMembership membership : membershipList) {
+		// groupMembershipRepository.create(membership);
+		// }
+		// EntityManagerSupport.commit();
+		// } finally {
+		// EntityManagerSupport.closeEntityManager();
+		// }
 	}
 
 	private void createRecommendedVideos(Set<String> groups,
@@ -411,8 +516,10 @@ public class AnalyticsService {
 
 		try {
 			RecommendedVideoRepository recommendedVideoRepository = new RecommendedVideoRepositoryJpaImpl();
-//			EngagedDocumentRepository engagedDocumentRepository = new EngagedDocumentRepositoryJpaImpl();
-//			EngagedVideoRepository engagedVideoRepository = new EngagedVideoRepositoryJpaImpl();
+			// EngagedDocumentRepository engagedDocumentRepository = new
+			// EngagedDocumentRepositoryJpaImpl();
+			// EngagedVideoRepository engagedVideoRepository = new
+			// EngagedVideoRepositoryJpaImpl();
 
 			EntityManagerSupport.beginTransaction();
 			List<RecommendedVideo> recommended = recommendedVideoRepository
@@ -422,27 +529,28 @@ public class AnalyticsService {
 			EntityManagerSupport.commit();
 
 			for (String group : groups) {
-//				List<EngagedVideo> engagedVideos = engagedVideoRepository
-//						.findMeanByGroup(group, 10);
-//				List<EngagedDocument> engagedDocuments = engagedDocumentRepository
-//						.findMeanByGroup(group, 10);
-//				for (EngagedVideo engagedVideo : engagedVideos) {
-//					EntityManagerSupport.beginTransaction();
-//					recommendedVideoRepository.create(new RecommendedVideo(
-//							engagedVideo.getVideoContent(), group));
-//					EntityManagerSupport.commit();
-//				}
+				// List<EngagedVideo> engagedVideos = engagedVideoRepository
+				// .findMeanByGroup(group, 10);
+				// List<EngagedDocument> engagedDocuments =
+				// engagedDocumentRepository
+				// .findMeanByGroup(group, 10);
+				// for (EngagedVideo engagedVideo : engagedVideos) {
+				// EntityManagerSupport.beginTransaction();
+				// recommendedVideoRepository.create(new RecommendedVideo(
+				// engagedVideo.getVideoContent(), group));
+				// EntityManagerSupport.commit();
+				// }
 				// these will be activities clicked on from search results
-//				for (EngagedDocument engagedDocument : engagedDocuments) {
-//					VideoContent videoContent = engagedDocument
-//							.getVideoContent();
-//					if (videoContent != null) {
-//						EntityManagerSupport.beginTransaction();
-//						recommendedVideoRepository.create(new RecommendedVideo(
-//								videoContent, group));
-//						EntityManagerSupport.commit();
-//					}
-//				}
+				// for (EngagedDocument engagedDocument : engagedDocuments) {
+				// VideoContent videoContent = engagedDocument
+				// .getVideoContent();
+				// if (videoContent != null) {
+				// EntityManagerSupport.beginTransaction();
+				// recommendedVideoRepository.create(new RecommendedVideo(
+				// videoContent, group));
+				// EntityManagerSupport.commit();
+				// }
+				// }
 
 				String key = CacheKeys.generateCacheKeyForExternalNetwork(
 						CacheKeys.GroupProperties.RECOMMENDED_VIDEOS, network);
@@ -462,8 +570,10 @@ public class AnalyticsService {
 
 		try {
 			RecommendedActivityRepository recommendedActivityRepository = new RecommendedActivityRepositoryJpaImpl();
-//			EngagedDocumentRepository engagedDocumentRepository = new EngagedDocumentRepositoryJpaImpl();
-//			EngagedActivityRepository engagedActivityRepository = new EngagedActivityRepositoryJpaImpl();
+			// EngagedDocumentRepository engagedDocumentRepository = new
+			// EngagedDocumentRepositoryJpaImpl();
+			// EngagedActivityRepository engagedActivityRepository = new
+			// EngagedActivityRepositoryJpaImpl();
 
 			EntityManagerSupport.beginTransaction();
 			List<RecommendedActivity> recommended = recommendedActivityRepository
@@ -473,27 +583,29 @@ public class AnalyticsService {
 			EntityManagerSupport.commit();
 
 			for (String group : groups) {
-//				List<EngagedActivity> engagedActivities = engagedActivityRepository
-//						.findMeanByGroup(group, 10);
-//				List<EngagedDocument> engagedDocuments = engagedDocumentRepository
-//						.findMeanByGroup(group, 10);
-//				for (EngagedActivity engagedActivity : engagedActivities) {
-//					EntityManagerSupport.beginTransaction();
-//					recommendedActivityRepository
-//					.create(new RecommendedActivity(engagedActivity
-//							.getActivity(), group));
-//					EntityManagerSupport.commit();
-//				}
+				// List<EngagedActivity> engagedActivities =
+				// engagedActivityRepository
+				// .findMeanByGroup(group, 10);
+				// List<EngagedDocument> engagedDocuments =
+				// engagedDocumentRepository
+				// .findMeanByGroup(group, 10);
+				// for (EngagedActivity engagedActivity : engagedActivities) {
+				// EntityManagerSupport.beginTransaction();
+				// recommendedActivityRepository
+				// .create(new RecommendedActivity(engagedActivity
+				// .getActivity(), group));
+				// EntityManagerSupport.commit();
+				// }
 				// these will be activities clicked on from search results
-//				for (EngagedDocument engagedDocument : engagedDocuments) {
-//					Activity activity = engagedDocument.getActivity();
-//					if (activity != null) {
-//						EntityManagerSupport.beginTransaction();
-//						recommendedActivityRepository
-//						.create(new RecommendedActivity(activity, group));
-//						EntityManagerSupport.commit();
-//					}
-//				}
+				// for (EngagedDocument engagedDocument : engagedDocuments) {
+				// Activity activity = engagedDocument.getActivity();
+				// if (activity != null) {
+				// EntityManagerSupport.beginTransaction();
+				// recommendedActivityRepository
+				// .create(new RecommendedActivity(activity, group));
+				// EntityManagerSupport.commit();
+				// }
+				// }
 
 				String key = CacheKeys.generateCacheKeyForExternalNetwork(
 						CacheKeys.GroupProperties.RECOMMENDED_ACTIVITIES,
@@ -522,7 +634,7 @@ public class AnalyticsService {
 
 			// get the group map for this user
 			List<GroupMembership> groupMembershipList = new GroupMembershipRepositoryJpaImpl()
-			.findAllByUserId(ownerId);
+					.findAllByUserId(ownerId);
 
 			GroupMembership groupMembership = null;
 			for (GroupMembership assigned : groupMembershipList) {
@@ -547,8 +659,8 @@ public class AnalyticsService {
 			}
 
 			List<VideoContent> videos = new RecommendedVideoRepositoryJpaImpl()
-			.findRecommendedVideosByGroup(groupMembership
-					.getGroupIdentifier());
+					.findRecommendedVideosByGroup(groupMembership
+							.getGroupIdentifier());
 
 			return new CollectionVariant<VideoContent>(videos, lastModified);
 
@@ -558,47 +670,48 @@ public class AnalyticsService {
 	}
 
 	private Set<String> assignGroups(ExternalNetwork network) {
-//		// track the unique set of group names
-//		Set<String> groups = new HashSet<String>();
-//
-//		GroupMembershipRepository groupMembershipRepository = new GroupMembershipRepositoryJpaImpl();
-//
-//		// remove all assignments in db by this network
-//		EntityManagerSupport.beginTransaction();
-//		groupMembershipRepository.deleteByExternalNetwork(network);
-//		EntityManagerSupport.commit();
-//
-//		// query all contacts
-//		List<Contact> contacts = new ContactRepositoryJpaImpl()
-//		.findByExternalNetwork(network);
-//		for (Contact contact : contacts) {
-//
-//			// load in user we have one
-//			User user = new UserRepositoryJpaImpl().getByIdentityId(contact
-//					.getExternalIdentity().getIdentityId());
-//			UserLocation location = null;
-//			if (user != null)
-//				location = new UserLocationRepositoryJpaImpl()
-//			.findByUserId(user.getUserId());
-//
-//			// this profile may have both values as null; that's ok for now
-//			Profile profile = new Profile(user, location);
-//			// only add this contact for the assignment
-//			profile.getContacts().add(contact);
-//
-//			List<GroupMembership> membershipList = recommendationEngine.assign(
-//					profile, network);
-//			// persist assignments
-//			for (GroupMembership membership : membershipList) {
-//				EntityManagerSupport.beginTransaction();
-//				groupMembershipRepository.create(membership);
-//				EntityManagerSupport.commit();
-//
-//				// add to groups
-//				groups.add(membership.getGroupIdentifier());
-//			}
-//		}
-//		return groups;
+		// // track the unique set of group names
+		// Set<String> groups = new HashSet<String>();
+		//
+		// GroupMembershipRepository groupMembershipRepository = new
+		// GroupMembershipRepositoryJpaImpl();
+		//
+		// // remove all assignments in db by this network
+		// EntityManagerSupport.beginTransaction();
+		// groupMembershipRepository.deleteByExternalNetwork(network);
+		// EntityManagerSupport.commit();
+		//
+		// // query all contacts
+		// List<Contact> contacts = new ContactRepositoryJpaImpl()
+		// .findByExternalNetwork(network);
+		// for (Contact contact : contacts) {
+		//
+		// // load in user we have one
+		// User user = new UserRepositoryJpaImpl().getByIdentityId(contact
+		// .getExternalIdentity().getIdentityId());
+		// UserLocation location = null;
+		// if (user != null)
+		// location = new UserLocationRepositoryJpaImpl()
+		// .findByUserId(user.getUserId());
+		//
+		// // this profile may have both values as null; that's ok for now
+		// Profile profile = new Profile(user, location);
+		// // only add this contact for the assignment
+		// profile.getContacts().add(contact);
+		//
+		// List<GroupMembership> membershipList = recommendationEngine.assign(
+		// profile, network);
+		// // persist assignments
+		// for (GroupMembership membership : membershipList) {
+		// EntityManagerSupport.beginTransaction();
+		// groupMembershipRepository.create(membership);
+		// EntityManagerSupport.commit();
+		//
+		// // add to groups
+		// groups.add(membership.getGroupIdentifier());
+		// }
+		// }
+		// return groups;
 		return null;
 	}
 
@@ -622,7 +735,7 @@ public class AnalyticsService {
 
 		// create fb specific context, with dimensions where
 		recommendationEngine
-		.addContext(ExternalNetwork.Facebook, configuration);
+				.addContext(ExternalNetwork.Facebook, configuration);
 		recommendationEngine.addDimension(
 				Dimension.createFromEnum("gender", Gender.class, 1.0),
 				ExternalNetwork.Facebook);
@@ -649,12 +762,12 @@ public class AnalyticsService {
 				-180.0, 180.0), 0.5));
 
 	}
-	
+
 	private void setUpLily(Configuration configuration) {
 		namespace = configuration.getString("hbase.sprocket.namespace");
-		LilyRepositoryFactory.initialize(configuration);
+		//LilyRepositoryFactory.initialize(configuration);
 	}
-	
+
 	public void resetInterestsLastModifiedCache() {
 		String key = CacheKeys
 				.generateCacheKeyForPlaces(CacheKeys.GlobalProperties.INTERESTS);

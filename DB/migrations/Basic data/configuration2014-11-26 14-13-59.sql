@@ -1,6 +1,8 @@
 USE sprocket;
+delete from configuration;
+ALTER TABLE configuration AUTO_INCREMENT = 1;
 
-insert into `configuration` (`configuration_id`,`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) (`configuration_id`,`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,0,1,1415285840335,'message.service.host','localhost',-1);
+insert into `configuration` (`configuration_id`,`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,0,1,1415285840335,'message.service.host','localhost',-1);
 insert into `configuration` (`configuration_id`,`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (2,0,1,1415285845693,'message.service.port','5222',-1);
 insert into `configuration` (`configuration_id`,`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (3,0,1,1415285845698,'message.service.protocol','xmpp',-1);
 insert into `configuration` (`configuration_id`,`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (4,1,1,1415285845703,'http.connnection.timeout','5',-1);
@@ -10,13 +12,13 @@ insert into `configuration` (`configuration_id`,`configuration_type`,`is_active`
 #########
 #TWITTER#
 #########
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages ','true',0);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities ','true',0);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos ','false',0);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages','true',0);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities','true',0);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos','false',0);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.localfeed','false',0);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.favorite','false',0);
 
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute ','false ',0);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute','false',0);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.image','false',0);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.url','false',0);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.text','true',0);
@@ -36,13 +38,13 @@ insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`na
 ##########
 #FACEBOOK#
 ##########
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages ','true',1);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities ','true',1);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos ','false',1);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages','true',1);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities','true',1);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos','false',1);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.localfeed','true',1);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.favorite','false',1);
 
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute ','false ',1);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute','false',1);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.image','false',1);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.url','false',1);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.text','false',1);
@@ -66,13 +68,13 @@ insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`na
 ##########
 #LinkedIn#
 ##########
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages ','false',3);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities ','true',3);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos ','false',3);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages','false',3);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities','true',3);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos','false',3);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.localfeed','false',3);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.favorite','false',3);
 
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute ','false ',3);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute','false',3);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.image','false',3);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.url','false',3);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.text','true',3);
@@ -92,13 +94,13 @@ insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`na
 ########
 #Google#
 ########
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages ','true',4);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities ','false',4);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos ','false',4);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages','true',4);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities','false',4);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos','false',4);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.localfeed','false',4);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.favorite','false',4);
 
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute ','false ',4);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute','false',4);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.image','false',4);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.url','false',4);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.text','false',4);
@@ -118,13 +120,13 @@ insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`na
 #########
 #YouTube#
 #########
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages ','false',5);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities ','false',5);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos ','true',5);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages','false',5);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities','false',5);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos','true',5);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.localfeed','false',5);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.favorite','false',5);
 
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute ','false ',5);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute','false',5);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.image','false',5);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.url','false',5);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.text','false',5);
@@ -145,13 +147,13 @@ insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`na
 #######
 #Vimeo#
 #######
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages ','false',6);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities ','false',6);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos ','true',6);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages','false',6);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities','false',6);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos','true',6);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.localfeed','false',6);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.favorite','false',6);
 
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute ','false ',6);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute','false',6);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.image','false',6);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.url','false',6);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.text','false',6);
@@ -175,13 +177,13 @@ insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`na
 ######
 #Yelp#
 ######	
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages ','false',8);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities ','false',8);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos ','false',8);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages','false',8);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities','false',8);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos','false',8);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.localfeed','false',8);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.favorite','true',8);
 
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute ','false ',8);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute','false',8);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.image','false',8);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.url','false',8);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.text','false',8);
@@ -202,13 +204,13 @@ insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`na
 ########
 #Tumblr#
 ########
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages ','true',9);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities ','true',9);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos ','false',9);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages','true',9);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities','true',9);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos','false',9);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.localfeed','false',9);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.favorite','false',9);
 
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute ','false ',9);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute','false',9);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.image','true',9);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.url','true',9);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.text','true',9);
@@ -228,14 +230,14 @@ insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`na
 ########
 #Reddit#
 ########
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages ','false',10);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities ','true',10);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos ','false',10);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.messages','false',10);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.activities','true',10);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.videos','false',10);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.localfeed','false',10);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'sync.favorite','false',10);
 
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute ','false ',10);
-insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.image','false ',10);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'messages.post.contribute','false',10);
+insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.image','false',10);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.url','true',10);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.text','true',10);
 insert into `configuration` (`configuration_type`,`is_active`,`last_updated`,`name`,`value`,`external_network`) values  (1,1,1417004543000,'activities.post.audio','false',10);

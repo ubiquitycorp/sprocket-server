@@ -26,3 +26,12 @@ sprocket-api/bin
 /sprocket-backchannel-worker\.settings/*.prefs
 /sprocket-backchannel-worker\.settings/*.prefs
 /sprocket-backchannel-worker\.settings/*.prefs
+/sprocket-datasync-master-worker/.gitignore
+/sprocket-datasync-master-worker/.project
+/sprocket-datasync-master-worker\target\classes\META-INF/MANIFEST.MF
+/sprocket-datasync-master-worker\target\classes\META-INF\maven\com.ubiquity\sprocket-datasync-master-worker/pom.properties
+/sprocket-datasync-master-worker\target\classes\META-INF\maven\com.ubiquity\sprocket-datasync-master-worker/pom.xml
+/sprocket-datasync-master-worker\target\classes\META-INF/persistence.xml
+/sprocket-datasync-master-worker\target\classes/datasyncmasterworker.properties
+/sprocket-datasync-master-worker\target\classes/logback.xml
+/sprocket-datasync-master-worker\target\classes/sprocket-datasync-master-worker
