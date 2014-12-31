@@ -130,7 +130,7 @@
 		<dependency>
 			<artifactId>niobium-data-access</artifactId>
 			<groupId>com.niobium</groupId>
-			<version>0.9.4</version>
+			<version>0.9.6</version>
 		</dependency>
 		<dependency>
 			<artifactId>niobium-common</artifactId>
