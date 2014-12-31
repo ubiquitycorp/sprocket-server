@@ -35,20 +35,23 @@ public class DataSyncWorker {
 
 	private static final int DEFAULT_NUM_CONSUMERS = 10;
 	protected static Logger log = Logger.getLogger(DataSyncWorker.class);
-	private static Boolean isMaster;
+	private static WorkerRole role;
 
 	public void destroy() {
 		stopServices();
 	}
 
 	public void initialize(Configuration configuration,
-			Configuration errorsConfiguration) throws IOException, SchedulerException {
+			Configuration errorsConfiguration) throws IOException,
+			SchedulerException {
 
 		startServices(configuration, errorsConfiguration);
-		if (isMaster) {
+		if (role.equals(WorkerRole.MASTER) || role.equals(WorkerRole.UNIVERSAL))
 			// start scheduler in the master worker
-			startScheduler(configuration.getInt("rules.sync.blockSize", 10), configuration.getInt("rules.sync.period", 8));
-		} else {
+			startScheduler(configuration.getInt("rules.sync.blockSize", 10),
+					configuration.getInt("rules.sync.period", 8));
+		
+		if (role.equals(WorkerRole.SLAVE) || role.equals(WorkerRole.UNIVERSAL)) {
 			// creates N threads to consume messages in a slave worker
 			List<CacheInvalidateConsumer> consumers = new LinkedList<CacheInvalidateConsumer>();
 			try {
@@ -83,8 +86,13 @@ public class DataSyncWorker {
 		try {
 			log.info("Initializing " + args[0] + " worker...");
 			// args[0] represents is worker is master or slave
-			isMaster = args[0].equalsIgnoreCase("master") ? true : false;
-			
+			if (args[0].equalsIgnoreCase("master"))
+				role = WorkerRole.MASTER;
+			else if (args[0].equalsIgnoreCase("slave"))
+				role = WorkerRole.SLAVE;
+			else
+				role = WorkerRole.UNIVERSAL;
+
 			worker.initialize(new PropertiesConfiguration(
 					"datasyncworker.properties"), new PropertiesConfiguration(
 					"messages.properties"));
@@ -121,7 +129,8 @@ public class DataSyncWorker {
 		// TODO: we need an mq disconnect
 	}
 
-	private void startScheduler(int blockSize, int syncPeriod) throws SchedulerException {
+	private void startScheduler(int blockSize, int syncPeriod)
+			throws SchedulerException {
 		Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
 		scheduler.start();
 
