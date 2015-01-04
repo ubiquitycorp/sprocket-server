@@ -40,7 +40,7 @@ public class PlacesEndpoint {
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 
 	@GET
-	@Path("/users/{userId}/Region/{region}/neighborhoods")
+	@Path("/users/{userId}/regions/{region}/neighborhoods")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response neighborhoods(@PathParam("userId") Long userId,
@@ -67,7 +67,7 @@ public class PlacesEndpoint {
 	}
 
 	@GET
-	@Path("/users/{userId}/providers/{externalNetworkId}/location/{placeId}")
+	@Path("/users/{userId}/providers/{externalNetworkId}/places/{placeId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response placesByInterestIdAndNeighborhood(
@@ -92,7 +92,7 @@ public class PlacesEndpoint {
 	}
 
 	@GET
-	@Path("/users/{userId}/providers/{externalNetworkId}/location/current")
+	@Path("/users/{userId}/providers/{externalNetworkId}/places/current")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response placesByInterestIdAndCurrent(
@@ -162,7 +162,7 @@ public class PlacesEndpoint {
 	}
 
 	@GET
-	@Path("/users/{userId}/providers/{providerId}/favorites/location/{placeId}")
+	@Path("/users/{userId}/providers/{providerId}/favorites/places/{placeId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response favoritesByOwnerAndProviderAndNeighborhood(
@@ -191,7 +191,7 @@ public class PlacesEndpoint {
 	}
 
 	@GET
-	@Path("/users/{userId}/providers/{providerId}/favorites/location/current")
+	@Path("/users/{userId}/providers/{providerId}/favorites/places/current")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response favoritesByOwnerAndProviderAndCurrent(
