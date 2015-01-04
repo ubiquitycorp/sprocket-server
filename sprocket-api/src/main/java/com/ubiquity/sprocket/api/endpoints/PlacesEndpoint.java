@@ -66,7 +66,7 @@ public class PlacesEndpoint {
 					DtoAssembler.assembleCityOrNeighborhood(place));
 		}
 
-		return Response.ok().header("Last-Modified", variant.lastModified)
+		return Response.ok().header("Last-Modified", variant.getLastModified())
 				.entity(jsonConverter.convertToPayload(results)).build();
 	}
 
@@ -164,11 +164,11 @@ public class PlacesEndpoint {
 						ifModifiedSince, delta);
 		if (places == null)
 			return Response.notModified().build();
-		for (Place place : places.collection) {
+		for (Place place : places.getCollection()) {
 			results.getPlaces().add(DtoAssembler.assemble(place));
 		}
 
-		return Response.ok().header("Last-Modified", places.lastModified)
+		return Response.ok().header("Last-Modified", places.getLastModified())
 				.entity(jsonConverter.convertToPayload(results)).build();
 	}
 
@@ -193,11 +193,11 @@ public class PlacesEndpoint {
 						externalNetwork, placeId, ifModifiedSince, delta);
 		if (places == null)
 			return Response.notModified().build();
-		for (Place place : places.collection) {
+		for (Place place : places.getCollection()) {
 			results.getPlaces().add(DtoAssembler.assemble(place));
 		}
 
-		return Response.ok().header("Last-Modified", places.lastModified)
+		return Response.ok().header("Last-Modified", places.getLastModified())
 				.entity(jsonConverter.convertToPayload(results)).build();
 	}
 
@@ -227,11 +227,11 @@ public class PlacesEndpoint {
 						ifModifiedSince, delta);
 		if (places == null)
 			return Response.notModified().build();
-		for (Place place : places.collection) {
+		for (Place place : places.getCollection()) {
 			results.getPlaces().add(DtoAssembler.assemble(place));
 		}
 
-		return Response.ok().header("Last-Modified", places.lastModified)
+		return Response.ok().header("Last-Modified", places.getLastModified())
 				.entity(jsonConverter.convertToPayload(results)).build();
 	}
 

@@ -82,4 +82,11 @@ public class LocationUpdateConsumer extends AbstractConsumerThread {
 			ServiceFactory.getLocationService().updatePlace(place);
 		}
 	}
+
+	@Override
+	protected void handleException(Throwable e) {
+		// TODO Auto-generated method stub
+		log.info("Exeception : {}", e.getMessage());
+		
+	}
 }

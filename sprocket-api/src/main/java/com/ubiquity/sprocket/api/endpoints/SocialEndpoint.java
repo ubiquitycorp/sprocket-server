@@ -102,7 +102,7 @@ public class SocialEndpoint {
 			results.getActivities().add(DtoAssembler.assemble(activity));
 		}
 
-		return Response.ok().header("Last-Modified", variant.lastModified)
+		return Response.ok().header("Last-Modified", variant.getLastModified())
 				.entity(jsonConverter.convertToPayload(results)).build();
 	}
 
@@ -148,7 +148,7 @@ public class SocialEndpoint {
 			results.getActivities().add(DtoAssembler.assemble(activity));
 		}
 
-		return Response.ok().header("Last-Modified", variant.lastModified)
+		return Response.ok().header("Last-Modified", variant.getLastModified())
 				.entity(jsonConverter.convertToPayload(results)).build();
 	}
 

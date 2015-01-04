@@ -138,4 +138,10 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		DataSyncProcessor dataSyncManager = new DataSyncProcessor(users);
 		dataSyncManager.syncData();
 	}
+
+	@Override
+	protected void handleException(Throwable e) {
+		// TODO Auto-generated method stub
+		
+	}
 }
