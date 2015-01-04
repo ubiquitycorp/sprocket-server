@@ -50,10 +50,6 @@ public class PlacesEndpoint {
 			throws IOException {
 		PlacesDto results = new PlacesDto();
 
-		// ExternalNetwork socialNetwork =
-		// ExternalNetwork.getNetworkById(socialProviderId);
-
-		// Locale localeObj = new Locale(locale);
 		CollectionVariant<Place> variant = ServiceFactory.getLocationService()
 				.getAllCitiesAndNeighborhoods(region, ifModifiedSince, delta);
 
@@ -112,13 +108,6 @@ public class PlacesEndpoint {
 				throw new IllegalArgumentException(
 						"User location is not available");
 			else {
-				
-				try {
-					Thread.sleep(4000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 				userLocation = ServiceFactory.getLocationService()
 						.getLocation(userId);
 				if (userLocation == null)
