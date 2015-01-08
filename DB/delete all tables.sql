@@ -28,4 +28,5 @@ delete from user_location;
 delete from external_identity;
 delete from native_identity;
 delete from identity;
+delete from user_location;
 delete from user;
