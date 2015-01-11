@@ -465,7 +465,7 @@ public class AnalyticsService {
 	public void assign(Long userId, ExternalNetwork network) {
 		try {
 			List<Contact> contacts = new ContactRepositoryJpaImpl()
-					.findByOwnerIdExternalNetwork(userId, network);
+					.findByOwnerIdAndExternalNetwork(userId, network);
 			// TODO: do we have multiple contacts? we should not allow this any
 			// more
 			for (Contact contact : contacts) {
