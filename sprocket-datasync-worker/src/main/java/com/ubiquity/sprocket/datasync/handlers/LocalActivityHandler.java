@@ -46,8 +46,11 @@ public class LocalActivityHandler extends Handler {
 		try {
 			synced = ServiceFactory.getSocialService().syncLocalNewsFeed(
 					identity, network);
-			log.debug(" indexing local activities for identity {}", identity);
-			return synced.size();
+			int activitiesSize =synced.size();
+			if(activitiesSize ==0){
+				activitiesSize = ServiceFactory.getSocialService().getLastLocalActivities(identity,network);
+			}
+			return activitiesSize;
 		} catch (AuthorizationException e) {
 			ServiceFactory.getSocialService().setActiveNetworkForUser(userId,
 					network, false);

@@ -72,8 +72,8 @@ public class DataSyncWorker {
 		}
 
 		log.info("Initialized {} version: {}"
-				+ configuration.getProperty("application.name") + "  "
-				+ configuration.getProperty("application.version"));
+				, configuration.getProperty("application.name")
+				, configuration.getProperty("application.version"));
 		while (true) {
 			try {
 				Thread.sleep(1000);
