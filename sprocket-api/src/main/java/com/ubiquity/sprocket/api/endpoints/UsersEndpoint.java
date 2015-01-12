@@ -115,7 +115,8 @@ public class UsersEndpoint {
 		String[] accesstokens = exchangservice.exchangeToken(cookieString);
 
 		if (accesstokens[0] == null || accesstokens[0].equalsIgnoreCase(""))
-			throw new AuthorizationException("Autontication Failed no oAuth_token_returned", null);
+			throw new AuthorizationException(
+					"Autontication Failed no oAuth_token_returned", null);
 
 		// create the identity if it does not exist; or use the existing one
 		List<ExternalIdentity> identities = ServiceFactory
@@ -124,18 +125,21 @@ public class UsersEndpoint {
 						ClientPlatform.WEB, ExternalNetwork.LinkedIn, null);
 
 		ExternalIdentity identity = identities.get(0);
-		IdentityDto result = new IdentityDto.Builder().identifier(
-				identity.getIdentifier()).clientPlatformId(identity.getClientPlatform().ordinal()).build();
+		IdentityDto result = new IdentityDto.Builder()
+				.identifier(identity.getIdentifier())
+				.clientPlatformId(identity.getClientPlatform().ordinal())
+				.build();
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identities, result.getClientPlatformId());
-		
-		ServiceFactory.getSocialService().setActiveNetworkForUser(userId, ExternalNetwork.LinkedIn, true);
-		
+
+		ServiceFactory.getSocialService().setActiveNetworkForUser(userId,
+				ExternalNetwork.LinkedIn, true);
+
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identity.getIdentityId(),
-							user.getUserId());
+					.getBySocialIdentityId(user.getUserId(),
+							identity.getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
@@ -221,7 +225,8 @@ public class UsersEndpoint {
 		User user = authenticationService.authenticate(
 				identityDto.getUsername(), identityDto.getPassword());
 		if (user == null)
-			throw new AuthorizationException("Username / password incorrect", null);
+			throw new AuthorizationException("Username / password incorrect",
+					null);
 
 		// update user last login
 		user.setLastLogin(System.currentTimeMillis());
@@ -239,10 +244,14 @@ public class UsersEndpoint {
 				ExternalIdentity externalIdentity = (ExternalIdentity) identity;
 				IdentityDto associatedIdentityDto = new IdentityDto.Builder()
 						.identifier(externalIdentity.getIdentifier())
-						.externalNetworkId(externalIdentity.getExternalNetwork())
-						.build();
-				Boolean isActive = ServiceFactory.getSocialService().IsActiveNetworkForUser(user.getUserId(), ExternalNetwork.getNetworkById(externalIdentity.getExternalNetwork()));
-				if(isActive)
+						.externalNetworkId(
+								externalIdentity.getExternalNetwork()).build();
+				Boolean isActive = ServiceFactory.getSocialService()
+						.IsActiveNetworkForUser(
+								user.getUserId(),
+								ExternalNetwork.getNetworkById(externalIdentity
+										.getExternalNetwork()));
+				if (isActive)
 					accountDto.getIdentities().add(associatedIdentityDto);
 			}
 		}
@@ -311,8 +320,14 @@ public class UsersEndpoint {
 
 		ContactsDto contactsDto = new ContactsDto();
 		for (Contact contact : contacts) {
-			Boolean isActive = ServiceFactory.getSocialService().IsActiveNetworkForUser(userId, ExternalNetwork.getNetworkById(contact.getExternalIdentity().getExternalNetwork()));
-			if(isActive)
+			Boolean isActive = ServiceFactory.getSocialService()
+					.IsActiveNetworkForUser(
+							userId,
+							ExternalNetwork
+									.getNetworkById(contact
+											.getExternalIdentity()
+											.getExternalNetwork()));
+			if (isActive)
 				contactsDto.getContacts().add(DtoAssembler.assemble(contact));
 		}
 		return Response.ok()
@@ -350,15 +365,16 @@ public class UsersEndpoint {
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto.getClientPlatformId());
 
-		ServiceFactory.getSocialService().setActiveNetworkForUser(userId, externalNetwork, true);
-		
+		ServiceFactory.getSocialService().setActiveNetworkForUser(userId,
+				externalNetwork, true);
+
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identity.get(0).getIdentityId(),
-							userId);
+					.getBySocialIdentityId(userId,
+							identity.get(0).getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
@@ -395,7 +411,7 @@ public class UsersEndpoint {
 				.getClientPlatformId());
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identityDto.getExternalNetworkId());
-		List<ExternalIdentity> identiies = null;
+		List<ExternalIdentity> identities = null;
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		if (externalNetwork.network == Network.Content) {
@@ -406,7 +422,7 @@ public class UsersEndpoint {
 					identityDto.getCode(), identityDto.getRedirectUrl());
 
 			// create the identity if it does not exist; or use the existing one
-			identiies = ServiceFactory.getExternalIdentityService()
+			identities = ServiceFactory.getExternalIdentityService()
 					.createOrUpdateExternalIdentity(user, accessToken,
 							identityDto.getSecretToken(),
 							identityDto.getRefreshToken(), clientPlatform,
@@ -426,7 +442,7 @@ public class UsersEndpoint {
 					identityDto.getCode(), identityDto.getOauthToken(),
 					identityDto.getOauthTokenSecret(), redirectUri);
 
-			identiies = ServiceFactory.getExternalIdentityService()
+			identities = ServiceFactory.getExternalIdentityService()
 					.createOrUpdateExternalIdentity(user,
 							externalidentity.getAccessToken(),
 							externalidentity.getSecretToken(),
@@ -436,24 +452,25 @@ public class UsersEndpoint {
 		}
 
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identiies, identityDto.getClientPlatformId());
+		sendActivatedMessage(user, identities, identityDto.getClientPlatformId());
 
-		ServiceFactory.getSocialService().setActiveNetworkForUser(userId, externalNetwork, true);
-		
+		ServiceFactory.getSocialService().setActiveNetworkForUser(userId,
+				externalNetwork, true);
+
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
 
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identiies.get(0).getIdentityId(),
-							userId);
+					.getBySocialIdentityId(userId,
+							identities.get(0).getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
 		} catch (NoResultException ex) {
 			IdentityDto result = new IdentityDto.Builder().identifier(
-					identiies.get(0).getIdentifier()).build();
+					identities.get(0).getIdentifier()).build();
 			return Response.ok().entity(jsonConverter.convertToPayload(result))
 					.build();
 		}
@@ -570,7 +587,7 @@ public class UsersEndpoint {
 		String fileName = "";
 		RemoteAsset media = null;
 		// 50 MB size of memory
-		int maxMemorySize = ServiceFactory.getUserService().getMaxMemorySize(); 
+		int maxMemorySize = ServiceFactory.getUserService().getMaxMemorySize();
 		// 500 MB size of file
 		long maxRequestSize = ServiceFactory.getUserService().getMaxFileSize();
 
@@ -606,7 +623,7 @@ public class UsersEndpoint {
 			log.debug("Failed to Upload File");
 			throw new RuntimeException("Failed to Upload File");
 		}
-		
+
 		if (items != null) {
 			Iterator<FileItem> iter = items.iterator();
 			while (iter.hasNext()) {
@@ -614,28 +631,34 @@ public class UsersEndpoint {
 				if (!item.isFormField() && item.getSize() > 0) {
 					String fileExtension = item.getContentType().substring(
 							item.getContentType().lastIndexOf("/") + 1);
-					
-					fileName = new StringBuilder().append("sprocket").append("_")
-							.append(System.currentTimeMillis()).append(".")
-							.append(fileExtension).toString();
-					
+
+					fileName = new StringBuilder().append("sprocket")
+							.append("_").append(System.currentTimeMillis())
+							.append(".").append(fileExtension).toString();
+
 					log.debug(fileName);
-					
+
 					if (item.getContentType().contains("image")) {
-						media = new Image.Builder().itemKey(fileName).contentLength(item.getSize()).build();
+						media = new Image.Builder().itemKey(fileName)
+								.contentLength(item.getSize()).build();
 					} else if (item.getContentType().contains("audio")) {
-						media = new AudioTrack.Builder().itemKey(fileName).contentLength(item.getSize()).build();
+						media = new AudioTrack.Builder().itemKey(fileName)
+								.contentLength(item.getSize()).build();
 					} else if (item.getContentType().contains("video")) {
-						media = new Video.Builder().itemKey(fileName).contentLength(item.getSize()).build();
-					} else 
-						throw new IllegalArgumentException("Unsupported media type");
-					
+						media = new Video.Builder().itemKey(fileName)
+								.contentLength(item.getSize()).build();
+					} else
+						throw new IllegalArgumentException(
+								"Unsupported media type");
+
 					media.setInputStream(item.getInputStream());
 					ServiceFactory.getMediaService().create(media);
 					long endTime = System.currentTimeMillis();
-					
-					log.info("media uploaded successfully:\n url:" + media.getUrl() + "\n upload time: " + (endTime - startTime) / 1000 + " seconds");
-					
+
+					log.info("media uploaded successfully:\n url:"
+							+ media.getUrl() + "\n upload time: "
+							+ (endTime - startTime) / 1000 + " seconds");
+
 				}
 			}
 
@@ -646,9 +669,10 @@ public class UsersEndpoint {
 			throw new IllegalArgumentException("No file found");
 
 	}
-	
+
 	/***
 	 * This end point forces synchronization for specific external network
+	 * 
 	 * @param userId
 	 * @param payload
 	 * @return
@@ -659,28 +683,32 @@ public class UsersEndpoint {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response sync(@PathParam("userId") Long userId,
-			InputStream payload) throws IOException {
+	public Response sync(@PathParam("userId") Long userId, InputStream payload)
+			throws IOException {
 
 		// convert payload
-		SyncDto syncDto = jsonConverter.convertFromPayload(payload, SyncDto.class);
+		SyncDto syncDto = jsonConverter.convertFromPayload(payload,
+				SyncDto.class);
 
-		ClientPlatform clientPlatform = ClientPlatform.getEnum(syncDto.getClientPlatformId());
-		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(syncDto.getExternalNetworkId());
-		
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, externalNetwork);
-		
+		ClientPlatform clientPlatform = ClientPlatform.getEnum(syncDto
+				.getClientPlatformId());
+		ExternalNetwork externalNetwork = ExternalNetwork
+				.getNetworkById(syncDto.getExternalNetworkId());
+
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+				.findExternalIdentity(userId, externalNetwork);
+
 		User user = new User(userId);
-		
+
 		List<ExternalIdentity> identities = new LinkedList<ExternalIdentity>();
 		identities.add(identity);
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identities, clientPlatform.ordinal());
 
 		return Response.ok().build();
-		
+
 	}
-	
+
 	private void sendActivatedMessage(User user,
 			List<ExternalIdentity> identities, Integer clientPlatformId)
 			throws IOException {
