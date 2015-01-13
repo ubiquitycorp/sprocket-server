@@ -38,8 +38,10 @@ import com.ubiquity.integration.domain.PostVote;
 import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
+import com.ubiquity.sprocket.api.dto.containers.ContactsDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
 import com.ubiquity.sprocket.api.dto.model.ActivityDto;
+import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 import com.ubiquity.sprocket.api.dto.model.PostActivityDto;
 import com.ubiquity.sprocket.api.dto.model.PostCommentDto;
@@ -104,6 +106,35 @@ public class SocialEndpoint {
 
 		return Response.ok().header("Last-Modified", variant.getLastModified())
 				.entity(jsonConverter.convertToPayload(results)).build();
+	}
+
+	@GET
+	@Path("users/{userId}/contacts")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response contacts(@PathParam("userId") Long userId,
+			@HeaderParam("delta") Boolean delta,
+			@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+		log.debug("Listing contacts modified since: {}", ifModifiedSince);
+
+		// Manager will return contacts if they have been modified, else it will
+		// be empty
+		CollectionVariant<Contact> variant = ServiceFactory.getContactService()
+				.findAllContactsByOwnerId(userId, ifModifiedSince);
+
+		// Throw a 304 if there is no variant (no change)
+		if (variant == null) {
+			return Response.notModified().build();
+		}
+		// Convert entire list to DTO
+		ContactsDto result = new ContactsDto();
+		for (Contact contact : variant.getCollection()) {
+			ContactDto contactDto = DtoAssembler.assemble(contact);
+			result.getContacts().add(contactDto);
+		}
+
+		return Response.ok().header("Last-Modified", variant.getLastModified())
+				.entity(jsonConverter.convertToPayload(result)).build();
 	}
 
 	/***
@@ -398,7 +429,6 @@ public class SocialEndpoint {
 		Captcha captcha = ServiceFactory.getSocialService().requestCaptcha(
 				identity, externalNetwork);
 
-		
 		final byte[] image = captcha.getImage();
 
 		if (image != null) {
