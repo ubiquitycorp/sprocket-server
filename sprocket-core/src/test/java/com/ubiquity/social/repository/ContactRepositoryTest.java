@@ -95,7 +95,7 @@ public class ContactRepositoryTest {
 		contactRepository.update(facebookContact);
 		EntityManagerSupport.commit();
 
-		contacts = contactRepository.findActiveContactsByOwnerId(owner
+		contacts = contactRepository.findContactsForActiveNetworksByOwnerId(owner
 				.getUserId());
 		Assert.assertEquals(contacts.size(), 5);
 	}
