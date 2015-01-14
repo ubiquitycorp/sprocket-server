@@ -48,7 +48,7 @@ public class LocalActivityHandler extends Handler {
 					identity, network);
 			int activitiesSize =synced.size();
 			if(activitiesSize ==0){
-				activitiesSize = ServiceFactory.getSocialService().getLastLocalActivities(identity,network);
+				activitiesSize = ServiceFactory.getSocialService().getCountOfLastLocalActivities(identity,network);
 			}
 			return activitiesSize;
 		} catch (AuthorizationException e) {
