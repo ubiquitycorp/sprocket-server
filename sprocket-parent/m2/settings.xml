@@ -580,11 +580,30 @@
 			<id>swisscom</id>
 			<properties>
 				<app.log.level>INFO</app.log.level>
+				<loggly.customer.token>4ed5a2fe-f74b-47f8-ba62-ab0ac09e7505
+				</loggly.customer.token>
+				<tomcat.processes>1</tomcat.processes>
+				<datasync.worker.processes>1</datasync.worker.processes>
+				<datasync.worker.size>1024</datasync.worker.size>
 				<syslog.host>localhost</syslog.host>
 				<redis.host>sprocket-redis</redis.host>
 				<hibernate.debug>false</hibernate.debug>
 				<solr.api.host>sprocket-search</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
+				
+				<!--<social.facebook.api.host>http://localhost/sprocket-network-api/api/1.0/facebook</social.facebook.api.host>-->
+				<social.facebook.api.host>https://graph.facebook.com</social.facebook.api.host>
+				<!--<social.googlePlus.api.host>http://localhost/sprocket-network-api/api/1.0/googleplus</social.googlePlus.api.host>-->
+				<social.googlePlus.api.host>https://www.googleapis.com/plus/v1</social.googlePlus.api.host>
+				<!--<social.google.api.host>http://localhost/sprocket-network-api/api/1.0/googleplus</social.google.api.host>-->
+				<social.google.api.host>https://accounts.google.com</social.google.api.host>
+				<!--<content.youtube.api.host>http://localhost/sprocket-network-api/api/1.0/youtube</content.youtube.api.host>-->
+				<content.youtube.api.host>https://www.googleapis.com/youtube</content.youtube.api.host>
+				<!--<social.reddit.oauth.api.host>http://localhost/sprocket-network-api/api/1.0/reddit</social.reddit.oauth.api.host>-->
+				<social.reddit.oauth.api.host>https://oauth.reddit.com</social.reddit.oauth.api.host>
+				<!--<social.reddit.ssl.api.host>http://localhost/sprocket-network-api/api/1.0/reddit</social.reddit.ssl.api.host>-->
+				<social.reddit.ssl.api.host>https://ssl.reddit.com</social.reddit.ssl.api.host>
+				
 				<social.twitter.app.consumerKey>wzH6L355yCEXl6LJFh4r0oDuY
 				</social.twitter.app.consumerKey>
 				<social.twitter.app.consumerSecret>69Po2Lc9DpwLp6AcXX24KOcPRk8IJjbJkh9PKAWlFz0PIZmApP
@@ -623,13 +642,25 @@
 				</content.vimeo.mobile.clientId>
 				<content.vimeo.mobile.clientSecret>6814eea3b1195e9f8cd81688481c76688fea1120
 				</content.vimeo.mobile.clientSecret>
+				<constants.resetUrl>swisscom.ubiquitycorp.com/#/reset?token=
+				</constants.resetUrl>
 				<yelp.consumerKey>mnm5G8XclwYIwbED8HV4EQ</yelp.consumerKey>
 				<yelp.consumerSecret>3X5_IqGMVRE9dwb_pxV23FxS68k
 				</yelp.consumerSecret>
 				<yelp.token>wjVmlQFhPyMNYEPcyIyCenucRoBPPwJp</yelp.token>
 				<yelp.tokenSecret>w7oeFsjoVLEb4c8bUbgRiQ4smec</yelp.tokenSecret>
-				<constants.resetUrl>swisscom.ubiquitycorp.com/#/reset?token=
-				</constants.resetUrl>
+				<social.tumblr.consumerKey>X4Jwwn3OaWgt9BlzaibfDw8ZFWcs1NUlgHTeitGSoC65cBXir3
+				</social.tumblr.consumerKey>
+				<social.tumblr.consumerSecret>s7CPOLZnwSsdJkyYYus2r7KByMcwwgFWtGyPxhtjDXnhkUBLhg
+				</social.tumblr.consumerSecret>
+				<social.reddit.web.consumerKey>yIhf9yZdXmU4_w
+				</social.reddit.web.consumerKey>
+				<social.reddit.web.consumerSecret>0rJkc9DYrC-WpiMCypl0hoy8S0c
+				</social.reddit.web.consumerSecret>
+				<social.reddit.installed.consumerSecret>NVMIMSbywkA7xA
+				</social.reddit.installed.consumerSecret>
+				<social.reddit.userAgent>minashafik/1.0 by sprocketVM
+				</social.reddit.userAgent>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
 				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
@@ -657,6 +688,13 @@
 				<mq.host>sprocket-rabbitmq</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
+				<!-- xmpp configuration -->
+				<xmpp.host>localhost</xmpp.host>
+				<xmpp.port>5222</xmpp.port>
+				<xmpp.domain>localhost</xmpp.domain>
+				<xmpp.user>bot</xmpp.user>
+				<xmpp.password>sprocket9801</xmpp.password>
+				<xmpp.resource>localhost</xmpp.resource>
 				<!-- mail configuration -->
 				<mail.host>email-smtp.us-west-2.amazonaws.com</mail.host>
 				<mail.port>465</mail.port>
@@ -671,6 +709,8 @@
 				</recommendation.engine.hadoop.master>
 				<recommendation.engine.alg.kmeans.iterations>5
 				</recommendation.engine.alg.kmeans.iterations>
+				<!-- folder repository for uploaded files -->
+				<repo.files>/usr/etc/files/</repo.files>
 			</properties>
 			<activation>
 				<property>
