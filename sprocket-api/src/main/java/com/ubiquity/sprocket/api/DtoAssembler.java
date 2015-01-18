@@ -148,6 +148,7 @@ public class DtoAssembler {
 				.lastName(contactDto.getLastName())
 				.lastUpdated(System.currentTimeMillis())
 				.profileUrl(contactDto.getProfileUrl())
+				.contactId(contactDto.getContactId())
 				.isDeleted(false);
 
 		if (contactDto.getImageUrl() != null) {
