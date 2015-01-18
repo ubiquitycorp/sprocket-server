@@ -88,7 +88,7 @@
 				</social.reddit.web.consumerSecret>
 				<social.reddit.installed.consumerSecret>NVMIMSbywkA7xA
 				</social.reddit.installed.consumerSecret>
-				<social.reddit.userAgent>minashafik/1.0 by sprocketVM
+				<social.reddit.userAgent>by sprocketVM
 				</social.reddit.userAgent>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
@@ -234,7 +234,7 @@
 				</social.reddit.web.consumerSecret>
 				<social.reddit.installed.consumerSecret>xvOJZJMeG5HQZw
 				</social.reddit.installed.consumerSecret>
-				<social.reddit.userAgent>userName/1.0 by sprocketQA
+				<social.reddit.userAgent>by sprocketQA
 				</social.reddit.userAgent>
 
 				<constants.resetUrl>http://sprocket-qa.ubiquitycorp.com/#/reset?token=
@@ -381,7 +381,7 @@
 				</social.reddit.web.consumerSecret>
 				<social.reddit.installed.consumerSecret>Fm2rYVyn5bVhmw
 				</social.reddit.installed.consumerSecret>
-				<social.reddit.userAgent>userName/1.0 by sprocketStage
+				<social.reddit.userAgent>by sprocketStage
 				</social.reddit.userAgent>
 
 				<constants.resetUrl>sprocket-web-stage.ubiquitycorp.com/#/reset?token=
@@ -513,7 +513,7 @@
 				</social.reddit.web.consumerSecret>
 				<social.reddit.installed.consumerSecret>Fm2rYVyn5bVhmw
 				</social.reddit.installed.consumerSecret>
-				<social.reddit.userAgent>userName/1.0 by sprocketStage
+				<social.reddit.userAgent>by sprocket
 				</social.reddit.userAgent>
 
 				<constants.resetUrl>sprocket-web-prod.ubiquitycorp.com/#/reset?token=
