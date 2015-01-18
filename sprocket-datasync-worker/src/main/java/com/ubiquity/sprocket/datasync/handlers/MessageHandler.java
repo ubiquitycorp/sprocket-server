@@ -11,8 +11,8 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.service.SocialService;
-import com.ubiquity.sprocket.datasync.worker.manager.DataSyncProcessor;
 import com.ubiquity.sprocket.datasync.worker.manager.ResourceType;
+import com.ubiquity.sprocket.datasync.worker.manager.SyncProcessor;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 /***
@@ -22,7 +22,7 @@ import com.ubiquity.sprocket.service.ServiceFactory;
  */
 public class MessageHandler extends Handler {
 
-	public MessageHandler(DataSyncProcessor processor) {
+	public MessageHandler(SyncProcessor processor) {
 		super(processor);
 		networks = EnumSet.of(ExternalNetwork.Twitter,
 				ExternalNetwork.Facebook, ExternalNetwork.Google,

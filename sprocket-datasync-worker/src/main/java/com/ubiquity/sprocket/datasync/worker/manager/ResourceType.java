@@ -4,5 +4,6 @@ public enum ResourceType {
 	messages,
 	activities,
 	videos,
-	localfeed;
+	localfeed,
+	contacts;
 }

@@ -2,6 +2,7 @@ package com.ubiquity.sprocket.messaging;
 
 import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.sprocket.messaging.definition.ActiveUsersFound;
+import com.ubiquity.sprocket.messaging.definition.ContactsSync;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.messaging.definition.LocationUpdated;
 import com.ubiquity.sprocket.messaging.definition.PlaceLocationUpdated;
@@ -37,6 +38,7 @@ public class MessageConverterFactory {
 				.registerMessageType(SynchronizationStarted.class)
 				.registerMessageType(SynchronizationStepNotification.class)
 				.registerMessageType(ActiveUsersFound.class)
+				.registerMessageType(ContactsSync.class)
 				.build();
 		}
 		return converter;

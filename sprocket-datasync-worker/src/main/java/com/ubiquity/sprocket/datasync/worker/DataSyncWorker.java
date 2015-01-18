@@ -13,7 +13,6 @@ import java.util.List;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -28,6 +27,7 @@ import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.integration.api.PlaceAPIFactory;
 import com.ubiquity.integration.api.SocialAPIFactory;
+import com.ubiquity.sprocket.datasync.worker.master.jobs.ContactsSyncJob;
 import com.ubiquity.sprocket.datasync.worker.master.jobs.DataSyncJob;
 import com.ubiquity.sprocket.datasync.worker.mq.consumer.CacheInvalidateConsumer;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
@@ -51,7 +51,9 @@ public class DataSyncWorker {
 		if (role.equals(WorkerRole.MASTER) || role.equals(WorkerRole.UNIVERSAL))
 			// start scheduler in the master worker
 			startScheduler(configuration.getInt("rules.sync.blockSize", 10),
-					configuration.getInt("rules.sync.period", 8));
+					configuration.getInt("rules.sync.period", 8),
+					configuration.getInt("rules.sync.contacts.blockSize", 10),
+					configuration.getInt("rules.sync.contacts.period", 8));
 		
 		if (role.equals(WorkerRole.SLAVE) || role.equals(WorkerRole.UNIVERSAL)) {
 			// creates N threads to consume messages in a slave worker
@@ -131,11 +133,11 @@ public class DataSyncWorker {
 		// TODO: we need an mq disconnect
 	}
 
-	private void startScheduler(int blockSize, int syncPeriod)
+	private void startScheduler(int blockSize, int syncPeriod, int contactsBlockSize, int contactsSyncPeriod)
 			throws SchedulerException {
 		Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
 		scheduler.start();
-
+		//create job for syncing data
 		JobDetail job = newJob(DataSyncJob.class)
 				.withIdentity("dataSync", "sync")
 				.usingJobData("blockSize", blockSize).build();
@@ -146,8 +148,21 @@ public class DataSyncWorker {
 						simpleSchedule().withIntervalInMinutes(syncPeriod)
 								.repeatForever())
 				.startAt(futureDate(1, IntervalUnit.SECOND)).build();
+		
+		//create job for syncing contacts
+		JobDetail contactsJob = newJob(ContactsSyncJob.class)
+				.withIdentity("contactsSync", "sync")
+				.usingJobData("blockSize", contactsBlockSize).build();
+
+		Trigger contactsTrigger = newTrigger()
+				.withIdentity(triggerKey("contactsTrigger", "trigger"))
+				.withSchedule(
+						simpleSchedule().withIntervalInMinutes(contactsSyncPeriod)
+								.repeatForever())
+				.startAt(futureDate(1, IntervalUnit.SECOND)).build();
 
 		scheduler.scheduleJob(job, trigger);
+		//scheduler.scheduleJob(contactsJob, contactsTrigger);
 	}
 
 }

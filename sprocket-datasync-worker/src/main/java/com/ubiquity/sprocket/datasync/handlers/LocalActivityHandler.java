@@ -11,8 +11,8 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ExternalNetwork;
-import com.ubiquity.sprocket.datasync.worker.manager.DataSyncProcessor;
 import com.ubiquity.sprocket.datasync.worker.manager.ResourceType;
+import com.ubiquity.sprocket.datasync.worker.manager.SyncProcessor;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 /***
@@ -22,7 +22,7 @@ import com.ubiquity.sprocket.service.ServiceFactory;
  */
 public class LocalActivityHandler extends Handler {
 
-	public LocalActivityHandler(DataSyncProcessor processor) {
+	public LocalActivityHandler(SyncProcessor processor) {
 		super(processor);
 		networks = EnumSet.of(ExternalNetwork.Facebook);
 	}

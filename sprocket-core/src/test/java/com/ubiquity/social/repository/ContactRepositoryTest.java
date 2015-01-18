@@ -65,7 +65,7 @@ public class ContactRepositoryTest {
 		contactRepository.create(facebookIdentityContact);
 		contactRepository.create(twitterIdentityContact);
 		contactRepository.create(vimeoIdentityContact);
-		
+
 		contactRepository.create(facebookContact);
 		contactRepository.create(twitterContact);
 		contactRepository.create(vimeoContact);
@@ -95,8 +95,8 @@ public class ContactRepositoryTest {
 		contactRepository.update(facebookContact);
 		EntityManagerSupport.commit();
 
-		contacts = contactRepository.findContactsForActiveNetworksByOwnerId(owner
-				.getUserId());
+		contacts = contactRepository
+				.findContactsForActiveNetworksByOwnerId(owner.getUserId());
 		Assert.assertEquals(contacts.size(), 5);
 	}
 
@@ -107,7 +107,23 @@ public class ContactRepositoryTest {
 						twitterContact.getExternalIdentity().getIdentifier(),
 						ExternalNetwork.Twitter);
 		Assert.assertEquals(c.getContactId(), twitterContact.getContactId());
-		;
+
+		Contact contact = TestContactFactory
+				.createContactWithMininumRequiredFieldsAndExternalNetwork(null,
+						ExternalNetwork.Twitter);
+		contact.setExternalIdentity(c.getExternalIdentity());
+
+		EntityManagerSupport.beginTransaction();
+		contactRepository.create(contact);
+		EntityManagerSupport.commit();
+
+		Contact c2 = contactRepository
+				.findByOwnerIDAndExternalNetworkAndExternalIdentitfier(null,
+						contact.getExternalIdentity().getIdentifier(),
+						ExternalNetwork.Twitter);
+		
+		Assert.assertEquals(c2.getContactId(), contact.getContactId());
+
 	}
 
 	@Test

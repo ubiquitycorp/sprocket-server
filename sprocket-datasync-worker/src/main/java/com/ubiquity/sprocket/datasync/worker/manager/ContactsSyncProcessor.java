@@ -1,27 +1,19 @@
 package com.ubiquity.sprocket.datasync.worker.manager;
 
 import java.util.List;
-
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.sprocket.datasync.handlers.ActivityHandler;
-import com.ubiquity.sprocket.datasync.handlers.Handler;
-import com.ubiquity.sprocket.datasync.handlers.LocalActivityHandler;
-import com.ubiquity.sprocket.datasync.handlers.MessageHandler;
-import com.ubiquity.sprocket.datasync.handlers.VideoHandler;
-import com.ubiquity.sprocket.datasync.worker.manager.SyncProcessor;
+import com.ubiquity.sprocket.datasync.handlers.ContactHandler;
 
 /***
  * Handles the processing of each feed type
  * 
- * @author mina, peter
+ * @author peter.tadros
  * 
  */
-public class DataSyncProcessor extends SyncProcessor {
+public class ContactsSyncProcessor extends SyncProcessor {
 
 	private List<User> users;
-	
-	SyncNotificationSender notificationProcessor;
 
 	/**
 	 * Starts a processor with the underlying list
@@ -30,31 +22,22 @@ public class DataSyncProcessor extends SyncProcessor {
 	 * @param from
 	 * @param to
 	 */
-	public DataSyncProcessor(List<User> users) {
+	public ContactsSyncProcessor(List<User> users) {
 		log.info("Created DataSycnProcessor for users {}", users);
 		this.users = users;
 		createChainHandelrs();
-		notificationProcessor = new SyncNotificationSender(mainHandler.getNext().getProcessedMessages());
 	}
 
 	/***
 	 * Creates a data sync processor that operate
 	 */
-	public DataSyncProcessor() {
+	public ContactsSyncProcessor() {
 		log.info("Created DataSyncProcessor");
 		createChainHandelrs();
-		notificationProcessor = new SyncNotificationSender(mainHandler.getNext().getProcessedMessages());
 	}
 
 	private void createChainHandelrs() {
-		mainHandler = new ActivityHandler(this);
-		Handler messageHandler = new MessageHandler(this);
-		Handler localActivityHandler = new LocalActivityHandler(this);
-		Handler videoHandler = new VideoHandler(this);
-
-		mainHandler.setNext(messageHandler);
-		messageHandler.setNext(localActivityHandler);
-		localActivityHandler.setNext(videoHandler);
+		mainHandler = new ContactHandler(this);
 	}
 
 	/***
@@ -68,7 +51,6 @@ public class DataSyncProcessor extends SyncProcessor {
 		int numRefreshed = 0;
 
 		try {
-			notificationProcessor.start();
 			Long startTime, endTime;
 			startTime = System.currentTimeMillis();
 			for (User user : users) {
@@ -79,10 +61,8 @@ public class DataSyncProcessor extends SyncProcessor {
 					.currentThread().getName(), (endTime - startTime) / 1000);
 		} finally {
 			EntityManagerSupport.closeEntityManager();
-			notificationProcessor.setTerminate();
 		}
 		
 		return numRefreshed;
 	}
-	
 }
