@@ -112,28 +112,21 @@ public class SocialEndpoint {
 	@Path("users/{userId}/contacts")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response contacts(@PathParam("userId") Long userId,
-			@HeaderParam("delta") Boolean delta,
-			@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
-		log.debug("Listing contacts modified since: {}", ifModifiedSince);
+	public Response contacts(@PathParam("userId") Long userId) {
 
 		// Manager will return contacts if they have been modified, else it will
 		// be empty
-		CollectionVariant<Contact> variant = ServiceFactory.getContactService()
-				.findAllContactsForActiveNetworksByOwnerId(userId, ifModifiedSince);
+		List<Contact> variant = ServiceFactory.getContactService()
+				.findAllContactsForActiveNetworksByOwnerId(userId);
 
-		// Throw a 304 if there is no variant (no change)
-		if (variant == null) {
-			return Response.notModified().build();
-		}
 		// Convert entire list to DTO
 		ContactsDto result = new ContactsDto();
-		for (Contact contact : variant.getCollection()) {
+		for (Contact contact : variant) {
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			result.getContacts().add(contactDto);
 		}
 
-		return Response.ok().header("Last-Modified", variant.getLastModified())
+		return Response.ok()
 				.entity(jsonConverter.convertToPayload(result)).build();
 	}
 	/***
@@ -155,7 +148,7 @@ public class SocialEndpoint {
 		// Manager will return contacts if they have been modified, else it will
 		// be empty
 		CollectionVariant<Contact> variant = ServiceFactory.getContactService()
-				.findAllContactsForActiveNetworksByOwnerId(userId, ifModifiedSince);
+				.findModifiedContactsForActiveNetworksByOwnerId(userId, ifModifiedSince);
 
 		// Throw a 304 if there is no variant (no change)
 		if (variant == null) {
