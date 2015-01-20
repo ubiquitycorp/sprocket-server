@@ -43,6 +43,7 @@ public class LocalActivityHandler extends Handler {
 		List<Activity> synced = null;
 		DateTime start = new DateTime();
 		Long userId = identity.getUser().getUserId();
+		int size = -1;
 		try {
 			synced = ServiceFactory.getSocialService().syncLocalNewsFeed(
 					identity, network);
@@ -50,22 +51,22 @@ public class LocalActivityHandler extends Handler {
 			if(activitiesSize ==0){
 				activitiesSize = ServiceFactory.getSocialService().getCountOfLastLocalActivities(identity,network);
 			}
-			return activitiesSize;
+			
 		} catch (AuthorizationException e) {
-			ServiceFactory.getSocialService().setActiveNetworkForUser(userId,
-					network, false);
+			identity.setIsActive(false);
+			ServiceFactory.getExternalIdentityService().update(identity);
 			log.error(" Unable to sync local activities for identity {}: {}",
 					identity, ExceptionUtils.getStackTrace(e));
 			return -1;
 		} catch (Exception e) {
 			log.error(" Unable to sync local activities for identity {}: {}",
 					identity, ExceptionUtils.getStackTrace(e));
-			return -1;
 		} finally {
-			int n = (synced == null) ? -1 : synced.size();
+			size = (synced == null) ? -1 : synced.size();
 			log.debug(" Processed {} local activities in {} seconds for user "
-					+ userId, n, new Period(start, new DateTime()).getSeconds());
+					+ userId, size, new Period(start, new DateTime()).getSeconds());
 		}
+		return size;
 	}
 
 }

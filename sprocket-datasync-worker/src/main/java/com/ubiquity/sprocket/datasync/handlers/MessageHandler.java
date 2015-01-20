@@ -52,6 +52,7 @@ public class MessageHandler extends Handler {
 		List<com.ubiquity.integration.domain.Message> synced = null;
 		DateTime start = new DateTime();
 		Long userId = identity.getUser().getUserId();
+		int size;
 		try {
 			SocialService socialService = ServiceFactory.getSocialService();
 
@@ -62,23 +63,21 @@ public class MessageHandler extends Handler {
 			ServiceFactory.getSearchService().indexMessages(
 					identity.getUser().getUserId(), synced);
 			log.debug(" indexing messages for identity {}", identity);
-			return synced.size();
 		} catch (AuthorizationException e) {
-			ServiceFactory.getSocialService().setActiveNetworkForUser(userId,
-					network, false);
+			identity.setIsActive(false);
+			ServiceFactory.getExternalIdentityService().update(identity);
 			log.error(" Could not process messages for identity: {}",
 					ExceptionUtils.getStackTrace(e));
-			return -1;
 		} catch (Exception e) {
 			log.error(" Could not process messages for identity: {}",
 					ExceptionUtils.getStackTrace(e));
-			return -1;
 		} finally {
-			int n = (synced == null) ? -1 : synced.size();
+			size = (synced == null) ? -1 : synced.size();
 			log.debug(
 					" Processed {} messages in {} seconds for user " + userId,
-					n, new Period(start, new DateTime()).getSeconds());
+					size, new Period(start, new DateTime()).getSeconds());
 		}
+		return size;
 	}
 
 }
