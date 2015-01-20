@@ -117,7 +117,7 @@ public class SocialEndpoint {
 		// Manager will return contacts if they have been modified, else it will
 		// be empty
 		List<Contact> variant = ServiceFactory.getContactService()
-				.findAllContactsForActiveNetworksByOwnerId(userId);
+				.findUserContactsForActiveNetworksByOwnerId(userId);
 
 		// Convert entire list to DTO
 		ContactsDto result = new ContactsDto();

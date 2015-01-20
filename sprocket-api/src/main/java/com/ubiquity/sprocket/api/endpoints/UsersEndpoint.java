@@ -132,9 +132,6 @@ public class UsersEndpoint {
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identities, result.getClientPlatformId());
 
-		ServiceFactory.getSocialService().setActiveNetworkForUser(userId,
-				ExternalNetwork.LinkedIn, true);
-
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
@@ -306,6 +303,12 @@ public class UsersEndpoint {
 				.build();
 	}
 
+	/***
+	 * Returns only active identities owned by the given user
+	 * @param userId
+	 * @return
+	 * @throws IOException
+	 */
 	@GET
 	@Path("/{userId}/identities")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -316,19 +319,11 @@ public class UsersEndpoint {
 
 		// load user
 		List<Contact> contacts = ServiceFactory.getContactService()
-				.findAllContactByUserIdentities(userId);
+				.findUserContactsForActiveNetworksByOwnerId(userId);
 
 		ContactsDto contactsDto = new ContactsDto();
 		for (Contact contact : contacts) {
-			Boolean isActive = ServiceFactory.getSocialService()
-					.IsActiveNetworkForUser(
-							userId,
-							ExternalNetwork
-									.getNetworkById(contact
-											.getExternalIdentity()
-											.getExternalNetwork()));
-			if (isActive)
-				contactsDto.getContacts().add(DtoAssembler.assemble(contact));
+			contactsDto.getContacts().add(DtoAssembler.assemble(contact));
 		}
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(contactsDto)).build();
@@ -364,9 +359,6 @@ public class UsersEndpoint {
 
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto.getClientPlatformId());
-
-		ServiceFactory.getSocialService().setActiveNetworkForUser(userId,
-				externalNetwork, true);
 
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
@@ -452,16 +444,13 @@ public class UsersEndpoint {
 		}
 
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identities, identityDto.getClientPlatformId());
-
-		ServiceFactory.getSocialService().setActiveNetworkForUser(userId,
-				externalNetwork, true);
+		sendActivatedMessage(user, identities,
+				identityDto.getClientPlatformId());
 
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
 
 		try {
-
 			Contact contact = ServiceFactory.getContactService()
 					.getBySocialIdentityId(userId,
 							identities.get(0).getIdentityId());
