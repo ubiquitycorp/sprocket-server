@@ -364,7 +364,8 @@ public class DtoAssembler {
 				.contactId(contact.getContactId())
 				.displayName(contact.getDisplayName())
 				.firstName(contact.getFirstName())
-				.lastName(contact.getLastName()).email(contact.getEmail())
+				.lastName(contact.getLastName())
+				.email(contact.getEmail())
 				.profileUrl(contact.getProfileUrl())
 				.etag(UUID.randomUUID().toString());
 
