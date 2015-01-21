@@ -23,7 +23,7 @@ public class ContactsSyncProcessor extends SyncProcessor {
 	 * @param to
 	 */
 	public ContactsSyncProcessor(List<User> users) {
-		log.info("Created DataSycnProcessor for users {}", users);
+		log.info("Created ContactSyncProcessor for users {}", users);
 		this.users = users;
 		createChainHandelrs();
 	}
@@ -32,7 +32,7 @@ public class ContactsSyncProcessor extends SyncProcessor {
 	 * Creates a data sync processor that operate
 	 */
 	public ContactsSyncProcessor() {
-		log.info("Created DataSyncProcessor");
+		log.info("Created ContactSyncProcessor");
 		createChainHandelrs();
 	}
 

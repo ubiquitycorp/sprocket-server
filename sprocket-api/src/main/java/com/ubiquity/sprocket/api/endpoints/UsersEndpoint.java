@@ -243,12 +243,7 @@ public class UsersEndpoint {
 						.identifier(externalIdentity.getIdentifier())
 						.externalNetworkId(
 								externalIdentity.getExternalNetwork()).build();
-				Boolean isActive = ServiceFactory.getSocialService()
-						.IsActiveNetworkForUser(
-								user.getUserId(),
-								ExternalNetwork.getNetworkById(externalIdentity
-										.getExternalNetwork()));
-				if (isActive)
+				if (identity.getIsActive())
 					accountDto.getIdentities().add(associatedIdentityDto);
 			}
 		}
@@ -319,7 +314,7 @@ public class UsersEndpoint {
 
 		// load user
 		List<Contact> contacts = ServiceFactory.getContactService()
-				.findUserContactsForActiveNetworksByOwnerId(userId);
+				.findAllContactByUserIdentities(userId);
 
 		ContactsDto contactsDto = new ContactsDto();
 		for (Contact contact : contacts) {
