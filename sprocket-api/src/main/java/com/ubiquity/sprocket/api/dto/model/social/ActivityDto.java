@@ -1,10 +1,14 @@
-package com.ubiquity.sprocket.api.dto.model;
+package com.ubiquity.sprocket.api.dto.model.social;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import com.ubiquity.sprocket.api.dto.model.AudioDto;
+import com.ubiquity.sprocket.api.dto.model.InterestDto;
+import com.ubiquity.sprocket.api.dto.model.media.ImageDto;
+import com.ubiquity.sprocket.api.dto.model.media.VideoDto;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
 
 /***

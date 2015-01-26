@@ -1,4 +1,5 @@
-package com.ubiquity.sprocket.api.dto.model;
+package com.ubiquity.sprocket.api.dto.model.social;
+
 
 public class EventDto {
 

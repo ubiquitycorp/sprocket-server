@@ -9,6 +9,15 @@ import java.util.Stack;
 import java.util.UUID;
 
 
+
+
+
+
+
+
+
+
+
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.domain.Activity;
@@ -35,25 +44,25 @@ import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
 import com.ubiquity.social.domain.factories.ActivityFactory;
 import com.ubiquity.sprocket.api.dto.containers.ConfigurationRulesDto;
-import com.ubiquity.sprocket.api.dto.model.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.AddressDto;
 import com.ubiquity.sprocket.api.dto.model.AudioDto;
-import com.ubiquity.sprocket.api.dto.model.CommentDto;
-import com.ubiquity.sprocket.api.dto.model.ContactDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
-import com.ubiquity.sprocket.api.dto.model.AdminInterestDto;
 import com.ubiquity.sprocket.api.dto.model.ExternalNetworkConfigurationDto;
 import com.ubiquity.sprocket.api.dto.model.GeoboxDto;
-import com.ubiquity.sprocket.api.dto.model.IdentityDto;
-import com.ubiquity.sprocket.api.dto.model.ImageDto;
 import com.ubiquity.sprocket.api.dto.model.InterestDto;
 import com.ubiquity.sprocket.api.dto.model.LocationDto;
 import com.ubiquity.sprocket.api.dto.model.MessageDto;
 import com.ubiquity.sprocket.api.dto.model.PlaceDto;
-import com.ubiquity.sprocket.api.dto.model.PostCommentDto;
-import com.ubiquity.sprocket.api.dto.model.PostVoteDto;
-import com.ubiquity.sprocket.api.dto.model.RatingDto;
-import com.ubiquity.sprocket.api.dto.model.VideoDto;
+import com.ubiquity.sprocket.api.dto.model.admin.AdminInterestDto;
+import com.ubiquity.sprocket.api.dto.model.media.ImageDto;
+import com.ubiquity.sprocket.api.dto.model.media.VideoDto;
+import com.ubiquity.sprocket.api.dto.model.social.ActivityDto;
+import com.ubiquity.sprocket.api.dto.model.social.CommentDto;
+import com.ubiquity.sprocket.api.dto.model.social.ContactDto;
+import com.ubiquity.sprocket.api.dto.model.social.PostCommentDto;
+import com.ubiquity.sprocket.api.dto.model.social.PostVoteDto;
+import com.ubiquity.sprocket.api.dto.model.social.RatingDto;
+import com.ubiquity.sprocket.api.dto.model.user.IdentityDto;
 import com.ubiquity.sprocket.domain.Configuration;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchKeys;

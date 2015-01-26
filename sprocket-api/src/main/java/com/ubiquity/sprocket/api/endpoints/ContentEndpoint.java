@@ -20,7 +20,7 @@ import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.VideosDto;
-import com.ubiquity.sprocket.api.dto.model.VideoDto;
+import com.ubiquity.sprocket.api.dto.model.media.VideoDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;

@@ -1,4 +1,4 @@
-package com.ubiquity.sprocket.api.dto.model;
+package com.ubiquity.sprocket.api.dto.model.user;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
