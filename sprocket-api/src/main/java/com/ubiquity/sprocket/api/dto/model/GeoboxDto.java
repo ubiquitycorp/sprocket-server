@@ -2,6 +2,7 @@ package com.ubiquity.sprocket.api.dto.model;
 
 import javax.validation.constraints.NotNull;
 
+import com.ubiquity.sprocket.api.dto.model.user.LocationDto;
 import com.ubiquity.sprocket.api.validation.PlaceLocationUpdateValidation;
 
 public class GeoboxDto {

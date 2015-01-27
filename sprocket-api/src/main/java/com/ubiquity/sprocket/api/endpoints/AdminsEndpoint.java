@@ -30,7 +30,7 @@ import com.ubiquity.integration.domain.UnmappedInterest;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.AdminInterestsDto;
 import com.ubiquity.sprocket.api.dto.containers.InterestsDto;
-import com.ubiquity.sprocket.api.dto.model.AdminDto;
+import com.ubiquity.sprocket.api.dto.model.admin.AdminDto;
 import com.ubiquity.sprocket.api.dto.model.admin.AdminInterestDto;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.service.ServiceFactory;
