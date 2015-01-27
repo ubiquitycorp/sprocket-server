@@ -14,8 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.identity.domain.Developer;
+import com.ubiquity.identity.service.AuthenticationService;
+import com.ubiquity.identity.service.DeveloperAuthenticationService;
 import com.ubiquity.sprocket.api.dto.model.developer.DeveloperDto;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
+import com.ubiquity.sprocket.service.ServiceFactory;
 
 /***
  * 
@@ -35,7 +39,7 @@ public class DeveloperEndPoint {
 	public Response ping() {
 		return Response.ok().entity("{\"message\":\"pong\"}").build();
 	}
-	
+
 	/***
 	 * This method registers a developer to the system
 	 * 
@@ -50,30 +54,24 @@ public class DeveloperEndPoint {
 		DeveloperDto developerDto = jsonConverter.convertFromPayload(payload,
 				DeveloperDto.class, RegistrationValidation.class);
 
-		/*
-		 * AuthenticationService authenticationService = ServiceFactory
-		 * .getAuthenticationService();
-		 * 
-		 * 
-		 * User user = ServiceFactory.getAuthenticationService().register(
-		 * identityDto.getUsername(), identityDto.getPassword(), "", "",
-		 * identityDto.getDisplayName(), identityDto.getEmail(), clientPlatform,
-		 * Boolean.TRUE);
-		 * 
-		 * // user now has a single, native identity String apiKey =
-		 * AuthenticationService.generateAPIKey();
-		 * 
-		 * // set the account DTO with an api key and new user id and send it
-		 * back AccountDto accountDto = new AccountDto.Builder().apiKey(apiKey)
-		 * .userId(user.getUserId()).build();
-		 * 
-		 * // Save UserId and APIKey in Redis cache database
-		 * authenticationService.saveAuthkey(user.getUserId(), apiKey);
-		 * 
-		 * log.debug("Created user {}", user);
-		 */
+		DeveloperAuthenticationService authenticationService = ServiceFactory
+				.getDeveloperAuthenticationService();
+		Developer developer = authenticationService.register(null, null,
+				developerDto.getDisplayName(), developerDto.getEmail(),
+				developerDto.getUsername(), developerDto.getPassword());
 
-		return Response.ok().build();
+		String apiKey = AuthenticationService.generateAPIKey();
+
+		DeveloperDto account = new DeveloperDto.Builder()
+				.developerId(developer.getDeveloperId()).apiKey(apiKey).build();
+
+		// Save developerId and APIKey in Redis cache database
+		authenticationService.saveAuthkey(developer.getDeveloperId(), apiKey);
+
+		log.debug("Created Developer {}", developer);
+
+		return Response.ok().entity(jsonConverter.convertToPayload(account))
+				.build();
 	}
 
 	/***

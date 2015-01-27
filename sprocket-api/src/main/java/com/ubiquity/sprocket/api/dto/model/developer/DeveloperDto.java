@@ -15,6 +15,10 @@ import com.ubiquity.sprocket.api.validation.RegistrationValidation;
  */
 public class DeveloperDto {
 
+	private Long developerId;
+
+	private String apiKey;
+	
 	@NotNull(groups = { RegistrationValidation.class,
 			AuthenticationValidation.class})
 	@Size(min = 3, max = 80, groups = { RegistrationValidation.class,
@@ -47,5 +51,37 @@ public class DeveloperDto {
 
 	public String getEmail() {
 		return email;
+	}
+	
+	public Long getDeveloperId() {
+		return developerId;
+	}
+
+	public String getApiKey() {
+		return apiKey;
+	}
+
+	public static class Builder {
+		private Long developerId;
+		private String apiKey;
+
+		public Builder developerId(Long developerId) {
+			this.developerId = developerId;
+			return this;
+		}
+
+		public Builder apiKey(String apiKey) {
+			this.apiKey = apiKey;
+			return this;
+		}
+
+		public DeveloperDto build() {
+			return new DeveloperDto(this);
+		}
+	}
+	
+	private DeveloperDto(Builder builder) {
+		this.developerId = builder.developerId;
+		this.apiKey = builder.apiKey;
 	}
 }
