@@ -61,6 +61,8 @@ public class DataSyncJob implements Job {
 	}
 
 	private void sendSyncActiveUsersMessage(List<Long> userIds) throws IOException {
+		if(userIds.size()==0)
+			return;
 		ActiveUsersFound content = new ActiveUsersFound(userIds);
 
 		// serialize and send it
