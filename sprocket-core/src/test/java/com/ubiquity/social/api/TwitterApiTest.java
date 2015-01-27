@@ -71,7 +71,7 @@ public class TwitterApiTest {
 								.externalNetwork(
 										ExternalNetwork.Twitter.ordinal())
 								.identifier("2576165924").build())
-				.isDeleted(false).build();
+				.build();
 		Boolean sent = twitterAPI.sendMessage(identity, c, null, message, "");
 		Assert.assertTrue(sent);
 	}
