@@ -3,6 +3,7 @@ package com.ubiquity.sprocket.service;
 import org.apache.commons.configuration.Configuration;
 
 import com.ubiquity.identity.service.AuthenticationService;
+import com.ubiquity.identity.service.DeveloperAuthenticationService;
 import com.ubiquity.identity.service.UserService;
 import com.ubiquity.integration.service.ContactService;
 import com.ubiquity.integration.service.ContentService;
@@ -34,6 +35,7 @@ public class ServiceFactory {
 	private static LocationService locationService;
 	private static FavoriteService favoriteService;
 	private static MediaService mediaService;
+	private static DeveloperAuthenticationService developerAuthenticationService;
 	
 	/***
 	 * Initializes all services with the specified configuration
@@ -197,6 +199,16 @@ public class ServiceFactory {
 		if(mediaService == null)
 			mediaService = new MediaService(configuration);
 		return mediaService;
+	}
+	
+	/***
+	 * Creates or returns a developer authentication manager
+	 * @return
+	 */
+	public static DeveloperAuthenticationService getDeveloperAuthenticationService() {
+		if(developerAuthenticationService == null)
+			developerAuthenticationService = new DeveloperAuthenticationService(configuration);
+		return developerAuthenticationService;
 	}
 }
 
