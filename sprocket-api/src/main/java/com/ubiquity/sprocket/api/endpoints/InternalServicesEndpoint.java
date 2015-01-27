@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.niobium.common.serialize.JsonConverter;
-import com.ubiquity.sprocket.api.dto.model.AccountDto;
+import com.ubiquity.sprocket.api.dto.model.user.AccountDto;
 import com.ubiquity.sprocket.api.validation.MessageServiceAuthenticationValidation;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
