@@ -19,8 +19,6 @@ import com.ubiquity.identity.domain.Developer;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.identity.service.DeveloperAuthenticationService;
 import com.ubiquity.sprocket.api.dto.model.developer.DeveloperDto;
-import com.ubiquity.sprocket.api.dto.model.user.AccountDto;
-import com.ubiquity.sprocket.api.dto.model.user.IdentityDto;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -79,7 +77,7 @@ public class DeveloperEndPoint {
 	}
 
 	/***
-	 * This method authenticates developer via native login. Thereafter users
+	 * This method authenticates developer via native login. Thereafter developers
 	 * can authenticate
 	 * 
 	 * @param accessToken
