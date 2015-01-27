@@ -25,15 +25,16 @@ import com.ubiquity.sprocket.messaging.definition.SynchronizationCompleted;
 import com.ubiquity.sprocket.messaging.definition.SynchronizationStarted;
 import com.ubiquity.sprocket.messaging.definition.SynchronizationStepCompleted;
 import com.ubiquity.sprocket.service.ServiceFactory;
+
 /***
  * 
  * @author peter.tadros
- *
+ * 
  */
 public abstract class SyncProcessor {
 
 	Handler mainHandler;
-	
+
 	protected MessageConverter messageConverter = MessageConverterFactory
 			.getMessageConverter();
 	protected Logger log = LoggerFactory.getLogger(getClass());
@@ -50,7 +51,7 @@ public abstract class SyncProcessor {
 				.getExternalIdentityById(activated.getIdentityId());
 		processSync(identity);
 	}
-	
+
 	/**
 	 * Synchronizes an identity by network
 	 * 
@@ -80,9 +81,9 @@ public abstract class SyncProcessor {
 				userId);
 
 	}
-	
-	
+
 	public abstract int syncData();
+
 	/**
 	 * Refresh data for specific user in all social networks
 	 * 
@@ -104,11 +105,8 @@ public abstract class SyncProcessor {
 							.getSocialService();
 					socialService
 							.checkValidityOfExternalIdentity(externalIdentity);
-					Boolean isActive = socialService.IsActiveNetworkForUser(
-							externalIdentity.getUser().getUserId(),
-							ExternalNetwork.getNetworkById(externalIdentity
-									.getExternalNetwork()));
-					if (isActive)
+
+					if (externalIdentity.getIsActive())
 						processSync(externalIdentity);
 
 				} catch (Exception ex) {

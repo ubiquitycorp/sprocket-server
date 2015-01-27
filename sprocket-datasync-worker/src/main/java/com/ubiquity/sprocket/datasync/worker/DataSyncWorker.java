@@ -162,7 +162,7 @@ public class DataSyncWorker {
 				.startAt(futureDate(1, IntervalUnit.SECOND)).build();
 
 		scheduler.scheduleJob(job, trigger);
-		//scheduler.scheduleJob(contactsJob, contactsTrigger);
+		scheduler.scheduleJob(contactsJob, contactsTrigger);
 	}
 
 }
