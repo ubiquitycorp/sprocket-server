@@ -3,6 +3,7 @@ package com.ubiquity.sprocket.api.endpoints;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -28,6 +29,13 @@ public class DeveloperEndPoint {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 
+	@GET
+	@Path("/ping")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response ping() {
+		return Response.ok().entity("{\"message\":\"pong\"}").build();
+	}
+	
 	/***
 	 * This method registers a developer to the system
 	 * 
