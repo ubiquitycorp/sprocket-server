@@ -3,6 +3,7 @@ package com.ubiquity.sprocket.api.endpoints;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.security.sasl.AuthenticationException;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -18,6 +19,9 @@ import com.ubiquity.identity.domain.Developer;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.identity.service.DeveloperAuthenticationService;
 import com.ubiquity.sprocket.api.dto.model.developer.DeveloperDto;
+import com.ubiquity.sprocket.api.dto.model.user.AccountDto;
+import com.ubiquity.sprocket.api.dto.model.user.IdentityDto;
+import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
@@ -87,7 +91,27 @@ public class DeveloperEndPoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response authenticate(InputStream payload) throws IOException {
 
-		return Response.ok().build();
+		DeveloperDto developerDto = jsonConverter.convertFromPayload(payload,
+				DeveloperDto.class, AuthenticationValidation.class);
+		DeveloperAuthenticationService developerAuthenticationService = ServiceFactory
+				.getDeveloperAuthenticationService();
+		Developer developer = developerAuthenticationService.authenticate(
+				developerDto.getUsername(), developerDto.getPassword());
+		if (developer == null)
+			throw new AuthenticationException("Username / password incorrect",
+					null);
+
+		String apiKey = developerAuthenticationService
+				.generateAPIKeyIfNotExsits(developer.getDeveloperId());
+
+		DeveloperDto account = new DeveloperDto.Builder().apiKey(apiKey)
+				.developerId(developer.getDeveloperId()).build();
+		
+		developerAuthenticationService.saveAuthkey(developer.getDeveloperId(), apiKey);
+		
+		log.debug("Authenticated developer {}", developer);
+
+		return Response.ok().entity(jsonConverter.convertToPayload(account)).build();
 	}
 
 }
