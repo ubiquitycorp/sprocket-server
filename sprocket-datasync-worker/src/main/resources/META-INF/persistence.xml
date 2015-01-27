@@ -42,6 +42,7 @@
 		<class>com.ubiquity.integration.domain.Event</class>
 		<class>com.ubiquity.integration.domain.Comment</class>
 		<class>com.ubiquity.integration.domain.UnmappedInterest</class>
+		<class>com.ubiquity.integration.domain.UserContact</class>
 
 		<class>com.ubiquity.sprocket.domain.Configuration</class>
 		<properties>
