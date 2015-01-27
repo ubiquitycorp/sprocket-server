@@ -33,6 +33,7 @@ import com.ubiquity.integration.repository.InterestRepository;
 import com.ubiquity.integration.repository.InterestRepositoryJpaImpl;
 import com.ubiquity.integration.repository.UnmappedInterestRepository;
 import com.ubiquity.integration.repository.UnmappedInterestRepositoryJpaImpl;
+import com.ubiquity.integration.repository.UserContactRepositoryJpaImpl;
 import com.ubiquity.integration.repository.cache.CacheKeys;
 import com.ubiquity.sprocket.analytics.recommendation.Dimension;
 import com.ubiquity.sprocket.analytics.recommendation.RecommendationEngine;
@@ -464,7 +465,7 @@ public class AnalyticsService {
 	 */
 	public void assign(Long userId, ExternalNetwork network) {
 		try {
-			List<Contact> contacts = new ContactRepositoryJpaImpl()
+			List<Contact> contacts = new UserContactRepositoryJpaImpl()
 					.findByOwnerIdAndExternalNetwork(userId, network);
 			// TODO: do we have multiple contacts? we should not allow this any
 			// more
