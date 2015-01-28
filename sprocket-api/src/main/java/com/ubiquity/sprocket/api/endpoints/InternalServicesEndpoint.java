@@ -27,7 +27,7 @@ public class InternalServicesEndpoint {
 		AccountDto accountDto = jsonConverter.convertFromPayload(payload,
 				AccountDto.class, MessageServiceAuthenticationValidation.class);
 		
-		Boolean isAuthenticated = ServiceFactory.getAuthenticationService().isUserAuthenticated(
+		Boolean isAuthenticated = ServiceFactory.getUserAuthService().isAuthenticated(
 				String.valueOf(accountDto.getUserId()), accountDto.getAuthToken());
 		if(isAuthenticated)
 			return Response.ok().build();

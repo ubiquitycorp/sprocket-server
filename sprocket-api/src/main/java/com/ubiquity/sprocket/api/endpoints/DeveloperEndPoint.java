@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.security.sasl.AuthenticationException;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -19,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.identity.domain.Developer;
 import com.ubiquity.identity.service.AuthenticationService;
-import com.ubiquity.identity.service.DeveloperAuthenticationService;
 import com.ubiquity.sprocket.api.dto.model.developer.DeveloperDto;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
@@ -58,11 +56,12 @@ public class DeveloperEndPoint {
 		DeveloperDto developerDto = jsonConverter.convertFromPayload(payload,
 				DeveloperDto.class, RegistrationValidation.class);
 
-		DeveloperAuthenticationService authenticationService = ServiceFactory
-				.getDeveloperAuthenticationService();
-		Developer developer = authenticationService.register(null, null,
-				developerDto.getDisplayName(), developerDto.getEmail(),
-				developerDto.getUsername(), developerDto.getPassword());
+		AuthenticationService<Developer> authenticationService = ServiceFactory
+				.getDevloperAuthService();
+		Developer developer = authenticationService.register(
+				developerDto.getUsername(), developerDto.getPassword(), null,
+				null, developerDto.getDisplayName(), developerDto.getEmail(),
+				null, true);
 
 		String apiKey = AuthenticationService.generateAPIKey();
 
@@ -79,8 +78,8 @@ public class DeveloperEndPoint {
 	}
 
 	/***
-	 * This method authenticates developer via native login. Thereafter developers
-	 * can authenticate
+	 * This method authenticates developer via native login. Thereafter
+	 * developers can authenticate
 	 * 
 	 * @param accessToken
 	 * @return
@@ -93,22 +92,21 @@ public class DeveloperEndPoint {
 
 		DeveloperDto developerDto = jsonConverter.convertFromPayload(payload,
 				DeveloperDto.class, AuthenticationValidation.class);
-		DeveloperAuthenticationService developerAuthenticationService = ServiceFactory
-				.getDeveloperAuthenticationService();
-		Developer developer = developerAuthenticationService.authenticate(
+		AuthenticationService<Developer> developerAuthService = ServiceFactory
+				.getDevloperAuthService();
+		Developer developer = developerAuthService.authenticate(
 				developerDto.getUsername(), developerDto.getPassword());
 		if (developer == null)
 			throw new AuthenticationException("Username / password incorrect",
 					null);
 
-		String apiKey = developerAuthenticationService
+		String apiKey = developerAuthService
 				.generateAPIKeyIfNotExsits(developer.getDeveloperId());
 
 		DeveloperDto account = new DeveloperDto.Builder().apiKey(apiKey)
 				.developerId(developer.getDeveloperId()).build();
 
-		developerAuthenticationService.saveAuthkey(developer.getDeveloperId(),
-				apiKey);
+		developerAuthService.saveAuthkey(developer.getDeveloperId(), apiKey);
 
 		log.debug("Authenticated developer {}", developer);
 
@@ -126,7 +124,8 @@ public class DeveloperEndPoint {
 	@POST
 	@Path("/{developerId}/applications/created")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createApplication(InputStream payload, @PathParam("developerId") Long developerId) {
+	public Response createApplication(InputStream payload,
+			@PathParam("developerId") Long developerId) {
 
 		return Response.ok().build();
 	}

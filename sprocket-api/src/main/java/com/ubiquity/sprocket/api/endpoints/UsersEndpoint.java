@@ -217,8 +217,8 @@ public class UsersEndpoint {
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
 				IdentityDto.class, AuthenticationValidation.class);
 
-		AuthenticationService authenticationService = ServiceFactory
-				.getAuthenticationService();
+		AuthenticationService<User> authenticationService = ServiceFactory
+				.getUserAuthService();
 		User user = authenticationService.authenticate(
 				identityDto.getUsername(), identityDto.getPassword());
 		if (user == null)
@@ -272,12 +272,12 @@ public class UsersEndpoint {
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
 				IdentityDto.class, RegistrationValidation.class);
 
-		AuthenticationService authenticationService = ServiceFactory
-				.getAuthenticationService();
+		AuthenticationService<User> authenticationService = ServiceFactory
+				.getUserAuthService();
 
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
 				.getClientPlatformId());
-		User user = ServiceFactory.getAuthenticationService().register(
+		User user = authenticationService.register(
 				identityDto.getUsername(), identityDto.getPassword(), "", "",
 				identityDto.getDisplayName(), identityDto.getEmail(),
 				clientPlatform, Boolean.TRUE);

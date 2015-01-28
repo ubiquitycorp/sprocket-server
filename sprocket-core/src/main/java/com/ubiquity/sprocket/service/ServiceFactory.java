@@ -2,8 +2,13 @@ package com.ubiquity.sprocket.service;
 
 import org.apache.commons.configuration.Configuration;
 
+import com.ubiquity.identity.domain.Admin;
+import com.ubiquity.identity.domain.Developer;
+import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.service.AdminAuthService;
 import com.ubiquity.identity.service.AuthenticationService;
-import com.ubiquity.identity.service.DeveloperAuthenticationService;
+import com.ubiquity.identity.service.DeveloperAuthService;
+import com.ubiquity.identity.service.UserAuthService;
 import com.ubiquity.identity.service.UserService;
 import com.ubiquity.integration.service.ContactService;
 import com.ubiquity.integration.service.ContentService;
@@ -21,7 +26,9 @@ public class ServiceFactory {
 		
 	private static Configuration configuration;
 	private static Configuration errorsConfiguration;
-	private static AuthenticationService authenticationService;
+	private static AuthenticationService<User> userAuthService;
+	private static AuthenticationService<Admin> adminAuthService;
+	private static AuthenticationService<Developer> developerAuthService;
 	private static UserService userService;
 	private static SocialService socialService;
 	private static ClientConfigurationService clientConfigurationService;
@@ -35,7 +42,6 @@ public class ServiceFactory {
 	private static LocationService locationService;
 	private static FavoriteService favoriteService;
 	private static MediaService mediaService;
-	private static DeveloperAuthenticationService developerAuthenticationService;
 	
 	/***
 	 * Initializes all services with the specified configuration
@@ -152,13 +158,33 @@ public class ServiceFactory {
 
 	
 	/***
-	 * Creates or returns an authentication manager
+	 * Creates or returns a user authentication manager
 	 * @return
 	 */
-	public static AuthenticationService getAuthenticationService() {
-		if(authenticationService == null)
-			authenticationService = new AuthenticationService(configuration);
-		return authenticationService;
+	public static AuthenticationService<User> getUserAuthService() {
+		if(userAuthService == null)
+			userAuthService = new UserAuthService(configuration);
+		return userAuthService;
+	}
+	
+	/***
+	 * Creates or returns a user authentication manager
+	 * @return
+	 */
+	public static AuthenticationService<Admin> getAdminAuthService() {
+		if(adminAuthService == null)
+			adminAuthService = new AdminAuthService(configuration);
+		return adminAuthService;
+	}
+	
+	/***
+	 * Creates or returns a user authentication manager
+	 * @return
+	 */
+	public static AuthenticationService<Developer> getDevloperAuthService() {
+		if(developerAuthService == null)
+			developerAuthService = new DeveloperAuthService(configuration);
+		return developerAuthService;
 	}
 	
 	/***
@@ -199,16 +225,6 @@ public class ServiceFactory {
 		if(mediaService == null)
 			mediaService = new MediaService(configuration);
 		return mediaService;
-	}
-	
-	/***
-	 * Creates or returns a developer authentication manager
-	 * @return
-	 */
-	public static DeveloperAuthenticationService getDeveloperAuthenticationService() {
-		if(developerAuthenticationService == null)
-			developerAuthenticationService = new DeveloperAuthenticationService(configuration);
-		return developerAuthenticationService;
 	}
 }
 

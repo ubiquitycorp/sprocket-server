@@ -78,23 +78,23 @@ public class AdminsEndpoint {
 		AdminDto adminDto = jsonConverter.convertFromPayload(payload,
 				AdminDto.class, AuthenticationValidation.class);
 
-		AuthenticationService authenticationService = ServiceFactory
-				.getAuthenticationService();
-		Admin admin = authenticationService.authenticateAdmin(
+		AuthenticationService<Admin> authenticationService = ServiceFactory
+				.getAdminAuthService();
+		Admin admin = authenticationService.authenticate(
 				adminDto.getUsername(), adminDto.getPassword());
 		if (admin == null)
 			throw new AuthorizationException("Username / password incorrect",
 					null);
 
-		// create api key and pass back associated rules for this admin
+		// create APIKey and pass back associated rules for this admin
 
 		String apiKey = AuthenticationService.generateAPIKey();
 		
 		adminDto = new AdminDto.Builder().apiKey(apiKey)
 				.adminId(admin.getAdminId()).build();
 
-		// Save admin and APIKey in Redis cache database
-		authenticationService.saveAdminAuthkey(admin.getAdminId(), apiKey);
+		// Save adminId and APIKey in Redis cache database
+		authenticationService.saveAuthkey(admin.getAdminId(), apiKey);
 
 		log.debug("Authenticated admin {}", admin);
 

@@ -11,11 +11,12 @@ import org.junit.Test;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
+import com.ubiquity.identity.service.UserAuthService;
 import com.ubiquity.identity.service.UserService;
 
 public class AuthenticationServiceTest {
 
-	private AuthenticationService authenticationService;
+	private AuthenticationService<User> authenticationService;
 	private UserService userService;
 	
 	private User user;
@@ -23,7 +24,7 @@ public class AuthenticationServiceTest {
 	@Before
 	public void setUp() throws Exception {
 		Configuration config = new PropertiesConfiguration("test.properties");
-		authenticationService = new AuthenticationService(config);
+		authenticationService = new UserAuthService(config);
 		userService = new UserService(config);
 
 		user = authenticationService.register(UUID.randomUUID().toString(), UUID.randomUUID().toString(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),UUID.randomUUID().toString(), UUID.randomUUID().toString(), ClientPlatform.Android, Boolean.TRUE);

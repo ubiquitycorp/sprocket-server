@@ -55,9 +55,9 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 //				if (!isValid)
 //					throw new IllegalArgumentException(ServiceFactory.getErrorsConfigurationService().getErrorMessage(ErrorKeys.USER_NOT_EXIST));
 				
-				AuthenticationService authenticationService = ServiceFactory.getAuthenticationService();
+				AuthenticationService authenticationService = ServiceFactory.getUserAuthService();
 				// get the user id
-				if (!authenticationService.isUserAuthenticated(userId, apiKey)) {
+				if (!authenticationService.isAuthenticated(userId, apiKey)) {
 					throw new AuthorizationException(ServiceFactory.getErrorsConfigurationService().getErrorMessage(ErrorKeys.AUTHORIZATION_ERROR), null);
 				}
 			} else
