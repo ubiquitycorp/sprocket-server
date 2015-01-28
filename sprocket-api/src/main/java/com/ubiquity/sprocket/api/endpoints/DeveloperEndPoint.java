@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.security.sasl.AuthenticationException;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -106,12 +108,29 @@ public class DeveloperEndPoint {
 
 		DeveloperDto account = new DeveloperDto.Builder().apiKey(apiKey)
 				.developerId(developer.getDeveloperId()).build();
-		
-		developerAuthenticationService.saveAuthkey(developer.getDeveloperId(), apiKey);
-		
+
+		developerAuthenticationService.saveAuthkey(developer.getDeveloperId(),
+				apiKey);
+
 		log.debug("Authenticated developer {}", developer);
 
-		return Response.ok().entity(jsonConverter.convertToPayload(account)).build();
+		return Response.ok().entity(jsonConverter.convertToPayload(account))
+				.build();
+	}
+
+	/***
+	 * This end point creates an sprocket application for the developer who
+	 * invoked the request
+	 * 
+	 * @param payload
+	 * @return
+	 */
+	@POST
+	@Path("/{developerId}/applications/created")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response createApplication(InputStream payload, @PathParam("developerId") Long developerId) {
+
+		return Response.ok().build();
 	}
 
 }
