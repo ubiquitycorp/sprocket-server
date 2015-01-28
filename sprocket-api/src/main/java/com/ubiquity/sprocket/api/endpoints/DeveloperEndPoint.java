@@ -16,8 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.Developer;
 import com.ubiquity.identity.service.AuthenticationService;
+import com.ubiquity.identity.service.DeveloperService;
+import com.ubiquity.sprocket.api.dto.model.developer.ApplicationDto;
 import com.ubiquity.sprocket.api.dto.model.developer.DeveloperDto;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
@@ -125,9 +128,23 @@ public class DeveloperEndPoint {
 	@Path("/{developerId}/applications/created")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createApplication(InputStream payload,
-			@PathParam("developerId") Long developerId) {
-
-		return Response.ok().build();
+			@PathParam("developerId") Long developerId) throws IOException {
+		ApplicationDto applicationDto = jsonConverter.convertFromPayload(
+				payload, ApplicationDto.class, AuthenticationValidation.class);
+		DeveloperService developerService = ServiceFactory
+				.getDeveloperService();
+		Application application = developerService.createApp(developerId,
+				applicationDto.getName(), applicationDto.getDescription());
+		if (application == null)
+			throw new AuthenticationException("Application cannot be created",
+					null);
+		ApplicationDto developerApplication = new ApplicationDto.Builder()
+				.appId(application.getAppId()).appKey(application.getAppKey())
+				.appSecret(application.getAppKey()).build();
+		log.debug("Created Application {}", application);
+		return Response.ok()
+				.entity(jsonConverter.convertToPayload(developerApplication))
+				.build();
 	}
 
 }
