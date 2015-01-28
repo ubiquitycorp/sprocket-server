@@ -1,5 +1,7 @@
 package com.ubiquity.social.repository;
 
+import java.util.List;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -84,6 +86,13 @@ public class ContactRepositoryTest {
 		int count = contactRepository
 				.countAllByExternalNetwork(ExternalNetwork.Vimeo);
 		Assert.assertEquals(count, 2);
+	}
+	
+	@Test
+	public void testFindAllContactsOfActiveUserIdentities() {
+		List<Contact> contacts = contactRepository
+				.findAllContactsOfActiveUserIdentities(owner.getUserId());
+		Assert.assertEquals(contacts.size(), 3);
 	}
 
 }
