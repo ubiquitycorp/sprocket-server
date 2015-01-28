@@ -17,16 +17,16 @@
 				<solr.api.port>8080</solr.api.port>
 				
 				<!--<social.facebook.api.host>http://localhost/sprocket-network-api/api/1.0/facebook</social.facebook.api.host>-->
-				<social.facebook.api.host>https://graph.facebook.com</social.facebook.api.host>
 				<!--<social.googlePlus.api.host>http://localhost/sprocket-network-api/api/1.0/googleplus</social.googlePlus.api.host>-->
-				<social.googlePlus.api.host>https://www.googleapis.com/plus/v1</social.googlePlus.api.host>
 				<!--<social.google.api.host>http://localhost/sprocket-network-api/api/1.0/googleplus</social.google.api.host>-->
-				<social.google.api.host>https://accounts.google.com</social.google.api.host>
 				<!--<content.youtube.api.host>http://localhost/sprocket-network-api/api/1.0/youtube</content.youtube.api.host>-->
-				<content.youtube.api.host>https://www.googleapis.com/youtube</content.youtube.api.host>
 				<!--<social.reddit.oauth.api.host>http://localhost/sprocket-network-api/api/1.0/reddit</social.reddit.oauth.api.host>-->
-				<social.reddit.oauth.api.host>https://oauth.reddit.com</social.reddit.oauth.api.host>
 				<!--<social.reddit.ssl.api.host>http://localhost/sprocket-network-api/api/1.0/reddit</social.reddit.ssl.api.host>-->
+				<social.facebook.api.host>https://graph.facebook.com</social.facebook.api.host>
+				<social.googlePlus.api.host>https://www.googleapis.com/plus/v1</social.googlePlus.api.host>
+				<social.google.api.host>https://accounts.google.com</social.google.api.host>
+				<content.youtube.api.host>https://www.googleapis.com/youtube</content.youtube.api.host>
+				<social.reddit.oauth.api.host>https://oauth.reddit.com</social.reddit.oauth.api.host>
 				<social.reddit.ssl.api.host>https://ssl.reddit.com</social.reddit.ssl.api.host>
 				
 				<social.twitter.app.consumerKey>eIxhGVt1wo8yNs7cTq0mNHsi0
@@ -86,8 +86,10 @@
 				</social.reddit.web.consumerSecret>
 				<social.reddit.installed.consumerSecret>NVMIMSbywkA7xA
 				</social.reddit.installed.consumerSecret>
-				<social.reddit.userAgent>sprocketuser/1.5 by ubiquitybcVM
-				</social.reddit.userAgent>
+				<social.reddit.web.userAgent>web:com.ubiquiy.sprocketDevWeb:v1.0.1 (by /u/ubiquitybc)
+				</social.reddit.web.userAgent>
+				<social.reddit.installed.userAgent>andriod:com.ubiquiy.sprocketDevMobile:v1.0.1 (by /u/ubiquitybc)
+				</social.reddit.installed.userAgent>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
 				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
@@ -230,8 +232,10 @@
 				</social.reddit.web.consumerSecret>
 				<social.reddit.installed.consumerSecret>xvOJZJMeG5HQZw
 				</social.reddit.installed.consumerSecret>
-				<social.reddit.userAgent>sprocketuser/1.5 by ubiquitybcQA
-				</social.reddit.userAgent>
+				<social.reddit.web.userAgent>web:com.ubiquiy.sprocketQAWeb:v1.0.1 (by /u/ubiquitybc)
+				</social.reddit.web.userAgent>
+				<social.reddit.installed.userAgent>andriod:com.ubiquiy.sprocketQAMobile:v1.0.1 (by /u/ubiquitybc)
+				</social.reddit.installed.userAgent>
 
 				<constants.resetUrl>http://sprocket-qa.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>
@@ -375,8 +379,10 @@
 				</social.reddit.web.consumerSecret>
 				<social.reddit.installed.consumerSecret>Fm2rYVyn5bVhmw
 				</social.reddit.installed.consumerSecret>
-				<social.reddit.userAgent>sprocketuser/1.5 by ubiquitybcStage
-				</social.reddit.userAgent>
+				<social.reddit.web.userAgent>web:com.ubiquiy.sprocketStageWeb:v1.0.1 (by /u/ubiquitybc)
+				</social.reddit.web.userAgent>
+				<social.reddit.installed.userAgent>andriod:com.ubiquiy.sprocketStageMobile:v1.0.1 (by /u/ubiquitybc)
+				</social.reddit.installed.userAgent>
 
 				<constants.resetUrl>sprocket-web-stage.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>
@@ -505,8 +511,10 @@
 				</social.reddit.web.consumerSecret>
 				<social.reddit.installed.consumerSecret>Fm2rYVyn5bVhmw
 				</social.reddit.installed.consumerSecret>
-				<social.reddit.userAgent>sprocketuser/1.5 by sprocket
-				</social.reddit.userAgent>
+				<social.reddit.web.userAgent>web:com.ubiquiy.sprocketWeb:v1.0.1 (by /u/ubiquitybc)
+				</social.reddit.web.userAgent>
+				<social.reddit.installed.userAgent>andriod:com.ubiquiy.sprocketMobile:v1.0.1 (by /u/ubiquitybc)
+				</social.reddit.installed.userAgent>
 
 				<constants.resetUrl>sprocket-web-prod.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>

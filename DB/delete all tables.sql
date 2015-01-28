@@ -18,6 +18,7 @@ delete from conversation_contact;
 delete from conversation;
 delete from video_content;
 delete from event;
+delete from user_contact;
 delete from contact;
 #place
 delete from user_location;
