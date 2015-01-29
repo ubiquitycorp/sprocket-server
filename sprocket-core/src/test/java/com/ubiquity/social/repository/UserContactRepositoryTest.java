@@ -70,23 +70,33 @@ public class UserContactRepositoryTest {
 						ExternalNetwork.Vimeo);
 
 		UserContact facebookIdentityUserContact = new UserContact.Builder()
-				.contact(facebookIdentityContact).user(owner).isDeleted(false)
+				.contact(facebookIdentityContact).user(owner)
+				.externalNetwork(ExternalNetwork.Facebook).isDeleted(false)
+				.createdAt(System.currentTimeMillis())
 				.lastUpdated(System.currentTimeMillis()).build();
 		UserContact twitterIdentityUserContact = new UserContact.Builder()
-				.contact(twitterIdentityContact).user(owner).isDeleted(false)
+				.contact(twitterIdentityContact).user(owner)
+				.externalNetwork(ExternalNetwork.Twitter).isDeleted(false)
+				.createdAt(System.currentTimeMillis())
 				.lastUpdated(System.currentTimeMillis()).build();
 		UserContact vimeoIdentityUserContact = new UserContact.Builder()
-				.contact(vimeoIdentityContact).user(owner).isDeleted(false)
+				.contact(vimeoIdentityContact).user(owner)
+				.createdAt(System.currentTimeMillis())
+				.externalNetwork(ExternalNetwork.Vimeo).isDeleted(false)
 				.lastUpdated(System.currentTimeMillis()).build();
 
 		facebookUserContact = new UserContact.Builder()
-				.contact(facebookContact).user(owner).isDeleted(false)
+				.contact(facebookContact).user(owner)
+				.externalNetwork(ExternalNetwork.Facebook).isDeleted(false)
+				.createdAt(System.currentTimeMillis())
 				.lastUpdated(System.currentTimeMillis()).build();
 		twitterUserContact = new UserContact.Builder().contact(twitterContact)
-				.user(owner).isDeleted(false)
+				.user(owner).externalNetwork(ExternalNetwork.Twitter)
+				.isDeleted(false).createdAt(System.currentTimeMillis())
 				.lastUpdated(System.currentTimeMillis()).build();
 		vimeoUserContact = new UserContact.Builder().contact(vimeoContact)
-				.user(owner).isDeleted(false)
+				.user(owner).externalNetwork(ExternalNetwork.Vimeo)
+				.isDeleted(false).createdAt(System.currentTimeMillis())
 				.lastUpdated(System.currentTimeMillis()).build();
 		EntityManagerSupport.beginTransaction();
 		contactRepository.create(facebookContact);
