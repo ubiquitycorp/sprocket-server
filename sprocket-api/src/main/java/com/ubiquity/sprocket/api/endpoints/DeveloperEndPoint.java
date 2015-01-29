@@ -130,20 +130,20 @@ public class DeveloperEndPoint {
 	public Response createApplication(InputStream payload,
 			@PathParam("developerId") Long developerId) throws IOException {
 		ApplicationDto applicationDto = jsonConverter.convertFromPayload(
-				payload, ApplicationDto.class, AuthenticationValidation.class);
+				payload, ApplicationDto.class);
 		DeveloperService developerService = ServiceFactory
 				.getDeveloperService();
-		
+
 		Developer developer = developerService.getDeveloperById(developerId);
 		Application application = developerService.createApp(developer,
 				applicationDto.getName(), applicationDto.getDescription());
-		
+
 		ApplicationDto developerApplication = new ApplicationDto.Builder()
 				.appId(application.getAppId()).appKey(application.getAppKey())
-				.appSecret(application.getAppKey()).build();
-		
+				.appSecret(application.getAppSecret()).build();
+
 		log.debug("Created Application {}", application);
-		
+
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(developerApplication))
 				.build();
