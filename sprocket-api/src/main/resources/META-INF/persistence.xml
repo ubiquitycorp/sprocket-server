@@ -25,7 +25,7 @@
 		<class>com.ubiquity.identity.domain.Admin</class>
 		<class>com.ubiquity.identity.domain.Developer</class>
 		<class>com.ubiquity.identity.domain.SecRole</class>
-		<class>com.ubiquity.identity.domain.Identity</class>
+		<class>com.ubiquity.identity.domain.Identity</class> 
 		<class>com.ubiquity.identity.domain.NativeIdentity</class>
 		<class>com.ubiquity.identity.domain.ExternalIdentity</class>
 		<class>com.ubiquity.integration.domain.Contact</class>

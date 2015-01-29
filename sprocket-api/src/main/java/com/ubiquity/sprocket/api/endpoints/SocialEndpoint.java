@@ -35,10 +35,12 @@ import com.ubiquity.integration.domain.Message;
 import com.ubiquity.integration.domain.PostActivity;
 import com.ubiquity.integration.domain.PostComment;
 import com.ubiquity.integration.domain.PostVote;
+import com.ubiquity.integration.domain.UserContact;
 import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
 import com.ubiquity.sprocket.api.dto.containers.ContactsDto;
+import com.ubiquity.sprocket.api.dto.containers.ContactsSyncedDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
 import com.ubiquity.sprocket.api.dto.model.social.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.social.ContactDto;
@@ -126,9 +128,10 @@ public class SocialEndpoint {
 			result.getContacts().add(contactDto);
 		}
 
-		return Response.ok()
-				.entity(jsonConverter.convertToPayload(result)).build();
+		return Response.ok().entity(jsonConverter.convertToPayload(result))
+				.build();
 	}
+
 	/***
 	 * 
 	 * @param userId
@@ -137,28 +140,39 @@ public class SocialEndpoint {
 	 * @return
 	 */
 	@GET
-	@Path("users/{userId}/contacts/sync")
+	@Path("users/{userId}/contacts/synced")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response contactsSync(@PathParam("userId") Long userId,
-			@HeaderParam("delta") Boolean delta,
 			@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		log.debug("Listing contacts modified since: {}", ifModifiedSince);
 
 		// Manager will return contacts if they have been modified, else it will
 		// be empty
-		CollectionVariant<Contact> variant = ServiceFactory.getContactService()
-				.findModifiedContactsForActiveNetworksByOwnerId(userId, ifModifiedSince);
+
+		CollectionVariant<UserContact> variant = ServiceFactory
+				.getContactService()
+				.findModifiedContactsForActiveNetworksByOwnerId(userId,
+						ifModifiedSince);
 
 		// Throw a 304 if there is no variant (no change)
 		if (variant == null) {
 			return Response.notModified().build();
 		}
 		// Convert entire list to DTO
-		ContactsDto result = new ContactsDto();
-		for (Contact contact : variant.getCollection()) {
-			ContactDto contactDto = DtoAssembler.assemble(contact);
-			result.getContacts().add(contactDto);
+		ContactsSyncedDto result = new ContactsSyncedDto();
+		for (UserContact contact : variant.getCollection()) {
+
+			if (contact.IsDeleted())
+				result.getDeleted().add(contact.getContact().getContactId());
+			else{
+				ContactDto contactDto = DtoAssembler.assemble(contact.getContact());
+				if (contact.getCreatedAt()>ifModifiedSince){
+					result.getAdded().add(contactDto);
+				}else{
+					result.getUpdated().add(contactDto);
+				}
+			}
 		}
 
 		return Response.ok().header("Last-Modified", variant.getLastModified())
