@@ -17,12 +17,15 @@ import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.UserContact;
 import com.ubiquity.integration.factory.TestContactFactory;
+import com.ubiquity.integration.repository.ContactRepository;
+import com.ubiquity.integration.repository.ContactRepositoryJpaImpl;
 import com.ubiquity.integration.repository.UserContactRepository;
 import com.ubiquity.integration.repository.UserContactRepositoryJpaImpl;
 
 public class UserContactRepositoryTest {
 	private static UserContactRepository userContactRepository;
 	private static UserRepository userRepository;
+	private static ContactRepository contactRepository;
 	private static User owner;
 	private static Contact facebookContact, twitterContact, vimeoContact;
 	private static UserContact facebookUserContact, twitterUserContact,
@@ -35,8 +38,10 @@ public class UserContactRepositoryTest {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
+
 		userContactRepository = new UserContactRepositoryJpaImpl();
 		userRepository = new UserRepositoryJpaImpl();
+		contactRepository = new ContactRepositoryJpaImpl();
 
 		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 
@@ -55,14 +60,15 @@ public class UserContactRepositoryTest {
 						owner, ExternalNetwork.Vimeo);
 
 		facebookContact = TestContactFactory
-				.createContactWithMininumRequiredFieldsAndExternalNetwork(
-						owner, ExternalNetwork.Facebook);
+				.createContactWithMininumRequiredFieldsAndExternalNetwork(null,
+						ExternalNetwork.Facebook);
 		twitterContact = TestContactFactory
-				.createContactWithMininumRequiredFieldsAndExternalNetwork(
-						owner, ExternalNetwork.Twitter);
+				.createContactWithMininumRequiredFieldsAndExternalNetwork(null,
+						ExternalNetwork.Twitter);
 		vimeoContact = TestContactFactory
-				.createContactWithMininumRequiredFieldsAndExternalNetwork(
-						owner, ExternalNetwork.Vimeo);
+				.createContactWithMininumRequiredFieldsAndExternalNetwork(null,
+						ExternalNetwork.Vimeo);
+
 		UserContact facebookIdentityUserContact = new UserContact.Builder()
 				.contact(facebookIdentityContact).user(owner).isDeleted(false)
 				.lastUpdated(System.currentTimeMillis()).build();
@@ -83,6 +89,14 @@ public class UserContactRepositoryTest {
 				.user(owner).isDeleted(false)
 				.lastUpdated(System.currentTimeMillis()).build();
 		EntityManagerSupport.beginTransaction();
+		contactRepository.create(facebookContact);
+		contactRepository.create(twitterContact);
+		contactRepository.create(vimeoContact);
+
+		contactRepository.create(facebookIdentityContact);
+		contactRepository.create(twitterIdentityContact);
+		contactRepository.create(vimeoIdentityContact);
+
 		userContactRepository.create(facebookIdentityUserContact);
 		userContactRepository.create(twitterIdentityUserContact);
 		userContactRepository.create(vimeoIdentityUserContact);
@@ -101,14 +115,11 @@ public class UserContactRepositoryTest {
 		Assert.assertEquals(contacts.size(), 2);
 
 		List<Long> contactsIds = new LinkedList<Long>();
-		try {
-			EntityManagerSupport.beginTransaction();
-			userContactRepository.deleteWithoutIds(owner.getUserId(),
-					contactsIds, ExternalNetwork.Twitter);
-			EntityManagerSupport.commit();
-		} finally {
-			EntityManagerSupport.closeEntityManager();
-		}
+		contactsIds.add(twitterUserContact.getContact().getContactId());
+		EntityManagerSupport.beginTransaction();
+		userContactRepository.deleteWithoutIds(owner.getUserId(), contactsIds,
+				ExternalNetwork.Twitter);
+		EntityManagerSupport.commit();
 
 		contacts = userContactRepository.findByOwnerIdAndExternalNetwork(
 				owner.getUserId(), ExternalNetwork.Twitter);
@@ -119,7 +130,7 @@ public class UserContactRepositoryTest {
 	public void testFindByOwnerId() {
 		List<Contact> contacts = userContactRepository.findByOwnerId(owner
 				.getUserId());
-		Assert.assertEquals(contacts.size(), 4);
+		Assert.assertEquals(contacts.size(), 3);
 	}
 
 	@Test
@@ -133,11 +144,14 @@ public class UserContactRepositoryTest {
 				owner.getUserId(), ExternalNetwork.YouTube);
 		Assert.assertEquals(contacts.size(), 0);
 
-		EntityManagerSupport.beginTransaction();
-		facebookUserContact.setIsDeleted(true);
-		userContactRepository.update(facebookUserContact);
-		EntityManagerSupport.commit();
-
+		try {
+			EntityManagerSupport.beginTransaction();
+			facebookUserContact.setIsDeleted(true);
+			userContactRepository.update(facebookUserContact);
+			EntityManagerSupport.commit();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
 		contacts = userContactRepository.findByOwnerIdAndExternalNetwork(
 				owner.getUserId(), ExternalNetwork.Facebook);
 		Assert.assertEquals(contacts.size(), 1);
@@ -158,7 +172,7 @@ public class UserContactRepositoryTest {
 		int count = userContactRepository
 				.countAllActiveContactsByOwnerIdAndExternalNetwork(
 						owner.getUserId(), ExternalNetwork.Twitter);
-		Assert.assertEquals(count, 2);
+		Assert.assertEquals(count, 1);
 	}
 
 	@Test
@@ -167,13 +181,6 @@ public class UserContactRepositoryTest {
 				owner.getUserId(), twitterContact.getExternalIdentity()
 						.getIdentityId());
 		Assert.assertNotNull(c);
-	}
-
-	@Test
-	public void testFindAllContactsOfActiveUserIdentities() {
-		List<Contact> contacts = userContactRepository
-				.findAllContactsOfActiveUserIdentities(owner.getUserId());
-		Assert.assertEquals(contacts.size(), 3);
 	}
 
 	@Test
