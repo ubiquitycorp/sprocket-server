@@ -6,7 +6,7 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.ubiquity.sprocket.api.dto.model.ActivityDto;
+import com.ubiquity.sprocket.api.dto.model.social.ActivityDto;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
 
 public class ActivitiesDto {

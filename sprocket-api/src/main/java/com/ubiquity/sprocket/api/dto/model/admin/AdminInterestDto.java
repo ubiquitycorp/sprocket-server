@@ -1,4 +1,4 @@
-package com.ubiquity.sprocket.api.dto.model;
+package com.ubiquity.sprocket.api.dto.model.admin;
 
 import com.esotericsoftware.kryo.NotNull;
 import com.ubiquity.integration.domain.AdminInterestType;

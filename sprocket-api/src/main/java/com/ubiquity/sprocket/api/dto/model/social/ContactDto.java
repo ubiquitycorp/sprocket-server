@@ -1,7 +1,8 @@
-package com.ubiquity.sprocket.api.dto.model;
+package com.ubiquity.sprocket.api.dto.model.social;
 
 import javax.validation.constraints.NotNull;
 
+import com.ubiquity.sprocket.api.dto.model.user.IdentityDto;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
 
 public class ContactDto {

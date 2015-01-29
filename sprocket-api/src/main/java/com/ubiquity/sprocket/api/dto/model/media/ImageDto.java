@@ -1,4 +1,4 @@
-package com.ubiquity.sprocket.api.dto.model;
+package com.ubiquity.sprocket.api.dto.model.media;
 
 public class ImageDto {
 	

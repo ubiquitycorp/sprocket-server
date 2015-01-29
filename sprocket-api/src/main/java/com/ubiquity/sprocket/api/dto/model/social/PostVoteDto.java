@@ -1,4 +1,4 @@
-package com.ubiquity.sprocket.api.dto.model;
+package com.ubiquity.sprocket.api.dto.model.social;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
