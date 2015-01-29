@@ -133,15 +133,17 @@ public class DeveloperEndPoint {
 				payload, ApplicationDto.class, AuthenticationValidation.class);
 		DeveloperService developerService = ServiceFactory
 				.getDeveloperService();
-		Application application = developerService.createApp(developerId,
+		
+		Developer developer = developerService.getDeveloperById(developerId);
+		Application application = developerService.createApp(developer,
 				applicationDto.getName(), applicationDto.getDescription());
-		if (application == null)
-			throw new AuthenticationException("Application cannot be created",
-					null);
+		
 		ApplicationDto developerApplication = new ApplicationDto.Builder()
 				.appId(application.getAppId()).appKey(application.getAppKey())
 				.appSecret(application.getAppKey()).build();
+		
 		log.debug("Created Application {}", application);
+		
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(developerApplication))
 				.build();
