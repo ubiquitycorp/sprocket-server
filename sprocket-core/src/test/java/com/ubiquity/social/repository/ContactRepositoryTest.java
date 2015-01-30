@@ -36,7 +36,7 @@ public class ContactRepositoryTest {
 		userRepository = new UserRepositoryJpaImpl();
 
 		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-
+		
 		EntityManagerSupport.beginTransaction();
 		userRepository.create(owner);
 		EntityManagerSupport.commit();
@@ -73,96 +73,26 @@ public class ContactRepositoryTest {
 	}
 
 	@Test
-	public void testFindByOwnerId() {
-		List<Contact> contacts = contactRepository.findByOwnerId(owner
-				.getUserId());
-		Assert.assertEquals(contacts.size(), 5);
-	}
-
-	@Test
-	public void testFindByOwnerIdAndExternalNetwork() {
-		List<Contact> contacts = contactRepository
-				.findByOwnerIdAndExternalNetwork(owner.getUserId(),
-						ExternalNetwork.Facebook);
-		Assert.assertEquals(contacts.size(), 2);
-
-		contacts = contactRepository.findByOwnerIdAndExternalNetwork(
-				owner.getUserId(), ExternalNetwork.YouTube);
-		Assert.assertEquals(contacts.size(), 0);
-
-		EntityManagerSupport.beginTransaction();
-		facebookContact.isDeleted(true);
-		contactRepository.update(facebookContact);
-		EntityManagerSupport.commit();
-
-		contacts = contactRepository
-				.findContactsForActiveNetworksByOwnerId(owner.getUserId());
-		Assert.assertEquals(contacts.size(), 5);
-	}
-
-	@Test
 	public void testFindByOwnerIDAndExternalNetworkAndExternalIdentitfier() {
 		Contact c = contactRepository
-				.findByOwnerIDAndExternalNetworkAndExternalIdentitfier(owner,
-						twitterContact.getExternalIdentity().getIdentifier(),
+				.findByExternalIdentitfierAndExternalNetwork(twitterContact
+						.getExternalIdentity().getIdentifier(),
 						ExternalNetwork.Twitter);
 		Assert.assertEquals(c.getContactId(), twitterContact.getContactId());
-
-		Contact contact = TestContactFactory
-				.createContactWithMininumRequiredFieldsAndExternalNetwork(null,
-						ExternalNetwork.Twitter);
-		contact.setExternalIdentity(c.getExternalIdentity());
-
-		EntityManagerSupport.beginTransaction();
-		contactRepository.create(contact);
-		EntityManagerSupport.commit();
-
-		Contact c2 = contactRepository
-				.findByOwnerIDAndExternalNetworkAndExternalIdentitfier(null,
-						contact.getExternalIdentity().getIdentifier(),
-						ExternalNetwork.Twitter);
-		
-		Assert.assertEquals(c2.getContactId(), contact.getContactId());
-
 	}
-
+	
 	@Test
 	public void testCountContacts() {
 		int count = contactRepository
-				.countAllActiveContactsByOwnerIdAndExternalNetwork(
-						owner.getUserId(), ExternalNetwork.Twitter);
-		Assert.assertEquals(count, 2);
-
-		count = contactRepository
 				.countAllByExternalNetwork(ExternalNetwork.Vimeo);
 		Assert.assertEquals(count, 2);
 	}
-
+	
 	@Test
-	public void testFindByUserIdAndExternalIdentityId() {
-		Contact c = contactRepository.findByUserIdAndExternalIdentityId(owner
-				.getUserId(), twitterContact.getExternalIdentity()
-				.getIdentityId());
-		Assert.assertNotNull(c);
-	}
-
-	public void testRemoveAllContacts() {
-		List<Contact> contacts = contactRepository
-				.findByOwnerIdAndExternalNetwork(owner.getUserId(),
-						ExternalNetwork.Twitter);
-		Assert.assertEquals(contacts.size(), 2);
-
-		contactRepository.removeAllContacts(owner.getUserId(),
-				ExternalNetwork.Twitter);
-
-		contacts = contactRepository.findByOwnerIdAndExternalNetwork(
-				owner.getUserId(), ExternalNetwork.Twitter);
-		Assert.assertEquals(contacts.size(), 0);
-	}
-
 	public void testFindAllContactsOfActiveUserIdentities() {
 		List<Contact> contacts = contactRepository
 				.findAllContactsOfActiveUserIdentities(owner.getUserId());
-		Assert.assertNotEquals(contacts.size(), 3);
+		Assert.assertEquals(contacts.size(), 3);
 	}
+
 }

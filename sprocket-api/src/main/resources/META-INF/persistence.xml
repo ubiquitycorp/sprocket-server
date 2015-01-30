@@ -26,7 +26,7 @@
 		<class>com.ubiquity.identity.domain.Developer</class>
 		<class>com.ubiquity.identity.domain.Application</class>
 		<class>com.ubiquity.identity.domain.SecRole</class>
-		<class>com.ubiquity.identity.domain.Identity</class>
+		<class>com.ubiquity.identity.domain.Identity</class> 
 		<class>com.ubiquity.identity.domain.NativeIdentity</class>
 		<class>com.ubiquity.identity.domain.ExternalIdentity</class>
 		<class>com.ubiquity.integration.domain.Contact</class>
@@ -38,6 +38,7 @@
 		<class>com.ubiquity.integration.domain.Event</class>
 		<class>com.ubiquity.integration.domain.Comment</class>
 		<class>com.ubiquity.integration.domain.UnmappedInterest</class>
+		<class>com.ubiquity.integration.domain.UserContact</class>
 
 		<class>com.ubiquity.sprocket.domain.Configuration</class>
 

@@ -81,7 +81,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 							+ " Could not process, message: {}, root cause message: {}",
 					ExceptionUtils.getMessage(e),
 					ExceptionUtils.getFullStackTrace(e));
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 

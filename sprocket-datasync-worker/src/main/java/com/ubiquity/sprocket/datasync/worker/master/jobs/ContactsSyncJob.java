@@ -61,6 +61,8 @@ public class ContactsSyncJob implements Job {
 	}
 
 	private void sendSyncContactsMessage(List<Long> userIds) throws IOException {
+		if(userIds.size()==0)
+			return;
 		ContactsSync content = new ContactsSync(userIds);
 
 		// serialize and send it
