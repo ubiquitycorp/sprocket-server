@@ -143,7 +143,7 @@ public class SocialEndpoint {
 	@Path("users/{userId}/contacts/synced")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response contactsSync(@PathParam("userId") Long userId,
+	public Response syncContacts(@PathParam("userId") Long userId,
 			@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		log.debug("Listing contacts modified since: {}", ifModifiedSince);
 
@@ -165,11 +165,12 @@ public class SocialEndpoint {
 
 			if (contact.IsDeleted())
 				result.getDeleted().add(contact.getContact().getContactId());
-			else{
-				ContactDto contactDto = DtoAssembler.assemble(contact.getContact());
-				if (contact.getCreatedAt()>ifModifiedSince){
+			else {
+				ContactDto contactDto = DtoAssembler.assemble(contact
+						.getContact());
+				if (contact.getCreatedAt() > ifModifiedSince) {
 					result.getAdded().add(contactDto);
-				}else{
+				} else {
 					result.getUpdated().add(contactDto);
 				}
 			}
