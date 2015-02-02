@@ -143,7 +143,7 @@ public class SocialEndpoint {
 	@Path("users/{userId}/contacts/synced")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
-	public Response syncContacts(@PathParam("userId") Long userId,
+	public Response getModifiedContacts(@PathParam("userId") Long userId,
 			@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		log.debug("Listing contacts modified since: {}", ifModifiedSince);
 
