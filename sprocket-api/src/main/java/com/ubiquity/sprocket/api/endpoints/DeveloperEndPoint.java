@@ -22,6 +22,7 @@ import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.identity.service.DeveloperService;
 import com.ubiquity.sprocket.api.dto.model.developer.ApplicationDto;
 import com.ubiquity.sprocket.api.dto.model.developer.DeveloperDto;
+import com.ubiquity.sprocket.api.interceptors.DeveloperSecure;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -126,6 +127,7 @@ public class DeveloperEndPoint {
 	 */
 	@POST
 	@Path("/{developerId}/applications/created")
+	@DeveloperSecure
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createApplication(InputStream payload,
 			@PathParam("developerId") Long developerId) throws IOException {
