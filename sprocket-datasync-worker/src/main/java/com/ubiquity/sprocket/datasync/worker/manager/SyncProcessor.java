@@ -229,9 +229,11 @@ public abstract class SyncProcessor {
 			resourcePath.append("/content/users/");
 		else
 			resourcePath.append("/social/users/");
-		resourcePath.append(userId).append("/providers/")
-				.append(externalNetwork.ordinal()).append("/")
-				.append(resource.name());
+		if (!resource.equals(ResourceType.contacts))
+			resourcePath.append(userId).append("/providers/")
+					.append(externalNetwork.ordinal()).append("/");
+		
+		resourcePath.append(resource.getEndpointName());
 		return resourcePath.toString();
 	}
 }
