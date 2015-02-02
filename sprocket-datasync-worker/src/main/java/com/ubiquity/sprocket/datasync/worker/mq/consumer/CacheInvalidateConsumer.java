@@ -50,12 +50,9 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			log.info("Message received: {}", message);
 			if (message.getType().equals(
 					ExternalIdentityActivated.class.getSimpleName())) {
-				SyncProcessor dataSyncManager = new DataSyncProcessor();
+				SyncProcessor dataSyncManager = new DataSyncProcessor(true);
 				dataSyncManager.processSync((ExternalIdentityActivated) message
 						.getContent());
-				SyncProcessor contactSyncManager = new ContactsSyncProcessor();
-				contactSyncManager.processSync((ExternalIdentityActivated) message
-								.getContent());
 			}
 			if (message.getType()
 					.equals(ActiveUsersFound.class.getSimpleName())) {

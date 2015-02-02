@@ -5,6 +5,7 @@ import java.util.List;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.sprocket.datasync.handlers.ActivityHandler;
+import com.ubiquity.sprocket.datasync.handlers.ContactHandler;
 import com.ubiquity.sprocket.datasync.handlers.Handler;
 import com.ubiquity.sprocket.datasync.handlers.LocalActivityHandler;
 import com.ubiquity.sprocket.datasync.handlers.MessageHandler;
@@ -40,8 +41,9 @@ public class DataSyncProcessor extends SyncProcessor {
 	/***
 	 * Creates a data sync processor that operate
 	 */
-	public DataSyncProcessor() {
+	public DataSyncProcessor(Boolean syncContacts) {
 		log.info("Created DataSyncProcessor");
+		this.syncContacts = syncContacts;
 		createChainHandelrs();
 		notificationProcessor = new SyncNotificationSender(mainHandler.getNext().getProcessedMessages());
 	}
@@ -51,10 +53,16 @@ public class DataSyncProcessor extends SyncProcessor {
 		Handler messageHandler = new MessageHandler(this);
 		Handler localActivityHandler = new LocalActivityHandler(this);
 		Handler videoHandler = new VideoHandler(this);
-
+		
 		mainHandler.setNext(messageHandler);
 		messageHandler.setNext(localActivityHandler);
 		localActivityHandler.setNext(videoHandler);
+		
+		if(syncContacts)
+		{
+			Handler contactHandler = new ContactHandler(this);
+			videoHandler.setNext(contactHandler);
+		}
 	}
 
 	/***
