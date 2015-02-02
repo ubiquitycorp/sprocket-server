@@ -74,7 +74,9 @@ public class FacebookEndPoint {
 	public Response getFriends(@QueryParam("access_token") String accessToken,
 			@QueryParam("fields") String fields,
 			@QueryParam("date_format") String dateFormat) {
-		return null;
+		Long userId = CacheFactory.findOrCreateUser(accessToken);
+		FacebookDataDto facebookData = FacebookMockNetwork.getFriends(userId);
+		return Response.ok().entity(jsonConverter.convertToPayload(facebookData)).build();
 	}
 
 	@GET
