@@ -49,6 +49,17 @@ public class FacebookMockNetwork {
 
 		return facebookData;
 	}
+	
+	public static FacebookDataDto getFriends(Long userId)
+	{
+		List<Contact> contacts = RandomListGenerator.GenerateContactList(userId);
+		FacebookDataDto facebookData = new FacebookDataDto();
+		for (Contact contact : contacts)
+			facebookData.getData().add(
+					FacebookGraphApiDtoAssembler.assembleContact(contact));
+
+		return facebookData;
+	}
 
 	public static List<FacebookBatchResponseDto> getbatchActivity(Long userId,
 			Long lastRequest, Long thisRequest, Integer maxResults) {
