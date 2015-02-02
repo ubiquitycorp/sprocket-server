@@ -3,7 +3,7 @@ package com.ubiquity.sprocket.api.endpoints;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.security.sasl.AuthenticationException;
+import com.ubiquity.integration.api.exception.AuthorizationException;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -100,7 +100,7 @@ public class DeveloperEndPoint {
 		Developer developer = developerAuthService.authenticate(
 				developerDto.getUsername(), developerDto.getPassword());
 		if (developer == null)
-			throw new AuthenticationException("Username / password incorrect",
+			throw new AuthorizationException("Username / password incorrect",
 					null);
 
 		String apiKey = developerAuthService
