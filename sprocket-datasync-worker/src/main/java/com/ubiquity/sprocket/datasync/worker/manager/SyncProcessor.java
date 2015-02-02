@@ -34,6 +34,7 @@ import com.ubiquity.sprocket.service.ServiceFactory;
 public abstract class SyncProcessor {
 
 	Handler mainHandler;
+	Boolean syncContacts = false;
 
 	protected MessageConverter messageConverter = MessageConverterFactory
 			.getMessageConverter();
