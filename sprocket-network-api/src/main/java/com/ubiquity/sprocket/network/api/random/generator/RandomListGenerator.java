@@ -6,6 +6,7 @@ import java.util.Random;
 
 import com.ubiquity.sprocket.network.api.dto.model.Activity;
 import com.ubiquity.sprocket.network.api.dto.model.Comment;
+import com.ubiquity.sprocket.network.api.dto.model.Contact;
 import com.ubiquity.sprocket.network.api.dto.model.Conversation;
 import com.ubiquity.sprocket.network.api.dto.model.VideoContent;
 
@@ -13,23 +14,24 @@ public class RandomListGenerator {
 	private static Random random = new Random();
 
 	public static List<Activity> GenerateActivityList(Long userId,
-			Long lastRequest, Long thisRequest,boolean withComments,boolean withTags,Integer maxResults) {
+			Long lastRequest, Long thisRequest, boolean withComments,
+			boolean withTags, Integer maxResults) {
 		List<Activity> activities = new LinkedList<Activity>();
-		int mid = (maxResults/2)+1;
+		int mid = (maxResults / 2) + 1;
 		for (int i = 1; i <= mid; i++) {
 			activities.add(RandomObjectGenerator.generateActivity(userId,
-					lastRequest, i, random.nextInt(6),withComments,withTags));
+					lastRequest, i, random.nextInt(6), withComments, withTags));
 		}
 		for (int i = mid; i <= maxResults; i++) {
 			activities.add(RandomObjectGenerator.generateActivity(userId,
-					thisRequest, i, random.nextInt(6),withComments,withTags));
+					thisRequest, i, random.nextInt(6), withComments, withTags));
 		}
 		return activities;
 	}
 
 	public static List<VideoContent> GenerateVideoList(Long userId,
-			Long lastRequest, Long thisRequest,Integer maxResults) {
-		int mid = (maxResults/2)+1;
+			Long lastRequest, Long thisRequest, Integer maxResults) {
+		int mid = (maxResults / 2) + 1;
 		List<VideoContent> videos = new LinkedList<VideoContent>();
 		for (int i = 1; i <= mid; i++) {
 			videos.add(RandomObjectGenerator.generateVideoContent(userId,
@@ -66,8 +68,16 @@ public class RandomListGenerator {
 		}
 		return conversations;
 	}
-	public static List<Comment> GenerateCommentList(Long userId,Long thisRequest,String ActivityId) {
-		
-		return RandomObjectGenerator.GenerateCommentList(userId,thisRequest,ActivityId);
+
+	public static List<Comment> GenerateCommentList(Long userId,
+			Long thisRequest, String ActivityId) {
+
+		return RandomObjectGenerator.GenerateCommentList(userId, thisRequest,
+				ActivityId);
+	}
+
+	public static List<Contact> GenerateContactList(Long userId) {
+
+		return RandomObjectGenerator.generateContactList(userId);
 	}
 }

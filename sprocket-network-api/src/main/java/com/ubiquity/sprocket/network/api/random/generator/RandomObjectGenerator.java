@@ -118,6 +118,19 @@ public class RandomObjectGenerator {
 		return activity;
 	}
 
+	public static List<Contact> generateContactList(Long userId)
+	{
+		List<Contact> contacts  = new LinkedList<Contact>();
+		int contactIndex = 1;
+		for (int i = 0; i < 4; i++) {
+			Contact contact = generateContact(userId, contactIndex);
+			contacts.add(contact);
+			
+			contactIndex ++;
+		}
+		return contacts;
+	}
+	
 	public static Contact generateContact(Long userId, Integer index) {
 		ExternalIdentity externalIdentity = null;
 		if (index == null) {
