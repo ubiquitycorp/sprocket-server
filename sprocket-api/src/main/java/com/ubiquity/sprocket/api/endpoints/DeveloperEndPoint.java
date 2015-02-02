@@ -2,6 +2,8 @@ package com.ubiquity.sprocket.api.endpoints;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.security.sasl.AuthenticationException;
 import javax.ws.rs.GET;
@@ -20,6 +22,8 @@ import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.Developer;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.identity.service.DeveloperService;
+import com.ubiquity.sprocket.api.DtoAssembler;
+import com.ubiquity.sprocket.api.dto.containers.ApplicationsDto;
 import com.ubiquity.sprocket.api.dto.model.developer.ApplicationDto;
 import com.ubiquity.sprocket.api.dto.model.developer.DeveloperDto;
 import com.ubiquity.sprocket.api.interceptors.DeveloperSecure;
@@ -148,6 +152,35 @@ public class DeveloperEndPoint {
 
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(developerApplication))
+				.build();
+	}
+
+	/***
+	 * 
+	 * @param developerId
+	 * @return
+	 * @throws IOException
+	 */
+	@GET
+	@Path("/{developerId}/applications")
+	public Response getApplications(@PathParam("developerId") Long developerId)
+			throws IOException {
+
+		DeveloperService developerService = ServiceFactory
+				.getDeveloperService();
+
+		List<Application> applications = new LinkedList<Application>();
+		applications = developerService
+				.getApplicationsByDeveloperID(developerId);
+		// convert each application to applicationDto :
+		ApplicationsDto applicationsDto = new ApplicationsDto();
+
+		for (Application application : applications) {
+			applicationsDto.getApplications().add(DtoAssembler.assemble(application));
+		}
+
+		return Response.ok()
+				.entity(jsonConverter.convertToPayload(applicationsDto))
 				.build();
 	}
 
