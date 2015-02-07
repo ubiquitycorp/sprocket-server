@@ -248,6 +248,14 @@ public class ContentRepositoryHBaseImpl extends BaseRepositoryHBaseImpl <Content
 		return content;
 	}
 	
+	/**
+	 * Assembles content from a get result
+	 * 
+	 * @param rowKey
+	 * @param get
+	 * 
+	 * @return a content entity loaded from the db
+	 */
 	private Content assembleContentFromGet(ContentPK rowKey, Get get) {
 		// execute query and get result back
 		Result result = getResult(get);
@@ -255,6 +263,15 @@ public class ContentRepositoryHBaseImpl extends BaseRepositoryHBaseImpl <Content
 		return assembleContentFromResult(rowKey, result);
 	}
 
+	/**
+	 * Assembles an activity from a content row key. There is an assumption that the type 
+	 * of content is an activity but there is no constraint applied to enforce this.
+	 * 
+	 * @param rowKey
+	 * @param result
+	 * 
+	 * @return activity entity
+	 */
 	private Activity assembleActivityFromResult(ContentPK rowKey, Result result) {
 
 		Activity.Builder activityBuilder = new Activity.Builder();
@@ -272,6 +289,15 @@ public class ContentRepositoryHBaseImpl extends BaseRepositoryHBaseImpl <Content
 		return activityBuilder.build();
 	}
 
+	/**
+	 * Assembles a video content entity from a content row key. There is an assumption that the type 
+	 * of content is an activity but there is no constraint applied to enforce this.
+	 * 
+	 * @param rowKey
+	 * @param result
+	 * 
+	 * @return a video content entity
+	 */
 	private VideoContent assembleVideoContentFromResult(ContentPK rowKey, Result result) {
 		VideoContent.Builder videoBuilder = new VideoContent.Builder();
 
@@ -288,6 +314,15 @@ public class ContentRepositoryHBaseImpl extends BaseRepositoryHBaseImpl <Content
 		return videoBuilder.build();
 	}
 
+	/**
+	 * Assembles a place from a content row key. There is an assumption that the type 
+	 * of content is an activity but there is no constraint applied to enforce this.
+	 * 
+	 * @param rowKey
+	 * @param result
+	 * 
+	 * @return a place entity
+	 */
 	private Place assemblePlaceFromResult(ContentPK rowKey, Result result) {
 		Place.Builder placeBuilder = new Place.Builder();
 		placeBuilder.externalIdentifier(rowKey.getIdentifier())

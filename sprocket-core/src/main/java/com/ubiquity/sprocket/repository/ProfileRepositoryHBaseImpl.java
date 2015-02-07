@@ -93,6 +93,13 @@ public class ProfileRepositoryHBaseImpl extends BaseRepositoryHBaseImpl <Profile
 		}
 	}
 
+	/**
+	 * Assembles a profile from a profile pk
+	 * 
+	 * @param id
+	 * @param get
+	 * @return
+	 */
 	private Profile assembleProfileFromGet(ProfilePK id, Get get) {
 		// execute query and get result back
 		Result result = getResult(get);
