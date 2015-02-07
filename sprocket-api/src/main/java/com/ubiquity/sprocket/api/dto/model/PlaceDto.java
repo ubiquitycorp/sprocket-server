@@ -3,6 +3,9 @@ package com.ubiquity.sprocket.api.dto.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.ubiquity.sprocket.api.dto.model.media.ImageDto;
+import com.ubiquity.sprocket.api.dto.model.social.RatingDto;
+
 
 public class PlaceDto {
 

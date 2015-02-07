@@ -32,10 +32,15 @@ import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.repository.HBaseConnectionFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
-
+/***
+ * Analytics worker is responsible for tracking events and scheduling jobs to support anaytics and the recommendation engine.
+ * 
+ * @author chris
+ *
+ */
 public class AnalyticsWorker {
 
-	private static final int DEFAULT_NUM_CONSUMERS = 2;
+	private static final int DEFAULT_NUM_CONSUMERS = 10;
 	protected static Logger log = LoggerFactory.getLogger(AnalyticsWorker.class);
 
 	public void destroy() {
@@ -46,10 +51,7 @@ public class AnalyticsWorker {
 
 		startServices(configuration, errorsConfiguration);
 
-		log.info("Service initialized.");
-
-		//startScheduler();
-		
+		log.info("Service initialized.");		
 
 		List<TrackConsumer> consumers = new LinkedList<TrackConsumer>();
 		try {			
@@ -60,7 +62,7 @@ public class AnalyticsWorker {
 			System.exit(0);
 		}
 
-		// start the thread pool, 10 consumer threads
+		// start the thread pool with 1 thread per consumer
 		ThreadPool<TrackConsumer> threadPool = new ThreadPool<TrackConsumer>();
 		threadPool.start(consumers);
 		
@@ -74,6 +76,10 @@ public class AnalyticsWorker {
 		}
 	}
 
+	/***
+	 * Returns the worker. If basic dependencies can't be met, the worker will exit.
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		final AnalyticsWorker worker = new AnalyticsWorker();
 		try {
@@ -81,13 +87,13 @@ public class AnalyticsWorker {
 					new PropertiesConfiguration("messages.properties"));
 		} catch (ConfigurationException e) {
 			log.error("Unable to configure service", e);
-			System.exit(-1);
+			System.exit(1);
 		} catch (SchedulerException e) {
 			log.error("Unable to schedule service", e);
-			System.exit(-1);
+			System.exit(1);
 		} catch (IOException e) {
 			log.error("Unable to connect to dependent service", e);
-			System.exit(-1);
+			System.exit(1);
 		}
 
 		Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -100,6 +106,13 @@ public class AnalyticsWorker {
 
 	}
 
+	/**
+	 * Initializes any connections to dependent subsystems
+	 * 
+	 * @param configuration
+	 * @param errorsConfiguration
+	 * @throws IOException
+	 */
 	private void startServices(Configuration configuration, Configuration errorsConfiguration) throws IOException {
 		ServiceFactory.initialize(configuration, errorsConfiguration);
 		JedisConnectionFactory.initialize(configuration);
@@ -107,13 +120,16 @@ public class AnalyticsWorker {
 		HBaseConnectionFactory.initialize(configuration);
 	}
 
+	/***
+	 * Cleans up connections to dependent subsystem
+	 */
 	private void stopServices() {
 		JedisConnectionFactory.destroyPool();
 		EntityManagerSupport.closeEntityManagerFactory();
 		HBaseConnectionFactory.close();
-		// TODO: we need an mq disconnect
 	}
 	
+	@SuppressWarnings("unused")
 	private void startScheduler() throws SchedulerException {
 		Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
 		scheduler.start();

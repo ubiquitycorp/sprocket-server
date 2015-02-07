@@ -11,7 +11,7 @@ import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Message;
 import com.ubiquity.integration.factory.TestMessageFactory;
-import com.ubiquity.sprocket.api.dto.model.MessageDto;
+import com.ubiquity.sprocket.api.dto.model.social.MessageDto;
 
 /***
  * Tests the routines that assemble entity object into api dto objects that have special processing or logic that needs to 

@@ -9,7 +9,6 @@ delete from favorite_item;
 #recommended
 delete from recommended_activity;
 delete from recommended_video;
-delete from engaged_item;
 delete from group_membership;
 #activities,messages and vedios 
 delete from activity ;
@@ -19,6 +18,7 @@ delete from conversation_contact;
 delete from conversation;
 delete from video_content;
 delete from event;
+delete from user_contact;
 delete from contact;
 #place
 delete from user_location;
@@ -28,4 +28,5 @@ delete from user_location;
 delete from external_identity;
 delete from native_identity;
 delete from identity;
+delete from user_location;
 delete from user;

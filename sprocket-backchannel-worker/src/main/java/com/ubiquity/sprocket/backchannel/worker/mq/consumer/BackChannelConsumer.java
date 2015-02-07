@@ -44,4 +44,11 @@ public class BackChannelConsumer extends AbstractConsumerThread {
 		}
 	}
 
+	@Override
+	protected void handleException(Throwable e) {
+		// TODO Auto-generated method stub
+		log.info("Exeception : {}", e.getMessage());
+		
+	}
+
 }

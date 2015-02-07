@@ -15,10 +15,11 @@ import com.ubiquity.integration.service.ContentService;
 import com.ubiquity.sprocket.datasync.worker.manager.DataSyncProcessor;
 import com.ubiquity.sprocket.datasync.worker.manager.ResourceType;
 import com.ubiquity.sprocket.service.ServiceFactory;
+
 /***
  * 
  * @author peter.tadros
- *
+ * 
  */
 public class VideoHandler extends Handler {
 
@@ -31,16 +32,14 @@ public class VideoHandler extends Handler {
 	protected void syncData(ExternalIdentity identity, ExternalNetwork network) {
 		Long userId = identity.getUser().getUserId();
 		int n = processVideos(identity, network);
-		
-		processor.sendStepCompletedMessageToIndividual(
-				backchannel,
-				network,
-				"Synchronized videos",
-				processor.getResoursePath(userId, network, ResourceType.videos),
-				n, userId, ResourceType.videos);
+
+		processor
+				.sendStepCompletedMessageToIndividual(backchannel, network,
+						"Synchronized videos", processor.getResoursePath(
+								userId, network, ResourceType.videos), n,
+						userId, ResourceType.videos);
 	}
-	
-	
+
 	/***
 	 * Process videos for this content provider
 	 * 
@@ -51,7 +50,7 @@ public class VideoHandler extends Handler {
 		List<VideoContent> synced = null;
 		DateTime start = new DateTime();
 		Long userId = identity.getUser().getUserId();
-		String threadName = Thread.currentThread().getName();
+		int size = -1;
 		try {
 			ContentService contentService = ServiceFactory.getContentService();
 			synced = contentService.sync(identity, network);
@@ -59,24 +58,20 @@ public class VideoHandler extends Handler {
 			// add videos to search results for this specific user
 			ServiceFactory.getSearchService()
 					.indexVideos(userId, synced, false);
-			return synced.size();
 		} catch (AuthorizationException e) {
-			ServiceFactory.getSocialService().setActiveNetworkForUser(userId,
-					network, false);
-			log.error(threadName + " Unable to sync for identity: {}",
-					identity.getIdentityId(),
-					ExceptionUtils.getRootCauseMessage(e));
-			return -1;
+			identity.setIsActive(false);
+			ServiceFactory.getExternalIdentityService().update(identity);
+			log.error(" Unable to sync for identity: {}",
+					identity.getIdentityId(), ExceptionUtils.getStackTrace(e));
 		} catch (Exception e) {
-			log.error(threadName + " Unable to sync for identity: {}",
-					identity.getIdentityId(),
-					ExceptionUtils.getRootCauseMessage(e));
-			return -1;
+			log.error(" Unable to sync for identity: {}",
+					identity.getIdentityId(), ExceptionUtils.getStackTrace(e));
 		} finally {
-			int n = (synced == null) ? -1 : synced.size();
-			log.debug(threadName
-					+ " Processed {} videos in {} seconds for user " + userId,
-					n, new Period(start, new DateTime()).getSeconds());
+			size = (synced == null) ? -1 : synced.size();
+			log.debug(" Processed {} videos in {} seconds for user " + userId,
+					size, new Period(start, new DateTime()).getSeconds());
 		}
+		
+		return size;
 	}
 }

@@ -13,18 +13,20 @@
 
 		<class>com.ubiquity.location.domain.UserLocation</class>
 		<class>com.ubiquity.sprocket.domain.GroupMembership</class>
-		
+
 		<class>com.ubiquity.sprocket.domain.RecommendedActivity</class>
 		<class>com.ubiquity.sprocket.domain.RecommendedVideo</class>
-		
+
 		<class>com.ubiquity.sprocket.domain.FavoritePlace</class>
 		<class>com.ubiquity.sprocket.domain.FavoriteItem</class>
-		
+
 		<class>com.ubiquity.integration.domain.VideoContent</class>
 		<class>com.ubiquity.identity.domain.User</class>
 		<class>com.ubiquity.identity.domain.Admin</class>
+		<class>com.ubiquity.identity.domain.Developer</class>
+		<class>com.ubiquity.identity.domain.Application</class>
 		<class>com.ubiquity.identity.domain.SecRole</class>
-		<class>com.ubiquity.identity.domain.Identity</class>
+		<class>com.ubiquity.identity.domain.Identity</class> 
 		<class>com.ubiquity.identity.domain.NativeIdentity</class>
 		<class>com.ubiquity.identity.domain.ExternalIdentity</class>
 		<class>com.ubiquity.integration.domain.Contact</class>
@@ -36,13 +38,16 @@
 		<class>com.ubiquity.integration.domain.Event</class>
 		<class>com.ubiquity.integration.domain.Comment</class>
 		<class>com.ubiquity.integration.domain.UnmappedInterest</class>
+		<class>com.ubiquity.integration.domain.UserContact</class>
 
 		<class>com.ubiquity.sprocket.domain.Configuration</class>
-		
+
+
 		<properties>
 
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
-			<property name="hibernate.connection.url" value="jdbc:mysql://${db.host}:3306/sprocket?autoReconnect=true" />
+			<property name="hibernate.connection.url"
+				value="jdbc:mysql://${db.host}:3306/sprocket?autoReconnect=true" />
 			<property name="hibernate.connection.username" value="${db.username}" />
 			<property name="hibernate.connection.password" value="${db.password}" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
@@ -54,19 +59,20 @@
 			<!-- Connection Pooling settings -->
 			<property name="hibernate.connection.provider_class"
 				value="com.niobium.repository.jpa.provider.BoneCPConnectionProvider" />
-			<property name="bonecp.idleConnectionTestPeriodInMinutes" value="1" />
-			<property name="bonecp.connectionTestStatement" value="select 1"/>
+			<property name="bonecp.idleConnectionTestPeriodInMinutes"
+				value="1" />
+			<property name="bonecp.connectionTestStatement" value="select 1" />
 			<property name="bonecp.partitionCount" value="3" />
 			<property name="bonecp.maxConnectionsPerPartition" value="10" />
 			<property name="bonecp.minConnectionsPerPartition" value="5" />
-			
+
 			<property name="bonecp.disableConnectionTracking" value="false" />
 			<property name="bonecp.closedConnectionWatch" value="true" />
-			
+
 			<property name="bonecp.statementsCacheSize" value="100" />
-			
+
 			<property name="hibernate.hbm2ddl.auto" value="${hibernate.schema.auto}" />
- 
+
 
 		</properties>
 	</persistence-unit>

@@ -11,21 +11,22 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.service.SocialService;
-import com.ubiquity.sprocket.datasync.worker.manager.DataSyncProcessor;
 import com.ubiquity.sprocket.datasync.worker.manager.ResourceType;
+import com.ubiquity.sprocket.datasync.worker.manager.SyncProcessor;
 import com.ubiquity.sprocket.service.ServiceFactory;
+
 /***
  * 
  * @author peter.tadros
- *
+ * 
  */
 public class MessageHandler extends Handler {
 
-	public MessageHandler(DataSyncProcessor processor) {
+	public MessageHandler(SyncProcessor processor) {
 		super(processor);
-		networks = EnumSet.of(
-				ExternalNetwork.Twitter, ExternalNetwork.Facebook,
-				ExternalNetwork.Google, ExternalNetwork.Tumblr);
+		networks = EnumSet.of(ExternalNetwork.Twitter,
+				ExternalNetwork.Facebook, ExternalNetwork.Google,
+				ExternalNetwork.Tumblr);
 	}
 
 	@Override
@@ -38,7 +39,7 @@ public class MessageHandler extends Handler {
 						network, ResourceType.messages), n, userId,
 				ResourceType.messages);
 	}
-	
+
 	/***
 	 * Process messages for this external network
 	 * 
@@ -51,39 +52,32 @@ public class MessageHandler extends Handler {
 		List<com.ubiquity.integration.domain.Message> synced = null;
 		DateTime start = new DateTime();
 		Long userId = identity.getUser().getUserId();
-		String threadName = Thread.currentThread().getName();
+		int size;
 		try {
 			SocialService socialService = ServiceFactory.getSocialService();
-			
+
 			synced = socialService.syncMessages(identity, network,
 					lastMessageIdentifier, processedMessages);
 
 			// add messages to search results
 			ServiceFactory.getSearchService().indexMessages(
 					identity.getUser().getUserId(), synced);
-			log.debug(threadName + " indexing messages for identity {}",
-					identity);
-			return synced.size();
+			log.debug(" indexing messages for identity {}", identity);
 		} catch (AuthorizationException e) {
-			ServiceFactory.getSocialService().setActiveNetworkForUser(userId,
-					network, false);
-			log.error(threadName
-					+ " Could not process messages for identity: {}",
-					ExceptionUtils.getRootCauseMessage(e));
-			return -1;
+			identity.setIsActive(false);
+			ServiceFactory.getExternalIdentityService().update(identity);
+			log.error(" Could not process messages for identity: {}",
+					ExceptionUtils.getStackTrace(e));
 		} catch (Exception e) {
-			log.error(threadName
-					+ " Could not process messages for identity: {}",
-					ExceptionUtils.getRootCauseMessage(e));
-			return -1;
+			log.error(" Could not process messages for identity: {}",
+					ExceptionUtils.getStackTrace(e));
 		} finally {
-			int n = (synced == null) ? -1 : synced.size();
+			size = (synced == null) ? -1 : synced.size();
 			log.debug(
-					threadName
-							+ " Processed {} messages in {} seconds for user "
-							+ userId, n,
-					new Period(start, new DateTime()).getSeconds());
+					" Processed {} messages in {} seconds for user " + userId,
+					size, new Period(start, new DateTime()).getSeconds());
 		}
+		return size;
 	}
 
 }

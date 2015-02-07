@@ -11,7 +11,7 @@ import com.niobium.amqp.MessageQueueProducer;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.SyncStatusMessage;
-import com.ubiquity.sprocket.datasync.worker.manager.DataSyncProcessor;
+import com.ubiquity.sprocket.datasync.worker.manager.SyncProcessor;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 
 /***
@@ -26,11 +26,11 @@ public abstract class Handler {
 
 	protected Logger log = LoggerFactory.getLogger(getClass());
 
-	protected DataSyncProcessor processor;
+	protected SyncProcessor processor;
 	protected MessageQueueProducer backchannel = null;
 	protected Map<String, SyncStatusMessage> processedMessages = null;
 
-	public Handler(DataSyncProcessor processor) {
+	public Handler(SyncProcessor processor) {
 		this.processor = processor;
 		processedMessages = new HashMap<String, SyncStatusMessage>();
 		// get the back channel mq; we don't want to skip sync because we can't

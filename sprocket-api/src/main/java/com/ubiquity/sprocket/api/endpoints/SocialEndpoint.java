@@ -35,16 +35,20 @@ import com.ubiquity.integration.domain.Message;
 import com.ubiquity.integration.domain.PostActivity;
 import com.ubiquity.integration.domain.PostComment;
 import com.ubiquity.integration.domain.PostVote;
+import com.ubiquity.integration.domain.UserContact;
 import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
+import com.ubiquity.sprocket.api.dto.containers.ContactsDto;
+import com.ubiquity.sprocket.api.dto.containers.ContactsSyncedDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
-import com.ubiquity.sprocket.api.dto.model.ActivityDto;
-import com.ubiquity.sprocket.api.dto.model.MessageDto;
-import com.ubiquity.sprocket.api.dto.model.PostActivityDto;
-import com.ubiquity.sprocket.api.dto.model.PostCommentDto;
-import com.ubiquity.sprocket.api.dto.model.PostVoteDto;
-import com.ubiquity.sprocket.api.dto.model.SendMessageDto;
+import com.ubiquity.sprocket.api.dto.model.social.ActivityDto;
+import com.ubiquity.sprocket.api.dto.model.social.ContactDto;
+import com.ubiquity.sprocket.api.dto.model.social.MessageDto;
+import com.ubiquity.sprocket.api.dto.model.social.PostActivityDto;
+import com.ubiquity.sprocket.api.dto.model.social.PostCommentDto;
+import com.ubiquity.sprocket.api.dto.model.social.PostVoteDto;
+import com.ubiquity.sprocket.api.dto.model.social.SendMessageDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
@@ -102,8 +106,78 @@ public class SocialEndpoint {
 			results.getActivities().add(DtoAssembler.assemble(activity));
 		}
 
-		return Response.ok().header("Last-Modified", variant.lastModified)
+		return Response.ok().header("Last-Modified", variant.getLastModified())
 				.entity(jsonConverter.convertToPayload(results)).build();
+	}
+
+	@GET
+	@Path("users/{userId}/contacts")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response contacts(@PathParam("userId") Long userId) {
+
+		// Manager will return contacts if they have been modified, else it will
+		// be empty
+		List<Contact> variant = ServiceFactory.getContactService()
+				.findContactsForActiveNetworksByOwnerId(userId);
+
+		// Convert entire list to DTO
+		ContactsDto result = new ContactsDto();
+		for (Contact contact : variant) {
+			ContactDto contactDto = DtoAssembler.assemble(contact);
+			result.getContacts().add(contactDto);
+		}
+
+		return Response.ok().entity(jsonConverter.convertToPayload(result))
+				.build();
+	}
+
+	/***
+	 * 
+	 * @param userId
+	 * @param delta
+	 * @param ifModifiedSince
+	 * @return
+	 */
+	@GET
+	@Path("users/{userId}/contacts/synced")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response syncContacts(@PathParam("userId") Long userId,
+			@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+		log.debug("Listing contacts modified since: {}", ifModifiedSince);
+
+		// Manager will return contacts if they have been modified, else it will
+		// be empty
+
+		CollectionVariant<UserContact> variant = ServiceFactory
+				.getContactService()
+				.findModifiedContactsForActiveNetworksByOwnerId(userId,
+						ifModifiedSince);
+
+		// Throw a 304 if there is no variant (no change)
+		if (variant == null) {
+			return Response.notModified().build();
+		}
+		// Convert entire list to DTO
+		ContactsSyncedDto result = new ContactsSyncedDto();
+		for (UserContact contact : variant.getCollection()) {
+
+			if (contact.IsDeleted())
+				result.getDeleted().add(contact.getContact().getContactId());
+			else {
+				ContactDto contactDto = DtoAssembler.assemble(contact
+						.getContact());
+				if (contact.getCreatedAt() > ifModifiedSince) {
+					result.getAdded().add(contactDto);
+				} else {
+					result.getUpdated().add(contactDto);
+				}
+			}
+		}
+
+		return Response.ok().header("Last-Modified", variant.getLastModified())
+				.entity(jsonConverter.convertToPayload(result)).build();
 	}
 
 	/***
@@ -148,7 +222,7 @@ public class SocialEndpoint {
 			results.getActivities().add(DtoAssembler.assemble(activity));
 		}
 
-		return Response.ok().header("Last-Modified", variant.lastModified)
+		return Response.ok().header("Last-Modified", variant.getLastModified())
 				.entity(jsonConverter.convertToPayload(results)).build();
 	}
 
@@ -398,7 +472,6 @@ public class SocialEndpoint {
 		Captcha captcha = ServiceFactory.getSocialService().requestCaptcha(
 				identity, externalNetwork);
 
-		
 		final byte[] image = captcha.getImage();
 
 		if (image != null) {

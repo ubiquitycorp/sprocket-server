@@ -40,7 +40,7 @@ public class PlacesEndpoint {
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 
 	@GET
-	@Path("/users/{userId}/Region/{region}/neighborhoods")
+	@Path("/users/{userId}/regions/{region}/neighborhoods")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response neighborhoods(@PathParam("userId") Long userId,
@@ -50,10 +50,6 @@ public class PlacesEndpoint {
 			throws IOException {
 		PlacesDto results = new PlacesDto();
 
-		// ExternalNetwork socialNetwork =
-		// ExternalNetwork.getNetworkById(socialProviderId);
-
-		// Locale localeObj = new Locale(locale);
 		CollectionVariant<Place> variant = ServiceFactory.getLocationService()
 				.getAllCitiesAndNeighborhoods(region, ifModifiedSince, delta);
 
@@ -66,12 +62,12 @@ public class PlacesEndpoint {
 					DtoAssembler.assembleCityOrNeighborhood(place));
 		}
 
-		return Response.ok().header("Last-Modified", variant.lastModified)
+		return Response.ok().header("Last-Modified", variant.getLastModified())
 				.entity(jsonConverter.convertToPayload(results)).build();
 	}
 
 	@GET
-	@Path("/users/{userId}/providers/{externalNetworkId}/location/{placeId}")
+	@Path("/users/{userId}/providers/{externalNetworkId}/places/{placeId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response placesByInterestIdAndNeighborhood(
@@ -96,7 +92,7 @@ public class PlacesEndpoint {
 	}
 
 	@GET
-	@Path("/users/{userId}/providers/{externalNetworkId}/location/current")
+	@Path("/users/{userId}/providers/{externalNetworkId}/places/current")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response placesByInterestIdAndCurrent(
@@ -112,13 +108,6 @@ public class PlacesEndpoint {
 				throw new IllegalArgumentException(
 						"User location is not available");
 			else {
-				
-				try {
-					Thread.sleep(4000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 				userLocation = ServiceFactory.getLocationService()
 						.getLocation(userId);
 				if (userLocation == null)
@@ -164,16 +153,16 @@ public class PlacesEndpoint {
 						ifModifiedSince, delta);
 		if (places == null)
 			return Response.notModified().build();
-		for (Place place : places.collection) {
+		for (Place place : places.getCollection()) {
 			results.getPlaces().add(DtoAssembler.assemble(place));
 		}
 
-		return Response.ok().header("Last-Modified", places.lastModified)
+		return Response.ok().header("Last-Modified", places.getLastModified())
 				.entity(jsonConverter.convertToPayload(results)).build();
 	}
 
 	@GET
-	@Path("/users/{userId}/providers/{providerId}/favorites/location/{placeId}")
+	@Path("/users/{userId}/providers/{providerId}/favorites/places/{placeId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response favoritesByOwnerAndProviderAndNeighborhood(
@@ -193,16 +182,16 @@ public class PlacesEndpoint {
 						externalNetwork, placeId, ifModifiedSince, delta);
 		if (places == null)
 			return Response.notModified().build();
-		for (Place place : places.collection) {
+		for (Place place : places.getCollection()) {
 			results.getPlaces().add(DtoAssembler.assemble(place));
 		}
 
-		return Response.ok().header("Last-Modified", places.lastModified)
+		return Response.ok().header("Last-Modified", places.getLastModified())
 				.entity(jsonConverter.convertToPayload(results)).build();
 	}
 
 	@GET
-	@Path("/users/{userId}/providers/{providerId}/favorites/location/current")
+	@Path("/users/{userId}/providers/{providerId}/favorites/places/current")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response favoritesByOwnerAndProviderAndCurrent(
@@ -227,11 +216,11 @@ public class PlacesEndpoint {
 						ifModifiedSince, delta);
 		if (places == null)
 			return Response.notModified().build();
-		for (Place place : places.collection) {
+		for (Place place : places.getCollection()) {
 			results.getPlaces().add(DtoAssembler.assemble(place));
 		}
 
-		return Response.ok().header("Last-Modified", places.lastModified)
+		return Response.ok().header("Last-Modified", places.getLastModified())
 				.entity(jsonConverter.convertToPayload(results)).build();
 	}
 

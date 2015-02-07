@@ -17,6 +17,11 @@ import com.ubiquity.sprocket.messaging.definition.UserEngagedVideo;
 import com.ubiquity.sprocket.service.AnalyticsService;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
+/**
+ * Track consumer reads off the track queue and stores events for analysis
+ * @author chris
+ *
+ */
 public class TrackConsumer extends AbstractConsumerThread {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
@@ -25,13 +30,18 @@ public class TrackConsumer extends AbstractConsumerThread {
 	
 	private AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
 	
+	/**
+	 * Creates a consumer thread for this channel, using a bulk read strategy
+	 * 
+	 * @param queueChannel
+	 */
 	public TrackConsumer(MessageQueueChannel queueChannel) {
 		super(queueChannel, ConsumerStrategy.Bulk);
 	}
 
 	@Override
 	public void processMessage(byte[] msg) {
-		log.info("processMessage {}", new String(msg));
+		log.debug("processMessage {}", new String(msg));
 		
 		Message message = messageConverter.deserialize(msg, Message.class);
 		if(message.getType().equals(UserEngagedVideo.class.getSimpleName())) {
@@ -53,6 +63,12 @@ public class TrackConsumer extends AbstractConsumerThread {
 	private void process(UserEngagedVideo engagedVideo) {
 		Content content = ContentFactory.createContent(engagedVideo.getVideoContent());
 		analyticsService.track(content, engagedVideo.getUserId(), System.currentTimeMillis(), null);
+	}
+
+	@Override
+	protected void handleException(Throwable e) {
+		log.error("Fatal exception", e);
+		System.exit(1);
 	}
 
 }

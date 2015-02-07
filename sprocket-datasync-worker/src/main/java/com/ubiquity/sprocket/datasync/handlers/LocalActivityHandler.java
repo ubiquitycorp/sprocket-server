@@ -11,19 +11,20 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ExternalNetwork;
-import com.ubiquity.sprocket.datasync.worker.manager.DataSyncProcessor;
 import com.ubiquity.sprocket.datasync.worker.manager.ResourceType;
+import com.ubiquity.sprocket.datasync.worker.manager.SyncProcessor;
 import com.ubiquity.sprocket.service.ServiceFactory;
+
 /***
  * 
  * @author peter.tadros
- *
+ * 
  */
 public class LocalActivityHandler extends Handler {
 
-	public LocalActivityHandler(DataSyncProcessor processor) {
+	public LocalActivityHandler(SyncProcessor processor) {
 		super(processor);
-		 networks = EnumSet.of(ExternalNetwork.Facebook);
+		networks = EnumSet.of(ExternalNetwork.Facebook);
 	}
 
 	@Override
@@ -36,37 +37,36 @@ public class LocalActivityHandler extends Handler {
 						network, ResourceType.localfeed), n, userId,
 				ResourceType.localfeed);
 	}
-	
+
 	private int processLocalActivities(ExternalIdentity identity,
 			ExternalNetwork network) {
 		List<Activity> synced = null;
 		DateTime start = new DateTime();
 		Long userId = identity.getUser().getUserId();
-		String threadName = Thread.currentThread().getName();
+		int size = -1;
 		try {
 			synced = ServiceFactory.getSocialService().syncLocalNewsFeed(
 					identity, network);
-			log.debug("{}: indexing local activities for identity {}",
-					threadName, identity);
-			return synced.size();
+			int activitiesSize =synced.size();
+			if(activitiesSize ==0){
+				activitiesSize = ServiceFactory.getSocialService().getCountOfLastLocalActivities(identity,network);
+			}
+			
 		} catch (AuthorizationException e) {
-			ServiceFactory.getSocialService().setActiveNetworkForUser(userId,
-					network, false);
-			log.error(threadName
-					+ " Unable to sync local activities for identity {}: {}",
-					identity, ExceptionUtils.getRootCauseMessage(e));
+			identity.setIsActive(false);
+			ServiceFactory.getExternalIdentityService().update(identity);
+			log.error(" Unable to sync local activities for identity {}: {}",
+					identity, ExceptionUtils.getStackTrace(e));
 			return -1;
 		} catch (Exception e) {
-			log.error(threadName
-					+ " Unable to sync local activities for identity {}: {}",
-					identity, ExceptionUtils.getRootCauseMessage(e));
-			return -1;
+			log.error(" Unable to sync local activities for identity {}: {}",
+					identity, ExceptionUtils.getStackTrace(e));
 		} finally {
-			int n = (synced == null) ? -1 : synced.size();
-			log.debug(threadName
-					+ " Processed {} local activities in {} seconds for user "
-					+ userId, n, new Period(start, new DateTime()).getSeconds());
+			size = (synced == null) ? -1 : synced.size();
+			log.debug(" Processed {} local activities in {} seconds for user "
+					+ userId, size, new Period(start, new DateTime()).getSeconds());
 		}
+		return size;
 	}
 
 }
