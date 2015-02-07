@@ -6,6 +6,12 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTable;
 
+/**
+ * Factory for managing HBase connections in a thread-safe manner
+ * 
+ * @author chris
+ *
+ */
 public class HBaseConnectionFactory {
 	
 	private static HBaseSchema schema;
@@ -17,6 +23,14 @@ public class HBaseConnectionFactory {
 		return conf;
 	}
 	
+	/***
+	 * Initializes the HBase client connection to zookeeper using the configuration
+	 * 
+	 * @param configuration
+	 * 
+	 * @throws RuntimeException if no connection could be established
+	 * 
+	 */
 	public static void initialize(Configuration configuration) {
 		
 		conf = HBaseConfiguration.create();
@@ -37,16 +51,26 @@ public class HBaseConnectionFactory {
 		
 	}
 
-	
-	public static synchronized HTable getTable(String tableName) {
+	/**
+	 * Returns a single table reference
+	 * 
+	 * @param tableName
+	 * 
+	 * @return an HTable reference
+	 */
+	public static HTable getTable(String tableName) {
 		try {
-			// TODO: here's where we check closed, or not...perhaps add in threading
+			
 			return schema.getTable(tableName);
 		} catch (IOException e) {
 			throw new RuntimeException("Could not connect to hbase table", e);
 		}
 	}
 
+	/**
+	 * Close the connections and clean up resources
+	 * 
+	 */
 	public static void close() {
 		schema.cleanup();
 	}
