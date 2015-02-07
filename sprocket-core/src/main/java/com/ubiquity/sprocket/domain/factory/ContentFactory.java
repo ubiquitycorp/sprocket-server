@@ -6,8 +6,20 @@ import com.ubiquity.media.domain.Video;
 import com.ubiquity.sprocket.domain.Content;
 import com.ubiquity.sprocket.domain.ContentPK;
 
+/**
+ *  Factory for simplifying and centralizing the creation of content entities
+ * 
+ * @author chris
+ *
+ */
 public class ContentFactory {
 
+	/**
+	 * Creates content with a content id based on the external network and identifier pair
+	 * 
+	 * @param activity
+	 * @return
+	 */
 	public static Content createContent(Activity activity) {
 		// create some public content
 		Content content = new Content.Builder()

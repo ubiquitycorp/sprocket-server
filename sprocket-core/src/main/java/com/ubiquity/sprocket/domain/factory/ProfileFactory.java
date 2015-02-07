@@ -7,6 +7,12 @@ import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.sprocket.domain.Profile;
 import com.ubiquity.sprocket.domain.ProfilePK;
 
+/***
+ *  Factory for simplifying and centralizing the creation of profile entities
+ *
+ * @author chris
+ *
+ */
 public class ProfileFactory {
 
 
