@@ -12,6 +12,13 @@ import org.apache.hadoop.hbase.ZooKeeperConnectionException;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
 
+/**
+ * Schema class for HBase exposing tables and columns for common access as well as administrative
+ * methods for creating tables
+ * 
+ * @author chris
+ *
+ */
 public class HBaseSchema {
 		
 	public static final class Tables {
@@ -19,12 +26,24 @@ public class HBaseSchema {
 		public static final String CONTENT = "content";
 	}
 	
+	/***
+	 * Column families
+	 * 
+	 * @author chris
+	 *
+	 */
 	public static final class ColumnFamilies {
 		public static final String ATTRIBUTES = "a";
 		public static final String INTERESTS = "i";
 		public static final String HISTORY = "h";
 	}
 	
+	/**
+	 * Column qualifiers
+	 * 
+	 * @author chris
+	 *
+	 */
 	public static final class Qualifiers {
 		public static final String GENDER  = "gender";
 		public static final String MIN_AGE = "min_age";
@@ -42,11 +61,27 @@ public class HBaseSchema {
 	private HBaseAdmin admin;
 	private Configuration conf;
 	
+	/***
+	 * Creates an HBase schema with a hadoop configuration
+	 * 
+	 * @param conf
+	 * @throws MasterNotRunningException
+	 * @throws ZooKeeperConnectionException
+	 * @throws IOException
+	 */
 	public HBaseSchema(Configuration conf) throws MasterNotRunningException, ZooKeeperConnectionException, IOException {
 		this.conf = conf;
 		admin = new HBaseAdmin(conf);	
 	}
 	
+	/**
+	 * Creates a table if one does not exist.  This method will validate name against the 
+	 * registered tables in {@link ccom.ubiquity.sprocket.repository.HBaseSchema.Tables}
+	 * 
+	 * @param name
+	 * @throws IOException
+	 * @throws IllegalArgumentException if the name does not match a registered table
+	 */
 	public void createTableIfNotExists(String name) throws IOException {
 		
 		if(name.equals(HBaseSchema.Tables.PROFILE)) {
@@ -77,11 +112,24 @@ public class HBaseSchema {
 		}
 	}
 
+	/**
+	 * Returns a table or creates one if it does not exist
+	 * 
+	 * @param name
+	 * 
+	 * @return a table reference
+	 * 
+	 * @throws IOException if a table could not be created
+	 * 
+	 */
 	public HTable getTable(String name) throws IOException {
 		createTableIfNotExists(name);
 		return new HTable(conf, name);		
 	}
 	
+	/**
+	 * Closes the admin connection
+	 */
 	public void cleanup() {
 		try {
 			admin.close();
