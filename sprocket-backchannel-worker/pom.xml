@@ -3,11 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>sprocket-backchannel-worker</artifactId>
 	<name>Sprocket Backchannel Worker</name>
-<<<<<<< HEAD
-	<version>0.2.3</version>
-=======
 	<version>0.1.18</version>
->>>>>>> develop
 	<parent>
 		<groupId>com.ubiquity</groupId>
 		<artifactId>sprocket-parent</artifactId>
