@@ -1,9 +1,9 @@
 package com.ubiquity.sprocket.domain;
 
-import com.ubiquity.sprocket.repository.hbase.ContentPK;
 
 /***
- * An entity tracking user engagement
+ * An entity tracking user engagement. This stores the time a user engaged with content and what group
+ * classification they received at the time, if any.
  * 
  * @author chris
  *

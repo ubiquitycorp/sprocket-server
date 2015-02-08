@@ -10,7 +10,7 @@
 	<artifactId>sprocket-core</artifactId>
 	<name>Sprocket Core</name>
 
-	<version>0.2.4</version>
+	<version>0.3.1</version>
 
 	<build>
 
@@ -74,6 +74,14 @@
 			<version>0.98.6.1-hadoop2</version>
 		</dependency>
 
+	   	<dependency>
+			<groupId>org.apache.hbase</groupId>
+			<artifactId>hbase-server</artifactId>
+			<version>0.98.6.1-hadoop2</version>
+		</dependency>
+	   
+		
+		
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-messaging</artifactId>
@@ -115,6 +123,7 @@
 			<artifactId>guava</artifactId>
 			<version>17.0</version>
 		</dependency>
+
 
 		<!-- analytics -->
 		<dependency>

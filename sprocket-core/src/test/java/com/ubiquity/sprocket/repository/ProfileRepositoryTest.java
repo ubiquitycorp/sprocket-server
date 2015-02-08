@@ -1,5 +1,6 @@
 package com.ubiquity.sprocket.repository;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.configuration.Configuration;
@@ -29,7 +30,7 @@ public class ProfileRepositoryTest {
 	@BeforeClass
 	public static void setUpServices() throws ConfigurationException {
 		Configuration config = new PropertiesConfiguration("test.properties");
-		HBaseTableConnectionFactory.initialize(config);
+		HBaseConnectionFactory.initialize(config);
 	}
 
 	@Before
@@ -39,10 +40,6 @@ public class ProfileRepositoryTest {
 		profile = TestProfileFactory
 				.createProfileAndIdentity(Math.abs(new java.util.Random().nextLong()),
 						ExternalNetwork.Facebook, Gender.Female, new AgeRange(24, 35), 34.2323232, -118.0822322);
-
-		profile.getSearchHistory().add("San Jose Sharks");
-		profile.getSearchHistory().add("Sharks");
-		profile.getSearchHistory().add("Bars San Jose");
 
 		profileRepository.create(profile);
 	}
@@ -61,7 +58,6 @@ public class ProfileRepositoryTest {
 		Assert.assertNotNull(persisted.getGender());
 		Assert.assertNotNull(persisted.getAgeRange());
 		Assert.assertEquals(persisted.getGender(), profile.getGender());
-		Assert.assertTrue(persisted.getSearchHistory().size() == 3);
 
 	}
 
@@ -79,6 +75,38 @@ public class ProfileRepositoryTest {
 		persisted = profileRepository.read(profile.getProfileId());
 		Assert.assertEquals(Gender.Female, persisted.getGender());
 		Assert.assertNotNull(persisted.getGroupMembership());
+	}
+	
+	@Test
+	public void testAddSearchTerm() {
+		String one = UUID.randomUUID().toString();
+		String two = UUID.randomUUID().toString();
+		String three = UUID.randomUUID().toString();
+
+		
+		profileRepository.addToSearchHistory(profile.getProfileId(), two);
+		profileRepository.addToSearchHistory(profile.getProfileId(), three);
+		
+		profileRepository.addToSearchHistory(profile.getProfileId(), UUID.randomUUID().toString());
+		profileRepository.addToSearchHistory(profile.getProfileId(), UUID.randomUUID().toString());
+		profileRepository.addToSearchHistory(profile.getProfileId(), UUID.randomUUID().toString());
+		profileRepository.addToSearchHistory(profile.getProfileId(), UUID.randomUUID().toString());
+		profileRepository.addToSearchHistory(profile.getProfileId(), UUID.randomUUID().toString());
+		profileRepository.addToSearchHistory(profile.getProfileId(), UUID.randomUUID().toString());
+		profileRepository.addToSearchHistory(profile.getProfileId(), UUID.randomUUID().toString());
+		
+		profileRepository.addToSearchHistory(profile.getProfileId(), one);
+		profileRepository.addToSearchHistory(profile.getProfileId(), one);
+
+		
+		// assert most searched on returns 
+		List<String> results = profileRepository.findMostSearchedOn(profile.getProfileId(), 5);
+		Assert.assertEquals(5, results.size());
+		
+		// make sure "one", which was added last, is still the first one out and the most popular
+		Assert.assertTrue(results.get(0).equals(one));
+		
+		
 	}
 
 }

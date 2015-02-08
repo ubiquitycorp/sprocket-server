@@ -24,7 +24,9 @@ $LOGGER "Available Memory: ${AVAILMEM}MB"
 $LOGGER "Running ${NUM_PROCESSES} workers each ${SPROCKET_WORKER_SIZE}MB."
 while [ $NUM_PROCESSES -gt 0 ]
 do
- $LOGGER "Launching worker ${NUM_PROCESSES} at `date`"
- $JAVA -Xmx${SPROCKET_WORKER_SIZE}m -jar ${SPROCKET_WORKER_NAME} &
+
+ echo "Launching worker ${NUM_PROCESSES} at `date`"
+ $JAVA -Xmx${SPROCKET_WORKER_INDIVIDUAL}m -cp ${SPROCKET_WORKER_NAME} com.ubiquity.sprocket.datasync.worker.DataSyncWorker &
+
  NUM_PROCESSES=`expr ${NUM_PROCESSES} - 1`
 done

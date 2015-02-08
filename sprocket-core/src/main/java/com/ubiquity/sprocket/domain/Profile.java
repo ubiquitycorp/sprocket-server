@@ -18,12 +18,11 @@ import com.ubiquity.location.domain.UserLocation;
  */
 public class Profile {
 
-	private String profileId;
+	private ProfilePK profileId;
 	private Long userId;
 	private Gender gender;
 	private AgeRange ageRange;
 	private List<Interest> interests = new LinkedList<Interest>();
-	private List<String> searchHistory = new LinkedList<String>();
 	private List<String> groupMembershipHistory = new LinkedList<String>();
 	private List<Profile> identities = new LinkedList<Profile>();
 	private UserLocation location;
@@ -40,6 +39,15 @@ public class Profile {
 				return identity;
 		}
 		return null;
+	}
+
+	
+	public ProfilePK getProfileId() {
+		return profileId;
+	}
+
+	public void setProfileId(ProfilePK profileId) {
+		this.profileId = profileId;
 	}
 
 	public String getGroupMembership() {
@@ -70,25 +78,12 @@ public class Profile {
 		return location;
 	}
 
-	/**
-	 * Setter needed to return the record id after create
-	 * 
-	 * @param profileId
-	 */
-	public void setProfileId(String profileId) {
-		this.profileId = profileId;
-	}
-
 	public void setGender(Gender gender) {
 		this.gender = gender;
 	}
 
 	public void setAgeRage(AgeRange ageRange) {
 		this.ageRange = ageRange;
-	}
-
-	public String getProfileId() {
-		return profileId;
 	}
 
 	public Long getUserId() {
@@ -103,16 +98,12 @@ public class Profile {
 		return ageRange;
 	}
 
-	public List<String> getSearchHistory() {
-		return searchHistory;
-	}
-
 	public List<Interest> getInterests() {
 		return interests;
 	}
 
 	public static class Builder {
-		private String profileId;
+		private ProfilePK profileId;
 		private Long userId;
 		private Gender gender;
 		private AgeRange ageRange;
@@ -121,7 +112,7 @@ public class Profile {
 		private String externalIdentifier;
 		private String groupMembership;
 
-		public Builder profileId(String profileId) {
+		public Builder profileId(ProfilePK profileId) {
 			this.profileId = profileId;
 			return this;
 		}
