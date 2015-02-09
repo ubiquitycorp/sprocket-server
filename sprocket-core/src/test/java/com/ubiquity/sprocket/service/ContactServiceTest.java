@@ -25,8 +25,6 @@ import com.ubiquity.integration.service.ExternalIdentityService;
 
 public class ContactServiceTest {
 	private static ContactService contactService;
-	private static ExternalIdentityService externalIdentityService;
-	private static UserService userService;
 	private static ExternalIdentity identity;
 	private static User user ;
 	@SuppressWarnings("unused")
@@ -36,17 +34,16 @@ public class ContactServiceTest {
 	public static void setUp() throws Exception {
 		Configuration config = new PropertiesConfiguration("test.properties");
 
-		contactService = new ContactService(config);
-		externalIdentityService = new ExternalIdentityService(config);
-		userService = new UserService(config);
+		
 
 		JedisConnectionFactory.initialize(config);
 		ServiceFactory.initialize(config, null);
 		SocialAPIFactory.initialize(config);
-
+		
+		contactService = ServiceFactory.getContactService();
 		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-		userService.create(user);
-		List<ExternalIdentity> externalIdentities = externalIdentityService.createOrUpdateExternalIdentity(user, UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), ClientPlatform.WEB, ExternalNetwork.Facebook, 3600L);
+		ServiceFactory.getUserService().create(user);
+		List<ExternalIdentity> externalIdentities = ServiceFactory.getExternalIdentityService().createOrUpdateExternalIdentity(user, UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), ClientPlatform.WEB, ExternalNetwork.Facebook, 3600L);
 		identity = externalIdentities.get(0);
 
 	}
