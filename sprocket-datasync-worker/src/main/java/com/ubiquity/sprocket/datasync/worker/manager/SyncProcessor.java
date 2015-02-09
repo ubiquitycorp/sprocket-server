@@ -227,12 +227,12 @@ public abstract class SyncProcessor {
 			ResourceType resource) {
 		StringBuilder resourcePath = new StringBuilder();
 		if (resource.equals(ResourceType.videos))
-			resourcePath.append("/content/users/").append(userId);
+			resourcePath.append("/content/users/").append(userId).append("/");
 		else
-			resourcePath.append("/social/users/").append(userId);
+			resourcePath.append("/social/users/").append(userId).append("/");
 		
 		if (!resource.equals(ResourceType.contacts))
-			resourcePath.append("/providers/")
+			resourcePath.append("providers/")
 					.append(externalNetwork.ordinal()).append("/");
 		
 		resourcePath.append(resource.getEndpointName());
