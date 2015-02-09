@@ -80,6 +80,7 @@ public class DtoAssembler {
 								.getExternalIdentifier());
 
 		// set optional fields
+		activityBuilder.activityId(activityDto.getActivityId());
 		activityBuilder.title(activityDto.getTitle());
 		activityBuilder.body(activityDto.getBody());
 		activityBuilder.link(activityDto.getLink());
