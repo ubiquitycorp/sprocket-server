@@ -1,11 +1,18 @@
 package com.ubiquity.sprocket.repository;
 
+import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import com.ubiquity.integration.domain.AgeRange;
 import com.ubiquity.integration.domain.Gender;
 import com.ubiquity.sprocket.domain.Profile;
+import com.ubiquity.sprocket.domain.ProfilePK;
 
 public class ProfileRepositoryHBaseImpl extends BaseRepositoryHBaseImpl <Profile> implements ProfileRepository {
 
@@ -32,14 +40,14 @@ public class ProfileRepositoryHBaseImpl extends BaseRepositoryHBaseImpl <Profile
 	@Override
 	public void create(Profile profile) {
 		try {
-			Put put = new Put(Bytes.toBytes(profile.getProfileId()));
+			Put put = new Put(Bytes.toBytes(profile.getProfileId().toString()));
 			loadProfileIntoPut(put, profile);
 			put(put);
 
 			// if we have identities, store them
 			List<Profile> identities = profile.getIdentities();
 			for(Profile identity : identities) {
-				put = new Put(Bytes.toBytes(identity.getProfileId()));
+				put = new Put(Bytes.toBytes(identity.getProfileId().toString()));
 				loadProfileIntoPut(put, identity);
 				put(put);
 			}
@@ -70,25 +78,29 @@ public class ProfileRepositoryHBaseImpl extends BaseRepositoryHBaseImpl <Profile
 		if(profile.getGroupMembership() != null)
 			addValue(put, HBaseSchema.ColumnFamilies.ATTRIBUTES, HBaseSchema.Qualifiers.GROUP_MEMBERSHIP, profile.getGroupMembership());
 
-		addValue(put, HBaseSchema.ColumnFamilies.HISTORY, HBaseSchema.Qualifiers.SEARCH, profile.getSearchHistory());
 	}
 
 	@Override
-	public Profile read(String id) {
+	public Profile read(ProfilePK profileId) {
 
 		try {
-			Get get = new Get(Bytes.toBytes(id));
-			get.addFamily(Bytes.toBytes(HBaseSchema.ColumnFamilies.ATTRIBUTES));
-			get.addFamily(Bytes.toBytes(HBaseSchema.ColumnFamilies.HISTORY));
-			
-			return assembleProfileFromGet(id, get);
+			Get get = new Get(Bytes.toBytes(profileId.toString()));
+			get.addFamily(Bytes.toBytes(HBaseSchema.ColumnFamilies.ATTRIBUTES));			
+			return assembleProfileFromGet(profileId, get);
 			
 		} finally {
 			close();
 		}
 	}
 
-	private Profile assembleProfileFromGet(String id, Get get) {
+	/**
+	 * Assembles a profile from a profile pk
+	 * 
+	 * @param id
+	 * @param get
+	 * @return
+	 */
+	private Profile assembleProfileFromGet(ProfilePK id, Get get) {
 		// execute query and get result back
 		Result result = getResult(get);
 
@@ -113,12 +125,6 @@ public class ProfileRepositoryHBaseImpl extends BaseRepositoryHBaseImpl <Profile
 		profileBuilder.groupMembership(groupMembership);
 		
 		Profile profile = profileBuilder.build();
-
-		// now do collections
-		String[] searchHistory = getStringValues(result, HBaseSchema.ColumnFamilies.HISTORY, HBaseSchema.Qualifiers.SEARCH);
-		if(searchHistory != null)
-			profile.getSearchHistory().addAll(Arrays.asList(searchHistory));
-		
 		return profile;
 	}
 
@@ -131,5 +137,57 @@ public class ProfileRepositoryHBaseImpl extends BaseRepositoryHBaseImpl <Profile
 	public Profile updateAndSelect(Profile obj) {
 		throw new UnsupportedOperationException();
 	}
+
+	@Override
+	public void addToSearchHistory(ProfilePK pk, String searchTerm) {
+		String qualifier = HBaseSchema.Qualifiers.PREFIX_SEARCH_TERM + "-" + searchTerm;
+		try {
+			incrementValue(pk.toString(), HBaseSchema.ColumnFamilies.HISTORY, qualifier, 1l);
+		} finally {
+			close();
+		}
+	}
+
+	@Override
+	public List<String> findMostSearchedOn(ProfilePK pk, Integer n) {
+
+		String[] mostSearchedOn = new String[n];
+		Long[] highestValues = new Long[n];
+		Arrays.fill(highestValues, 0l);
+		
+		Scan scan = createScanWithPrefixFilter(pk.toString(), HBaseSchema.ColumnFamilies.HISTORY, HBaseSchema.Qualifiers.PREFIX_SEARCH_TERM);
+		try {
+			ResultScanner rs = getTable().getScanner(scan);
+			for (Result r = rs.next(); r != null; r = rs.next()) {
+				Long count = new Long(0); // start counter for this profile
+				for (Cell cell : r.rawCells()) {
+					count += new BigInteger(cell.getValueArray()).longValue(); // count the number of times something was hig
+					for(int i = 0; i < highestValues.length; i++) {
+						if(count > highestValues[i]) {
+							highestValues[i] = count;
+							mostSearchedOn[i] = new String(CellUtil.cloneQualifier(cell)).split("-", 2)[1];
+							count = new Long(0);
+							break;
+						}
+					}
+				}
+			}
+			rs.close();
+
+		} catch (IOException e) {
+			throw new RuntimeException("Could not scan row", e);
+		}
+		
+		List<String> results = new LinkedList<String>();
+		for(int i = 0; i < mostSearchedOn.length;i++) {
+			String searchTerm = mostSearchedOn[i];
+			if(searchTerm != null)
+				results.add(searchTerm);
+		}
+		return results;
+		
+	}
+	
+	
 
 }

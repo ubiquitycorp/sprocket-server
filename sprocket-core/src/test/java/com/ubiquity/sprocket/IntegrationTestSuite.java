@@ -11,7 +11,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
-import com.ubiquity.sprocket.service.AnalyticsServiceTest;
+import com.ubiquity.sprocket.repository.HBaseConnectionFactory;
 
 /***
  * Test suite will ensure that the integration tests have their dependencies met and cleaned up
@@ -19,11 +19,11 @@ import com.ubiquity.sprocket.service.AnalyticsServiceTest;
  * @author chris
  *
  */
-@Ignore
 @RunWith(Suite.class)
 @SuiteClasses({ 
-	AnalyticsServiceTest.class
+	
 	})
+@Ignore
 public class IntegrationTestSuite {
 	
 	@AfterClass
@@ -38,5 +38,7 @@ public class IntegrationTestSuite {
 		Configuration configuration = new PropertiesConfiguration("test.properties");
 		// Start a connection pool to redis
 		JedisConnectionFactory.initialize(configuration);
+		HBaseConnectionFactory.initialize(configuration);;
+
 	}
 }
