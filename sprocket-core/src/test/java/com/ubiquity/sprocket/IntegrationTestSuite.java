@@ -4,15 +4,16 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.sprocket.repository.HBaseConnectionFactory;
 import com.ubiquity.sprocket.service.ContactServiceTest;
+import com.ubiquity.sprocket.service.ServiceFactory;
 
 /***
  * Test suite will ensure that the integration tests have their dependencies met and cleaned up
@@ -38,7 +39,9 @@ public class IntegrationTestSuite {
 		Configuration configuration = new PropertiesConfiguration("test.properties");
 		// Start a connection pool to redis
 		JedisConnectionFactory.initialize(configuration);
-		HBaseConnectionFactory.initialize(configuration);;
+		HBaseConnectionFactory.initialize(configuration);
+		ServiceFactory.initialize(configuration, null);
+		SocialAPIFactory.initialize(configuration);
 
 	}
 }
