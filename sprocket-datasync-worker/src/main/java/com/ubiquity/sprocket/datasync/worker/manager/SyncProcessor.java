@@ -233,9 +233,9 @@ public abstract class SyncProcessor {
 		
 		if (!resource.equals(ResourceType.contacts))
 			resourcePath.append("/providers/")
-					.append(externalNetwork.ordinal()).append("/");
+					.append(externalNetwork.ordinal());
 		
-		resourcePath.append(resource.getEndpointName());
+		resourcePath.append("/").append(resource.getEndpointName());
 		return resourcePath.toString();
 	}
 }
