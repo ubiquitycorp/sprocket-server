@@ -3,6 +3,7 @@ package com.ubiquity.sprocket.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import org.junit.Assert;
@@ -20,7 +21,9 @@ import com.ubiquity.integration.domain.Message;
 import com.ubiquity.integration.domain.SyncStatusMessage;
 import com.ubiquity.integration.factory.TestPlaceFactory;
 import com.ubiquity.integration.service.SocialService;
+import com.ubiquity.location.domain.Location;
 import com.ubiquity.location.domain.Place;
+import com.ubiquity.location.domain.UserLocation;
 
 public class SocialServiceTest {
 
@@ -43,28 +46,81 @@ public class SocialServiceTest {
 		identity = externalIdentities.get(0);
 
 	}
-	
+
 	@Test
 	public void SyncMessages() {
-		// sync Facebook friends from sprocket mock network 
+		// sync Facebook messages from sprocket mock network
 		Map<String, SyncStatusMessage> processedMessages = new HashMap<String, SyncStatusMessage>();
-		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(identity.getExternalNetwork());
-		List<Message> messages =socialService.syncMessages(identity, externalNetwork, null, processedMessages);
+		ExternalNetwork externalNetwork = ExternalNetwork
+				.getNetworkById(identity.getExternalNetwork());
+		List<Message> messages = socialService.syncMessages(identity,
+				externalNetwork, null, processedMessages);
 		Assert.assertFalse(messages.isEmpty());
 		// find Contacts for user
-		CollectionVariant<Message> messagesCollections =socialService.findMessagesByOwnerIdAndSocialNetwork(user.getUserId(), externalNetwork, 1L, false);
+		CollectionVariant<Message> messagesCollections = socialService
+				.findMessagesByOwnerIdAndSocialNetwork(user.getUserId(),
+						externalNetwork, 1L, false);
 		Assert.assertFalse(messagesCollections.getCollection().isEmpty());
 	}
-	
+
 	@Test
 	public void SyncActivities() {
-		// sync Facebook friends from sprocket mock network 
-		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(identity.getExternalNetwork());
-		List<Activity> activities =socialService.syncActivities(identity, externalNetwork);
+		// sync Facebook activities from sprocket mock network
+		ExternalNetwork externalNetwork = ExternalNetwork
+				.getNetworkById(identity.getExternalNetwork());
+		List<Activity> activities = socialService.syncActivities(identity,
+				externalNetwork);
 		Assert.assertFalse(activities.isEmpty());
 		// find Contacts for user
-		CollectionVariant<Activity> activitiesCollections =socialService.findActivityByOwnerIdAndSocialNetwork(user.getUserId(), externalNetwork, 1L, false);
+		CollectionVariant<Activity> activitiesCollections = socialService
+				.findActivityByOwnerIdAndSocialNetwork(user.getUserId(),
+						externalNetwork, 1L, false);
 		Assert.assertFalse(activitiesCollections.getCollection().isEmpty());
 	}
-	
+
+	@Test
+	public void AddUserLocationAndSyncLocalActivities() {
+		// sync Local Facebook Local activities from sprocket mock network
+		ExternalNetwork externalNetwork = ExternalNetwork
+				.getNetworkById(identity.getExternalNetwork());
+		Place losAngeles = TestPlaceFactory
+				.createLosAngelesAndNeighborhoodsAndBusiness();
+		Place neighbourhood = ((Place)losAngeles.getChildren().toArray()[0]);
+		ServiceFactory.getLocationService().create(losAngeles);
+		UserLocation userLocation = new UserLocation.Builder()
+				.user(user)
+				.location(
+						new Location.Builder()
+								.latitude(
+										losAngeles.getBoundingBox().getCenter()
+												.getLongitude())
+								.longitude(
+										losAngeles.getBoundingBox().getCenter()
+												.getLongitude())
+								.altitude(
+										losAngeles.getBoundingBox().getCenter()
+												.getAltitude()).build())
+				.timestamp(System.currentTimeMillis())
+				.lastUpdated(System.currentTimeMillis())
+				.horizontalAccuracy(new Random().nextDouble())
+				.verticalAccuracy(new Random().nextDouble()).build();
+		// Get nearest place to the new user's location
+		Place nearestPlace = ServiceFactory.getLocationService()
+				.getClosestNeighborhoodIsWithin(userLocation.getLocation());
+		userLocation.setNearestPlace(nearestPlace);
+		
+		Assert.assertEquals(neighbourhood.getPlaceId(), nearestPlace.getPlaceId());
+		// this will update the user's location in the SQL data store
+		ServiceFactory.getLocationService().updateLocation(userLocation);
+		
+		List<Activity> activities = socialService.syncLocalNewsFeed(identity,
+				externalNetwork,false);
+		Assert.assertFalse(activities.isEmpty());
+		// find Contacts for user
+		CollectionVariant<Activity> activitiesCollections = socialService
+				.findActivityByPlaceIdAndSocialNetwork(neighbourhood.getPlaceId(),
+						externalNetwork, 1L, false);
+		Assert.assertFalse(activitiesCollections.getCollection().isEmpty());
+	}
+
 }

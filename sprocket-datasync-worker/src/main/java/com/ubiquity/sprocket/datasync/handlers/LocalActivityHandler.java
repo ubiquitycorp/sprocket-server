@@ -46,7 +46,7 @@ public class LocalActivityHandler extends Handler {
 		int size = -1;
 		try {
 			synced = ServiceFactory.getSocialService().syncLocalNewsFeed(
-					identity, network);
+					identity, network,true);
 			int activitiesSize =synced.size();
 			if(activitiesSize ==0){
 				activitiesSize = ServiceFactory.getSocialService().getCountOfLastLocalActivities(identity,network);

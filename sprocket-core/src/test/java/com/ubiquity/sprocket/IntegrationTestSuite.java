@@ -13,30 +13,33 @@ import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.sprocket.repository.HBaseConnectionFactory;
 import com.ubiquity.sprocket.service.ContactServiceTest;
+import com.ubiquity.sprocket.service.ContentServiceTest;
 import com.ubiquity.sprocket.service.ServiceFactory;
+import com.ubiquity.sprocket.service.SocialServiceTest;
 
 /***
- * Test suite will ensure that the integration tests have their dependencies met and cleaned up
+ * Test suite will ensure that the integration tests have their dependencies met
+ * and cleaned up
  * 
  * @author chris
- *
+ * 
  */
 @RunWith(Suite.class)
-@SuiteClasses({ 
-	ContactServiceTest.class
-	})
+@SuiteClasses({ ContactServiceTest.class, SocialServiceTest.class,
+		ContentServiceTest.class })
 public class IntegrationTestSuite {
-	
+
 	@AfterClass
 	public static void tearDown() throws Exception {
 		// Close the pool for redis and and sql
 		JedisConnectionFactory.destroyPool();
 		EntityManagerSupport.closeEntityManagerFactory();
 	}
-	
+
 	@BeforeClass
 	public static void setUpDependencies() throws Exception {
-		Configuration configuration = new PropertiesConfiguration("test.properties");
+		Configuration configuration = new PropertiesConfiguration(
+				"test.properties");
 		// Start a connection pool to redis
 		JedisConnectionFactory.initialize(configuration);
 		HBaseConnectionFactory.initialize(configuration);
