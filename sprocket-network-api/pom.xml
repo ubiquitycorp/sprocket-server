@@ -7,7 +7,7 @@
 	<version>0.0.2</version>
 	<!-- Note, parameterize this -->
 	<properties>
-		<app.home>/var/lib/tomcat7/webapps/sprocket-api</app.home>
+		<app.home>/var/lib/tomcat7/webapps/sprocket-network-api</app.home>
 	</properties>
 
 	<!-- turns on resource filtering -->
@@ -84,7 +84,7 @@
 							<directory>${app.home}</directory>
 							<sources>
 								<source>
-									<location>target/sprocket-api</location>
+									<location>target/sprocket-network-api</location>
 								</source>
 							</sources>
 						</mapping>
