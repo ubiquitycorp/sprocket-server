@@ -6,7 +6,7 @@
 	<groupId>com.ubiquity</groupId>
 	<artifactId>sprocket-parent</artifactId>
 	<name>Sprocket Parent</name>
-	<version>0.1</version>
+	<version>0.2</version>
 	<packaging>pom</packaging>
 
 
@@ -51,13 +51,7 @@
 	</dependencies>
 
 	<modules>
-        <module>../sprocket-api</module>
-		<module>../sprocket-core</module>
-		<module>../sprocket-datasync-worker</module>
-		<module>../sprocket-analytics-worker</module>
-		<module>../sprocket-location-worker</module>
-		<module>../sprocket-backchannel-worker</module>
-		
+        	<module>../sprocket-network-api</module>
 	</modules>
 
 </project>
