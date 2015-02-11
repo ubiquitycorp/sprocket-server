@@ -3,15 +3,19 @@ package com.ubiquity.sprocket.service;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.niobium.repository.CollectionVariant;
+import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
+import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.integration.service.ContentService;
@@ -24,7 +28,14 @@ public class ContentServiceTest {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-
+		Configuration configuration = new PropertiesConfiguration(
+				"test.properties");
+		// Start a connection pool to redis
+		JedisConnectionFactory.initialize(configuration);
+		//HBaseConnectionFactory.initialize(configuration);
+		ServiceFactory.initialize(configuration, null);
+		SocialAPIFactory.initialize(configuration);
+		
 		contentService = ServiceFactory.getContentService();
 		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 		ServiceFactory.getUserService().create(user);
