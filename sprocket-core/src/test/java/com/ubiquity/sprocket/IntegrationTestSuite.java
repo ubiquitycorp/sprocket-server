@@ -11,7 +11,6 @@ import org.junit.runners.Suite.SuiteClasses;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.integration.api.SocialAPIFactory;
-import com.ubiquity.sprocket.repository.HBaseConnectionFactory;
 import com.ubiquity.sprocket.service.ContactServiceTest;
 import com.ubiquity.sprocket.service.ContentServiceTest;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -42,7 +41,7 @@ public class IntegrationTestSuite {
 				"test.properties");
 		// Start a connection pool to redis
 		JedisConnectionFactory.initialize(configuration);
-		HBaseConnectionFactory.initialize(configuration);
+		//HBaseConnectionFactory.initialize(configuration);
 		ServiceFactory.initialize(configuration, null);
 		SocialAPIFactory.initialize(configuration);
 
