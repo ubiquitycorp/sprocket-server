@@ -84,7 +84,7 @@
 							<directory>${app.home}</directory>
 							<sources>
 								<source>
-									<location>target/sprocket-api</location>
+									<location>target/sprocket-network-api</location>
 								</source>
 							</sources>
 						</mapping>
