@@ -3,6 +3,7 @@ package com.ubiquity.sprocket.datasync.worker.manager;
 import java.io.IOException;
 import java.util.Set;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.slf4j.Logger;
@@ -111,7 +112,7 @@ public abstract class SyncProcessor {
 						processSync(externalIdentity);
 
 				} catch (Exception ex) {
-					log.error(ex.getMessage());
+					log.error(ExceptionUtils.getStackTrace(ex));
 				}
 			}
 		}
