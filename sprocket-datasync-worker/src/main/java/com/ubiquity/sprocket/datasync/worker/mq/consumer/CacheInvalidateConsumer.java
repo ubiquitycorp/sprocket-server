@@ -74,9 +74,8 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 					UserFavoritePlace.class.getSimpleName()))
 				process((UserFavoritePlace) message.getContent());
 		} catch (Exception e) {
-			log.error(
-					Thread.currentThread().getName()
-							+ " Could not process, message: {}, root cause message: {}",
+			log.error("Cache Invalidate Consumer Stopped");
+			log.error("Could not process, message: {}, root cause message: {}",
 					ExceptionUtils.getMessage(e),
 					ExceptionUtils.getFullStackTrace(e));
 			//e.printStackTrace();
