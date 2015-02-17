@@ -19,12 +19,12 @@ delete from conversation;
 delete from video_content;
 delete from event;
 delete from user_contact;
-delete from contact;
 #place
 delete from user_location;
 #delete from place where parent_id is not null;
 #identities and users
 
+delete from contact;
 delete from external_identity;
 delete from native_identity;
 delete from identity;
