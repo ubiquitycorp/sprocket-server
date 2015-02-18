@@ -57,10 +57,10 @@ public class ContactHandler extends Handler {
 			identity.setIsActive(false);
 			ServiceFactory.getExternalIdentityService().update(identity);
 			log.error(" Could not process contacts for identity: {}",
-					ExceptionUtils.getStackTrace(e));
+					ExceptionUtils.getStackTrace(e), identity);
 		} catch (Exception e) {
 			log.error("{}: Could not process contacts for identity: {}",
-					ExceptionUtils.getStackTrace(e));
+					ExceptionUtils.getStackTrace(e), identity);
 		} finally {
 			size = (synced == null) ? -1 : synced.size();
 			log.debug(

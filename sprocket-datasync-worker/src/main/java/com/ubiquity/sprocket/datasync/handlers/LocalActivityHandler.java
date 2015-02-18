@@ -55,11 +55,11 @@ public class LocalActivityHandler extends Handler {
 		} catch (AuthorizationException e) {
 			identity.setIsActive(false);
 			ServiceFactory.getExternalIdentityService().update(identity);
-			log.error(" Unable to sync local activities for identity {}: {}",
+			log.error("Unable to sync local activities for identity {}: {}",
 					identity, ExceptionUtils.getStackTrace(e));
 			return -1;
 		} catch (Exception e) {
-			log.error(" Unable to sync local activities for identity {}: {}",
+			log.error("Unable to sync local activities for identity {}: {}",
 					identity, ExceptionUtils.getStackTrace(e));
 		} finally {
 			size = (synced == null) ? -1 : synced.size();

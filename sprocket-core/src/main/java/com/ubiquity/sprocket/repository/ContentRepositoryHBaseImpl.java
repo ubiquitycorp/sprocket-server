@@ -69,11 +69,6 @@ public class ContentRepositoryHBaseImpl extends BaseRepositoryHBaseImpl <Content
 	}
 
 	@Override
-	public Content updateAndSelect(Content content) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public void addUserEngagement(UserEngagement engagement) {
 		String qualifier = HBaseSchema.Qualifiers.PREFIX_ENGAGED + "-" + engagement.getGroupMembership() + "-" +
 				engagement.getUserId().toString();
