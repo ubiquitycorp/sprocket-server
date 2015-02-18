@@ -43,7 +43,7 @@ public class ProfilePK implements Serializable {
 	
 	@Override
 	public String toString() {
-		return externalNetwork == null ? COMPOSITE_KEY_PREFIX_INTERNAL_NETWORK + "-" + userId : externalNetwork.name() + "-" + userId;
+		return externalNetwork == null ? userId + "-" + COMPOSITE_KEY_PREFIX_INTERNAL_NETWORK  : userId + "-" + externalNetwork.name() ;
 	}
 	
 	

@@ -66,10 +66,10 @@ public class MessageHandler extends Handler {
 		} catch (AuthorizationException e) {
 			identity.setIsActive(false);
 			ServiceFactory.getExternalIdentityService().update(identity);
-			log.error(" Could not process messages for identity: {}",
-					ExceptionUtils.getStackTrace(e));
+			log.error("Could not process messages for identity {}: {}",
+					identity, ExceptionUtils.getStackTrace(e));
 		} catch (Exception e) {
-			log.error(" Could not process messages for identity: {}",
+			log.error("Could not process messages for identity: {}", identity,
 					ExceptionUtils.getStackTrace(e));
 		} finally {
 			size = (synced == null) ? -1 : synced.size();

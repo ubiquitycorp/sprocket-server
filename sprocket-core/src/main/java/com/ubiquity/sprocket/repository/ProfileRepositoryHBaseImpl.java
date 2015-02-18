@@ -134,11 +134,6 @@ public class ProfileRepositoryHBaseImpl extends BaseRepositoryHBaseImpl <Profile
 	}
 
 	@Override
-	public Profile updateAndSelect(Profile obj) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public void addToSearchHistory(ProfilePK pk, String searchTerm) {
 		String qualifier = HBaseSchema.Qualifiers.PREFIX_SEARCH_TERM + "-" + searchTerm;
 		try {
