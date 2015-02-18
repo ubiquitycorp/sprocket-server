@@ -90,6 +90,7 @@
 				</social.reddit.web.userAgent>
 				<social.reddit.installed.userAgent>andriod:com.ubiquiy.sprocketDevMobile:v1.0.1 (by /u/ubiquitybc)
 				</social.reddit.installed.userAgent>
+				<social.reddit.redirectUI>http://local.sprocket.com?nw=reddit</social.reddit.redirectUI>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
 				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
@@ -236,7 +237,8 @@
 				</social.reddit.web.userAgent>
 				<social.reddit.installed.userAgent>andriod:com.ubiquiy.sprocketQAMobile:v1.0.2 (by /u/ubiquitybc)
 				</social.reddit.installed.userAgent>
-
+				<social.reddit.redirectUI>http://sprocket-qa.ubiquitycorp.com?nw=reddit</social.reddit.redirectUI>
+				
 				<constants.resetUrl>http://sprocket-qa.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>
 				<db.pool.maxActive>50</db.pool.maxActive>
@@ -383,6 +385,7 @@
 				</social.reddit.web.userAgent>
 				<social.reddit.installed.userAgent>andriod:com.ubiquiy.sprocketStageMobile:v1.0.1 (by /u/ubiquitybc)
 				</social.reddit.installed.userAgent>
+				<social.reddit.redirectUI>http://sprocket-web-stage.ubiquitycorp.com?nw=reddit</social.reddit.redirectUI>
 
 				<constants.resetUrl>sprocket-web-stage.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>
