@@ -13,6 +13,7 @@ import com.niobium.amqp.MessageQueueProducer;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.service.SocialService;
 import com.ubiquity.messaging.MessageConverter;
@@ -105,12 +106,20 @@ public abstract class SyncProcessor {
 
 					SocialService socialService = ServiceFactory
 							.getSocialService();
+					if(!externalIdentity.getIsActive())
+						continue;
 					socialService
 							.checkValidityOfExternalIdentity(externalIdentity);
 
 					if (externalIdentity.getIsActive())
 						processSync(externalIdentity);
 
+				} catch (AuthorizationException e) {
+					identity.setIsActive(false);
+					ServiceFactory.getExternalIdentityService()
+							.update((ExternalIdentity) identity);
+					log.error("set identity {} to not active because: {}",identity, ExceptionUtils.getStackTrace(e));
+					return -1;
 				} catch (Exception ex) {
 					log.error(ExceptionUtils.getStackTrace(ex));
 				}
@@ -231,11 +240,10 @@ public abstract class SyncProcessor {
 			resourcePath.append("/content/users/").append(userId).append("/");
 		else
 			resourcePath.append("/social/users/").append(userId).append("/");
-		
+
 		if (!resource.equals(ResourceType.contacts))
-			resourcePath.append("providers/")
-					.append(externalNetwork.ordinal());
-		
+			resourcePath.append("providers/").append(externalNetwork.ordinal());
+
 		resourcePath.append("/").append(resource.getEndpointName());
 		return resourcePath.toString();
 	}
