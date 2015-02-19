@@ -387,7 +387,7 @@
 				</social.reddit.installed.userAgent>
 				<social.reddit.redirectUI>http://sprocket-web-stage.ubiquitycorp.com?nw=reddit</social.reddit.redirectUI>
 
-				<constants.resetUrl>sprocket-web-stage.ubiquitycorp.com/#/reset?token=
+				<constants.resetUrl>http://sprocket-web-stage.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
@@ -519,7 +519,7 @@
 				<social.reddit.installed.userAgent>andriod:com.ubiquiy.sprocketMobile:v1.0.1 (by /u/ubiquitybc)
 				</social.reddit.installed.userAgent>
 
-				<constants.resetUrl>sprocket-web-prod.ubiquitycorp.com/#/reset?token=
+				<constants.resetUrl>http://sprocket-web-prod.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
@@ -653,7 +653,7 @@
 				<social.reddit.userAgent>minashafik/1.0 by sprocketVM
 				</social.reddit.userAgent>
 
-				<constants.resetUrl>sprocket-web-prod.ubiquitycorp.com/#/reset?token=
+				<constants.resetUrl>http://sprocket-web-prod.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
@@ -783,7 +783,7 @@
 				</content.vimeo.mobile.clientId>
 				<content.vimeo.mobile.clientSecret>6814eea3b1195e9f8cd81688481c76688fea1120
 				</content.vimeo.mobile.clientSecret>
-				<constants.resetUrl>swisscom.ubiquitycorp.com/#/reset?token=
+				<constants.resetUrl>http://swisscom.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>
 				<yelp.consumerKey>mnm5G8XclwYIwbED8HV4EQ</yelp.consumerKey>
 				<yelp.consumerSecret>3X5_IqGMVRE9dwb_pxV23FxS68k
