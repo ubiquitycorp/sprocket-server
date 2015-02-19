@@ -41,6 +41,15 @@ public class ApplicationDto {
 	public String getAppSecret() {
 		return appSecret;
 	}
+	
+	public Long getCreatedAt() {
+		return createdAt;
+	}
+
+	public Long getLastUpdated() {
+		return lastUpdated;
+	}
+
 
 	public static class Builder {
 
