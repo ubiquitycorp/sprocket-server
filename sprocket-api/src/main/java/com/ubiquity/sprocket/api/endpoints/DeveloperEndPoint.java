@@ -183,5 +183,31 @@ public class DeveloperEndPoint {
 				.entity(jsonConverter.convertToPayload(applicationsDto))
 				.build();
 	}
+	
+	/***
+	 * 
+	 * @param developerId
+	 * @param applicationId
+	 * @return
+	 * @throws IOException
+	 */
+	@GET
+	@Path("/{developerId}/applications/{applicationId}")
+	public Response getApplications(@PathParam("developerId") Long developerId,@PathParam("applicationId") Long applicationId)
+			throws IOException {
+	
+		DeveloperService developerService = ServiceFactory
+				.getDeveloperService();
+	Application application ;
+	application = developerService.getApplicationByApplicationId(developerId,applicationId);
+	
+	ApplicationsDto applicationsDto = new ApplicationsDto();
+	applicationsDto.getApplications().add(DtoAssembler.assemble(application));
+	
+	return Response.ok()
+			.entity(jsonConverter.convertToPayload(applicationsDto))
+			.build();
+		
+	}
 
 }
