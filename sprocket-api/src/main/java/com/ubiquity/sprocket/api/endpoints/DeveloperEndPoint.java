@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.ubiquity.integration.api.exception.AuthorizationException;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -225,6 +226,7 @@ public class DeveloperEndPoint {
 	@Path("/{developerId}/applications/{applicationId}/external_apps/created")
 	@DeveloperSecure
 	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createExternalApplication(InputStream payload,
 			@PathParam("developerId") Long developerId,
 			@PathParam("applicationId") Long applicationId) throws IOException {
@@ -240,8 +242,8 @@ public class DeveloperEndPoint {
 				externalAppDto.getConsumerSecret(), externalAppDto.getApiKey(),
 				externalAppDto.getToken(), externalAppDto.getTokenSecret(),
 				externalAppDto.getUserAgent(), externalAppDto.getRedirectURL(),
-				externalAppDto.getExternalNetwork(),
-				externalAppDto.getClientPlatform(), application);
+				externalAppDto.getExternalNetworkId(),
+				externalAppDto.getClientPlatformId(), application);
 
 		return Response.ok().build();
 	}
