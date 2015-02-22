@@ -24,7 +24,7 @@ public class ExternalApplicationDto {
 
 	private String userAgent;
 
-	private String redirectURL;
+	private String redirectUrl;
 
 	public Integer getExternalNetworkId() {
 		return externalNetworkId;
@@ -58,9 +58,11 @@ public class ExternalApplicationDto {
 		return userAgent;
 	}
 
-	public String getRedirectURL() {
-		return redirectURL;
+	public String getRedirectUrl() {
+		return redirectUrl;
 	}
+
+
 
 	public static class Builder {
 		private Integer externalNetworkId;
@@ -71,7 +73,7 @@ public class ExternalApplicationDto {
 		private String token;
 		private String tokenSecret;
 		private String userAgent;
-		private String redirectURL;
+		private String redirectUrl;
 
 		public Builder externalNetwork(Integer externalNetwork) {
 			this.externalNetworkId = externalNetwork;
@@ -113,8 +115,8 @@ public class ExternalApplicationDto {
 			return this;
 		}
 
-		public Builder redirectURL(String redirectURL) {
-			this.redirectURL = redirectURL;
+		public Builder redirectUrl(String redirectUrl) {
+			this.redirectUrl = redirectUrl;
 			return this;
 		}
 		public ExternalApplicationDto build(){
@@ -131,6 +133,6 @@ public class ExternalApplicationDto {
 		this.token = builder.token;
 		this.tokenSecret = builder.tokenSecret;
 		this.userAgent = builder.userAgent;
-		this.redirectURL = builder.redirectURL;
+		this.redirectUrl = builder.redirectUrl;
 	}
 }

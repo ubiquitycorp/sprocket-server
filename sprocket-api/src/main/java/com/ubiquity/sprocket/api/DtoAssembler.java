@@ -841,7 +841,7 @@ public class DtoAssembler {
 				.consumerSecret(externalNetworkApplication.getConsumerSecret())
 				.externalNetwork(
 						externalNetworkApplication.getExternalNetwork())
-				.redirectURL(externalNetworkApplication.getRedirectURL())
+				.redirectUrl(externalNetworkApplication.getRedirectURL())
 				.token(externalNetworkApplication.getToken())
 				.tokenSecret(externalNetworkApplication.getTokenSecret())
 				.userAgent(externalNetworkApplication.getUserAgent()).build();

@@ -251,7 +251,7 @@ public class DeveloperEndPoint {
 				externalAppDto.getConsumerKey(),
 				externalAppDto.getConsumerSecret(), externalAppDto.getApiKey(),
 				externalAppDto.getToken(), externalAppDto.getTokenSecret(),
-				externalAppDto.getUserAgent(), externalAppDto.getRedirectURL(),
+				externalAppDto.getUserAgent(), externalAppDto.getRedirectUrl(),
 				externalAppDto.getExternalNetworkId(),
 				externalAppDto.getClientPlatformId(), application);
 
