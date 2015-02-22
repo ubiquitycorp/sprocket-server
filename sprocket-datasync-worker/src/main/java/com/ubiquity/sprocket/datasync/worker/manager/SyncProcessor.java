@@ -242,9 +242,9 @@ public abstract class SyncProcessor {
 			resourcePath.append("/social/users/").append(userId).append("/");
 
 		if (!resource.equals(ResourceType.contacts))
-			resourcePath.append("providers/").append(externalNetwork.ordinal());
+			resourcePath.append("providers/").append(externalNetwork.ordinal()).append("/");
 
-		resourcePath.append("/").append(resource.getEndpointName());
+		resourcePath.append(resource.getEndpointName());
 		return resourcePath.toString();
 	}
 }
