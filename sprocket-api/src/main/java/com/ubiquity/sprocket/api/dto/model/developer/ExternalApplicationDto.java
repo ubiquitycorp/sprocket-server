@@ -117,6 +117,9 @@ public class ExternalApplicationDto {
 			this.redirectURL = redirectURL;
 			return this;
 		}
+		public ExternalApplicationDto build(){
+			return new ExternalApplicationDto(this);
+		}
 	}
 
 	private ExternalApplicationDto(Builder builder) {
