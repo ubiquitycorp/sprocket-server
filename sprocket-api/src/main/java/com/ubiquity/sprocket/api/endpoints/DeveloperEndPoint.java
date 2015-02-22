@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.ubiquity.integration.api.exception.AuthorizationException;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -26,6 +27,7 @@ import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ApplicationsDto;
 import com.ubiquity.sprocket.api.dto.model.developer.ApplicationDto;
 import com.ubiquity.sprocket.api.dto.model.developer.DeveloperDto;
+import com.ubiquity.sprocket.api.dto.model.developer.ExternalApplicationDto;
 import com.ubiquity.sprocket.api.interceptors.DeveloperSecure;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
@@ -176,14 +178,15 @@ public class DeveloperEndPoint {
 		ApplicationsDto applicationsDto = new ApplicationsDto();
 
 		for (Application application : applications) {
-			applicationsDto.getApplications().add(DtoAssembler.assemble(application));
+			applicationsDto.getApplications().add(
+					DtoAssembler.assemble(application));
 		}
 
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(applicationsDto))
 				.build();
 	}
-	
+
 	/***
 	 * 
 	 * @param developerId
@@ -193,21 +196,54 @@ public class DeveloperEndPoint {
 	 */
 	@GET
 	@Path("/{developerId}/applications/{applicationId}")
-	public Response getApplications(@PathParam("developerId") Long developerId,@PathParam("applicationId") Long applicationId)
-			throws IOException {
-	
+	public Response getApplications(@PathParam("developerId") Long developerId,
+			@PathParam("applicationId") Long applicationId) throws IOException {
+
 		DeveloperService developerService = ServiceFactory
 				.getDeveloperService();
-	Application application ;
-	application = developerService.getApplicationByApplicationId(developerId,applicationId);
-	
-	ApplicationsDto applicationsDto = new ApplicationsDto();
-	applicationsDto.getApplications().add(DtoAssembler.assemble(application));
-	
-	return Response.ok()
-			.entity(jsonConverter.convertToPayload(applicationsDto))
-			.build();
-		
+		Application application;
+		application = developerService.getApplicationByApplicationId(
+				developerId, applicationId);
+
+		ApplicationsDto applicationsDto = new ApplicationsDto();
+		applicationsDto.getApplications().add(
+				DtoAssembler.assemble(application));
+
+		return Response.ok()
+				.entity(jsonConverter.convertToPayload(applicationsDto))
+				.build();
+	}
+
+	/***
+	 * This end point creates an sprocket application for the developer who
+	 * invoked the request
+	 * 
+	 * @param payload
+	 * @return
+	 */
+	@POST
+	@Path("/{developerId}/applications/{applicationId}/external_apps/created")
+	@DeveloperSecure
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response createExternalApplication(InputStream payload,
+			@PathParam("developerId") Long developerId,
+			@PathParam("applicationId") Long applicationId) throws IOException {
+		ExternalApplicationDto externalAppDto = jsonConverter
+				.convertFromPayload(payload, ExternalApplicationDto.class);
+		DeveloperService developerService = ServiceFactory
+				.getDeveloperService();
+
+		Application application = developerService
+				.getApplicationByApplicationId(developerId, applicationId);
+		developerService.createExternalApplication(
+				externalAppDto.getConsumerKey(),
+				externalAppDto.getConsumerSecret(), externalAppDto.getApiKey(),
+				externalAppDto.getToken(), externalAppDto.getTokenSecret(),
+				externalAppDto.getUserAgent(), externalAppDto.getRedirectURL(),
+				externalAppDto.getExternalNetwork(),
+				externalAppDto.getClientPlatform(), application);
+
+		return Response.ok().build();
 	}
 
 }
