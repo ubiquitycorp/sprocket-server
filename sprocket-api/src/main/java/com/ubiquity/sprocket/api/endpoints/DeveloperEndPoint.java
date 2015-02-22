@@ -265,7 +265,7 @@ public class DeveloperEndPoint {
 	 * @throws IOException
 	 */
 	@GET
-	@Path("/{developerId}/applications/{applicationId}/externalapplications")
+	@Path("/{developerId}/applications/{applicationId}/external_apps")
 	public Response getExternalApplicationByApplicationId(
 			@PathParam("developerId") Long developerId,
 			@PathParam("applicationId") Long applicationId) throws IOException {
