@@ -11,6 +11,7 @@ import java.util.UUID;
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ActivityType;
 import com.ubiquity.integration.domain.Address;
@@ -43,6 +44,7 @@ import com.ubiquity.sprocket.api.dto.model.InterestDto;
 import com.ubiquity.sprocket.api.dto.model.PlaceDto;
 import com.ubiquity.sprocket.api.dto.model.admin.AdminInterestDto;
 import com.ubiquity.sprocket.api.dto.model.developer.ApplicationDto;
+import com.ubiquity.sprocket.api.dto.model.developer.ExternalApplicationDto;
 import com.ubiquity.sprocket.api.dto.model.media.AudioDto;
 import com.ubiquity.sprocket.api.dto.model.media.ImageDto;
 import com.ubiquity.sprocket.api.dto.model.media.VideoDto;
@@ -820,15 +822,29 @@ public class DtoAssembler {
 	}
 
 	public static ApplicationDto assemble(Application application) {
-		
+
 		return new ApplicationDto.Builder().appId(application.getAppId())
 				.appKey(application.getAppKey())
 				.appSecret(application.getAppSecret())
 				.name(application.getName())
 				.description(application.getDescription())
 				.createdAt(application.getCreatedAt())
-				.lastUpdated(application.getLastUpdated())
-				.build();
+				.lastUpdated(application.getLastUpdated()).build();
+	}
+	
+	public static ExternalApplicationDto assemble(
+			ExternalNetworkApplication externalNetworkApplication) {
+		return new ExternalApplicationDto.Builder()
+				.apiKey(externalNetworkApplication.getApiKey())
+				.clientPlatform(externalNetworkApplication.getClientPlatform())
+				.consumerKey(externalNetworkApplication.getConsumerKey())
+				.consumerSecret(externalNetworkApplication.getConsumerSecret())
+				.externalNetwork(
+						externalNetworkApplication.getExternalNetwork())
+				.redirectURL(externalNetworkApplication.getRedirectURL())
+				.token(externalNetworkApplication.getToken())
+				.tokenSecret(externalNetworkApplication.getTokenSecret())
+				.userAgent(externalNetworkApplication.getUserAgent()).build();
 	}
 
 	public static List<ExternalNetworkConfigurationDto> getNetworks() {
@@ -839,4 +855,6 @@ public class DtoAssembler {
 		}
 		return networks;
 	}
+
+	
 }

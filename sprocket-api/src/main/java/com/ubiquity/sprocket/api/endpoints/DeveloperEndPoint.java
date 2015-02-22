@@ -5,8 +5,6 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.ubiquity.integration.api.exception.AuthorizationException;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -21,10 +19,13 @@ import org.slf4j.LoggerFactory;
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.Developer;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.identity.service.DeveloperService;
+import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ApplicationsDto;
+import com.ubiquity.sprocket.api.dto.containers.ExternalApplicationsDto;
 import com.ubiquity.sprocket.api.dto.model.developer.ApplicationDto;
 import com.ubiquity.sprocket.api.dto.model.developer.DeveloperDto;
 import com.ubiquity.sprocket.api.dto.model.developer.ExternalApplicationDto;
@@ -235,15 +236,42 @@ public class DeveloperEndPoint {
 
 		Application application = developerService
 				.getApplicationByApplicationId(developerId, applicationId);
-		developerService.createExternalApplication(
-				externalAppDto.getConsumerKey(),
-				externalAppDto.getConsumerSecret(), externalAppDto.getApiKey(),
-				externalAppDto.getToken(), externalAppDto.getTokenSecret(),
-				externalAppDto.getUserAgent(), externalAppDto.getRedirectURL(),
-				externalAppDto.getExternalNetwork(),
-				externalAppDto.getClientPlatform(), application);
+		// developerService.createExternalApplication(
+		// externalAppDto.getConsumerKey(),
+		// externalAppDto.getConsumerSecret(), externalAppDto.getApiKey(),
+		// externalAppDto.getToken(), externalAppDto.getTokenSecret(),
+		// externalAppDto.getUserAgent(), externalAppDto.getRedirectURL(),
+		// externalAppDto.getExternalNetwork(),
+		// externalAppDto.getClientPlatform(), application);
 
 		return Response.ok().build();
+	}
+	/***
+	 * Get external network applications by application Id 
+	 * @param developerId
+	 * @param applicationId
+	 * @return the external network applications if the developer have access to this application 
+	 * @throws IOException
+	 */
+	@GET
+	@Path("/{developerId}/applications/{applicationId}/externalapplications")
+	public Response getExternalApplicationByApplicationId(
+			@PathParam("developerId") Long developerId,
+			@PathParam("applicationId") Long applicationId) throws IOException {
+
+		DeveloperService developerService = ServiceFactory
+				.getDeveloperService();
+		List<ExternalNetworkApplication> externalNetworkApplications = developerService
+				.getExternalApplicationByApplicationId(developerId,
+						applicationId);
+		ExternalApplicationsDto result = new ExternalApplicationsDto() ;
+		for (ExternalNetworkApplication externalNetworkApplication : externalNetworkApplications) {
+			result.getExternalApplications().add(DtoAssembler.assemble(externalNetworkApplication));
+		}
+		return Response.ok()
+				.entity(jsonConverter.convertToPayload(result))
+				.build();
+
 	}
 
 }
