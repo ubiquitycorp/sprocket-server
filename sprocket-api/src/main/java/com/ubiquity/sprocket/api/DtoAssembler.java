@@ -836,7 +836,7 @@ public class DtoAssembler {
 			ExternalNetworkApplication externalNetworkApplication) {
 		return new ExternalApplicationDto.Builder()
 				.apiKey(externalNetworkApplication.getApiKey())
-				.clientPlatform(externalNetworkApplication.getClientPlatform())
+				.clientPlatformId(externalNetworkApplication.getClientPlatform().ordinal())
 				.consumerKey(externalNetworkApplication.getConsumerKey())
 				.consumerSecret(externalNetworkApplication.getConsumerSecret())
 				.externalNetwork(

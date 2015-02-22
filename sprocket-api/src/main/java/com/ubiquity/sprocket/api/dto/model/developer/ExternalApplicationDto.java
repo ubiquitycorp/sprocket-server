@@ -2,15 +2,13 @@ package com.ubiquity.sprocket.api.dto.model.developer;
 
 import javax.validation.constraints.NotNull;
 
-import com.ubiquity.identity.domain.ClientPlatform;
-
 public class ExternalApplicationDto {
 
 	@NotNull
-	private Integer externalNetwork;
+	private Integer externalNetworkId;
 
 	@NotNull
-	private ClientPlatform clientPlatform;
+	private Integer clientPlatformId;
 
 	@NotNull
 	private String consumerKey;
@@ -28,12 +26,12 @@ public class ExternalApplicationDto {
 
 	private String redirectURL;
 
-	public Integer getExternalNetwork() {
-		return externalNetwork;
+	public Integer getExternalNetworkId() {
+		return externalNetworkId;
 	}
 
-	public ClientPlatform getClientPlatform() {
-		return clientPlatform;
+	public Integer getClientPlatformId() {
+		return clientPlatformId;
 	}
 
 	public String getConsumerKey() {
@@ -65,8 +63,8 @@ public class ExternalApplicationDto {
 	}
 
 	public static class Builder {
-		private Integer externalNetwork;
-		private ClientPlatform clientPlatform;
+		private Integer externalNetworkId;
+		private Integer clientPlatformId;
 		private String consumerKey;
 		private String consumerSecret;
 		private String apiKey;
@@ -76,12 +74,12 @@ public class ExternalApplicationDto {
 		private String redirectURL;
 
 		public Builder externalNetwork(Integer externalNetwork) {
-			this.externalNetwork = externalNetwork;
+			this.externalNetworkId = externalNetwork;
 			return this;
 		}
 
-		public Builder clientPlatform(ClientPlatform clientPlatform) {
-			this.clientPlatform = clientPlatform;
+		public Builder clientPlatformId(Integer clientPlatformId) {
+			this.clientPlatformId = clientPlatformId;
 			return this;
 		}
 
@@ -125,8 +123,8 @@ public class ExternalApplicationDto {
 	}
 
 	private ExternalApplicationDto(Builder builder) {
-		this.externalNetwork = builder.externalNetwork;
-		this.clientPlatform = builder.clientPlatform;
+		this.externalNetworkId = builder.externalNetworkId;
+		this.clientPlatformId = builder.clientPlatformId;
 		this.consumerKey = builder.consumerKey;
 		this.consumerSecret = builder.consumerSecret;
 		this.apiKey = builder.apiKey;
