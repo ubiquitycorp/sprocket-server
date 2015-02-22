@@ -238,14 +238,6 @@ public class DeveloperEndPoint {
 
 		Application application = developerService
 				.getApplicationByApplicationId(developerId, applicationId);
-
-		boolean exists = developerService.isExist(
-				externalAppDto.getConsumerKey(),
-				externalAppDto.getConsumerSecret(),
-				externalAppDto.getExternalNetworkId());
-		if (exists)
-			throw new IllegalArgumentException(
-					"This application is already used");
 		
 		developerService.createExternalApplication(
 				externalAppDto.getConsumerKey(),
