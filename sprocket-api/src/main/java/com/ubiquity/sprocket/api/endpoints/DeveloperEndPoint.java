@@ -167,6 +167,7 @@ public class DeveloperEndPoint {
 	 */
 	@GET
 	@Path("/{developerId}/applications")
+	@DeveloperSecure
 	public Response getApplications(@PathParam("developerId") Long developerId)
 			throws IOException {
 
@@ -198,6 +199,7 @@ public class DeveloperEndPoint {
 	 */
 	@GET
 	@Path("/{developerId}/applications/{applicationId}")
+	@DeveloperSecure
 	public Response getApplications(@PathParam("developerId") Long developerId,
 			@PathParam("applicationId") Long applicationId) throws IOException {
 
@@ -266,6 +268,7 @@ public class DeveloperEndPoint {
 	 */
 	@GET
 	@Path("/{developerId}/applications/{applicationId}/external_apps")
+	@DeveloperSecure
 	public Response getExternalApplicationByApplicationId(
 			@PathParam("developerId") Long developerId,
 			@PathParam("applicationId") Long applicationId) throws IOException {
