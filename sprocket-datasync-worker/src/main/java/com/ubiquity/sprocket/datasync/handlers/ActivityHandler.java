@@ -58,7 +58,7 @@ public class ActivityHandler extends Handler {
 		} catch (AuthorizationException e) {
 			identity.setIsActive(false);
 			ServiceFactory.getExternalIdentityService().update(identity);
-			log.error("Could not process activities for identity {}: {}", identity,
+			log.error("Could not process activities for identity {}: set active to false ,exception: {}", identity,
 					ExceptionUtils.getStackTrace(e));
 			return -1;
 		} catch (Exception e) {

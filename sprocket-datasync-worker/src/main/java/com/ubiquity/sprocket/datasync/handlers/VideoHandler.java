@@ -61,10 +61,10 @@ public class VideoHandler extends Handler {
 		} catch (AuthorizationException e) {
 			identity.setIsActive(false);
 			ServiceFactory.getExternalIdentityService().update(identity);
-			log.error(" Unable to sync for identity: {}",
+			log.error(" Unable to sync for identity: {} set active to false ,exception: {}",
 					identity.getIdentityId(), ExceptionUtils.getStackTrace(e));
 		} catch (Exception e) {
-			log.error(" Unable to sync for identity: {}",
+			log.error(" Unable to sync for identity: {} ,exception: {}",
 					identity.getIdentityId(), ExceptionUtils.getStackTrace(e));
 		} finally {
 			size = (synced == null) ? -1 : synced.size();
