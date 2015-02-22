@@ -31,16 +31,19 @@ public class AuthorizationExceptionMapper implements ExceptionMapper<Authorizati
 	 * Returns error response and sets the response code
 	 */
 	public Response toResponse(AuthorizationException e) {
-		log.error("[ERROR] {}", ExceptionUtils.getRootCauseMessage(e));
+		
 		
 		ErrorDto response = new ErrorDto();
 		response.getMessages().add(e.getMessage());
 		if(e.getExternalNetwork() != null){
+			log.error("[ERROR] {}", ExceptionUtils.getRootCauseMessage(e));
 			response.setCode(ServerErrorCode.ExternalAPI.getCode());
 			response.setProviderName(e.getExternalNetwork().toString());
 		}
-		else
+		else{
+			log.warn("[WARN] {}", ExceptionUtils.getRootCauseMessage(e));
 			response.setCode(ServerErrorCode.SprocketAPI.getCode());
+		}
 		
 		return Response.status(Status.UNAUTHORIZED).entity(new Gson().toJson(response)).build();
 	}
