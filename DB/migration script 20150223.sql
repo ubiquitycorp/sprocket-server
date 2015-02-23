@@ -153,4 +153,10 @@ ALTER TABLE contact Drop COLUMN owner_id ;
 
 Update user set canPurchase=0 ,canRedeem =0 ;
 
+#insert record for each contact of external identity in user_contact
+insert into user_contact (contact_id, user_id, is_deleted, external_network, created_at, last_updated)  from
+select c.contact_id, identity.user_id, 0, i.external_network, identity.last_updated, identity.last_updated from contact c inner join external_identity i on c.external_identity = i.identity_id 
+                          inner join identity on i.identity_id = identity.identity_id 
+                          where identity.user_id is not null;
+
 
