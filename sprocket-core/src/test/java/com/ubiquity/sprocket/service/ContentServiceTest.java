@@ -33,7 +33,7 @@ public class ContentServiceTest {
 						user, UUID.randomUUID().toString(),
 						UUID.randomUUID().toString(),
 						UUID.randomUUID().toString(), ClientPlatform.WEB,
-						ExternalNetwork.Google, 3600L);
+						ExternalNetwork.Google, 3600L, true);
 		identity = externalIdentities.get(1);
 
 	}

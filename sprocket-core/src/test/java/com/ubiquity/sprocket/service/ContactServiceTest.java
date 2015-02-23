@@ -31,7 +31,7 @@ public class ContactServiceTest {
 		contactService = ServiceFactory.getContactService();
 		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 		ServiceFactory.getUserService().create(user);
-		List<ExternalIdentity> externalIdentities = ServiceFactory.getExternalIdentityService().createOrUpdateExternalIdentity(user, UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), ClientPlatform.WEB, ExternalNetwork.Facebook, 3600L);
+		List<ExternalIdentity> externalIdentities = ServiceFactory.getExternalIdentityService().createOrUpdateExternalIdentity(user, UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), ClientPlatform.WEB, ExternalNetwork.Facebook, 3600L, true);
 		identity = externalIdentities.get(0);
 
 	}

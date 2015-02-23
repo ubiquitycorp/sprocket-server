@@ -42,7 +42,7 @@ public class SocialServiceTest {
 						user, UUID.randomUUID().toString(),
 						UUID.randomUUID().toString(),
 						UUID.randomUUID().toString(), ClientPlatform.WEB,
-						ExternalNetwork.Facebook, 3600L);
+						ExternalNetwork.Facebook, 3600L, true);
 		identity = externalIdentities.get(0);
 
 	}

@@ -122,7 +122,7 @@ public class UsersEndpoint {
 		List<ExternalIdentity> identities = ServiceFactory
 				.getExternalIdentityService().createOrUpdateExternalIdentity(
 						user, accesstokens[0], accesstokens[1], null,
-						ClientPlatform.WEB, ExternalNetwork.LinkedIn, null);
+						ClientPlatform.WEB, ExternalNetwork.LinkedIn, null, true);
 
 		ExternalIdentity identity = identities.get(0);
 		IdentityDto result = new IdentityDto.Builder()
@@ -350,7 +350,7 @@ public class UsersEndpoint {
 						user, identityDto.getAccessToken(),
 						identityDto.getSecretToken(),
 						identityDto.getRefreshToken(), clientPlatform,
-						externalNetwork, identityDto.getExpiresIn());
+						externalNetwork, identityDto.getExpiresIn(), true);
 
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto.getClientPlatformId());
@@ -413,7 +413,7 @@ public class UsersEndpoint {
 					.createOrUpdateExternalIdentity(user, accessToken,
 							identityDto.getSecretToken(),
 							identityDto.getRefreshToken(), clientPlatform,
-							externalNetwork, null);
+							externalNetwork, null, true);
 		} else if (externalNetwork.network == Network.Social) {
 			SocialAPI socialApi = SocialAPIFactory.createProvider(
 					externalNetwork, clientPlatform);
@@ -434,7 +434,7 @@ public class UsersEndpoint {
 							externalidentity.getAccessToken(),
 							externalidentity.getSecretToken(),
 							externalidentity.getRefreshToken(), clientPlatform,
-							externalNetwork, externalidentity.getExpiredAt());
+							externalNetwork, externalidentity.getExpiredAt(), true);
 
 		}
 
