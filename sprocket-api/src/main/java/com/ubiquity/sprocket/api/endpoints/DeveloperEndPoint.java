@@ -64,6 +64,7 @@ public class DeveloperEndPoint {
 	@POST
 	@Path("/registered")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
 	public Response register(InputStream payload) throws IOException {
 		DeveloperDto developerDto = jsonConverter.convertFromPayload(payload,
 				DeveloperDto.class, RegistrationValidation.class);
@@ -100,6 +101,7 @@ public class DeveloperEndPoint {
 	@POST
 	@Path("/authenticated")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
 	public Response authenticate(InputStream payload) throws IOException {
 
 		DeveloperDto developerDto = jsonConverter.convertFromPayload(payload,
@@ -137,6 +139,7 @@ public class DeveloperEndPoint {
 	@Path("/{developerId}/applications/created")
 	@DeveloperSecure
 	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createApplication(InputStream payload,
 			@PathParam("developerId") Long developerId) throws IOException {
 		ApplicationDto applicationDto = jsonConverter.convertFromPayload(
