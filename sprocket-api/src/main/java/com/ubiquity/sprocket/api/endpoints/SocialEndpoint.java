@@ -27,6 +27,7 @@ import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.Captcha;
 import com.ubiquity.integration.domain.Contact;
@@ -306,11 +307,15 @@ public class SocialEndpoint {
 
 		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
 				identity);
-
-		ServiceFactory.getSocialService().sendMessage(identity, socialNetwork,
-				contact, sendMessageDto.getReceiverName(),
-				sendMessageDto.getText(), sendMessageDto.getSubject());
-
+		try {
+			ServiceFactory.getSocialService().sendMessage(identity,
+					socialNetwork, contact, sendMessageDto.getReceiverName(),
+					sendMessageDto.getText(), sendMessageDto.getSubject());
+		} catch (AuthorizationException ex) {
+			ServiceFactory.getExternalIdentityService()
+					.deactivateExternalIdentity(identity);
+			throw ex;
+		}
 		return Response.ok().build();
 
 	}
@@ -360,10 +365,14 @@ public class SocialEndpoint {
 				.pageId(postActivityDto.getPageId())
 				.captcha(postActivityDto.getCaptcha())
 				.captchaIden(postActivityDto.getCaptchaIden()).build();
-
-		ServiceFactory.getSocialService().postActivity(identity, socialNetwork,
-				postActivity);
-
+		try {
+			ServiceFactory.getSocialService().postActivity(identity,
+					socialNetwork, postActivity);
+		} catch (AuthorizationException ex) {
+			ServiceFactory.getExternalIdentityService()
+					.deactivateExternalIdentity(identity);
+			throw ex;
+		}
 		return Response.ok().build();
 
 	}
@@ -400,11 +409,15 @@ public class SocialEndpoint {
 
 		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
 				identity);
-
-		PostComment postComment = DtoAssembler.assemble(postCommentDto);
-		ServiceFactory.getSocialService().postComment(identity, socialNetwork,
-				postComment);
-
+		try {
+			PostComment postComment = DtoAssembler.assemble(postCommentDto);
+			ServiceFactory.getSocialService().postComment(identity,
+					socialNetwork, postComment);
+		} catch (AuthorizationException ex) {
+			ServiceFactory.getExternalIdentityService()
+					.deactivateExternalIdentity(identity);
+			throw ex;
+		}
 		return Response.ok().build();
 
 	}
@@ -435,10 +448,15 @@ public class SocialEndpoint {
 				identity);
 
 		PostVote postComment = DtoAssembler.assemble(postVoteDto);
+		try {
 
-		ServiceFactory.getSocialService().postVote(identity, socialNetwork,
-				postComment);
-
+			ServiceFactory.getSocialService().postVote(identity, socialNetwork,
+					postComment);
+		} catch (AuthorizationException ex) {
+			ServiceFactory.getExternalIdentityService()
+					.deactivateExternalIdentity(identity);
+			throw ex;
+		}
 		return Response.ok().build();
 
 	}
@@ -468,10 +486,15 @@ public class SocialEndpoint {
 
 		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
 				identity);
-
-		Captcha captcha = ServiceFactory.getSocialService().requestCaptcha(
-				identity, externalNetwork);
-
+		Captcha captcha = null;
+		try {
+			captcha = ServiceFactory.getSocialService().requestCaptcha(
+					identity, externalNetwork);
+		} catch (AuthorizationException ex) {
+			ServiceFactory.getExternalIdentityService()
+					.deactivateExternalIdentity(identity);
+			throw ex;
+		}
 		final byte[] image = captcha.getImage();
 
 		if (image != null) {
