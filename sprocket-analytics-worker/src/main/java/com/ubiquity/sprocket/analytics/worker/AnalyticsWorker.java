@@ -23,13 +23,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.thread.ThreadPool;
+import com.niobium.repository.hbase.HBaseConnectionFactory;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.sprocket.analytics.worker.jobs.AssignmentSyncJob;
 import com.ubiquity.sprocket.analytics.worker.jobs.RecommendationSyncJob;
 import com.ubiquity.sprocket.analytics.worker.mq.consumer.TrackConsumer;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
-import com.ubiquity.sprocket.repository.HBaseConnectionFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 /***

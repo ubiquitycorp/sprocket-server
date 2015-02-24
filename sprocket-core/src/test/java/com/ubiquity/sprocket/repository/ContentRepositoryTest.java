@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.repository.hbase.HBaseConnectionFactory;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.integration.domain.Activity;

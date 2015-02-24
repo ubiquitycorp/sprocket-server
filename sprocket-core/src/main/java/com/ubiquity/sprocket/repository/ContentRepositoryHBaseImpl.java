@@ -16,6 +16,8 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.repository.hbase.BaseRepositoryHBaseImpl;
+import com.niobium.repository.hbase.HBaseSchema;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.VideoContent;
