@@ -53,8 +53,7 @@ public class LocalActivityHandler extends Handler {
 			}
 			
 		} catch (AuthorizationException e) {
-			identity.setIsActive(false);
-			ServiceFactory.getExternalIdentityService().update(identity);
+			ServiceFactory.getExternalIdentityService().deactivateExternalIdentity(identity);
 			log.error("Unable to sync local activities for identity {}: set active to false ,exception: {}",
 					identity, ExceptionUtils.getStackTrace(e));
 			return -1;

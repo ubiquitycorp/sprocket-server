@@ -59,8 +59,7 @@ public class VideoHandler extends Handler {
 			ServiceFactory.getSearchService()
 					.indexVideos(userId, synced, false);
 		} catch (AuthorizationException e) {
-			identity.setIsActive(false);
-			ServiceFactory.getExternalIdentityService().update(identity);
+			ServiceFactory.getExternalIdentityService().deactivateExternalIdentity(identity);
 			log.error(" Unable to sync for identity: {} set active to false ,exception: {}",
 					identity.getIdentityId(), ExceptionUtils.getStackTrace(e));
 		} catch (Exception e) {

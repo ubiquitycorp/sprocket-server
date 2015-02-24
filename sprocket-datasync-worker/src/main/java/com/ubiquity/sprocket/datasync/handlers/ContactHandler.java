@@ -54,8 +54,7 @@ public class ContactHandler extends Handler {
 			// log.debug(" indexing activities for identity {}", identity);
 			
 		} catch (AuthorizationException e) {
-			identity.setIsActive(false);
-			ServiceFactory.getExternalIdentityService().update(identity);
+			ServiceFactory.getExternalIdentityService().deactivateExternalIdentity(identity);
 			log.error(" Could not process contacts for identity: {}",
 					ExceptionUtils.getStackTrace(e), identity);
 		} catch (Exception e) {

@@ -64,8 +64,7 @@ public class MessageHandler extends Handler {
 					identity.getUser().getUserId(), synced);
 			log.debug(" indexing messages for identity {}", identity);
 		} catch (AuthorizationException e) {
-			identity.setIsActive(false);
-			ServiceFactory.getExternalIdentityService().update(identity);
+			ServiceFactory.getExternalIdentityService().deactivateExternalIdentity(identity);
 			log.error("Could not process messages for identity {}: set active to false ,exception: {}",
 					identity, ExceptionUtils.getStackTrace(e));
 		} catch (Exception e) {

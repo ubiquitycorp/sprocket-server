@@ -115,9 +115,8 @@ public abstract class SyncProcessor {
 						processSync(externalIdentity);
 
 				} catch (AuthorizationException e) {
-					identity.setIsActive(false);
 					ServiceFactory.getExternalIdentityService()
-							.update((ExternalIdentity) identity);
+							.deactivateExternalIdentity((ExternalIdentity) identity);
 					log.error("set identity {} to not active because: {}",identity, ExceptionUtils.getStackTrace(e));
 					return -1;
 				} catch (Exception ex) {
