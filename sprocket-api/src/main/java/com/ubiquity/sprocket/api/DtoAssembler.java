@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.identity.domain.Application;
+import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.integration.domain.Activity;
@@ -831,12 +832,11 @@ public class DtoAssembler {
 				.createdAt(application.getCreatedAt())
 				.lastUpdated(application.getLastUpdated()).build();
 	}
-	
+
 	public static ExternalApplicationDto assemble(
 			ExternalNetworkApplication externalNetworkApplication) {
-		return new ExternalApplicationDto.Builder()
+		ExternalApplicationDto externalApplicationDto = new ExternalApplicationDto.Builder()
 				.apiKey(externalNetworkApplication.getApiKey())
-				.clientPlatformId(externalNetworkApplication.getClientPlatform().ordinal())
 				.consumerKey(externalNetworkApplication.getConsumerKey())
 				.consumerSecret(externalNetworkApplication.getConsumerSecret())
 				.externalNetwork(
@@ -845,6 +845,11 @@ public class DtoAssembler {
 				.token(externalNetworkApplication.getToken())
 				.tokenSecret(externalNetworkApplication.getTokenSecret())
 				.userAgent(externalNetworkApplication.getUserAgent()).build();
+		for (ClientPlatform clientPlatform : externalNetworkApplication
+				.getClientPlatforms())
+			externalApplicationDto.getClientPlatformIds().add(
+					clientPlatform.ordinal());
+		return externalApplicationDto;
 	}
 
 	public static List<ExternalNetworkConfigurationDto> getNetworks() {
@@ -856,5 +861,4 @@ public class DtoAssembler {
 		return networks;
 	}
 
-	
 }

@@ -1,5 +1,8 @@
 package com.ubiquity.sprocket.api.dto.model.developer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
 
 public class ExternalApplicationDto {
@@ -8,7 +11,7 @@ public class ExternalApplicationDto {
 	private Integer externalNetworkId;
 
 	@NotNull
-	private Integer clientPlatformId;
+	private List<Integer> clientPlatformIds = new LinkedList<Integer>(); ;
 
 	@NotNull
 	private String consumerKey;
@@ -30,8 +33,8 @@ public class ExternalApplicationDto {
 		return externalNetworkId;
 	}
 
-	public Integer getClientPlatformId() {
-		return clientPlatformId;
+	public List<Integer> getClientPlatformIds() {
+		return clientPlatformIds;
 	}
 
 	public String getConsumerKey() {
@@ -66,7 +69,6 @@ public class ExternalApplicationDto {
 
 	public static class Builder {
 		private Integer externalNetworkId;
-		private Integer clientPlatformId;
 		private String consumerKey;
 		private String consumerSecret;
 		private String apiKey;
@@ -77,11 +79,6 @@ public class ExternalApplicationDto {
 
 		public Builder externalNetwork(Integer externalNetwork) {
 			this.externalNetworkId = externalNetwork;
-			return this;
-		}
-
-		public Builder clientPlatformId(Integer clientPlatformId) {
-			this.clientPlatformId = clientPlatformId;
 			return this;
 		}
 
@@ -126,7 +123,6 @@ public class ExternalApplicationDto {
 
 	private ExternalApplicationDto(Builder builder) {
 		this.externalNetworkId = builder.externalNetworkId;
-		this.clientPlatformId = builder.clientPlatformId;
 		this.consumerKey = builder.consumerKey;
 		this.consumerSecret = builder.consumerSecret;
 		this.apiKey = builder.apiKey;

@@ -247,7 +247,7 @@ public class DeveloperEndPoint {
 				externalAppDto.getToken(), externalAppDto.getTokenSecret(),
 				externalAppDto.getUserAgent(), externalAppDto.getRedirectUrl(),
 				externalAppDto.getExternalNetworkId(),
-				externalAppDto.getClientPlatformId(), application);
+				externalAppDto.getClientPlatformIds(), application);
 
 		return Response.ok().build();
 	}

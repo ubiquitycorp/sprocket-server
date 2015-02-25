@@ -1,6 +1,8 @@
 package com.ubiquity.sprocket.repository;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.After;
@@ -52,19 +54,25 @@ public class ExternalNetworkRepositoryTest {
 		EntityManagerSupport.beginTransaction();
 		applicationRepository.create(application);
 		EntityManagerSupport.commit();
-
+		
+		Set<ClientPlatform> mobileClientplatforms = new HashSet<ClientPlatform>();
+		mobileClientplatforms.add(ClientPlatform.Android);
+		mobileClientplatforms.add(ClientPlatform.IOS);
+		
 		externalNetworkApplication1 = TestExternalApplicationFactory
 				.createTestExternalNetworkApplicationWithMinimumRequiredProperties(
-						application, ClientPlatform.Android, ExternalNetwork
+						application, mobileClientplatforms, ExternalNetwork
 								.ordinalOrDefault(ExternalNetwork.Facebook));
 		
 		EntityManagerSupport.beginTransaction();
 		externalNetworkApplicationRepository.create(externalNetworkApplication1);
 		EntityManagerSupport.commit();
 		
+		Set<ClientPlatform> webClientplatform = new HashSet<ClientPlatform>();
+		webClientplatform.add(ClientPlatform.WEB);
 		externalNetworkApplication2= TestExternalApplicationFactory
 				.createTestExternalNetworkApplicationWithMinimumRequiredProperties(
-						application, ClientPlatform.Android, ExternalNetwork
+						application, webClientplatform, ExternalNetwork
 								.ordinalOrDefault(ExternalNetwork.Twitter));
 		
 		EntityManagerSupport.beginTransaction();
