@@ -4,6 +4,12 @@
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+        <dependent-module archiveName="niobium-data-access-0.9.8.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/niobium-data-access/niobium-data-access">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="niobium-common-0.3.2.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/niobium-common/niobium-common">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="java-output-path" value="/sprocket-api/target/classes"/>
         <property name="context-root" value="sprocket-network-api"/>
     </wb-module>
