@@ -219,7 +219,7 @@ public class DeveloperEndPoint {
 	}
 
 	/***
-	 * This end point creates an sprocket application for the developer who
+	 * This end point creates an external network application for the developer who
 	 * invoked the request
 	 * 
 	 * @param payload
