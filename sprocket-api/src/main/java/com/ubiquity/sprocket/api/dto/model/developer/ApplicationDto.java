@@ -2,6 +2,8 @@ package com.ubiquity.sprocket.api.dto.model.developer;
 
 import javax.validation.constraints.NotNull;
 
+import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
+
 /**
  * 
  * @author shimaa
@@ -10,7 +12,11 @@ import javax.validation.constraints.NotNull;
 public class ApplicationDto {
 
 	private Long appId;
+	
+	@NotNull(groups = AuthenticationValidation.class)
 	private String appKey;
+	
+	@NotNull(groups = AuthenticationValidation.class)
 	private String appSecret;
 
 	@NotNull

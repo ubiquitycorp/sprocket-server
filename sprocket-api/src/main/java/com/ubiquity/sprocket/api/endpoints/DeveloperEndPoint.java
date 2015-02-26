@@ -206,7 +206,7 @@ public class DeveloperEndPoint {
 		DeveloperService developerService = ServiceFactory
 				.getDeveloperService();
 		Application application;
-		application = developerService.getApplicationByApplicationId(
+		application = developerService.getApplicationById(
 				developerId, applicationId);
 
 		ApplicationsDto applicationsDto = new ApplicationsDto();
@@ -239,7 +239,7 @@ public class DeveloperEndPoint {
 				.getDeveloperService();
 
 		Application application = developerService
-				.getApplicationByApplicationId(developerId, applicationId);
+				.getApplicationById(developerId, applicationId);
 
 		developerService.createExternalApplication(
 				externalAppDto.getConsumerKey(),
@@ -275,7 +275,7 @@ public class DeveloperEndPoint {
 				.getDeveloperService();
 
 		Application application = developerService
-				.getApplicationByApplicationId(developerId, applicationId);
+				.getApplicationById(developerId, applicationId);
 		
 		externalAppDto.setExternalApplicationId(externalApplicationId);
 
