@@ -836,6 +836,8 @@ public class DtoAssembler {
 	public static ExternalApplicationDto assemble(
 			ExternalNetworkApplication externalNetworkApplication) {
 		ExternalApplicationDto externalApplicationDto = new ExternalApplicationDto.Builder()
+				.externalApplicationId(
+						externalNetworkApplication.getExternalApplicationId())
 				.apiKey(externalNetworkApplication.getApiKey())
 				.consumerKey(externalNetworkApplication.getConsumerKey())
 				.consumerSecret(externalNetworkApplication.getConsumerSecret())
@@ -850,6 +852,30 @@ public class DtoAssembler {
 			externalApplicationDto.getClientPlatformIds().add(
 					clientPlatform.ordinal());
 		return externalApplicationDto;
+	}
+
+	public static ExternalNetworkApplication assemble(
+			ExternalApplicationDto externalNetworkApplicationDto) {
+		ExternalNetworkApplication externalApplication = new ExternalNetworkApplication.Builder()
+				.externalApplicationId(
+						externalNetworkApplicationDto
+								.getExternalApplicationId())
+				.apiKey(externalNetworkApplicationDto.getApiKey())
+				.consumerKey(externalNetworkApplicationDto.getConsumerKey())
+				.consumerSecret(
+						externalNetworkApplicationDto.getConsumerSecret())
+				.externalNetwork(
+						externalNetworkApplicationDto.getExternalNetworkId())
+				.redirectURL(externalNetworkApplicationDto.getRedirectUrl())
+				.token(externalNetworkApplicationDto.getToken())
+				.tokenSecret(externalNetworkApplicationDto.getTokenSecret())
+				.userAgent(externalNetworkApplicationDto.getUserAgent())
+				.build();
+		for (Integer clientPlatformId : externalNetworkApplicationDto
+				.getClientPlatformIds())
+			externalApplication.getClientPlatforms().add(
+					ClientPlatform.getEnum(clientPlatformId));
+		return externalApplication;
 	}
 
 	public static List<ExternalNetworkConfigurationDto> getNetworks() {

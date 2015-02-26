@@ -6,7 +6,9 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 public class ExternalApplicationDto {
-
+	
+	private Long externalApplicationId;
+	
 	@NotNull
 	private Integer externalNetworkId;
 
@@ -65,9 +67,18 @@ public class ExternalApplicationDto {
 		return redirectUrl;
 	}
 
+	public Long getExternalApplicationId() {
+		return externalApplicationId;
+	}
+
+	public void setExternalApplicationId(Long externalApplicationId) {
+		this.externalApplicationId = externalApplicationId;
+	}
+
 
 
 	public static class Builder {
+		private Long externalApplicationId;
 		private Integer externalNetworkId;
 		private String consumerKey;
 		private String consumerSecret;
@@ -76,7 +87,11 @@ public class ExternalApplicationDto {
 		private String tokenSecret;
 		private String userAgent;
 		private String redirectUrl;
-
+		
+		public Builder externalApplicationId(Long externalApplicationId){
+			this.externalApplicationId = externalApplicationId;
+			return this;
+		}
 		public Builder externalNetwork(Integer externalNetwork) {
 			this.externalNetworkId = externalNetwork;
 			return this;
@@ -122,6 +137,7 @@ public class ExternalApplicationDto {
 	}
 
 	private ExternalApplicationDto(Builder builder) {
+		this.externalApplicationId = builder.externalApplicationId;
 		this.externalNetworkId = builder.externalNetworkId;
 		this.consumerKey = builder.consumerKey;
 		this.consumerSecret = builder.consumerSecret;

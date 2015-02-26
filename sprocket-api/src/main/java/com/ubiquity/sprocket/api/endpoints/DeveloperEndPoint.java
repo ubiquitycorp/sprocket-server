@@ -200,7 +200,7 @@ public class DeveloperEndPoint {
 	@GET
 	@Path("/{developerId}/applications/{applicationId}")
 	@DeveloperSecure
-	public Response getApplications(@PathParam("developerId") Long developerId,
+	public Response getApplication(@PathParam("developerId") Long developerId,
 			@PathParam("applicationId") Long applicationId) throws IOException {
 
 		DeveloperService developerService = ServiceFactory
@@ -219,8 +219,8 @@ public class DeveloperEndPoint {
 	}
 
 	/***
-	 * This end point creates an external network application with the given sprocket application for the developer who
-	 * invoked the request
+	 * This end point creates an external network application with the given
+	 * sprocket application for the developer who invoked the request
 	 * 
 	 * @param payload
 	 * @return
@@ -240,7 +240,7 @@ public class DeveloperEndPoint {
 
 		Application application = developerService
 				.getApplicationByApplicationId(developerId, applicationId);
-		
+
 		developerService.createExternalApplication(
 				externalAppDto.getConsumerKey(),
 				externalAppDto.getConsumerSecret(), externalAppDto.getApiKey(),
@@ -251,11 +251,52 @@ public class DeveloperEndPoint {
 
 		return Response.ok().build();
 	}
+
 	/***
-	 * Get external network applications by application Id 
+	 * This end point creates an external network application with the given
+	 * sprocket application for the developer who invoked the request
+	 * 
+	 * @param payload
+	 * @return
+	 */
+	@POST
+	@Path("/{developerId}/applications/{applicationId}/external_apps/{externalApplicationId}/updated")
+	@DeveloperSecure
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateExternalApplication(InputStream payload,
+			@PathParam("developerId") Long developerId,
+			@PathParam("applicationId") Long applicationId,
+			@PathParam("externalApplicationId") Long externalApplicationId)
+			throws IOException {
+		ExternalApplicationDto externalAppDto = jsonConverter
+				.convertFromPayload(payload, ExternalApplicationDto.class);
+		DeveloperService developerService = ServiceFactory
+				.getDeveloperService();
+
+		Application application = developerService
+				.getApplicationByApplicationId(developerId, applicationId);
+		
+		externalAppDto.setExternalApplicationId(externalApplicationId);
+
+		ExternalNetworkApplication externalNetworkApp = DtoAssembler
+				.assemble(externalAppDto);
+		if (externalNetworkApp.getExternalApplicationId() == null)
+			throw new IllegalArgumentException(
+					"Please, provide External network id to perform your update.");
+		developerService.updateExternalApplication(externalNetworkApp,
+				application);
+
+		return Response.ok().build();
+	}
+
+	/***
+	 * Get external network applications by application Id
+	 * 
 	 * @param developerId
 	 * @param applicationId
-	 * @return the external network applications if the developer have access to this application 
+	 * @return the external network applications if the developer have access to
+	 *         this application
 	 * @throws IOException
 	 */
 	@GET
@@ -270,12 +311,12 @@ public class DeveloperEndPoint {
 		List<ExternalNetworkApplication> externalNetworkApplications = developerService
 				.getExternalApplicationByApplicationId(developerId,
 						applicationId);
-		ExternalApplicationsDto result = new ExternalApplicationsDto() ;
+		ExternalApplicationsDto result = new ExternalApplicationsDto();
 		for (ExternalNetworkApplication externalNetworkApplication : externalNetworkApplications) {
-			result.getExternalApplications().add(DtoAssembler.assemble(externalNetworkApplication));
+			result.getExternalApplications().add(
+					DtoAssembler.assemble(externalNetworkApplication));
 		}
-		return Response.ok()
-				.entity(jsonConverter.convertToPayload(result))
+		return Response.ok().entity(jsonConverter.convertToPayload(result))
 				.build();
 
 	}
