@@ -313,7 +313,7 @@ public class DeveloperEndPoint {
 				.getDeveloperService();
 
 		Application application = developerService
-				.getApplicationByApplicationId(developerId, applicationId);
+				.getApplicationById(developerId, applicationId);
 		
 		developerService.deletedExternalApplication(externalApplicationId,
 				application);
