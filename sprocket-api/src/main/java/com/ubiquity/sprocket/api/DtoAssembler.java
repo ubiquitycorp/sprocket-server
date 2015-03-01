@@ -846,6 +846,8 @@ public class DtoAssembler {
 				.redirectUrl(externalNetworkApplication.getRedirectURL())
 				.token(externalNetworkApplication.getToken())
 				.tokenSecret(externalNetworkApplication.getTokenSecret())
+				.lastUpdated(externalNetworkApplication.getLastUpdated())
+				.createdAt(externalNetworkApplication.getCreatedAt())
 				.userAgent(externalNetworkApplication.getUserAgent()).build();
 		for (ClientPlatform clientPlatform : externalNetworkApplication
 				.getClientPlatforms())
@@ -870,6 +872,8 @@ public class DtoAssembler {
 				.token(externalNetworkApplicationDto.getToken())
 				.tokenSecret(externalNetworkApplicationDto.getTokenSecret())
 				.userAgent(externalNetworkApplicationDto.getUserAgent())
+				.lastUpdated(externalNetworkApplicationDto.getLastUpdated())
+				.createdAt(externalNetworkApplicationDto.getCreatedAt())
 				.build();
 		for (Integer clientPlatformId : externalNetworkApplicationDto
 				.getClientPlatformIds())

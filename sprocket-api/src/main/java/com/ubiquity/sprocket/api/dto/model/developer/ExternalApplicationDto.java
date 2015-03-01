@@ -5,20 +5,22 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.integration.domain.ExternalNetwork;
+
 public class ExternalApplicationDto {
-	
+
 	private Long externalApplicationId;
-	
+
 	@NotNull
 	private Integer externalNetworkId;
 
 	@NotNull
-	private List<Integer> clientPlatformIds = new LinkedList<Integer>(); ;
+	private List<Integer> clientPlatformIds = new LinkedList<Integer>();;
 
 	@NotNull
 	private String consumerKey;
 
-	@NotNull
 	private String consumerSecret;
 
 	private String apiKey;
@@ -30,6 +32,10 @@ public class ExternalApplicationDto {
 	private String userAgent;
 
 	private String redirectUrl;
+	
+	private Long lastUpdated;
+	
+	private Long createdAt;
 
 	public Integer getExternalNetworkId() {
 		return externalNetworkId;
@@ -67,6 +73,14 @@ public class ExternalApplicationDto {
 		return redirectUrl;
 	}
 
+	public Long getLastUpdated() {
+		return lastUpdated;
+	}
+
+	public Long getCreatedAt() {
+		return createdAt;
+	}
+
 	public Long getExternalApplicationId() {
 		return externalApplicationId;
 	}
@@ -74,8 +88,6 @@ public class ExternalApplicationDto {
 	public void setExternalApplicationId(Long externalApplicationId) {
 		this.externalApplicationId = externalApplicationId;
 	}
-
-
 
 	public static class Builder {
 		private Long externalApplicationId;
@@ -87,11 +99,14 @@ public class ExternalApplicationDto {
 		private String tokenSecret;
 		private String userAgent;
 		private String redirectUrl;
-		
-		public Builder externalApplicationId(Long externalApplicationId){
+		private Long lastUpdated;
+		private Long createdAt;
+
+		public Builder externalApplicationId(Long externalApplicationId) {
 			this.externalApplicationId = externalApplicationId;
 			return this;
 		}
+
 		public Builder externalNetwork(Integer externalNetwork) {
 			this.externalNetworkId = externalNetwork;
 			return this;
@@ -131,7 +146,18 @@ public class ExternalApplicationDto {
 			this.redirectUrl = redirectUrl;
 			return this;
 		}
-		public ExternalApplicationDto build(){
+
+		public Builder createdAt(Long createdAt) {
+			this.createdAt = createdAt;
+			return this;
+		}
+
+		public Builder lastUpdated(Long lastUpdated) {
+			this.lastUpdated= lastUpdated;
+			return this;
+		}
+
+		public ExternalApplicationDto build() {
 			return new ExternalApplicationDto(this);
 		}
 	}
@@ -146,5 +172,44 @@ public class ExternalApplicationDto {
 		this.tokenSecret = builder.tokenSecret;
 		this.userAgent = builder.userAgent;
 		this.redirectUrl = builder.redirectUrl;
+		this.createdAt = builder.createdAt;
+		this.lastUpdated= builder.lastUpdated;
+	}
+
+	public void validate() {
+		if (externalNetworkId == ExternalNetwork.Twitter.ordinal()) {
+			if(consumerSecret ==null)
+				throw new IllegalArgumentException(	"consumerSecret couldn't be null.");
+			else if(redirectUrl == null)
+				throw new IllegalArgumentException(	"redirectUrl couldn't be null.");
+				
+		} else if (externalNetworkId == ExternalNetwork.Facebook.ordinal()) {
+			if(clientPlatformIds.contains(ClientPlatform.WEB)&& consumerSecret ==null)
+				throw new IllegalArgumentException(	"consumerSecret couldn't be null.");
+		} else if (externalNetworkId == ExternalNetwork.LinkedIn.ordinal()) {
+			if(consumerSecret ==null)
+				throw new IllegalArgumentException(	"consumerSecret couldn't be null.");
+		} else if (externalNetworkId == ExternalNetwork.Google.ordinal()) {
+			if(consumerSecret ==null)
+				throw new IllegalArgumentException(	"consumerSecret couldn't be null.");
+		} else if (externalNetworkId == ExternalNetwork.Vimeo.ordinal()) {
+			if(consumerSecret ==null)
+				throw new IllegalArgumentException(	"consumerSecret couldn't be null.");
+		} else if (externalNetworkId == ExternalNetwork.Tumblr.ordinal()) {
+			if(consumerSecret ==null)
+				throw new IllegalArgumentException(	"consumerSecret couldn't be null.");
+			else if(redirectUrl == null)
+				throw new IllegalArgumentException(	"redirectUrl couldn't be null.");
+		} else if (externalNetworkId == ExternalNetwork.Reddit.ordinal()) {
+			if(redirectUrl == null)
+				throw new IllegalArgumentException(	"redirectUrl couldn't be null.");
+			else if(userAgent == null)
+				throw new IllegalArgumentException(	"userAgent couldn't be null.");
+			if(clientPlatformIds.contains(ClientPlatform.WEB)&& consumerSecret ==null)
+				throw new IllegalArgumentException(	"consumerSecret couldn't be null.");
+		} else{
+			throw new IllegalArgumentException(	"External network number is not supported.");
+		}
+		
 	}
 }

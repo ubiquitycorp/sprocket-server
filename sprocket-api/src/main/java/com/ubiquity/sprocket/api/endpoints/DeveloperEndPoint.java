@@ -235,6 +235,9 @@ public class DeveloperEndPoint {
 			@PathParam("applicationId") Long applicationId) throws IOException {
 		ExternalApplicationDto externalAppDto = jsonConverter
 				.convertFromPayload(payload, ExternalApplicationDto.class);
+		
+		externalAppDto.validate();
+		
 		DeveloperService developerService = ServiceFactory
 				.getDeveloperService();
 
@@ -271,6 +274,8 @@ public class DeveloperEndPoint {
 			throws IOException {
 		ExternalApplicationDto externalAppDto = jsonConverter
 				.convertFromPayload(payload, ExternalApplicationDto.class);
+		
+		externalAppDto.validate(); 
 		DeveloperService developerService = ServiceFactory
 				.getDeveloperService();
 
@@ -281,15 +286,40 @@ public class DeveloperEndPoint {
 
 		ExternalNetworkApplication externalNetworkApp = DtoAssembler
 				.assemble(externalAppDto);
-		if (externalNetworkApp.getExternalApplicationId() == null)
-			throw new IllegalArgumentException(
-					"Please, provide External network id to perform your update.");
+		
 		developerService.updateExternalApplication(externalNetworkApp,
 				application);
 
 		return Response.ok().build();
 	}
+	/***
+	 * delete external application
+	 * @param developerId
+	 * @param applicationId
+	 * @param externalApplicationId
+	 * @return
+	 * @throws IOException
+	 */
+	@POST
+	@Path("/{developerId}/applications/{applicationId}/external_apps/{externalApplicationId}/deleted")
+	@DeveloperSecure
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response deletedExternalApplication(@PathParam("developerId") Long developerId,
+			@PathParam("applicationId") Long applicationId,
+			@PathParam("externalApplicationId") Long externalApplicationId)
+			throws IOException {
+		DeveloperService developerService = ServiceFactory
+				.getDeveloperService();
 
+		Application application = developerService
+				.getApplicationByApplicationId(developerId, applicationId);
+		
+		developerService.deletedExternalApplication(externalApplicationId,
+				application);
+
+		return Response.ok().build();
+	}
 	/***
 	 * Get external network applications by application Id
 	 * 
