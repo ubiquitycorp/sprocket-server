@@ -83,7 +83,7 @@
 		<dependency>
 			<groupId>com.niobium</groupId>
 			<artifactId>niobium-data-access</artifactId>
-			<version>0.9.8</version>
+			<version>0.9.9</version>
 		</dependency>
 
 		<dependency>
