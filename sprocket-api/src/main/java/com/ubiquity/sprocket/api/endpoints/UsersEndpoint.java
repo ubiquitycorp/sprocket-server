@@ -174,12 +174,12 @@ public class UsersEndpoint {
 		SocialToken requestToken = null;
 		if (externalNetwork == ExternalNetwork.Twitter) {
 			SocialAPI socialApi = SocialAPIFactory
-					.createTwitterProvider(identityDto.getRedirectUrl());
+					.createProviderWithCallBackUrl(externalNetwork,identityDto.getRedirectUrl());
 			TwitterAPI twitterApi = (TwitterAPI) socialApi;
 			requestToken = twitterApi.requesttoken();
 		} else if (externalNetwork == ExternalNetwork.Tumblr) {
 			SocialAPI socialApi = SocialAPIFactory
-					.createTumblrProvider(identityDto.getRedirectUrl());
+					.createProviderWithCallBackUrl(externalNetwork,identityDto.getRedirectUrl());
 			TumblrAPI tumblrApi = (TumblrAPI) socialApi;
 			requestToken = tumblrApi.requesttoken();
 		} else {
