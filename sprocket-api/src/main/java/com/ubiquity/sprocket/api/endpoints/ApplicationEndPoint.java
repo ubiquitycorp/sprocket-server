@@ -17,17 +17,14 @@ import org.slf4j.LoggerFactory;
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
-import com.ubiquity.identity.domain.ExternalIdentity;
-import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.sprocket.api.dto.model.user.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.user.IdentityDto;
-import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
-import com.ubiquity.sprocket.api.validation.RemoteAuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.RemoteRegistrationValidation;
 import com.ubiquity.sprocket.service.ServiceFactory;
+import com.ubiquity.sprocket.service.SprocketUserAuthService;
 
 @Path("/1.0/application")
 public class ApplicationEndPoint {
@@ -63,7 +60,7 @@ public class ApplicationEndPoint {
 
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
 				.getClientPlatformId());
-		User user = authenticationService.register(identityDto.getIdentifier(),
+		User user = ((SprocketUserAuthService) authenticationService).register(identityDto.getIdentifier(),
 				clientPlatform, Boolean.TRUE, application);
 
 		// user now has a single, native identity

@@ -9,7 +9,6 @@ import com.ubiquity.identity.service.AdminAuthService;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.identity.service.DeveloperAuthService;
 import com.ubiquity.identity.service.DeveloperService;
-import com.ubiquity.identity.service.UserAuthService;
 import com.ubiquity.identity.service.UserService;
 import com.ubiquity.integration.service.ContactService;
 import com.ubiquity.integration.service.ContentService;
@@ -165,7 +164,7 @@ public class ServiceFactory {
 	 */
 	public static AuthenticationService<User> getUserAuthService() {
 		if(userAuthService == null)
-			userAuthService = new UserAuthService(configuration);
+			userAuthService = new SprocketUserAuthService(configuration);
 		return userAuthService;
 	}
 	
