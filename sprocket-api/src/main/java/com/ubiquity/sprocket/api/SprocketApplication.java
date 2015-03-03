@@ -8,6 +8,7 @@ import javax.ws.rs.core.Application;
 
 import com.ubiquity.sprocket.api.endpoints.AdminsEndpoint;
 import com.ubiquity.sprocket.api.endpoints.AnalyticsEndpoint;
+import com.ubiquity.sprocket.api.endpoints.ApplicationEndPoint;
 import com.ubiquity.sprocket.api.endpoints.ClientEndpoint;
 import com.ubiquity.sprocket.api.endpoints.ContentEndpoint;
 import com.ubiquity.sprocket.api.endpoints.DeveloperEndPoint;
@@ -33,6 +34,7 @@ public class SprocketApplication extends Application {
 	    singletons.add(new InternalServicesEndpoint());
 	    singletons.add(new AdminsEndpoint());
 	    singletons.add(new DeveloperEndPoint());
+	    singletons.add(new ApplicationEndPoint());
 	  }
 
 	  @Override
