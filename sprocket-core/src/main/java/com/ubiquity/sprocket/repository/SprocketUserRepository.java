@@ -11,6 +11,13 @@ public interface SprocketUserRepository extends UserRepository {
 
 	/***
 	 * 
+	 * @param userId
+	 * @return
+	 */
+	User getSprocketUserById(Long userId);
+	
+	/***
+	 * 
 	 * @param identifier
 	 * @param appId
 	 * @return
