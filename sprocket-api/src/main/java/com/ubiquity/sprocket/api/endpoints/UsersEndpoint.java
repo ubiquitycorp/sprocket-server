@@ -70,6 +70,7 @@ import com.ubiquity.sprocket.api.validation.AuthorizationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
 import com.ubiquity.sprocket.api.validation.ResetValidation;
 import com.ubiquity.sprocket.api.validation.UserLocationUpdateValidation;
+import com.ubiquity.sprocket.domain.SprocketUser;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 //import com.ubiquity.sprocket.messaging.definition.EventTracked;
@@ -245,14 +246,11 @@ public class UsersEndpoint {
 				.userId(user.getUserId()).build();
 
 		for (Identity identity : user.getIdentities()) {
-			if (identity instanceof ExternalIdentity) {
+			if (identity instanceof ExternalIdentity && identity.getIsActive()) {
 				ExternalIdentity externalIdentity = (ExternalIdentity) identity;
-				IdentityDto associatedIdentityDto = new IdentityDto.Builder()
-						.identifier(externalIdentity.getIdentifier())
-						.externalNetworkId(
-								externalIdentity.getExternalNetwork()).build();
-				if (identity.getIsActive())
-					accountDto.getIdentities().add(associatedIdentityDto);
+				IdentityDto associatedIdentityDto = DtoAssembler
+						.assemble(externalIdentity);
+				accountDto.getIdentities().add(associatedIdentityDto);
 			}
 		}
 
@@ -353,13 +351,14 @@ public class UsersEndpoint {
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
 
+		//log.info("identifier = " + ((SprocketUser)user).getExternalIdentifier());
 		// Load External Application
 		ExternalNetworkApplication externalNetworkApplication = ServiceFactory.getApplicationService()
 				.getExAppByExternalNetworkAndClientPlatform(
 						user.getCreatedBy(), externalNetwork.ordinal(),
 						clientPlatform);
 		// create the identity if it does not exist; or use the existing one
-		List<ExternalIdentity> identity = ServiceFactory
+		List<ExternalIdentity> identities = ServiceFactory
 				.getExternalIdentityService().createOrUpdateExternalIdentity(
 						user, identityDto.getAccessToken(),
 						identityDto.getSecretToken(),
@@ -368,7 +367,7 @@ public class UsersEndpoint {
 						externalNetworkApplication);
 
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identity, identityDto.getClientPlatformId());
+		sendActivatedMessage(user, identities, identityDto.getClientPlatformId());
 
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
@@ -376,13 +375,12 @@ public class UsersEndpoint {
 
 			Contact contact = ServiceFactory.getContactService()
 					.getBySocialIdentityId(userId,
-							identity.get(0).getIdentityId());
+							identities.get(0).getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
 		} catch (NoResultException ex) {
-			IdentityDto result = new IdentityDto.Builder().identifier(
-					identity.get(0).getIdentifier()).build();
+			IdentityDto result = DtoAssembler.assemble(identities.get(0));
 			return Response.ok().entity(jsonConverter.convertToPayload(result))
 					.build();
 		}
