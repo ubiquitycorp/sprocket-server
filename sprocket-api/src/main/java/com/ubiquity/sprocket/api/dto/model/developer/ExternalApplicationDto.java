@@ -32,9 +32,9 @@ public class ExternalApplicationDto {
 	private String userAgent;
 
 	private String redirectUrl;
-	
+
 	private Long lastUpdated;
-	
+
 	private Long createdAt;
 
 	public Integer getExternalNetworkId() {
@@ -153,7 +153,7 @@ public class ExternalApplicationDto {
 		}
 
 		public Builder lastUpdated(Long lastUpdated) {
-			this.lastUpdated= lastUpdated;
+			this.lastUpdated = lastUpdated;
 			return this;
 		}
 
@@ -173,43 +173,67 @@ public class ExternalApplicationDto {
 		this.userAgent = builder.userAgent;
 		this.redirectUrl = builder.redirectUrl;
 		this.createdAt = builder.createdAt;
-		this.lastUpdated= builder.lastUpdated;
+		this.lastUpdated = builder.lastUpdated;
 	}
 
 	public void validate() {
 		if (externalNetworkId == ExternalNetwork.Twitter.ordinal()) {
-			if(consumerSecret ==null)
-				throw new IllegalArgumentException(	"consumerSecret couldn't be null.");
-			else if(redirectUrl == null)
-				throw new IllegalArgumentException(	"redirectUrl couldn't be null.");
-				
+			if (consumerSecret == null)
+				throw new IllegalArgumentException(
+						"consumerSecret couldn't be null.");
+			else if (redirectUrl == null)
+				throw new IllegalArgumentException(
+						"redirectUrl couldn't be null.");
+
 		} else if (externalNetworkId == ExternalNetwork.Facebook.ordinal()) {
-			if(clientPlatformIds.contains(ClientPlatform.WEB)&& consumerSecret ==null)
-				throw new IllegalArgumentException(	"consumerSecret couldn't be null.");
+			if (clientPlatformIds.contains(ClientPlatform.WEB)
+					&& consumerSecret == null)
+				throw new IllegalArgumentException(
+						"consumerSecret couldn't be null.");
 		} else if (externalNetworkId == ExternalNetwork.LinkedIn.ordinal()) {
-			if(consumerSecret ==null)
-				throw new IllegalArgumentException(	"consumerSecret couldn't be null.");
+			if (consumerSecret == null)
+				throw new IllegalArgumentException(
+						"consumerSecret couldn't be null.");
 		} else if (externalNetworkId == ExternalNetwork.Google.ordinal()) {
-			if(consumerSecret ==null)
-				throw new IllegalArgumentException(	"consumerSecret couldn't be null.");
+			if (consumerSecret == null)
+				throw new IllegalArgumentException(
+						"consumerSecret couldn't be null.");
 		} else if (externalNetworkId == ExternalNetwork.Vimeo.ordinal()) {
-			if(consumerSecret ==null)
-				throw new IllegalArgumentException(	"consumerSecret couldn't be null.");
+			if (consumerSecret == null)
+				throw new IllegalArgumentException(
+						"consumerSecret couldn't be null.");
+		} else if (externalNetworkId == ExternalNetwork.Yelp.ordinal()) {
+			if (consumerSecret == null)
+				throw new IllegalArgumentException(
+						"consumerSecret couldn't be null.");
+			else if (token == null)
+				throw new IllegalArgumentException(
+						"token couldn't be null.");
+			else if (tokenSecret == null)
+				throw new IllegalArgumentException(
+						"tokenSecret couldn't be null.");
 		} else if (externalNetworkId == ExternalNetwork.Tumblr.ordinal()) {
-			if(consumerSecret ==null)
-				throw new IllegalArgumentException(	"consumerSecret couldn't be null.");
-			else if(redirectUrl == null)
-				throw new IllegalArgumentException(	"redirectUrl couldn't be null.");
+			if (consumerSecret == null)
+				throw new IllegalArgumentException(
+						"consumerSecret couldn't be null.");
+			else if (redirectUrl == null)
+				throw new IllegalArgumentException(
+						"redirectUrl couldn't be null.");
 		} else if (externalNetworkId == ExternalNetwork.Reddit.ordinal()) {
-			if(redirectUrl == null)
-				throw new IllegalArgumentException(	"redirectUrl couldn't be null.");
-			else if(userAgent == null)
-				throw new IllegalArgumentException(	"userAgent couldn't be null.");
-			if(clientPlatformIds.contains(ClientPlatform.WEB)&& consumerSecret ==null)
-				throw new IllegalArgumentException(	"consumerSecret couldn't be null.");
-		} else{
-			throw new IllegalArgumentException(	"External network number is not supported.");
+			if (redirectUrl == null)
+				throw new IllegalArgumentException(
+						"redirectUrl couldn't be null.");
+			else if (userAgent == null)
+				throw new IllegalArgumentException(
+						"userAgent couldn't be null.");
+			if (clientPlatformIds.contains(ClientPlatform.WEB)
+					&& consumerSecret == null)
+				throw new IllegalArgumentException(
+						"consumerSecret couldn't be null.");
+		} else {
+			throw new IllegalArgumentException(
+					"External network number is not supported.");
 		}
-		
+
 	}
 }

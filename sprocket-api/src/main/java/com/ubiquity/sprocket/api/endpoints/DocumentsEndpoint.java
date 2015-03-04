@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ExternalNetwork;
@@ -126,12 +127,16 @@ public class DocumentsEndpoint {
 		User user = ServiceFactory.getUserService().getUserById(userId);
 		
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, externalNetwork);
+		
 		if(identity == null && externalNetwork != ExternalNetwork.Yelp)
 			throw new IllegalArgumentException("User does not have an identity for this provider");
-		if(externalNetwork != ExternalNetwork.Yelp)
-			ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity);
 		
-		List<Document> documents = ServiceFactory.getSearchService().searchLiveDocuments(q, user, externalNetwork, page ,longitude,latitude,locator);
+		ExternalNetworkApplication externalNetworkApplication = ServiceFactory.getApplicationService().getExAppByExternalIdentity(user.getCreatedBy(), identity);
+		
+		if(externalNetwork != ExternalNetwork.Yelp)
+			ServiceFactory.getSocialService().checkValidityOfExternalIdentity(identity,  externalNetworkApplication); 
+		
+		List<Document> documents = ServiceFactory.getSearchService().searchLiveDocuments(q, user, externalNetwork, page ,longitude,latitude,locator,externalNetworkApplication);
 		
 		for(Document document : documents) {
 			result.getDocuments().add(DtoAssembler.assemble(document));

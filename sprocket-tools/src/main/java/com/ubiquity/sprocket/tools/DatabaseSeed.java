@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.integration.api.PlaceAPIFactory;
 import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.integration.domain.ExternalInterest;
@@ -208,10 +210,11 @@ public class DatabaseSeed {
 	public static void main(String[] args) {
 		final DatabaseSeed loader = new DatabaseSeed();
 		try {
-			loader.initialize(new PropertiesConfiguration("tools.properties"));
+			Configuration configuration = new PropertiesConfiguration("tools.properties");
+			loader.initialize(configuration);
 			//loader.seedPlacesFromNeighborhoodsFeed();
 			//loader.seedInterests();
-			loader.goober();
+			loader.goober(configuration);
 		} catch (ConfigurationException e) {
 			log.error("Unable to configure service", e);
 			System.exit(-1);
@@ -229,9 +232,10 @@ public class DatabaseSeed {
 		});
 	}
 
-	private void goober() {
-		LocationService locationService = ServiceFactory.getLocationService();
-		locationService.syncPlaces(ExternalNetwork.Yelp);
+	private void goober(Configuration configuration) {
+		ServiceFactory.initialize(configuration, null);
+		ExternalNetworkApplication externalNetworkApplication = ServiceFactory.getApplicationService().getDefaultExternalApplication(ExternalNetwork.Yelp.ordinal(), ClientPlatform.WEB);
+		ServiceFactory.getLocationService().syncPlaces(ExternalNetwork.Yelp,externalNetworkApplication);
 	}
 
 	private void loadParentInterestWithFile(Interest parent, String resource)

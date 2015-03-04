@@ -20,6 +20,7 @@ import com.niobium.repository.cache.DataModificationCacheRedisImpl;
 import com.niobium.repository.cache.UserDataModificationCache;
 import com.niobium.repository.cache.UserDataModificationCacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.integration.api.PlaceAPI;
 import com.ubiquity.integration.api.PlaceAPIFactory;
 import com.ubiquity.integration.api.exception.ExternalNetworkException;
@@ -205,11 +206,11 @@ public class LocationService {
 	}
 
 
-	public void syncPlaces(ExternalNetwork network) {
+	public void syncPlaces(ExternalNetwork network,ExternalNetworkApplication externalNetworkApplication ) {
 
 		if(network.equals(ExternalNetwork.Yelp)) {
 
-			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(ExternalNetwork.Yelp, null);
+			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(ExternalNetwork.Yelp, null, externalNetworkApplication);
 
 			try {
 
@@ -279,11 +280,11 @@ public class LocationService {
 		}
 	}
 
-	public List<Place> liveSearch(String searchTerm, Long placeID, List<Long> interestIds, ExternalNetwork network)
+	public List<Place> liveSearch(String searchTerm, Long placeID, List<Long> interestIds, ExternalNetwork network, ExternalNetworkApplication externalNetworkApplication)
 	{
 		if(network.equals(ExternalNetwork.Yelp)) {
 			
-			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(ExternalNetwork.Yelp, null);
+			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(ExternalNetwork.Yelp, null,externalNetworkApplication);
 			PlaceRepository placeRepository = new PlaceRepositoryJpaImpl();
 			Place place =  placeRepository.read(placeID);
 			ExternalInterestRepository externalRepository = new ExternalInterestRepositoryJpaImpl();

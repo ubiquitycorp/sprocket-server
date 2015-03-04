@@ -15,6 +15,7 @@ import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.content.api.VimeoAPITest;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.integration.api.SocialAPI;
@@ -22,52 +23,76 @@ import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Message;
+import com.ubiquity.integration.service.ApplicationService;
 
 public class FacebookApiTest {
-	
-private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
-	
+
+	private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
+
 	private static ExternalIdentity identity;
-	
+	private static ExternalNetworkApplication externalNetworkApplication;
+
 	@BeforeClass
 	public static void setUp() throws Exception {
+		Configuration configuration = new PropertiesConfiguration(
+				"test.properties");
+		JedisConnectionFactory.initialize(configuration);
+		SocialAPIFactory.initialize(configuration);
+		ApplicationService developerService = new ApplicationService(configuration);
+		
 		
 		EntityManagerSupport.beginTransaction();
-		User user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+
+		User user = TestUserFactory
+				.createTestUserWithMinimumRequiredProperties();
 		EntityManagerSupport.commit();
-		
+
 		identity = new ExternalIdentity.Builder()
-			.user(user)
-			.accessToken("CAACEdEose0cBADwKBAaDVntezhdSvYJ8IM1EJX822o2UDvLlPBybcRlPI8s80FohfcaaFvFey3C42zlboHop55TNRhqysu5hPZCZAvV7gUnxsXPDbds0sIxWOecgFvXW2ZCFDDnG52im55OjcZC3L59WW5sfGZAPHZA4yGyzhgd8zwiqHpEDCd6niBOUR7lThw1wrGvIQI1KCs3KuKob24BwI5weAcd28ZD").build();
+				.user(user)
+				.accessToken(
+						"CAACEdEose0cBADwKBAaDVntezhdSvYJ8IM1EJX822o2UDvLlPBybcRlPI8s80FohfcaaFvFey3C42zlboHop55TNRhqysu5hPZCZAvV7gUnxsXPDbds0sIxWOecgFvXW2ZCFDDnG52im55OjcZC3L59WW5sfGZAPHZA4yGyzhgd8zwiqHpEDCd6niBOUR7lThw1wrGvIQI1KCs3KuKob24BwI5weAcd28ZD")
+				.clientPlatform(ClientPlatform.WEB)
+				.externalNetwork(ExternalNetwork.Facebook.ordinal()).build();
 		log.debug("authenticated Facebook with identity {} ", identity);
-		
-		Configuration configuration = new PropertiesConfiguration("test.properties");
-		
-		JedisConnectionFactory.initialize(configuration);
-		
-		SocialAPIFactory.initialize(configuration);
+
+		externalNetworkApplication = developerService
+				.getDefaultExternalApplication(identity.getExternalNetwork(),
+						identity.getClientPlatform());
+
 	}
-	
+
 	@Test
 	public void testGetMessages() {
-		
-		SocialAPI facebookAPI = SocialAPIFactory.createProvider(ExternalNetwork.Facebook, ClientPlatform.WEB);
-		List<Message> messages = facebookAPI.listMessages(identity,null, null);
+
+		SocialAPI facebookAPI = SocialAPIFactory.createProvider(
+				ExternalNetwork.Facebook, ClientPlatform.WEB,
+				externalNetworkApplication);
+		List<Message> messages = facebookAPI.listMessages(identity, null, null);
 		Assert.assertFalse(messages.isEmpty());
 		// all fb messages will have conversations
-		for(Message message : messages) {
+		for (Message message : messages) {
 			log.debug("message {}", message);
-			Assert.assertNotNull(message.getConversation().getConversationIdentifier());
+			Assert.assertNotNull(message.getConversation()
+					.getConversationIdentifier());
 		}
 	}
-	
+
 	@Test
 	public void testAuthenticateReturnsGenderAgeRangeAndLocation() {
-		SocialAPI facebookAPI = SocialAPIFactory.createProvider(ExternalNetwork.Facebook, ClientPlatform.WEB);
+		SocialAPI facebookAPI = SocialAPIFactory.createProvider(
+				ExternalNetwork.Facebook, ClientPlatform.WEB,
+				externalNetworkApplication);
 		Contact contact = facebookAPI.authenticateUser(identity);
-		Assert.assertTrue(contact.getGender() != null);	
+		Assert.assertTrue(contact.getGender() != null);
 		Assert.assertTrue(contact.getAgeRange() != null);
-		Assert.assertTrue(contact.getAgeRange().getMin() == 35); // 21 would be the default, this token has an age greater than 21
+		Assert.assertTrue(contact.getAgeRange().getMin() == 35); // 21 would be
+																	// the
+																	// default,
+																	// this
+																	// token has
+																	// an age
+																	// greater
+																	// than 21
 		Assert.assertTrue(contact.getLocation() != null);
 	}
 

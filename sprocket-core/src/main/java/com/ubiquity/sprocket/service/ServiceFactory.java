@@ -11,6 +11,7 @@ import com.ubiquity.identity.service.DeveloperAuthService;
 import com.ubiquity.identity.service.DeveloperService;
 import com.ubiquity.identity.service.UserAuthService;
 import com.ubiquity.identity.service.UserService;
+import com.ubiquity.integration.service.ApplicationService;
 import com.ubiquity.integration.service.ContactService;
 import com.ubiquity.integration.service.ContentService;
 import com.ubiquity.integration.service.ExternalIdentityService;
@@ -44,6 +45,7 @@ public class ServiceFactory {
 	private static FavoriteService favoriteService;
 	private static MediaService mediaService;
 	private static DeveloperService developerService;
+	private static ApplicationService applicationService;
 	
 	/***
 	 * Initializes all services with the specified configuration
@@ -145,6 +147,17 @@ public class ServiceFactory {
 		if(socialService == null)
 			socialService = new SocialService(configuration);
 		return socialService;
+	}
+	
+	/***
+	 * Creates or returns user manager
+	 * 
+	 * @return
+	 */
+	public static ApplicationService getApplicationService() {
+		if(applicationService == null)
+			applicationService = new ApplicationService(configuration);
+		return applicationService;
 	}
 	
 	

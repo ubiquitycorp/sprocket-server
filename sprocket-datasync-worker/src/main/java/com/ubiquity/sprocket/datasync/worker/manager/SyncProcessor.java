@@ -10,7 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.amqp.MessageQueueProducer;
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.api.exception.AuthorizationException;
@@ -52,7 +54,11 @@ public abstract class SyncProcessor {
 		// get identity from message
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.getExternalIdentityById(activated.getIdentityId());
-		processSync(identity);
+		//get External application from application 
+		ExternalNetworkApplication externalNetworkApplication = ServiceFactory.getApplicationService()
+				.getExAppByExternalIdentity(
+						identity.getUser().getCreatedBy(), identity);
+		processSync(identity,externalNetworkApplication);
 	}
 
 	/**
@@ -61,7 +67,8 @@ public abstract class SyncProcessor {
 	 * @param identity
 	 * @throws IOException
 	 */
-	public void processSync(ExternalIdentity identity) {
+	public void processSync(ExternalIdentity identity,
+			ExternalNetworkApplication externalNetworkApplication) {
 
 		MessageQueueProducer backchannel = null;
 		// get the back channel mq; we don't want to skip sync because we can't
@@ -78,7 +85,8 @@ public abstract class SyncProcessor {
 
 		sendSyncStartedMessageToIndividual(backchannel, externalNetwork, userId);
 
-		mainHandler.canAccept(identity, externalNetwork);
+		mainHandler.canAccept(identity, externalNetwork,
+				externalNetworkApplication);
 
 		sendSyncCompletedMessageToIndividual(backchannel, externalNetwork,
 				userId);
@@ -95,7 +103,7 @@ public abstract class SyncProcessor {
 	 */
 	public int syncDataForUser(User user) {
 		Set<Identity> identities = user.getIdentities();
-
+		Application application = user.getCreatedBy();
 		DateTime start = new DateTime();
 
 		for (Identity identity : identities) {
@@ -106,19 +114,26 @@ public abstract class SyncProcessor {
 
 					SocialService socialService = ServiceFactory
 							.getSocialService();
-					if(!externalIdentity.getIsActive())
+					if (!externalIdentity.getIsActive())
 						continue;
-					socialService
-							.checkValidityOfExternalIdentity(externalIdentity);
+					//get External application from application 
+					ExternalNetworkApplication externalNetworkApplication = ServiceFactory.getApplicationService()
+							.getExAppByExternalIdentity(
+									application, externalIdentity);
+
+					socialService.checkValidityOfExternalIdentity(
+							externalIdentity, externalNetworkApplication);
 
 					if (externalIdentity.getIsActive())
-						processSync(externalIdentity);
+						processSync(externalIdentity,
+								externalNetworkApplication);
 
 				} catch (AuthorizationException e) {
 					identity.setIsActive(false);
-					ServiceFactory.getExternalIdentityService()
-							.update((ExternalIdentity) identity);
-					log.error("set identity {} to not active because: {}",identity, ExceptionUtils.getStackTrace(e));
+					ServiceFactory.getExternalIdentityService().update(
+							(ExternalIdentity) identity);
+					log.error("set identity {} to not active because: {}",
+							identity, ExceptionUtils.getStackTrace(e));
 					return -1;
 				} catch (Exception ex) {
 					log.error(ExceptionUtils.getStackTrace(ex));
@@ -242,7 +257,8 @@ public abstract class SyncProcessor {
 			resourcePath.append("/social/users/").append(userId).append("/");
 
 		if (!resource.equals(ResourceType.contacts))
-			resourcePath.append("providers/").append(externalNetwork.ordinal()).append("/");
+			resourcePath.append("providers/").append(externalNetwork.ordinal())
+					.append("/");
 
 		resourcePath.append(resource.getEndpointName());
 		return resourcePath.toString();

@@ -8,6 +8,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Period;
 
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
@@ -30,10 +31,10 @@ public class ContactHandler extends Handler {
 	}
 
 	@Override
-	protected void syncData(ExternalIdentity identity, ExternalNetwork network) {
+	protected void syncData(ExternalIdentity identity, ExternalNetwork network, ExternalNetworkApplication externalNetworkApplication) {
 		Long userId = identity.getUser().getUserId();
 		// Sync activities
-		int n = processContacts(identity, network);
+		int n = processContacts(identity, network, externalNetworkApplication);
 		processor.sendStepCompletedMessageToIndividual(backchannel, network,
 				"Synchronized contacts", processor.getResoursePath(userId,
 						network, ResourceType.contacts), n, userId,
@@ -41,14 +42,14 @@ public class ContactHandler extends Handler {
 	}
 
 	private int processContacts(ExternalIdentity identity,
-			ExternalNetwork network) {
+			ExternalNetwork network, ExternalNetworkApplication externalNetworkApplication) {
 		List<Contact> synced = null;
 		DateTime start = new DateTime();
 		Long userId = identity.getUser().getUserId();
 		int size = -1;
 		try {
 			ContactService contactService = ServiceFactory.getContactService();
-			synced = contactService.syncContacts(identity);
+			synced = contactService.syncContacts(identity, externalNetworkApplication);
 			// index for searching
 
 			// log.debug(" indexing activities for identity {}", identity);

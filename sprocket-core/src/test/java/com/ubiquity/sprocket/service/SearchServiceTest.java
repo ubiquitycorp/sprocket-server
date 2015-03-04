@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.integration.api.ContentAPIFactory;
@@ -29,13 +30,14 @@ import com.ubiquity.integration.factory.TestActivityFactory;
 import com.ubiquity.integration.factory.TestContactFactory;
 import com.ubiquity.integration.factory.TestMessageFactory;
 import com.ubiquity.integration.factory.TestVideoContentFactory;
+import com.ubiquity.integration.service.ApplicationService;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchKeys;
 
 public class SearchServiceTest {
 
 	private static SearchService searchService;
-
+	private static ApplicationService applicationService;
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	private static User owner;
@@ -45,12 +47,12 @@ public class SearchServiceTest {
 		Configuration config = new PropertiesConfiguration("test.properties");
 		Configuration errorsConfiguration = new PropertiesConfiguration("messages.properties");
 		
-		searchService = new SearchService(config);
-		
 		JedisConnectionFactory.initialize(config);
 		SocialAPIFactory.initialize(config);
 		ContentAPIFactory.initialize(config);
 		ServiceFactory.initialize(config, errorsConfiguration);
+		searchService = ServiceFactory.getSearchService();
+		applicationService = ServiceFactory.getApplicationService();
 		
 		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 		ServiceFactory.getUserService().create(owner);
@@ -64,7 +66,8 @@ public class SearchServiceTest {
 		
 		User user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("CAAIQjk0elpEBAHOw7lgI0DEXgr9WZATxvFqWIwZCdbq7PuxEkBD3fjLE1oP6Www1J8T21f1XITpNDijPu2xlaoh8AdviGZCLIIzp5eTmrfnuWcy6D1OKn6GRliPuJQZA5LmUxqTRthADMuhbGUXPiYllUgl09CUfevjSSMSphsyBwPFZCLy9fX8QFYYieYRUZD").clientPlatform(ClientPlatform.WEB).externalNetwork(ExternalNetwork.Facebook.ordinal()).build());
-		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.Facebook, 1,null,null,null);
+		ExternalNetworkApplication externalNetworkApplication =applicationService.getDefaultExternalApplication(ExternalNetwork.Facebook.ordinal(), ClientPlatform.Android);
+		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.Facebook, 1,null,null,null,externalNetworkApplication);
 		log.debug("documents: {}", documents);
 		Assert.assertFalse(documents.isEmpty());
 		
@@ -75,7 +78,8 @@ public class SearchServiceTest {
 		
 		User user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("a5f46897abbbd2b83501ea79b4916f44").clientPlatform(ClientPlatform.WEB).externalNetwork(ExternalNetwork.Vimeo.ordinal()).build());
-		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.Vimeo, 1,null,null,null);
+		ExternalNetworkApplication externalNetworkApplication =applicationService.getDefaultExternalApplication(ExternalNetwork.Vimeo.ordinal(), ClientPlatform.Android);
+		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.Vimeo, 1,null,null,null,externalNetworkApplication);
 		log.debug("documents: {}", documents);
 		Assert.assertFalse(documents.isEmpty());
 		
@@ -85,7 +89,8 @@ public class SearchServiceTest {
 	public void testLiveSearchWithYouTube() {
 		User user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("ya29.YADq4neRcxr8kiIAAABXuPKmNyMLWRUfEOtm3zfio0Ua5xIuW9sho7Mbms1nCTs96nsseog3eWo7vq2sdLw").clientPlatform(ClientPlatform.Android).externalNetwork(ExternalNetwork.YouTube.ordinal()).build());
-		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.YouTube, 1,null,null,null);
+		ExternalNetworkApplication externalNetworkApplication =applicationService.getDefaultExternalApplication(ExternalNetwork.Vimeo.ordinal(), ClientPlatform.Android);
+		List<Document> documents = searchService.searchLiveDocuments("Karate", user, ExternalNetwork.YouTube, 1,null,null,null,externalNetworkApplication);
 		log.debug("documents: {}", documents);
 		Assert.assertFalse(documents.isEmpty());
 	}

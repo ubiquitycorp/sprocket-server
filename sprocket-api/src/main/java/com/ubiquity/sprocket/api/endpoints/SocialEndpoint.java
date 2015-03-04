@@ -27,6 +27,8 @@ import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
+import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.Captcha;
 import com.ubiquity.integration.domain.Contact;
@@ -303,13 +305,14 @@ public class SocialEndpoint {
 
 		Contact contact = ServiceFactory.getContactService().getByContactId(
 				sendMessageDto.getReceiverId());
-
-		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
-				identity);
+		// get External network and check the validity of identity
+		ExternalNetworkApplication externalNetworkApplication = checkValidityOfExternalIdentity(
+				userId, identity);
 
 		ServiceFactory.getSocialService().sendMessage(identity, socialNetwork,
 				contact, sendMessageDto.getReceiverName(),
-				sendMessageDto.getText(), sendMessageDto.getSubject());
+				sendMessageDto.getText(), sendMessageDto.getSubject(),
+				externalNetworkApplication);
 
 		return Response.ok().build();
 
@@ -347,8 +350,9 @@ public class SocialEndpoint {
 			throw new IllegalArgumentException(
 					"User has no identity for this network");
 
-		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
-				identity);
+		// get External network and check the validity of identity
+		ExternalNetworkApplication externalNetworkApplication = checkValidityOfExternalIdentity(
+				userId, identity);
 
 		// Prepare post activity object
 		PostActivity postActivity = new PostActivity.Builder()
@@ -362,7 +366,7 @@ public class SocialEndpoint {
 				.captchaIden(postActivityDto.getCaptchaIden()).build();
 
 		ServiceFactory.getSocialService().postActivity(identity, socialNetwork,
-				postActivity);
+				postActivity,externalNetworkApplication);
 
 		return Response.ok().build();
 
@@ -398,12 +402,13 @@ public class SocialEndpoint {
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.findExternalIdentity(userId, socialNetwork);
 
-		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
-				identity);
+		// get External network and check the validity of identity
+		ExternalNetworkApplication externalNetworkApplication = checkValidityOfExternalIdentity(
+				userId, identity);
 
 		PostComment postComment = DtoAssembler.assemble(postCommentDto);
 		ServiceFactory.getSocialService().postComment(identity, socialNetwork,
-				postComment);
+				postComment,externalNetworkApplication);
 
 		return Response.ok().build();
 
@@ -431,13 +436,14 @@ public class SocialEndpoint {
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.findExternalIdentity(userId, socialNetwork);
 
-		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
-				identity);
+		// get External network and check the validity of identity
+		ExternalNetworkApplication externalNetworkApplication = checkValidityOfExternalIdentity(
+				userId, identity);
 
 		PostVote postComment = DtoAssembler.assemble(postVoteDto);
 
 		ServiceFactory.getSocialService().postVote(identity, socialNetwork,
-				postComment);
+				postComment,externalNetworkApplication);
 
 		return Response.ok().build();
 
@@ -466,11 +472,12 @@ public class SocialEndpoint {
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.findExternalIdentity(userId, externalNetwork);
 
-		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
-				identity);
-
+		// get External network and check the validity of identity	
+		ExternalNetworkApplication externalNetworkApplication = checkValidityOfExternalIdentity(
+				userId, identity);
+		
 		Captcha captcha = ServiceFactory.getSocialService().requestCaptcha(
-				identity, externalNetwork);
+				identity, externalNetwork,externalNetworkApplication);
 
 		final byte[] image = captcha.getImage();
 
@@ -501,6 +508,23 @@ public class SocialEndpoint {
 
 	}
 
+	/***
+	 * 
+	 * @param userId
+	 * @param identity
+	 * @return
+	 */
+	private ExternalNetworkApplication checkValidityOfExternalIdentity(
+			Long userId, ExternalIdentity identity) {
+		// load user
+		User user = ServiceFactory.getUserService().getUserById(userId);
+		// Load external network application
+		ExternalNetworkApplication externalNetworkApp = ServiceFactory.getApplicationService().getExAppByExternalIdentity(user.getCreatedBy(), identity);
+		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
+				identity, externalNetworkApp);
+		return externalNetworkApp;
+	}
+
 	/**
 	 * Drops a message for tracking this event
 	 * 
@@ -522,5 +546,4 @@ public class SocialEndpoint {
 		byte[] bytes = message.getBytes();
 		MessageQueueFactory.getTrackQueueProducer().write(bytes);
 	}
-
 }

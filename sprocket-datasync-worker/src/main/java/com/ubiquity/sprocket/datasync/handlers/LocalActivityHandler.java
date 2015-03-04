@@ -8,6 +8,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Period;
 
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ExternalNetwork;
@@ -28,10 +29,10 @@ public class LocalActivityHandler extends Handler {
 	}
 
 	@Override
-	protected void syncData(ExternalIdentity identity, ExternalNetwork network) {
+	protected void syncData(ExternalIdentity identity, ExternalNetwork network,ExternalNetworkApplication externalNetworkApplication) {
 		Long userId = identity.getUser().getUserId();
 		// Sync local feed
-		int n = processLocalActivities(identity, network);
+		int n = processLocalActivities(identity, network, externalNetworkApplication);
 		processor.sendStepCompletedMessageToIndividual(backchannel, network,
 				"Synchronized local feed", processor.getResoursePath(userId,
 						network, ResourceType.localfeed), n, userId,
@@ -39,14 +40,14 @@ public class LocalActivityHandler extends Handler {
 	}
 
 	private int processLocalActivities(ExternalIdentity identity,
-			ExternalNetwork network) {
+			ExternalNetwork network,ExternalNetworkApplication externalNetworkApplication) {
 		List<Activity> synced = null;
 		DateTime start = new DateTime();
 		Long userId = identity.getUser().getUserId();
 		int size = -1;
 		try {
 			synced = ServiceFactory.getSocialService().syncLocalNewsFeed(
-					identity, network,true);
+					identity, network,true, externalNetworkApplication);
 			int activitiesSize =synced.size();
 			if(activitiesSize ==0){
 				activitiesSize = ServiceFactory.getSocialService().getCountOfLastLocalActivities(identity,network);
