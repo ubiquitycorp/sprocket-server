@@ -20,6 +20,9 @@ public class SprocketUser extends User {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	public SprocketUser(){
+	}
+	
 	@Column(name = "external_identifier", nullable = true, length = 50)
 	private String externalIdentifier;
 

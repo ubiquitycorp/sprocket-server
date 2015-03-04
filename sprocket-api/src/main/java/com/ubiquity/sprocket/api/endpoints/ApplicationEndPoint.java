@@ -17,11 +17,15 @@ import org.slf4j.LoggerFactory;
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.integration.api.exception.AuthorizationException;
+import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.model.user.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.user.IdentityDto;
+import com.ubiquity.sprocket.api.validation.RemoteAuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.RemoteRegistrationValidation;
 import com.ubiquity.sprocket.service.ServiceFactory;
 import com.ubiquity.sprocket.service.SprocketUserAuthService;
@@ -43,15 +47,19 @@ public class ApplicationEndPoint {
 	@POST
 	@Path("/users/registered")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response register(InputStream payload, @HeaderParam("Authorization") String header) throws IOException {
-		
-		if(header == null)
+	public Response register(InputStream payload,
+			@HeaderParam("Authorization") String header) throws IOException {
+
+		if (header == null)
 			throw new AuthorizationException("Invalid credentials", null);
-		String decodedHeader = new String(Base64.decodeBase64(header.getBytes()));
+		String decodedHeader = new String(
+				Base64.decodeBase64(header.getBytes()));
 		String credentials[] = decodedHeader.split(":");
 		log.info(credentials[0] + " " + credentials[1]);
-		Application application = ServiceFactory.getDeveloperService().getApplicationByAppkeyAndAppSecret(credentials[0], credentials[1]);
-		
+		Application application = ServiceFactory.getDeveloperService()
+				.getApplicationByAppkeyAndAppSecret(credentials[0],
+						credentials[1]);
+
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
 				IdentityDto.class, RemoteRegistrationValidation.class);
 
@@ -60,8 +68,9 @@ public class ApplicationEndPoint {
 
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
 				.getClientPlatformId());
-		User user = ((SprocketUserAuthService) authenticationService).register(identityDto.getIdentifier(),
-				clientPlatform, Boolean.TRUE, application);
+		User user = ((SprocketUserAuthService) authenticationService).register(
+				identityDto.getIdentifier(), clientPlatform, Boolean.TRUE,
+				application);
 
 		// user now has a single, native identity
 		String apiKey = AuthenticationService.generateAPIKey();
@@ -78,7 +87,7 @@ public class ApplicationEndPoint {
 		return Response.ok().entity(jsonConverter.convertToPayload(accountDto))
 				.build();
 	}
-	
+
 	/***
 	 * This method authenticates user via native login. Thereafter users can
 	 * authenticate
@@ -87,32 +96,33 @@ public class ApplicationEndPoint {
 	 * @return
 	 * @throws IOException
 	 */
-	/*@POST
+	@POST
 	@Path("users/authenticated")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response authenticate(InputStream payload, @HeaderParam("Authorization") String header) throws IOException {
-		
-		String decodedHeader = new String(Base64.decodeBase64(header.getBytes()));
+	public Response authenticate(InputStream payload,
+			@HeaderParam("Authorization") String header) throws IOException {
+
+		String decodedHeader = new String(
+				Base64.decodeBase64(header.getBytes()));
 		String credentials[] = decodedHeader.split(":");
 		log.info(credentials[0] + " " + credentials[1]);
-		Application application = ServiceFactory.getDeveloperService().getApplicationByAppkeyAndAppSecret(credentials[0], credentials[1]);
-		
+		Application application = ServiceFactory.getDeveloperService()
+				.getApplicationByAppkeyAndAppSecret(credentials[0],
+						credentials[1]);
+
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
 				IdentityDto.class, RemoteAuthenticationValidation.class);
 
 		AuthenticationService<User> authenticationService = ServiceFactory
 				.getUserAuthService();
-		User user = authenticationService.authenticate(
-				identityDto.getUsername(), identityDto.getPassword());
+		User user = ((SprocketUserAuthService) authenticationService)
+				.authenticate(identityDto.getIdentifier(), application);
 		if (user == null)
-			throw new AuthorizationException("Username / password incorrect",
-					null);
+			throw new AuthorizationException("Invalid identifier", null);
 
 		// update user last login
 		user.setLastLogin(System.currentTimeMillis());
 		ServiceFactory.getUserService().update(user);
-		// create api key and pass back associated identities for this user (in
-		// case of a login from a different device)
 
 		String apiKey = authenticationService.generateAPIKeyIfNotExsits(user
 				.getUserId());
@@ -120,14 +130,11 @@ public class ApplicationEndPoint {
 				.userId(user.getUserId()).build();
 
 		for (Identity identity : user.getIdentities()) {
-			if (identity instanceof ExternalIdentity) {
+			if (identity instanceof ExternalIdentity && identity.getIsActive()) {
 				ExternalIdentity externalIdentity = (ExternalIdentity) identity;
-				IdentityDto associatedIdentityDto = new IdentityDto.Builder()
-						.identifier(externalIdentity.getIdentifier())
-						.externalNetworkId(
-								externalIdentity.getExternalNetwork()).build();
-				if (identity.getIsActive())
-					accountDto.getIdentities().add(associatedIdentityDto);
+				IdentityDto associatedIdentityDto = DtoAssembler
+						.assemble(externalIdentity);
+				accountDto.getIdentities().add(associatedIdentityDto);
 			}
 		}
 
@@ -138,5 +145,5 @@ public class ApplicationEndPoint {
 
 		return Response.ok().entity(jsonConverter.convertToPayload(accountDto))
 				.build();
-	}*/
+	}
 }

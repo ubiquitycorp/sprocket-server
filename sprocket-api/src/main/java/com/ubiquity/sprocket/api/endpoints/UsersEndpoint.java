@@ -122,7 +122,8 @@ public class UsersEndpoint {
 		List<ExternalIdentity> identities = ServiceFactory
 				.getExternalIdentityService().createOrUpdateExternalIdentity(
 						user, accesstokens[0], accesstokens[1], null,
-						ClientPlatform.WEB, ExternalNetwork.LinkedIn, null, true);
+						ClientPlatform.WEB, ExternalNetwork.LinkedIn, null,
+						true);
 
 		ExternalIdentity identity = identities.get(0);
 		IdentityDto result = new IdentityDto.Builder()
@@ -237,14 +238,11 @@ public class UsersEndpoint {
 				.userId(user.getUserId()).build();
 
 		for (Identity identity : user.getIdentities()) {
-			if (identity instanceof ExternalIdentity) {
+			if (identity instanceof ExternalIdentity && identity.getIsActive()) {
 				ExternalIdentity externalIdentity = (ExternalIdentity) identity;
-				IdentityDto associatedIdentityDto = new IdentityDto.Builder()
-						.identifier(externalIdentity.getIdentifier())
-						.externalNetworkId(
-								externalIdentity.getExternalNetwork()).build();
-				if (identity.getIsActive())
-					accountDto.getIdentities().add(associatedIdentityDto);
+				IdentityDto associatedIdentityDto = DtoAssembler
+						.assemble(externalIdentity);
+				accountDto.getIdentities().add(associatedIdentityDto);
 			}
 		}
 
@@ -277,8 +275,8 @@ public class UsersEndpoint {
 
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
 				.getClientPlatformId());
-		User user = authenticationService.register(
-				identityDto.getUsername(), identityDto.getPassword(), "", "",
+		User user = authenticationService.register(identityDto.getUsername(),
+				identityDto.getPassword(), "", "",
 				identityDto.getDisplayName(), identityDto.getEmail(),
 				clientPlatform, Boolean.TRUE);
 
@@ -300,6 +298,7 @@ public class UsersEndpoint {
 
 	/***
 	 * Returns only active identities owned by the given user
+	 * 
 	 * @param userId
 	 * @return
 	 * @throws IOException
@@ -345,7 +344,7 @@ public class UsersEndpoint {
 		User user = ServiceFactory.getUserService().getUserById(userId);
 
 		// create the identity if it does not exist; or use the existing one
-		List<ExternalIdentity> identity = ServiceFactory
+		List<ExternalIdentity> identities = ServiceFactory
 				.getExternalIdentityService().createOrUpdateExternalIdentity(
 						user, identityDto.getAccessToken(),
 						identityDto.getSecretToken(),
@@ -353,7 +352,7 @@ public class UsersEndpoint {
 						externalNetwork, identityDto.getExpiresIn(), true);
 
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identity, identityDto.getClientPlatformId());
+		sendActivatedMessage(user, identities, identityDto.getClientPlatformId());
 
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
@@ -361,13 +360,12 @@ public class UsersEndpoint {
 
 			Contact contact = ServiceFactory.getContactService()
 					.getBySocialIdentityId(userId,
-							identity.get(0).getIdentityId());
+							identities.get(0).getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
 		} catch (NoResultException ex) {
-			IdentityDto result = new IdentityDto.Builder().identifier(
-					identity.get(0).getIdentifier()).build();
+			IdentityDto result = DtoAssembler.assemble(identities.get(0));
 			return Response.ok().entity(jsonConverter.convertToPayload(result))
 					.build();
 		}
@@ -434,7 +432,8 @@ public class UsersEndpoint {
 							externalidentity.getAccessToken(),
 							externalidentity.getSecretToken(),
 							externalidentity.getRefreshToken(), clientPlatform,
-							externalNetwork, externalidentity.getExpiredAt(), true);
+							externalNetwork, externalidentity.getExpiredAt(),
+							true);
 
 		}
 

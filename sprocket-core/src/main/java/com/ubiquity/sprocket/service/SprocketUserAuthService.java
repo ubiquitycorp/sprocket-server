@@ -18,13 +18,13 @@ import com.ubiquity.sprocket.repository.SprocketUserRepositoryJpaImpl;
  */
 public class SprocketUserAuthService extends UserAuthService {
 
-	
 	public SprocketUserAuthService(Configuration configuration) {
 		super(configuration);
 	}
 
 	/***
 	 * Registers a new user using external identifier via a sprocket application
+	 * 
 	 * @param externalIdentifier
 	 * @param platform
 	 * @param hasVerified
@@ -33,7 +33,6 @@ public class SprocketUserAuthService extends UserAuthService {
 	 */
 	public User register(String externalIdentifier, ClientPlatform platform,
 			Boolean hasVerified, Application application) {
-		// first check if the user name is take
 		try {
 			SprocketUserRepository userRepository = new SprocketUserRepositoryJpaImpl();
 			User user = userRepository.searchByIdentifierAndApplicationId(
@@ -41,22 +40,29 @@ public class SprocketUserAuthService extends UserAuthService {
 			if (user != null)
 				throw new IllegalArgumentException("User already exists");
 
-			user = SprocketUserFactory.createUserWithRequiredFieldsUsingApplication(
-					externalIdentifier, platform, hasVerified, application);
+			user = SprocketUserFactory
+					.createUserWithRequiredFieldsUsingApplication(
+							externalIdentifier, platform, hasVerified,
+							application);
 
 			EntityManagerSupport.beginTransaction();
 			userRepository.create(user);
 			EntityManagerSupport.commit();
-			
+
 			return user;
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
 	}
 
-	
-	public User authenticate(String identifier) {
-		// TODO Auto-generated method stub
-		return null;
+	public User authenticate(String externalIdentifier, Application application) {
+		try {
+			SprocketUserRepository userRepository = new SprocketUserRepositoryJpaImpl();
+			User user = userRepository.searchByIdentifierAndApplicationId(
+					externalIdentifier, application.getAppId());
+			return user;
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
 	}
 }
