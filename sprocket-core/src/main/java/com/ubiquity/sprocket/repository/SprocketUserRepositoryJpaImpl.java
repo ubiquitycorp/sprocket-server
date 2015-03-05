@@ -7,7 +7,7 @@ import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
 
 /***
- * 
+ * extends UserRepositoryJpaImpl and adds new methods for SprocketUser
  * @author peter.tadros
  * 
  */

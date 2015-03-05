@@ -12,6 +12,8 @@ import com.ubiquity.sprocket.repository.SprocketUserRepository;
 import com.ubiquity.sprocket.repository.SprocketUserRepositoryJpaImpl;
 
 /****
+ * authenticates and registers SprocketUser via SDK. This class extends
+ * "UserAuthService" to use basic functionalities of it
  * 
  * @author peter.tadros
  * 
@@ -23,7 +25,7 @@ public class SprocketUserAuthService extends UserAuthService {
 	}
 
 	/***
-	 * Registers a new user using external identifier via a sprocket application
+	 * Registers a new user using external identifier via SDK
 	 * 
 	 * @param externalIdentifier
 	 * @param platform
@@ -55,6 +57,13 @@ public class SprocketUserAuthService extends UserAuthService {
 		}
 	}
 
+	/***
+	 * authenticates a user by an external identifier via SDK
+	 * 
+	 * @param externalIdentifier
+	 * @param application
+	 * @return
+	 */
 	public User authenticate(String externalIdentifier, Application application) {
 		try {
 			SprocketUserRepository userRepository = new SprocketUserRepositoryJpaImpl();
