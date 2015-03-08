@@ -14,7 +14,6 @@ import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.integration.service.ContentService;
