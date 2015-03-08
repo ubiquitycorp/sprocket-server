@@ -38,7 +38,9 @@ public class ApplicationEndPoint {
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	/***
-	 * This method registers user via an sprocket application.
+	 * This method registers user using an external identifier provided by a
+	 * developer via sprocket application. The request is authenticated using
+	 * appKey and appSecret encoded in base64 in the header
 	 * 
 	 * @param payload
 	 * @return
@@ -50,15 +52,7 @@ public class ApplicationEndPoint {
 	public Response register(InputStream payload,
 			@HeaderParam("Authorization") String header) throws IOException {
 
-		if (header == null)
-			throw new AuthorizationException("Invalid credentials", null);
-		String decodedHeader = new String(
-				Base64.decodeBase64(header.getBytes()));
-		String credentials[] = decodedHeader.split(":");
-		log.info(credentials[0] + " " + credentials[1]);
-		Application application = ServiceFactory.getDeveloperService()
-				.getApplicationByAppkeyAndAppSecret(credentials[0],
-						credentials[1]);
+		Application application = authenticateHeader(header);
 
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
 				IdentityDto.class, RemoteRegistrationValidation.class);
@@ -89,10 +83,12 @@ public class ApplicationEndPoint {
 	}
 
 	/***
-	 * This method authenticates user via native login. Thereafter users can
-	 * authenticate
+	 * This method authenticates user by an external identifier provided by a
+	 * developer via sprocket application. The request is authenticated using
+	 * appKey and appSecret encoded in base64 in the header
 	 * 
-	 * @param accessToken
+	 * @param payload
+	 * @param header
 	 * @return
 	 * @throws IOException
 	 */
@@ -102,13 +98,7 @@ public class ApplicationEndPoint {
 	public Response authenticate(InputStream payload,
 			@HeaderParam("Authorization") String header) throws IOException {
 
-		String decodedHeader = new String(
-				Base64.decodeBase64(header.getBytes()));
-		String credentials[] = decodedHeader.split(":");
-		log.info(credentials[0] + " " + credentials[1]);
-		Application application = ServiceFactory.getDeveloperService()
-				.getApplicationByAppkeyAndAppSecret(credentials[0],
-						credentials[1]);
+		Application application = authenticateHeader(header);
 
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
 				IdentityDto.class, RemoteAuthenticationValidation.class);
@@ -145,5 +135,25 @@ public class ApplicationEndPoint {
 
 		return Response.ok().entity(jsonConverter.convertToPayload(accountDto))
 				.build();
+	}
+
+	/***
+	 * authenticates header by decoding it and validates appKey and appSecret of
+	 * sprocket application
+	 * 
+	 * @param header
+	 * @return
+	 */
+	private Application authenticateHeader(String header) {
+		if (header == null)
+			throw new AuthorizationException("Invalid credentials", null);
+		String decodedHeader = new String(
+				Base64.decodeBase64(header.getBytes()));
+		String credentials[] = decodedHeader.split(":");
+		log.info(credentials[0] + " " + credentials[1]);
+		Application application = ServiceFactory.getDeveloperService()
+				.getApplicationByAppkeyAndAppSecret(credentials[0],
+						credentials[1]);
+		return application;
 	}
 }

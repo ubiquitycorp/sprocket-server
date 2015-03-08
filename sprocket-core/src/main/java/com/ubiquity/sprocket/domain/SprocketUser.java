@@ -7,10 +7,13 @@ import javax.persistence.ManyToOne;
 
 import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.User;
+
 /***
+ * This is the domain class which represents a sprocket user. It extends the
+ * base "User" domain
  * 
  * @author peter.tadros
- *
+ * 
  */
 @Entity
 public class SprocketUser extends User {
@@ -20,9 +23,9 @@ public class SprocketUser extends User {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public SprocketUser(){
+	public SprocketUser() {
 	}
-	
+
 	@Column(name = "external_identifier", nullable = true, length = 50)
 	private String externalIdentifier;
 

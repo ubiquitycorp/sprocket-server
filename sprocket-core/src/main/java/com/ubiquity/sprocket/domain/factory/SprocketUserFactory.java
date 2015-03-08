@@ -23,4 +23,15 @@ public class SprocketUserFactory extends UserFactory {
 				.lastLogin(System.currentTimeMillis()).isVerified(isVerified)
 				.build();
 	}
+	
+	public static User createUserWithMinimumRequiredFields(String firstName,
+			String lastName, String displayName, String email,
+			ClientPlatform clientPlatform, boolean isVerified) {
+		return new SprocketUser.Builder().displayName(displayName).firstName(firstName)
+				.lastName(lastName).clientPlatform(clientPlatform)
+				.createdAt(System.currentTimeMillis())
+				.lastUpdated(System.currentTimeMillis())
+				.lastLogin(System.currentTimeMillis()).email(email)
+				.isVerified(isVerified).build();
+	}
 }
