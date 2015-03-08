@@ -110,7 +110,8 @@ public class UsersEndpoint {
 			throws Exception {
 
 		// load user
-		User user = ServiceFactory.getUserService().getUserById(userId);
+		SprocketUser user = (SprocketUser) ServiceFactory.getUserService()
+				.getUserById(userId);
 
 		String cookieString = java.net.URLDecoder.decode(cookie, "UTF-8");
 		ExchangeService exchangservice = new ExchangeService();
@@ -120,9 +121,11 @@ public class UsersEndpoint {
 			throw new AuthorizationException(
 					"Autontication Failed no oAuth_token_returned", null);
 		//
-		ExternalNetworkApplication externalNetworkApplication = ServiceFactory.getApplicationService()
+		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
+				.getApplicationService()
 				.getExAppByExternalNetworkAndClientPlatform(
-						user.getCreatedBy(), ExternalNetwork.LinkedIn.ordinal(), ClientPlatform.WEB);
+						user.getCreatedBy(),
+						ExternalNetwork.LinkedIn.ordinal(), ClientPlatform.WEB);
 		// create the identity if it does not exist; or use the existing one
 		List<ExternalIdentity> identities = ServiceFactory
 				.getExternalIdentityService().createOrUpdateExternalIdentity(
@@ -177,7 +180,8 @@ public class UsersEndpoint {
 		// .getClientPlatformId());
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identityDto.getExternalNetworkId());
-		User user = ServiceFactory.getUserService().getUserById(userId);
+		SprocketUser user = (SprocketUser) ServiceFactory.getUserService()
+				.getUserById(userId);
 		SocialToken requestToken = null;
 		if (externalNetwork == ExternalNetwork.Twitter) {
 			SocialAPI socialApi = SocialAPIFactory
@@ -349,11 +353,14 @@ public class UsersEndpoint {
 				.getNetworkById(identityDto.getExternalNetworkId());
 
 		// load user
-		User user = ServiceFactory.getUserService().getUserById(userId);
+		SprocketUser user = (SprocketUser) ServiceFactory.getUserService()
+				.getUserById(userId);
 
-		//log.info("identifier = " + ((SprocketUser)user).getExternalIdentifier());
+		// log.info("identifier = " +
+		// ((SprocketUser)user).getExternalIdentifier());
 		// Load External Application
-		ExternalNetworkApplication externalNetworkApplication = ServiceFactory.getApplicationService()
+		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
+				.getApplicationService()
 				.getExAppByExternalNetworkAndClientPlatform(
 						user.getCreatedBy(), externalNetwork.ordinal(),
 						clientPlatform);
@@ -367,7 +374,8 @@ public class UsersEndpoint {
 						externalNetworkApplication);
 
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identities, identityDto.getClientPlatformId());
+		sendActivatedMessage(user, identities,
+				identityDto.getClientPlatformId());
 
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
@@ -414,9 +422,11 @@ public class UsersEndpoint {
 		List<ExternalIdentity> identities = null;
 
 		// load user
-		User user = ServiceFactory.getUserService().getUserById(userId);
-		// load External Network application 
-		ExternalNetworkApplication externalNetworkApplication = ServiceFactory.getApplicationService()
+		SprocketUser user = (SprocketUser) ServiceFactory.getUserService()
+				.getUserById(userId);
+		// load External Network application
+		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
+				.getApplicationService()
 				.getExAppByExternalNetworkAndClientPlatform(
 						user.getCreatedBy(), externalNetwork.ordinal(),
 						clientPlatform);
@@ -506,7 +516,8 @@ public class UsersEndpoint {
 				.getNetworkById(exchangeTokenDto.getExternalNetworkId());
 
 		// load user
-		User user = ServiceFactory.getUserService().getUserById(userId);
+		SprocketUser user = (SprocketUser) ServiceFactory.getUserService()
+				.getUserById(userId);
 		SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork,
 				ClientPlatform.WEB, user.getCreatedBy());
 		SocialToken token = socialApi.exchangeAccessToken(exchangeTokenDto

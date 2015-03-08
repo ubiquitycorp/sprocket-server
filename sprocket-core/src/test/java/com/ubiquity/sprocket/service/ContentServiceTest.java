@@ -18,6 +18,7 @@ import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.integration.service.ContentService;
+import com.ubiquity.sprocket.domain.factory.SprocketUserFactory;
 
 public class ContentServiceTest {
 	
@@ -32,7 +33,9 @@ public class ContentServiceTest {
 				"test.properties");
 		
 		contentService = ServiceFactory.getContentService();
-		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		user = SprocketUserFactory
+				.createUserWithRequiredFieldsUsingApplication(UUID.randomUUID()
+						.toString(), ClientPlatform.WEB, true, null);
 		
 		ServiceFactory.getUserService().create(user);
 		

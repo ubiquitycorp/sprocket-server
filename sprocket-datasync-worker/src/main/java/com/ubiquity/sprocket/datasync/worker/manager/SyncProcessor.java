@@ -14,7 +14,6 @@ import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.Identity;
-import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.service.SocialService;
@@ -22,6 +21,7 @@ import com.ubiquity.messaging.MessageConverter;
 import com.ubiquity.messaging.format.DestinationType;
 import com.ubiquity.messaging.format.Envelope;
 import com.ubiquity.sprocket.datasync.handlers.Handler;
+import com.ubiquity.sprocket.domain.SprocketUser;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
@@ -57,7 +57,7 @@ public abstract class SyncProcessor {
 		//get External application from application 
 		ExternalNetworkApplication externalNetworkApplication = ServiceFactory.getApplicationService()
 				.getExAppByExternalIdentity(
-						identity.getUser().getCreatedBy(), identity);
+						((SprocketUser)identity.getUser()).getCreatedBy(), identity);
 		processSync(identity,externalNetworkApplication);
 	}
 
@@ -101,7 +101,7 @@ public abstract class SyncProcessor {
 	 * @param user
 	 * @return
 	 */
-	public int syncDataForUser(User user) {
+	public int syncDataForUser(SprocketUser user) {
 		Set<Identity> identities = user.getIdentities();
 		Application application = user.getCreatedBy();
 		DateTime start = new DateTime();

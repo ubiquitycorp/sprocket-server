@@ -13,10 +13,11 @@ import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.service.ContactService;
+import com.ubiquity.sprocket.domain.SprocketUser;
+import com.ubiquity.sprocket.domain.factory.SprocketUserFactory;
 
 public class ContactServiceTest {
 
@@ -32,8 +33,14 @@ public class ContactServiceTest {
 	public static void setUp() throws Exception {
 
 		contactService = ServiceFactory.getContactService();
-		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-		ServiceFactory.getUserService().create(user);
+		user = SprocketUserFactory
+				.createUserWithRequiredFieldsUsingApplication(UUID.randomUUID()
+						.toString(), ClientPlatform.WEB, true, null);
+		ServiceFactory.getUserService().create((SprocketUser) user);
+		externalNetworkApplication = ServiceFactory.getApplicationService()
+				.getExAppByExternalNetworkAndClientPlatform(
+						((SprocketUser) user).getCreatedBy(),
+						ExternalNetwork.Facebook.ordinal(), ClientPlatform.WEB);
 		List<ExternalIdentity> externalIdentities = ServiceFactory
 				.getExternalIdentityService().createOrUpdateExternalIdentity(
 						user, UUID.randomUUID().toString(),

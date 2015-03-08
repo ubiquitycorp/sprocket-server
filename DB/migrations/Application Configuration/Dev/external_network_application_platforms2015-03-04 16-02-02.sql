@@ -1,5 +1,5 @@
 USE sprocket;
-
+delete from external_network_application_platforms;
 insert into `external_network_application_platforms`(`ex_app_id`,`client_platform`) values (1,2);
 insert into `external_network_application_platforms`(`ex_app_id`,`client_platform`) values (1,0);
 insert into `external_network_application_platforms`(`ex_app_id`,`client_platform`) values (1,1);

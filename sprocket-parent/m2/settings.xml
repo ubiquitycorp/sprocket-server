@@ -29,6 +29,8 @@
 				<social.reddit.oauth.api.host>https://oauth.reddit.com</social.reddit.oauth.api.host>
 				<social.reddit.ssl.api.host>https://ssl.reddit.com</social.reddit.ssl.api.host>
 				
+				<application.default.id>1</application.default.id>
+				
 				<social.twitter.app.consumerKey>eIxhGVt1wo8yNs7cTq0mNHsi0
 				</social.twitter.app.consumerKey>
 				<social.twitter.app.consumerSecret>qBTsSTelIlh0Lq4ILPlxgeTfhKk1GR8uetrlgaGExNulfxx37n
@@ -179,6 +181,8 @@
 				<!--<social.reddit.ssl.api.host>http://localhost/sprocket-network-api/api/1.0/reddit</social.reddit.ssl.api.host>-->
 				<social.reddit.ssl.api.host>https://ssl.reddit.com</social.reddit.ssl.api.host>
 				
+				<application.default.id>1</application.default.id>
+				
 				<social.twitter.app.consumerKey>eIxhGVt1wo8yNs7cTq0mNHsi0
 				</social.twitter.app.consumerKey>
 				<social.twitter.app.consumerSecret>qBTsSTelIlh0Lq4ILPlxgeTfhKk1GR8uetrlgaGExNulfxx37n
@@ -327,6 +331,8 @@
 				<!--<social.reddit.ssl.api.host>http://localhost/sprocket-network-api/api/1.0/reddit</social.reddit.ssl.api.host>-->
 				<social.reddit.ssl.api.host>https://ssl.reddit.com</social.reddit.ssl.api.host>
 				
+				<application.default.id>1</application.default.id>
+				
 				<social.twitter.app.consumerKey>f5cMrdDfL4mxP1eaUOwAvUtfJ
 				</social.twitter.app.consumerKey>
 				<social.twitter.app.consumerSecret>Z7Q61m3kHejh09muK0aX97Ed1baamdF70svowkM2nKLYvh6EYp
@@ -455,7 +461,9 @@
 				<tomcat.processes>4</tomcat.processes>
 				<datasync.worker.processes>2</datasync.worker.processes>
 				<datasync.worker.size>2048</datasync.worker.size>
-
+				
+				<application.default.id>1</application.default.id>
+				
 				<redis.host>sprocket-redis</redis.host>
 				<hibernate.debug>false</hibernate.debug>
 				<solr.api.host>sprocket-search</solr.api.host>

@@ -28,7 +28,6 @@ import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
-import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.Captcha;
 import com.ubiquity.integration.domain.Contact;
@@ -53,6 +52,7 @@ import com.ubiquity.sprocket.api.dto.model.social.PostVoteDto;
 import com.ubiquity.sprocket.api.dto.model.social.SendMessageDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
+import com.ubiquity.sprocket.domain.SprocketUser;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
@@ -517,7 +517,7 @@ public class SocialEndpoint {
 	private ExternalNetworkApplication checkValidityOfExternalIdentity(
 			Long userId, ExternalIdentity identity) {
 		// load user
-		User user = ServiceFactory.getUserService().getUserById(userId);
+		SprocketUser user = (SprocketUser) ServiceFactory.getUserService().getUserById(userId);
 		// Load external network application
 		ExternalNetworkApplication externalNetworkApp = ServiceFactory.getApplicationService().getExAppByExternalIdentity(user.getCreatedBy(), identity);
 		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(

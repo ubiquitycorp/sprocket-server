@@ -11,6 +11,7 @@ import com.ubiquity.sprocket.datasync.handlers.LocalActivityHandler;
 import com.ubiquity.sprocket.datasync.handlers.MessageHandler;
 import com.ubiquity.sprocket.datasync.handlers.VideoHandler;
 import com.ubiquity.sprocket.datasync.worker.manager.SyncProcessor;
+import com.ubiquity.sprocket.domain.SprocketUser;
 
 /***
  * Handles the processing of each feed type
@@ -80,7 +81,7 @@ public class DataSyncProcessor extends SyncProcessor {
 			Long startTime, endTime;
 			startTime = System.currentTimeMillis();
 			for (User user : users) {
-				numRefreshed += syncDataForUser(user);
+				numRefreshed += syncDataForUser((SprocketUser)user);
 			}
 			endTime = System.currentTimeMillis();
 			log.info("{}: Periodic Sync completed in {} seconds", Thread
