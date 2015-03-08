@@ -178,21 +178,30 @@ public class UsersEndpoint {
 				IdentityDto.class, AuthorizationValidation.class);
 		// ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
 		// .getClientPlatformId());
+
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identityDto.getExternalNetworkId());
 		SprocketUser user = (SprocketUser) ServiceFactory.getUserService()
 				.getUserById(userId);
+		// load External Network application
+		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
+				.getApplicationService()
+				.getExAppByExternalNetworkAndClientPlatform(
+						user.getCreatedBy(), externalNetwork.ordinal(),
+						ClientPlatform.getEnum(identityDto.getClientPlatformId()));
+
 		SocialToken requestToken = null;
 		if (externalNetwork == ExternalNetwork.Twitter) {
+
 			SocialAPI socialApi = SocialAPIFactory
 					.createProviderWithCallBackUrl(externalNetwork,
-							identityDto.getRedirectUrl(), user.getCreatedBy());
+							identityDto.getRedirectUrl(), externalNetworkApplication);
 			TwitterAPI twitterApi = (TwitterAPI) socialApi;
 			requestToken = twitterApi.requesttoken();
 		} else if (externalNetwork == ExternalNetwork.Tumblr) {
 			SocialAPI socialApi = SocialAPIFactory
 					.createProviderWithCallBackUrl(externalNetwork,
-							identityDto.getRedirectUrl(), user.getCreatedBy());
+							identityDto.getRedirectUrl(), externalNetworkApplication);
 			TumblrAPI tumblrApi = (TumblrAPI) socialApi;
 			requestToken = tumblrApi.requesttoken();
 		} else {
@@ -430,7 +439,6 @@ public class UsersEndpoint {
 				.getExAppByExternalNetworkAndClientPlatform(
 						user.getCreatedBy(), externalNetwork.ordinal(),
 						clientPlatform);
-
 		if (externalNetwork.network == Network.Content) {
 
 			ContentAPI contentApi = ContentAPIFactory.createProvider(
@@ -446,8 +454,9 @@ public class UsersEndpoint {
 							externalNetwork, null, true,
 							externalNetworkApplication);
 		} else if (externalNetwork.network == Network.Social) {
-			SocialAPI socialApi = SocialAPIFactory.createProvider(
-					externalNetwork, clientPlatform, user.getCreatedBy());
+			SocialAPI socialApi = SocialAPIFactory
+					.createProvider(externalNetwork, clientPlatform,
+							externalNetworkApplication);
 			String redirectUri = identityDto.getRedirectUrl();
 			if ((externalNetwork.equals(ExternalNetwork.Google) || externalNetwork
 					.equals(ExternalNetwork.YouTube))
@@ -518,8 +527,14 @@ public class UsersEndpoint {
 		// load user
 		SprocketUser user = (SprocketUser) ServiceFactory.getUserService()
 				.getUserById(userId);
+		// load External Network application
+		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
+				.getApplicationService()
+				.getExAppByExternalNetworkAndClientPlatform(
+						user.getCreatedBy(), externalNetwork.ordinal(),
+						ClientPlatform.WEB);
 		SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork,
-				ClientPlatform.WEB, user.getCreatedBy());
+				ClientPlatform.WEB, externalNetworkApplication);
 		SocialToken token = socialApi.exchangeAccessToken(exchangeTokenDto
 				.getAccessToken());
 
