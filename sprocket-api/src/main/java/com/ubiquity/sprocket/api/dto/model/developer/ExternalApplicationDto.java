@@ -3,6 +3,7 @@ package com.ubiquity.sprocket.api.dto.model.developer;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 
 import com.ubiquity.identity.domain.ClientPlatform;
@@ -175,8 +176,9 @@ public class ExternalApplicationDto {
 		this.createdAt = builder.createdAt;
 		this.lastUpdated = builder.lastUpdated;
 	}
-
-	public void validate() {
+	
+	@AssertTrue
+	public boolean validate() {
 		if (externalNetworkId == ExternalNetwork.Twitter.ordinal()) {
 			if (consumerSecret == null)
 				throw new IllegalArgumentException(
@@ -234,6 +236,7 @@ public class ExternalApplicationDto {
 			throw new IllegalArgumentException(
 					"External network number is not supported.");
 		}
+		return true;
 
 	}
 }
