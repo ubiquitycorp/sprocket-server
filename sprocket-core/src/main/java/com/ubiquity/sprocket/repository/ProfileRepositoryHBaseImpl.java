@@ -127,9 +127,4 @@ public class ProfileRepositoryHBaseImpl extends BaseRepositoryHBaseImpl <Profile
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public Profile updateAndSelect(Profile obj) {
-		throw new UnsupportedOperationException();
-	}
-
 }
