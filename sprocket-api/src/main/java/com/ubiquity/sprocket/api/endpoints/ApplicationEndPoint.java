@@ -147,9 +147,16 @@ public class ApplicationEndPoint {
 	private Application authenticateHeader(String header) {
 		if (header == null)
 			throw new AuthorizationException("Invalid credentials", null);
+		
+		String[] parts = header.split(" ");
+		if(parts.length != 2 || (parts.length == 2 && !parts[0].equals("Basic")))
+			throw new AuthorizationException("Invalid authorization header", null);
 		String decodedHeader = new String(
-				Base64.decodeBase64(header.getBytes()));
+				Base64.decodeBase64(parts[1].getBytes()));
 		String credentials[] = decodedHeader.split(":");
+		if(credentials.length != 2)
+			throw new AuthorizationException("Invalid authorization header", null);
+		
 		log.info(credentials[0] + " " + credentials[1]);
 		Application application = ServiceFactory.getDeveloperService()
 				.getApplicationByAppkeyAndAppSecret(credentials[0],
