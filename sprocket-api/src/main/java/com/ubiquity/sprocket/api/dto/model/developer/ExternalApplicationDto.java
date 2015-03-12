@@ -176,7 +176,6 @@ public class ExternalApplicationDto {
 		this.createdAt = builder.createdAt;
 		this.lastUpdated = builder.lastUpdated;
 	}
-	
 	@AssertTrue
 	public boolean validate() {
 		if (externalNetworkId == ExternalNetwork.Twitter.ordinal()) {

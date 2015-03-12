@@ -7,6 +7,8 @@ public class ActiveUsersFound {
 
 	private List<Long> userIds;
 	
+	private Long apllicationID;
+	
 	public ActiveUsersFound(List<Long> userIds) {
 		this.userIds = userIds;
 	}
@@ -19,4 +21,10 @@ public class ActiveUsersFound {
 	public List<Long> getUserIds() {
 		return userIds;
 	}
+
+	public Long getApllicationID() {
+		return apllicationID;
+	}
+	
+	
 }

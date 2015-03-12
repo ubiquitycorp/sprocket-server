@@ -150,9 +150,14 @@ public class DocumentsEndpoint {
 
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(externalNetworkId);
+
+		// Get app_i from Redis
+		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+				userId);
+		
 		SprocketUser user = (SprocketUser) ServiceFactory.getUserService()
 				.getUserById(userId);
-
+		
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.findExternalIdentity(userId, externalNetwork);
 
@@ -161,8 +166,10 @@ public class DocumentsEndpoint {
 					"User does not have an identity for this provider");
 
 		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
-				.getApplicationService().getExAppByExternalIdentity(
-						user.getCreatedBy(), identity);
+				.getApplicationService()
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
+						identity.getExternalNetwork(),
+						identity.getClientPlatform());
 
 		if (externalNetwork != ExternalNetwork.Yelp)
 			ServiceFactory.getSocialService().checkValidityOfExternalIdentity(

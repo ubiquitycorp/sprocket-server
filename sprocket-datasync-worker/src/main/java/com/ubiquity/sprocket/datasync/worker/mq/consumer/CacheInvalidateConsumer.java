@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
 import com.niobium.repository.jpa.EntityManagerSupport;
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.VideoContent;
@@ -175,15 +176,17 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		List<User> users = ServiceFactory.getUserService().findUsersInRange(
 				userIds);
 		SyncProcessor dataSyncManager = new DataSyncProcessor(users);
-		dataSyncManager.syncData();
+		Application application = ServiceFactory.getApplicationService().getApplicationByIdOrDefault(activeUsersFound.getApllicationID());
+		dataSyncManager.syncData(application);
 	}
 
 	private void process(ContactsSync contactsSyncMessage) {
 		List<Long> userIds = contactsSyncMessage.getUserIds();
 		List<User> users = ServiceFactory.getUserService().findUsersInRange(
 				userIds);
+		Application application = ServiceFactory.getApplicationService().getApplicationByIdOrDefault(contactsSyncMessage.getApllicationID());
 		SyncProcessor contactSyncManager = new ContactsSyncProcessor(users);
-		contactSyncManager.syncData();
+		contactSyncManager.syncData(application);
 	}
 
 	@Override

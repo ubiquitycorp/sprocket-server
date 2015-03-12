@@ -16,12 +16,13 @@
 				<solr.api.host>localhost</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
 				
-				<!--<social.facebook.api.host>http://localhost/sprocket-network-api/api/1.0/facebook</social.facebook.api.host>-->
-				<!--<social.googlePlus.api.host>http://localhost/sprocket-network-api/api/1.0/googleplus</social.googlePlus.api.host>-->
-				<!--<social.google.api.host>http://localhost/sprocket-network-api/api/1.0/googleplus</social.google.api.host>-->
-				<!--<content.youtube.api.host>http://localhost/sprocket-network-api/api/1.0/youtube</content.youtube.api.host>-->
-				<!--<social.reddit.oauth.api.host>http://localhost/sprocket-network-api/api/1.0/reddit</social.reddit.oauth.api.host>-->
-				<!--<social.reddit.ssl.api.host>http://localhost/sprocket-network-api/api/1.0/reddit</social.reddit.ssl.api.host>-->
+				<!--<social.facebook.api.host>http://localhost/sprocket-network-api/api/1.0/facebook</social.facebook.api.host>
+				<social.googlePlus.api.host>http://localhost/sprocket-network-api/api/1.0/googleplus</social.googlePlus.api.host>
+				<social.google.api.host>http://localhost/sprocket-network-api/api/1.0/googleplus</social.google.api.host>
+				<content.youtube.api.host>http://localhost/sprocket-network-api/api/1.0/youtube</content.youtube.api.host>
+				<social.reddit.oauth.api.host>http://localhost/sprocket-network-api/api/1.0/reddit</social.reddit.oauth.api.host>
+				<social.reddit.ssl.api.host>http://localhost/sprocket-network-api/api/1.0/reddit</social.reddit.ssl.api.host>-->
+				
 				<social.facebook.api.host>https://graph.facebook.com</social.facebook.api.host>
 				<social.googlePlus.api.host>https://www.googleapis.com/plus/v1</social.googlePlus.api.host>
 				<social.google.api.host>https://accounts.google.com</social.google.api.host>
@@ -31,68 +32,9 @@
 				
 				<application.default.id>1</application.default.id>
 				
-				<social.twitter.app.consumerKey>eIxhGVt1wo8yNs7cTq0mNHsi0
-				</social.twitter.app.consumerKey>
-				<social.twitter.app.consumerSecret>qBTsSTelIlh0Lq4ILPlxgeTfhKk1GR8uetrlgaGExNulfxx37n
-				</social.twitter.app.consumerSecret>
-				<social.linkedin.app.consumerKey>77fa6kjljumj8x
-				</social.linkedin.app.consumerKey>
-				<social.linkedin.app.consumerSecret>Qp7qxRm1usYix65e
-				</social.linkedin.app.consumerSecret>
-				<social.facebook.consumerKey>581153318672017
-				</social.facebook.consumerKey>
-				<social.facebook.consumerSecret>0752b1dfd97a54334b53f3a22ee9b3ca
-				</social.facebook.consumerSecret>
-				<social.google.android.apikey>AIzaSyC-EfEn6WHFEDg3UjuaNxb-ZhqsCzY1D84
-				</social.google.android.apikey>
-				<social.google.ios.apikey>AIzaSyBLbSDsyGMBbXGVlnIUIpiSP3JKY706Gf0
-				</social.google.ios.apikey>
-				<social.google.web.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I
-				</social.google.web.apikey>
-				<social.google.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I
-				</social.google.apikey>
-				<social.google.web.clientId>963651180860-gdgpmd4pqpsetql8932mrgbif8f4t89p.apps.googleusercontent.com
-				</social.google.web.clientId>
-				<social.google.web.clientSecret>NRWmgbRuewuTUmL-IgMsuVzG
-				</social.google.web.clientSecret>
-				<social.google.android.clientId>518857244614-odu6ukf381cd2vmg8e0rphkp0hfksg9l.apps.googleusercontent.com
-				</social.google.android.clientId>
-				<social.google.android.clientSecret>iLUKupqRjUl6gybpP7YYINE6
-				</social.google.android.clientSecret>
-				<social.google.ios.clientId>798637804367-oeuq4acmf6jivul2gbqnig7pcspjirfu.apps.googleusercontent.com
-				</social.google.ios.clientId>
-				<social.google.ios.clientSecret>7ND3-wtvZg2GUZhWxZesE4qp
-				</social.google.ios.clientSecret>
-				<content.vimeo.web.clientId>8aa78eaeb615f47cdbc3806baa64e7b41ea7bb63
-				</content.vimeo.web.clientId>
-				<content.vimeo.web.clientSecret>631651bf50ecde53df4a5a3097e31acee3240ba6
-				</content.vimeo.web.clientSecret>
-				<content.vimeo.mobile.clientId>00a3112427cc0de8be5710eceb5bd83524001a6b
-				</content.vimeo.mobile.clientId>
-				<content.vimeo.mobile.clientSecret>6814eea3b1195e9f8cd81688481c76688fea1120
-				</content.vimeo.mobile.clientSecret>
 				<constants.resetUrl>http://192.168.12.118/sprocket-web/src/#/reset?token=
 				</constants.resetUrl>
-				<yelp.consumerKey>mnm5G8XclwYIwbED8HV4EQ</yelp.consumerKey>
-				<yelp.consumerSecret>3X5_IqGMVRE9dwb_pxV23FxS68k
-				</yelp.consumerSecret>
-				<yelp.token>wjVmlQFhPyMNYEPcyIyCenucRoBPPwJp</yelp.token>
-				<yelp.tokenSecret>w7oeFsjoVLEb4c8bUbgRiQ4smec</yelp.tokenSecret>
-				<social.tumblr.consumerKey>X4Jwwn3OaWgt9BlzaibfDw8ZFWcs1NUlgHTeitGSoC65cBXir3
-				</social.tumblr.consumerKey>
-				<social.tumblr.consumerSecret>s7CPOLZnwSsdJkyYYus2r7KByMcwwgFWtGyPxhtjDXnhkUBLhg
-				</social.tumblr.consumerSecret>
-				<social.reddit.web.consumerKey>yIhf9yZdXmU4_w
-				</social.reddit.web.consumerKey>
-				<social.reddit.web.consumerSecret>0rJkc9DYrC-WpiMCypl0hoy8S0c
-				</social.reddit.web.consumerSecret>
-				<social.reddit.installed.consumerSecret>NVMIMSbywkA7xA
-				</social.reddit.installed.consumerSecret>
-				<social.reddit.web.userAgent>web:com.ubiquiy.sprocketDevWeb:v1.0.1 (by /u/ubiquitybc)
-				</social.reddit.web.userAgent>
-				<social.reddit.installed.userAgent>andriod:com.ubiquiy.sprocketDevMobile:v1.0.1 (by /u/ubiquitybc)
-				</social.reddit.installed.userAgent>
-				<social.reddit.redirectUI>http://local.sprocket.com?nw=reddit</social.reddit.redirectUI>
+				
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
 				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>

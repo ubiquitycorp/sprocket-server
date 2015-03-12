@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
@@ -45,7 +46,8 @@ public class YouTubeAPITest {
 		JedisConnectionFactory.initialize(config);
 		ContentAPIFactory.initialize(config);
 		ServiceFactory.initialize(config, null); 
-		externalApplication = ServiceFactory.getApplicationService().getDefaultExternalApplication(
+		Application application =  ServiceFactory.getApplicationService().loadApplicationFromConfiguration();
+		externalApplication = ServiceFactory.getApplicationService().getExAppByExternalNetworkAndClientPlatform(application,
 				identity.getExternalNetwork(), identity.getClientPlatform());
 	}
 

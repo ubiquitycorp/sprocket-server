@@ -54,11 +54,14 @@ public abstract class SyncProcessor {
 		// get identity from message
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.getExternalIdentityById(activated.getIdentityId());
-		//get External application from application 
-		ExternalNetworkApplication externalNetworkApplication = ServiceFactory.getApplicationService()
-				.getExAppByExternalIdentity(
-						((SprocketUser)identity.getUser()).getCreatedBy(), identity);
-		processSync(identity,externalNetworkApplication);
+		// get External application from application
+		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
+				.getApplicationService()
+				.getExAppByExternalNetworkAndClientPlatform(
+						((SprocketUser) identity.getUser()).getCreatedBy(),
+						identity.getExternalNetwork(),
+						identity.getClientPlatform());
+		processSync(identity, externalNetworkApplication);
 	}
 
 	/**
@@ -93,7 +96,7 @@ public abstract class SyncProcessor {
 
 	}
 
-	public abstract int syncData();
+	public abstract int syncData(Application application);
 
 	/**
 	 * Refresh data for specific user in all social networks
@@ -101,9 +104,8 @@ public abstract class SyncProcessor {
 	 * @param user
 	 * @return
 	 */
-	public int syncDataForUser(SprocketUser user) {
+	public int syncDataForUser(SprocketUser user,Application application) {
 		Set<Identity> identities = user.getIdentities();
-		Application application = user.getCreatedBy();
 		DateTime start = new DateTime();
 
 		for (Identity identity : identities) {
@@ -116,10 +118,12 @@ public abstract class SyncProcessor {
 							.getSocialService();
 					if (!externalIdentity.getIsActive())
 						continue;
-					//get External application from application 
-					ExternalNetworkApplication externalNetworkApplication = ServiceFactory.getApplicationService()
-							.getExAppByExternalIdentity(
-									application, externalIdentity);
+					// get External application from application
+					ExternalNetworkApplication externalNetworkApplication = ServiceFactory
+							.getApplicationService()
+							.getExAppByExternalNetworkAndClientPlatform(application,
+									externalIdentity.getExternalNetwork(),
+									externalIdentity.getClientPlatform());
 
 					socialService.checkValidityOfExternalIdentity(
 							externalIdentity, externalNetworkApplication);

@@ -52,7 +52,6 @@ import com.ubiquity.sprocket.api.dto.model.social.PostVoteDto;
 import com.ubiquity.sprocket.api.dto.model.social.SendMessageDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
-import com.ubiquity.sprocket.domain.SprocketUser;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
@@ -366,7 +365,7 @@ public class SocialEndpoint {
 				.captchaIden(postActivityDto.getCaptchaIden()).build();
 
 		ServiceFactory.getSocialService().postActivity(identity, socialNetwork,
-				postActivity,externalNetworkApplication);
+				postActivity, externalNetworkApplication);
 
 		return Response.ok().build();
 
@@ -408,7 +407,7 @@ public class SocialEndpoint {
 
 		PostComment postComment = DtoAssembler.assemble(postCommentDto);
 		ServiceFactory.getSocialService().postComment(identity, socialNetwork,
-				postComment,externalNetworkApplication);
+				postComment, externalNetworkApplication);
 
 		return Response.ok().build();
 
@@ -443,7 +442,7 @@ public class SocialEndpoint {
 		PostVote postComment = DtoAssembler.assemble(postVoteDto);
 
 		ServiceFactory.getSocialService().postVote(identity, socialNetwork,
-				postComment,externalNetworkApplication);
+				postComment, externalNetworkApplication);
 
 		return Response.ok().build();
 
@@ -472,12 +471,12 @@ public class SocialEndpoint {
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.findExternalIdentity(userId, externalNetwork);
 
-		// get External network and check the validity of identity	
+		// get External network and check the validity of identity
 		ExternalNetworkApplication externalNetworkApplication = checkValidityOfExternalIdentity(
 				userId, identity);
-		
+
 		Captcha captcha = ServiceFactory.getSocialService().requestCaptcha(
-				identity, externalNetwork,externalNetworkApplication);
+				identity, externalNetwork, externalNetworkApplication);
 
 		final byte[] image = captcha.getImage();
 
@@ -516,10 +515,17 @@ public class SocialEndpoint {
 	 */
 	private ExternalNetworkApplication checkValidityOfExternalIdentity(
 			Long userId, ExternalIdentity identity) {
-		// load user
-		SprocketUser user = (SprocketUser) ServiceFactory.getUserService().getUserById(userId);
+		
+		// Get app_i from Redis
+		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+				userId);
+
 		// Load external network application
-		ExternalNetworkApplication externalNetworkApp = ServiceFactory.getApplicationService().getExAppByExternalIdentity(user.getCreatedBy(), identity);
+		ExternalNetworkApplication externalNetworkApp = ServiceFactory
+				.getApplicationService()
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
+						identity.getExternalNetwork(),
+						identity.getClientPlatform());
 		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
 				identity, externalNetworkApp);
 		return externalNetworkApp;

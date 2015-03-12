@@ -54,51 +54,70 @@ public class ExternalNetworkRepositoryTest {
 		EntityManagerSupport.beginTransaction();
 		applicationRepository.create(application);
 		EntityManagerSupport.commit();
-		
+
 		Set<ClientPlatform> mobileClientplatforms = new HashSet<ClientPlatform>();
 		mobileClientplatforms.add(ClientPlatform.Android);
 		mobileClientplatforms.add(ClientPlatform.IOS);
-		
+
 		externalNetworkApplication1 = TestExternalApplicationFactory
 				.createTestExternalNetworkApplicationWithMinimumRequiredProperties(
 						application, mobileClientplatforms, ExternalNetwork
 								.ordinalOrDefault(ExternalNetwork.Facebook));
-		
+
 		EntityManagerSupport.beginTransaction();
-		externalNetworkApplicationRepository.create(externalNetworkApplication1);
+		externalNetworkApplicationRepository
+				.create(externalNetworkApplication1);
 		EntityManagerSupport.commit();
-		
+
 		Set<ClientPlatform> webClientplatform = new HashSet<ClientPlatform>();
 		webClientplatform.add(ClientPlatform.WEB);
-		externalNetworkApplication2= TestExternalApplicationFactory
+		externalNetworkApplication2 = TestExternalApplicationFactory
 				.createTestExternalNetworkApplicationWithMinimumRequiredProperties(
 						application, webClientplatform, ExternalNetwork
 								.ordinalOrDefault(ExternalNetwork.Twitter));
-		
+
 		EntityManagerSupport.beginTransaction();
-		externalNetworkApplicationRepository.create(externalNetworkApplication2);
+		externalNetworkApplicationRepository
+				.create(externalNetworkApplication2);
 		EntityManagerSupport.commit();
 	}
 
 	@Test
 	public void testExists() {
-		boolean exists = externalNetworkApplicationRepository.exists(externalNetworkApplication1.getConsumerKey(),
-				externalNetworkApplication1.getConsumerSecret(),externalNetworkApplication1.getExternalNetwork());
+		boolean exists = externalNetworkApplicationRepository.exists(
+				externalNetworkApplication1.getConsumerKey(),
+				externalNetworkApplication1.getConsumerSecret(),
+				externalNetworkApplication1.getExternalNetwork());
 		Assert.assertEquals(exists, Boolean.TRUE);
-		
-		exists = externalNetworkApplicationRepository.exists(UUID.randomUUID().toString(),
-				externalNetworkApplication1.getConsumerSecret(),externalNetworkApplication1.getExternalNetwork());
+
+		exists = externalNetworkApplicationRepository.exists(UUID.randomUUID()
+				.toString(), externalNetworkApplication1.getConsumerSecret(),
+				externalNetworkApplication1.getExternalNetwork());
 		Assert.assertEquals(exists, Boolean.FALSE);
-		
-		exists = externalNetworkApplicationRepository.exists(externalNetworkApplication1.getConsumerKey(),
-				UUID.randomUUID().toString(),externalNetworkApplication1.getExternalNetwork()); 
+
+		exists = externalNetworkApplicationRepository.exists(
+				externalNetworkApplication1.getConsumerKey(), UUID.randomUUID()
+						.toString(), externalNetworkApplication1
+						.getExternalNetwork());
 		Assert.assertEquals(exists, Boolean.FALSE);
 	}
 
 	@Test
 	public void testFindAppsByDeveloperId() {
-		List<ExternalNetworkApplication> externalApplications = externalNetworkApplicationRepository.getByApplicationId(application.getAppId());
+		List<ExternalNetworkApplication> externalApplications = externalNetworkApplicationRepository
+				.getByApplicationId(application.getAppId());
 		Assert.assertEquals(externalApplications.size(), 2);
+	}
+
+	@Test
+	public void testGetByAppIdAndExternalNetworkAndClientPlatform() {
+		ExternalNetworkApplication externalNetworkapp = externalNetworkApplicationRepository
+				.getByAppIdAndExternalNetworkAndClientPlatform(
+						application.getAppId(),
+						externalNetworkApplication1.getExternalNetwork(),
+						externalNetworkApplication1.getClientPlatforms().iterator().next());
+		
+		Assert.assertEquals(externalNetworkapp.getExternalApplicationId(), externalNetworkApplication1.getExternalApplicationId());
 	}
 
 }

@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.niobium.repository.CollectionVariant;
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
@@ -39,10 +40,11 @@ public class ContentServiceTest {
 		ServiceFactory.getUserService().create(user);
 		
 		ServiceFactory.initialize(configuration, null); 
-		externalNetworkApplication = ServiceFactory.getApplicationService()
-				.getDefaultExternalApplication(ExternalNetwork.Facebook.ordinal(),
-						ClientPlatform.WEB);
 		
+		Application application =  ServiceFactory.getApplicationService().loadApplicationFromConfiguration();
+		externalNetworkApplication = ServiceFactory.getApplicationService().getExAppByExternalNetworkAndClientPlatform(application,
+				ExternalNetwork.Facebook.ordinal(),
+				ClientPlatform.WEB);
 		List<ExternalIdentity> externalIdentities = ServiceFactory
 				.getExternalIdentityService().createOrUpdateExternalIdentity(
 						user, UUID.randomUUID().toString(),

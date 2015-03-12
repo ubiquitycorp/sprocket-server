@@ -2,6 +2,8 @@ package com.ubiquity.sprocket.service;
 
 import org.apache.commons.configuration.Configuration;
 
+import com.niobium.repository.Cache;
+import com.niobium.repository.CacheRedisImpl;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.repository.UserRepository;
@@ -10,8 +12,12 @@ import com.ubiquity.sprocket.repository.SprocketUserRepositoryJpaImpl;
 
 public class SprocketUserService extends UserService {
 
+	private Cache cache;
+
 	public SprocketUserService(Configuration configuration) {
 		super(configuration);
+		cache = new CacheRedisImpl(
+				configuration.getInt("redis.user.application.database"));
 	}
 
 	/***
@@ -34,7 +40,7 @@ public class SprocketUserService extends UserService {
 			EntityManagerSupport.closeEntityManager();
 		}
 	}
-	
+
 	/***
 	 * Creates a user in the underlying database
 	 * 
@@ -50,5 +56,17 @@ public class SprocketUserService extends UserService {
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}
+	}
+
+	public void saveApplicationId(Long userId, Long applicationId) {
+		cache.put(userId.toString(), applicationId.toString());
+	}
+
+	public Long retrieveApplicationId(Long userId) {
+		String applicationID = cache.get(userId.toString());
+		if (applicationID == null)
+			return null;
+		return Long.parseLong(applicationID);
+
 	}
 }

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
@@ -32,8 +33,7 @@ public class VimeoAPITest {
 		identity = new ExternalIdentity.Builder()
 				.accessToken("a5f46897abbbd2b83501ea79b4916f44")
 				.clientPlatform(ClientPlatform.WEB)
-				.externalNetwork(ExternalNetwork.YouTube.ordinal())
-				.build();
+				.externalNetwork(ExternalNetwork.YouTube.ordinal()).build();
 		log.debug("authenticated Vimeo with identity {} ", identity);
 
 		Configuration configuration = new PropertiesConfiguration(
@@ -41,9 +41,13 @@ public class VimeoAPITest {
 
 		JedisConnectionFactory.initialize(configuration);
 		ContentAPIFactory.initialize(configuration);
-		ServiceFactory.initialize(configuration, null); 
-		externalApplication = ServiceFactory.getApplicationService().getDefaultExternalApplication(
-				identity.getExternalNetwork(), identity.getClientPlatform());
+		ServiceFactory.initialize(configuration, null);
+		Application application = ServiceFactory.getApplicationService()
+				.loadApplicationFromConfiguration();
+		externalApplication = ServiceFactory.getApplicationService()
+				.getExAppByExternalNetworkAndClientPlatform(application,
+						identity.getExternalNetwork(),
+						identity.getClientPlatform());
 	}
 
 	@Test

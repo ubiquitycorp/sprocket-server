@@ -37,9 +37,10 @@ public class ContactServiceTest {
 				.createUserWithRequiredFieldsUsingApplication(UUID.randomUUID()
 						.toString(), ClientPlatform.WEB, true, null);
 		ServiceFactory.getUserService().create((SprocketUser) user);
+
 		externalNetworkApplication = ServiceFactory.getApplicationService()
 				.getExAppByExternalNetworkAndClientPlatform(
-						((SprocketUser) user).getCreatedBy(),
+						ServiceFactory.getApplicationService().getDefaultApplication(),
 						ExternalNetwork.Facebook.ordinal(), ClientPlatform.WEB);
 		List<ExternalIdentity> externalIdentities = ServiceFactory
 				.getExternalIdentityService().createOrUpdateExternalIdentity(

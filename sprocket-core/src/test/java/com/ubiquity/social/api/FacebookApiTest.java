@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.content.api.VimeoAPITest;
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
@@ -23,7 +24,7 @@ import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Message;
-import com.ubiquity.integration.service.ApplicationService;
+import com.ubiquity.sprocket.service.ServiceFactory;
 
 public class FacebookApiTest {
 
@@ -38,9 +39,7 @@ public class FacebookApiTest {
 				"test.properties");
 		JedisConnectionFactory.initialize(configuration);
 		SocialAPIFactory.initialize(configuration);
-		ApplicationService developerService = new ApplicationService(configuration);
-		
-		
+				
 		EntityManagerSupport.beginTransaction();
 
 		User user = TestUserFactory
@@ -55,9 +54,9 @@ public class FacebookApiTest {
 				.externalNetwork(ExternalNetwork.Facebook.ordinal()).build();
 		log.debug("authenticated Facebook with identity {} ", identity);
 
-		externalNetworkApplication = developerService
-				.getDefaultExternalApplication(identity.getExternalNetwork(),
-						identity.getClientPlatform());
+		Application application =  ServiceFactory.getApplicationService().loadApplicationFromConfiguration();
+		externalNetworkApplication = ServiceFactory.getApplicationService().getExAppByExternalNetworkAndClientPlatform(application,
+				identity.getExternalNetwork(), identity.getClientPlatform());
 
 	}
 

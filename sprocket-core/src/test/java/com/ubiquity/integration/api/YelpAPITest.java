@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.integration.domain.ExternalInterest;
@@ -28,7 +29,9 @@ public class YelpAPITest {
 		Configuration configuration = new PropertiesConfiguration("test.properties");
 		PlaceAPIFactory.initialize(configuration);
 		ServiceFactory.initialize(configuration, null);
-		externalNetworkApplication = ServiceFactory.getApplicationService().getDefaultExternalApplication(ExternalNetwork.Yelp.ordinal(), ClientPlatform.WEB);
+		Application application =  ServiceFactory.getApplicationService().loadApplicationFromConfiguration();
+		externalNetworkApplication = ServiceFactory.getApplicationService().getExAppByExternalNetworkAndClientPlatform(application,
+				ExternalNetwork.Yelp.ordinal(), ClientPlatform.WEB);
 	}
 	
 	@Test

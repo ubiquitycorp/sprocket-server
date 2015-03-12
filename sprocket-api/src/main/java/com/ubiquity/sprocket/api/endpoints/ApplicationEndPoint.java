@@ -75,7 +75,9 @@ public class ApplicationEndPoint {
 
 		// Save UserId and APIKey in Redis cache database
 		authenticationService.saveAuthkey(user.getUserId(), apiKey);
-
+		
+		// Save application Id in the Redis 
+		ServiceFactory.getUserService().saveApplicationId(user.getUserId(), application.getAppId());
 		log.debug("Created user {}", user);
 
 		return Response.ok().entity(jsonConverter.convertToPayload(accountDto))

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.integration.api.PlaceAPIFactory;
@@ -170,8 +171,8 @@ public class DatabaseSeed {
 					// if place is not null, get the neighborhood
 					String description = neighborhood + ", " + locator;
 					Place place = locationService.getOrCreatePlaceByName(
-							neighborhood, description, "ch", null, new String[] {
-									"neighborhood", "locality" });
+							neighborhood, description, "ch", null,
+							new String[] { "neighborhood", "locality" });
 					if (place == null) {
 						log.info(
 								"failed to create neighborhood by description {} in {}",
@@ -210,10 +211,11 @@ public class DatabaseSeed {
 	public static void main(String[] args) {
 		final DatabaseSeed loader = new DatabaseSeed();
 		try {
-			Configuration configuration = new PropertiesConfiguration("tools.properties");
+			Configuration configuration = new PropertiesConfiguration(
+					"tools.properties");
 			loader.initialize(configuration);
-			//loader.seedPlacesFromNeighborhoodsFeed();
-			//loader.seedInterests();
+			// loader.seedPlacesFromNeighborhoodsFeed();
+			// loader.seedInterests();
 			loader.goober(configuration);
 		} catch (ConfigurationException e) {
 			log.error("Unable to configure service", e);
@@ -234,8 +236,14 @@ public class DatabaseSeed {
 
 	private void goober(Configuration configuration) {
 		ServiceFactory.initialize(configuration, null);
-		ExternalNetworkApplication externalNetworkApplication = ServiceFactory.getApplicationService().getDefaultExternalApplication(ExternalNetwork.Yelp.ordinal(), ClientPlatform.WEB);
-		ServiceFactory.getLocationService().syncPlaces(ExternalNetwork.Yelp,externalNetworkApplication);
+		Application application = ServiceFactory.getApplicationService()
+				.loadApplicationFromConfiguration();
+		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
+				.getApplicationService()
+				.getExAppByExternalNetworkAndClientPlatform(application,
+						ExternalNetwork.Yelp.ordinal(), ClientPlatform.WEB);
+		ServiceFactory.getLocationService().syncPlaces(ExternalNetwork.Yelp,
+				externalNetworkApplication);
 	}
 
 	private void loadParentInterestWithFile(Interest parent, String resource)

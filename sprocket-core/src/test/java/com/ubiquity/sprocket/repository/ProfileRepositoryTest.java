@@ -50,9 +50,6 @@ public class ProfileRepositoryTest {
 	public void testCreateProfile() {
 
 		log.info("reading record using id: {}", profile.getProfileId());
-		
-		
-
 		// read back in to validate the write completed
 		Profile persisted = profileRepository.read(profile.getProfileId());
 		Assert.assertNotNull(persisted.getProfileId());

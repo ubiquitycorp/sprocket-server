@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
@@ -40,9 +41,13 @@ public class GoogleApiTest {
 		Configuration config = new PropertiesConfiguration("test.properties");
 		JedisConnectionFactory.initialize(config);
 		SocialAPIFactory.initialize(config);
-		ServiceFactory.initialize(config, null); 
+		ServiceFactory.initialize(config, null);
+
+		Application application = ServiceFactory.getApplicationService()
+				.loadApplicationFromConfiguration();
 		externalNetworkApplication = ServiceFactory.getApplicationService()
-				.getDefaultExternalApplication(identity.getExternalNetwork(),
+				.getExAppByExternalNetworkAndClientPlatform(application,
+						identity.getExternalNetwork(),
 						identity.getClientPlatform());
 	}
 

@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.content.api.VimeoAPITest;
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
@@ -59,10 +60,9 @@ public class TwitterApiTest {
 				.clientPlatform(ClientPlatform.WEB)
 				.user(user).build();
 		
-		
-		externalNetworkApplication = ServiceFactory.getApplicationService()
-				.getDefaultExternalApplication(identity.getExternalNetwork(),
-						identity.getClientPlatform());
+		Application application =  ServiceFactory.getApplicationService().loadApplicationFromConfiguration();
+		externalNetworkApplication = ServiceFactory.getApplicationService().getExAppByExternalNetworkAndClientPlatform(application,
+				identity.getExternalNetwork(), identity.getClientPlatform());
 		log.debug("authenticated Twitter with identity {} ", identity);
 	}
 
