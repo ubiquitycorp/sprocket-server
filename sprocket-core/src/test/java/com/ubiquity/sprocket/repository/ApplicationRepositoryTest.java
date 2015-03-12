@@ -67,7 +67,6 @@ public class ApplicationRepositoryTest {
 				.randomUUID().toString());
 		Assert.assertEquals(exists, Boolean.FALSE);
 	}
-
 	@Test
 	public void testFindAppsByDeveloperId() {
 		List<Application> developerApplications = applicationRepository

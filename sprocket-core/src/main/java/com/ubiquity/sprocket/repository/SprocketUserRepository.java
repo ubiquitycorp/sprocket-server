@@ -1,7 +1,10 @@
 package com.ubiquity.sprocket.repository;
 
+import java.util.List;
+
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.repository.UserRepository;
+import com.ubiquity.sprocket.domain.SprocketUser;
 /***
  * 
  * @author peter.tadros
@@ -23,4 +26,10 @@ public interface SprocketUserRepository extends UserRepository {
 	 * @return
 	 */
 	User searchByIdentifierAndApplicationId(String identifier, Long appId);
+	
+	/***
+	 * 
+	 * @return
+	 */
+	List<SprocketUser> findAllActiveSprocketUserIds();
 }

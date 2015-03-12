@@ -11,45 +11,65 @@ import org.slf4j.LoggerFactory;
 
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.service.ContactService;
+import com.ubiquity.sprocket.domain.SprocketUser;
+import com.ubiquity.sprocket.domain.factory.SprocketUserFactory;
 
 public class ContactServiceTest {
-	
+
 	private static ContactService contactService;
 	private static ExternalIdentity identity;
-	private static User user ;
+	private static ExternalNetworkApplication externalNetworkApplication;
+	// private static Application application;
+	private static User user;
 	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		
+
 		contactService = ServiceFactory.getContactService();
-		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-		ServiceFactory.getUserService().create(user);
-		List<ExternalIdentity> externalIdentities = ServiceFactory.getExternalIdentityService().createOrUpdateExternalIdentity(user, UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), ClientPlatform.WEB, ExternalNetwork.Facebook, 3600L, true);
+		user = SprocketUserFactory
+				.createUserWithRequiredFieldsUsingApplication(UUID.randomUUID()
+						.toString(), ClientPlatform.WEB, true, null);
+		ServiceFactory.getUserService().create((SprocketUser) user);
+
+		externalNetworkApplication = ServiceFactory.getApplicationService()
+				.getExAppByExternalNetworkAndClientPlatform(
+						ServiceFactory.getApplicationService().getDefaultApplication(),
+						ExternalNetwork.Facebook.ordinal(), ClientPlatform.WEB);
+		List<ExternalIdentity> externalIdentities = ServiceFactory
+				.getExternalIdentityService().createOrUpdateExternalIdentity(
+						user, UUID.randomUUID().toString(),
+						UUID.randomUUID().toString(),
+						UUID.randomUUID().toString(), ClientPlatform.WEB,
+						ExternalNetwork.Facebook, 3600L, true,
+						externalNetworkApplication);
 		identity = externalIdentities.get(0);
 
 	}
 
 	@Test
 	public void SyncContacts() {
-		// sync Facebook friends from sprocket mock network 
-		List<Contact> contacts =contactService.syncContacts(identity);
+		// sync Facebook friends from sprocket mock network
+		List<Contact> contacts = contactService.syncContacts(identity,
+				externalNetworkApplication);
 		Assert.assertFalse(contacts.isEmpty());
 		// find Contacts for user
-		contacts =contactService.findContactsForActiveNetworksByOwnerId(user.getUserId());
-		Assert.assertTrue(contacts.size()>1);
+		contacts = contactService.findContactsForActiveNetworksByOwnerId(user
+				.getUserId());
+		Assert.assertTrue(contacts.size() > 1);
 	}
-	
+
 	@Test
 	public void FindAllContactByUserIdentities() {
-		List<Contact> contacts =contactService.findAllContactByUserIdentities(user.getUserId());
-		Assert.assertEquals(1,contacts.size());
+		List<Contact> contacts = contactService
+				.findAllContactByUserIdentities(user.getUserId());
+		Assert.assertEquals(1, contacts.size());
 	}
 
 }

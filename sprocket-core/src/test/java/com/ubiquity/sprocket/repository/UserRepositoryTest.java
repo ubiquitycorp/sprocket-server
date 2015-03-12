@@ -1,10 +1,11 @@
 package com.ubiquity.sprocket.repository;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,9 +14,8 @@ import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.NativeIdentity;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.identity.factory.TestUserFactory;
-import com.ubiquity.identity.repository.UserRepository;
-import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
+import com.ubiquity.sprocket.domain.SprocketUser;
+import com.ubiquity.sprocket.factory.TestSprocketUserFactory;
 
 /***
  * Tests testing basic CRUD operations for a user repository
@@ -25,29 +25,28 @@ import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
  */
 public class UserRepositoryTest {
 
-	private Logger log = LoggerFactory.getLogger(getClass());
+	private static Logger log = LoggerFactory.getLogger(UserRepositoryTest.class);
 
-	private UserRepository userRepository;
-	private User user;
-	private NativeIdentity identity;
+	private static SprocketUserRepository userRepository;
+	private static User user;
+	private static NativeIdentity identity;
 
 	@After
 	public void tearDown() throws Exception {
 		EntityManagerSupport.closeEntityManager();
 	}
-
-	@Before
-	public void setUp() throws Exception {
-
-		userRepository = new UserRepositoryJpaImpl();
-
-		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-		identity = (NativeIdentity)user.getIdentities().iterator().next();
+	
+	@BeforeClass
+	public static void setUp() throws Exception {
 		
+		userRepository = new SprocketUserRepositoryJpaImpl();
+
+		user = TestSprocketUserFactory.createTestUserWithMinimumRequiredProperties();
+		identity = (NativeIdentity)user.getIdentities().iterator().next();
+
 		EntityManagerSupport.beginTransaction();
 		userRepository.create(user);
 		EntityManagerSupport.commit();
-
 		log.info("id {}", user.getUserId());
 	}
 
@@ -81,7 +80,17 @@ public class UserRepositoryTest {
 		 persisted = userRepository.searchUserByUsername(UUID.randomUUID().toString());
 		Assert.assertNull(persisted);
 	}
-
+	
+	@Test
+	public void testFindAllActiveSprocketUser() {
+		List<SprocketUser> users =userRepository.findAllActiveSprocketUserIds();
+		Assert.assertEquals(1, users.size());
+		user.setLastLogin(System.currentTimeMillis()-(14*24*60*60*1000)-10000);
+		EntityManagerSupport.beginTransaction();
+		userRepository.create(user);
+		EntityManagerSupport.commit();
+		
+	}
 
 
 }

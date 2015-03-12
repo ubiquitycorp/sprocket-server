@@ -1,10 +1,13 @@
 package com.ubiquity.sprocket.repository;
 
+import java.util.List;
+
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
+import com.ubiquity.sprocket.domain.SprocketUser;
 
 /***
  * extends UserRepositoryJpaImpl and adds new methods for SprocketUser
@@ -43,6 +46,17 @@ public class SprocketUserRepositoryJpaImpl extends UserRepositoryJpaImpl
 		} catch (NoResultException e) {
 		}
 		return user;
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<SprocketUser> findAllActiveSprocketUserIds() {
+		Query query = getEntityManager()
+				.createNativeQuery(
+						"select u.user_id ,u.app_id from user u where u.last_login + 1209600000 > :lastLogin order by u.app_id");
+		query.setParameter("lastLogin", System.currentTimeMillis());
+		return (List<SprocketUser>)query.getResultList();
 	}
 
 }

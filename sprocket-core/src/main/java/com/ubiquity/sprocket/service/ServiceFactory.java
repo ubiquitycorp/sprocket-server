@@ -9,7 +9,7 @@ import com.ubiquity.identity.service.AdminAuthService;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.identity.service.DeveloperAuthService;
 import com.ubiquity.identity.service.DeveloperService;
-import com.ubiquity.identity.service.UserService;
+import com.ubiquity.integration.service.ApplicationService;
 import com.ubiquity.integration.service.ContactService;
 import com.ubiquity.integration.service.ContentService;
 import com.ubiquity.integration.service.ExternalIdentityService;
@@ -29,7 +29,7 @@ public class ServiceFactory {
 	private static AuthenticationService<User> userAuthService;
 	private static AuthenticationService<Admin> adminAuthService;
 	private static AuthenticationService<Developer> developerAuthService;
-	private static UserService userService;
+	private static SprocketUserService userService;
 	private static SocialService socialService;
 	private static ClientConfigurationService clientConfigurationService;
 	private static SearchService searchService;
@@ -43,7 +43,8 @@ public class ServiceFactory {
 	private static FavoriteService favoriteService;
 	private static MediaService mediaService;
 	private static DeveloperService developerService;
-
+	private static ApplicationService applicationService;
+	
 	/***
 	 * Initializes all services with the specified configuration
 	 * 
@@ -143,13 +144,25 @@ public class ServiceFactory {
 			socialService = new SocialService(configuration);
 		return socialService;
 	}
-
+	
+	/***
+	 * Creates or returns user manager
+	 * 
+	 * @return
+	 */
+	public static ApplicationService getApplicationService() {
+		if(applicationService == null)
+			applicationService = new ApplicationService(configuration);
+		return applicationService;
+	}
+	
+	
 	/**
 	 * Creates or returns a new user manager
 	 * 
 	 * @return
 	 */
-	public static UserService getUserService() {
+	public static SprocketUserService getUserService() {
 		if (userService == null)
 			userService = new SprocketUserService(configuration);
 		return userService;
