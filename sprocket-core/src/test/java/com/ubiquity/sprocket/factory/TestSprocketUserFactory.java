@@ -2,6 +2,7 @@ package com.ubiquity.sprocket.factory;
 
 import java.util.UUID;
 
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.NativeIdentity;
 import com.ubiquity.identity.domain.User;
@@ -14,8 +15,9 @@ public class TestSprocketUserFactory {
 	 * 
 	 * @return
 	 */
-	public static User createTestUserWithMinimumRequiredProperties() {
+	public static User createTestUserWithMinimumRequiredProperties(Application application) {
 		User user = new SprocketUser.Builder()
+		.createdBy(application)
 		.lastUpdated(System.currentTimeMillis())
 		.firstName(UUID.randomUUID().toString())
 		.lastName(UUID.randomUUID().toString())

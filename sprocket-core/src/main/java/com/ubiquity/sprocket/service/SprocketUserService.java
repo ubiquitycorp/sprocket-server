@@ -1,5 +1,7 @@
 package com.ubiquity.sprocket.service;
 
+import java.util.List;
+
 import org.apache.commons.configuration.Configuration;
 
 import com.niobium.repository.Cache;
@@ -68,5 +70,13 @@ public class SprocketUserService extends UserService {
 			return null;
 		return Long.parseLong(applicationID);
 
+	}
+	
+	public List<Long[]> findAllActiveSprocketUserIds() {
+		try {
+			return new SprocketUserRepositoryJpaImpl().findAllActiveSprocketUserIds();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
 	}
 }

@@ -1,6 +1,7 @@
 package com.ubiquity.sprocket.datasync.worker.master.jobs;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.quartz.Job;
@@ -24,46 +25,62 @@ public class DataSyncJob implements Job {
 		log.debug("Executing Data sync");
 		try {
 			// get the size of a processing block
-			int blockSize = context.getJobDetail().getJobDataMap()
+			int maxBlockSize = context.getJobDetail().getJobDataMap()
 					.getInt("blockSize");
 
 			// get total number of users; the number of threads is equal to
 			// users / block size
-			List<Long> userIds = ServiceFactory.getUserService()
-					.findAllActiveUserIds();
-			int numUsers = userIds.size();
-			long syncMessagesNum = numUsers / blockSize;
-
-			log.info("creating {} synchronization data for {} users",
-					syncMessagesNum + 1, numUsers);
+			List<Long[]> users = ServiceFactory.getUserService()
+					.findAllActiveSprocketUserIds();
+			
+			log.info("creating synchronization data for {} users", users.size());
 
 			// get the start/end block identifiers
-			int i;
-			int start = 0;
-			int end = 0;
-			for (i = 0; i < syncMessagesNum; i++) {
-				start = i == 0 ? 0 : end;
-				end += blockSize;
-				log.info("start {}, end {}", start, end);
-				sendSyncActiveUsersMessage(userIds.subList(start, end));
+			// int i;
+			// int start = 0;
+			// int end = 0;
+			// for (i = 0; i < syncMessagesNum; i++) {
+			// start = i == 0 ? 0 : end;
+			// end += blockSize;
+			// log.info("start {}, end {}", start, end);
+			// groupUsersByapplicationID(users.subList(start, end));
+			// }
+			//
+			// // get the remainder for the last thread
+			// int remainder = numUsers % blockSize;
+			// start = end;
+			// end = start + remainder;
+			// log.info("start {}, end {}", start, end);
+			// groupUsersByapplicationID(users.subList(start, end));
+			if (users.size() == 0)
+				return;
+			Long currentApplicationID = null;
+			List<Long> userIds = new ArrayList<Long>();
+			int currntBlockSize = 0;
+			for (Long[] userapplication : users) {
+				
+				if(currntBlockSize ==0 )
+					currentApplicationID = userapplication[1];
+				
+				if (!currentApplicationID.equals(userapplication[1])
+						|| currntBlockSize == maxBlockSize) {
+					sendSyncActiveUsersMessage(userIds, currentApplicationID);
+					userIds = new ArrayList<Long>();
+					currntBlockSize =0;
+				} else {
+					userIds.add(userapplication[0]);
+					currntBlockSize++;
+				}
 			}
-
-			// get the remainder for the last thread
-			int remainder = numUsers % blockSize;
-			start = end;
-			end = start + remainder;
-			log.info("start {}, end {}", start, end);
-			sendSyncActiveUsersMessage(userIds.subList(start, end));
 
 		} catch (Exception e) {
 			log.error("Could not process message: {}", e);
 		}
 	}
 
-	private void sendSyncActiveUsersMessage(List<Long> userIds) throws IOException {
-		if(userIds.size()==0)
-			return;
-		ActiveUsersFound content = new ActiveUsersFound(userIds);
+	private void sendSyncActiveUsersMessage(List<Long> userIds,
+			Long applicationID) throws IOException {
+		ActiveUsersFound content = new ActiveUsersFound(userIds, applicationID);
 
 		// serialize and send it
 		String message = MessageConverterFactory.getMessageConverter()

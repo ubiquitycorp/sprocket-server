@@ -32,9 +32,6 @@ public class SprocketUser extends User {
 	@ManyToOne
 	@JoinColumn(name = "app_id", nullable = true)
 	private Application createdBy;
-	
-	@Column(name = "app_id", nullable = true)
-	private Long createdByID;
 
 	public String getExternalIdentifier() {
 		return externalIdentifier;
@@ -42,10 +39,6 @@ public class SprocketUser extends User {
 
 	public Application getCreatedBy() {
 		return createdBy;
-	}
-
-	public Long getCreatedByID() {
-		return createdByID;
 	}
 
 	public static class Builder extends User.Builder {
