@@ -58,6 +58,7 @@ public class TwitterApiTest {
 				.secretToken("8StcfxfvMzdyuUFRcmf7dtn9kI1VTAvFCoB0deZZy8qkW")
 				.identifier("2576165924")
 				.clientPlatform(ClientPlatform.WEB)
+				.externalNetwork(ExternalNetwork.Twitter.ordinal())
 				.user(user).build();
 		
 		Application application =  ServiceFactory.getApplicationService().loadApplicationFromConfiguration();

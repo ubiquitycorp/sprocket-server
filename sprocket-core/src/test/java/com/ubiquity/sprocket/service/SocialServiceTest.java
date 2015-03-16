@@ -13,11 +13,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.niobium.repository.CollectionVariant;
+import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Message;
@@ -41,6 +43,8 @@ public class SocialServiceTest {
 		Configuration configuration = new PropertiesConfiguration(
 				"test.properties");
 		ServiceFactory.initialize(configuration, null);
+		SocialAPIFactory.initialize(configuration);
+		JedisConnectionFactory.initialize(configuration);
 		socialService = ServiceFactory.getSocialService();
 
 		user = SprocketUserFactory

@@ -57,8 +57,8 @@ public class GoogleApiTest {
 				ExternalNetwork.getNetworkById(identity.getExternalNetwork()),
 				identity.getClientPlatform(), externalNetworkApplication);
 		Contact contact = socialApi.authenticateUser(identity);
-		Assert.assertTrue(contact.getGender() != null);
-		Assert.assertTrue(contact.getAgeRange() != null);
+		Assert.assertTrue(contact.getGender() == null);
+		Assert.assertTrue(contact.getAgeRange() == null);
 
 	}
 
