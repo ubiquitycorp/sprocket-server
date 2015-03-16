@@ -151,7 +151,7 @@
 							<tasks>
 								<copy todir="/var/www/html/repository/${repo.env}" flatten="true" overwrite="true"
 									verbose="true" failonerror="true">
-									<fileset dir="target/rpm/${build.finalName}/RPMS/noarch/"
+									<fileset dir="target/rpm/${project.build.finalName}/RPMS/noarch/"
 										includes="**.rpm" />
 								</copy>
 							</tasks>
