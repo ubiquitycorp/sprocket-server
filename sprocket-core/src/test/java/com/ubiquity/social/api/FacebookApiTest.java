@@ -40,7 +40,7 @@ public class FacebookApiTest {
 		JedisConnectionFactory.initialize(configuration);
 		ServiceFactory.initialize(configuration, null);
 		SocialAPIFactory.initialize(configuration);
-				
+		ServiceFactory.initialize(configuration, null);		
 		EntityManagerSupport.beginTransaction();
 
 		User user = TestUserFactory

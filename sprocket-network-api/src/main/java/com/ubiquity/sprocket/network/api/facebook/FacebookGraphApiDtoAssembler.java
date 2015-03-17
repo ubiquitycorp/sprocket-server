@@ -6,12 +6,14 @@ import java.util.Random;
 
 import com.ubiquity.sprocket.network.api.dto.model.Activity;
 import com.ubiquity.sprocket.network.api.dto.model.ActivityType;
+import com.ubiquity.sprocket.network.api.dto.model.AgeRange;
 import com.ubiquity.sprocket.network.api.dto.model.Contact;
 import com.ubiquity.sprocket.network.api.dto.model.Conversation;
 import com.ubiquity.sprocket.network.api.dto.model.Gender;
 import com.ubiquity.sprocket.network.api.dto.model.Message;
 import com.ubiquity.sprocket.network.api.facebook.dto.container.FacebookDataDto;
 import com.ubiquity.sprocket.network.api.facebook.dto.model.FacebookActivityDto;
+import com.ubiquity.sprocket.network.api.facebook.dto.model.FacebookAgeRangeDto;
 import com.ubiquity.sprocket.network.api.facebook.dto.model.FacebookContactDto;
 import com.ubiquity.sprocket.network.api.facebook.dto.model.FacebookConversationDto;
 import com.ubiquity.sprocket.network.api.facebook.dto.model.FacebookMessageDto;
@@ -100,12 +102,17 @@ public class FacebookGraphApiDtoAssembler {
 			}
 		}
 
+		FacebookAgeRangeDto fbAgeRange = new FacebookAgeRangeDto();
+		AgeRange ageRange = result.getAgeRange();
+		fbAgeRange.setMax(ageRange.getMax());
+		fbAgeRange.setMin(ageRange.getMin());
+
 		// set the result and type on the
 		contactBuilder.gender(fbgender).firstName(result.getFirstName())
 				.lastName(result.getLastName())
 				.displayName(result.getDisplayName()).email(result.getEmail())
 				.id(result.getExternalIdentity().getIdentifier())
-				.link(result.getProfileUrl());
+				.link(result.getProfileUrl()).ageRange(fbAgeRange);
 		return contactBuilder.build();
 	}
 
