@@ -52,6 +52,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 				String apiKey = values.get(0).replaceFirst(
 						AUTHENTICATION_SCHEME + " ", "");
 				String userId = "";
+				@SuppressWarnings("rawtypes")
 				AuthenticationService authenticationService = null;
 				if (method.isAnnotationPresent(Secure.class)) {
 					authenticationService = ServiceFactory.getUserAuthService();

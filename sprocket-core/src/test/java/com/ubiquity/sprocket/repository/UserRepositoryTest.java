@@ -83,7 +83,7 @@ public class UserRepositoryTest {
 	
 	@Test
 	public void testFindAllActiveSprocketUser() {
-		List<SprocketUser> users =userRepository.findAllActiveSprocketUserIds();
+		List<SprocketUser> users =userRepository.findAllActiveUsers();
 		Assert.assertEquals(1, users.size());
 		user.setLastLogin(System.currentTimeMillis()-(14*24*60*60*1000)-10000);
 		EntityManagerSupport.beginTransaction();
