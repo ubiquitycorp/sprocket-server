@@ -1,6 +1,7 @@
 package com.ubiquity.sprocket.datasync.worker.master.jobs;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,9 +31,9 @@ public class DataSyncJob implements Job {
 
 			// get total number of users; the number of threads is equal to
 			// users / block size
-			List<Long[]> users = ServiceFactory.getUserService()
+			List<BigDecimal[]> users = ServiceFactory.getUserService()
 					.findAllActiveSprocketUserIds();
-			
+
 			log.info("creating synchronization data for {} users", users.size());
 
 			// get the start/end block identifiers
@@ -54,23 +55,29 @@ public class DataSyncJob implements Job {
 			// groupUsersByapplicationID(users.subList(start, end));
 			if (users.size() == 0)
 				return;
-			Long currentApplicationID = null;
+			Long currentApplicationID = -1L;
 			List<Long> userIds = new ArrayList<Long>();
 			int currntBlockSize = 0;
-			for (Long[] userapplication : users) {
-				
-				if(currntBlockSize ==0 )
-					currentApplicationID = userapplication[1];
-				
-				if (!currentApplicationID.equals(userapplication[1])
-						|| currntBlockSize == maxBlockSize) {
-					sendSyncActiveUsersMessage(userIds, currentApplicationID);
+			Long thisUser = null;
+			Long thisApplication = null;
+			for (Object[] userApplicationIds : users) {
+				thisUser = Long.valueOf(userApplicationIds[0].toString());
+				thisApplication = userApplicationIds[1] == null ? -1L : Long
+						.valueOf(userApplicationIds[1].toString());
+
+				if (!currentApplicationID.equals(thisApplication) || currntBlockSize == maxBlockSize) {
+					sendSyncActiveUsersMessage(userIds, currentApplicationID==-1?null:currentApplicationID);
 					userIds = new ArrayList<Long>();
-					currntBlockSize =0;
-				} else {
-					userIds.add(userapplication[0]);
-					currntBlockSize++;
+					currntBlockSize = 0;
+					currentApplicationID = thisApplication;
+
 				}
+				userIds.add(thisUser);
+				currntBlockSize++;
+			}
+			
+			if(currntBlockSize>0){
+				sendSyncActiveUsersMessage(userIds, currentApplicationID==-1?null:currentApplicationID);
 			}
 
 		} catch (Exception e) {

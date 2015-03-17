@@ -111,23 +111,23 @@ public class UsersEndpoint {
 
 		// load user
 		SprocketUser user = (SprocketUser) ServiceFactory.getUserService()
-						.getUserById(userId);
-
+				.getUserById(userId);
+		// Get app_i from Redis
+		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+				userId);
+		
+		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
+				.getApplicationService()
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
+						ExternalNetwork.LinkedIn.ordinal(), ClientPlatform.WEB);
 		String cookieString = java.net.URLDecoder.decode(cookie, "UTF-8");
-		ExchangeService exchangservice = new ExchangeService();
+		ExchangeService exchangservice = new ExchangeService(externalNetworkApplication);
 		String[] accesstokens = exchangservice.exchangeToken(cookieString);
 
 		if (accesstokens[0] == null || accesstokens[0].equalsIgnoreCase(""))
 			throw new AuthorizationException(
 					"Autontication Failed no oAuth_token_returned", null);
-		// Get app_i from Redis
-		Long appId = ServiceFactory.getUserService().retrieveApplicationId(userId);
-		//
-		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
-				.getApplicationService()
-				.getExAppByAppIdAndExternalNetworkAndClientPlatform(
-						appId,
-						ExternalNetwork.LinkedIn.ordinal(), ClientPlatform.WEB);
+
 		// create the identity if it does not exist; or use the existing one
 		List<ExternalIdentity> identities = ServiceFactory
 				.getExternalIdentityService().createOrUpdateExternalIdentity(
@@ -184,26 +184,31 @@ public class UsersEndpoint {
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identityDto.getExternalNetworkId());
 		// Get app_i from Redis
-		Long appId = ServiceFactory.getUserService().retrieveApplicationId(userId);
+		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+				userId);
 		// load External Network application
 		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
 				.getApplicationService()
 				.getExAppByAppIdAndExternalNetworkAndClientPlatform(
-						appId, externalNetwork.ordinal(),
-						ClientPlatform.getEnum(identityDto.getClientPlatformId()));
+						appId,
+						externalNetwork.ordinal(),
+						ClientPlatform.getEnum(identityDto
+								.getClientPlatformId()));
 
 		SocialToken requestToken = null;
 		if (externalNetwork == ExternalNetwork.Twitter) {
 
 			SocialAPI socialApi = SocialAPIFactory
 					.createProviderWithCallBackUrl(externalNetwork,
-							identityDto.getRedirectUrl(), externalNetworkApplication);
+							identityDto.getRedirectUrl(),
+							externalNetworkApplication);
 			TwitterAPI twitterApi = (TwitterAPI) socialApi;
 			requestToken = twitterApi.requesttoken();
 		} else if (externalNetwork == ExternalNetwork.Tumblr) {
 			SocialAPI socialApi = SocialAPIFactory
 					.createProviderWithCallBackUrl(externalNetwork,
-							identityDto.getRedirectUrl(), externalNetworkApplication);
+							identityDto.getRedirectUrl(),
+							externalNetworkApplication);
 			TumblrAPI tumblrApi = (TumblrAPI) socialApi;
 			requestToken = tumblrApi.requesttoken();
 		} else {
@@ -312,9 +317,12 @@ public class UsersEndpoint {
 
 		// Save UserId and APIKey in Redis cache database
 		authenticationService.saveAuthkey(user.getUserId(), apiKey);
-		
+
 		// Save application Id in the Redis cache database
-		ServiceFactory.getUserService().saveApplicationId(user.getUserId(), ServiceFactory.getApplicationService().getDefaultApplication().getAppId());
+		ServiceFactory.getUserService().saveApplicationId(
+				user.getUserId(),
+				ServiceFactory.getApplicationService().getDefaultApplication()
+						.getAppId());
 		log.debug("Created user {}", user);
 
 		return Response.ok().entity(jsonConverter.convertToPayload(accountDto))
@@ -369,16 +377,16 @@ public class UsersEndpoint {
 		SprocketUser user = (SprocketUser) ServiceFactory.getUserService()
 				.getUserById(userId);
 		// Get app_i from Redis
-		Long appId = ServiceFactory.getUserService().retrieveApplicationId(userId);
+		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+				userId);
 
 		// log.info("identifier = " +
 		// ((SprocketUser)user).getExternalIdentifier());
 		// Load External Application
 		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
 				.getApplicationService()
-				.getExAppByAppIdAndExternalNetworkAndClientPlatform(
-						appId, externalNetwork.ordinal(),
-						clientPlatform);
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
+						externalNetwork.ordinal(), clientPlatform);
 		// create the identity if it does not exist; or use the existing one
 		List<ExternalIdentity> identities = ServiceFactory
 				.getExternalIdentityService().createOrUpdateExternalIdentity(
@@ -439,20 +447,21 @@ public class UsersEndpoint {
 		// load user
 		SprocketUser user = (SprocketUser) ServiceFactory.getUserService()
 				.getUserById(userId);
-		
+
 		// Get app_i from Redis
-		Long appId = ServiceFactory.getUserService().retrieveApplicationId(userId);
-		
+		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+				userId);
+
 		// load External Network application
 		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
 				.getApplicationService()
-				.getExAppByAppIdAndExternalNetworkAndClientPlatform(
-						appId, externalNetwork.ordinal(),
-						clientPlatform);
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
+						externalNetwork.ordinal(), clientPlatform);
 		if (externalNetwork.network == Network.Content) {
 
-			ContentAPI contentApi = ContentAPIFactory.createProvider(
-					externalNetwork, clientPlatform, externalNetworkApplication);
+			ContentAPI contentApi = ContentAPIFactory
+					.createProvider(externalNetwork, clientPlatform,
+							externalNetworkApplication);
 			String accessToken = contentApi.getAccessToken(
 					identityDto.getCode(), identityDto.getRedirectUrl());
 
@@ -535,14 +544,14 @@ public class UsersEndpoint {
 				.getNetworkById(exchangeTokenDto.getExternalNetworkId());
 
 		// Get app_i from Redis
-		Long appId = ServiceFactory.getUserService().retrieveApplicationId(userId);
+		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+				userId);
 
 		// load External Network application
 		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
 				.getApplicationService()
-				.getExAppByAppIdAndExternalNetworkAndClientPlatform(
-						appId, externalNetwork.ordinal(),
-						ClientPlatform.WEB);
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
+						externalNetwork.ordinal(), ClientPlatform.WEB);
 		SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork,
 				ClientPlatform.WEB, externalNetworkApplication);
 		SocialToken token = socialApi.exchangeAccessToken(exchangeTokenDto

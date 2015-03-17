@@ -16,7 +16,7 @@ import com.ubiquity.sprocket.domain.SprocketUser;
  */
 public class ContactsSyncProcessor extends SyncProcessor {
 
-	private List<User> users;
+	private List<SprocketUser> users;
 
 	/**
 	 * Starts a processor with the underlying list
@@ -25,7 +25,7 @@ public class ContactsSyncProcessor extends SyncProcessor {
 	 * @param from
 	 * @param to
 	 */
-	public ContactsSyncProcessor(List<User> users) {
+	public ContactsSyncProcessor(List<SprocketUser> users) {
 		log.info("Created ContactSyncProcessor for users {}", users);
 		this.users = users;
 		createChainHandelrs();
