@@ -53,6 +53,7 @@ public class ExternalIdentityRepositoryTest {
 			.isActive(Boolean.TRUE)
 			.lastUpdated(System.currentTimeMillis())
 			.user(user)
+			.inUse(true)
 			.identifier(UUID.randomUUID().toString())
 			.accessToken(UUID.randomUUID().toString())
 			.externalNetwork(ExternalNetwork.Facebook.ordinal())

@@ -8,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.identity.domain.Application;
+import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.integration.api.PlaceAPIFactory;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.factory.TestPlaceFactory;
@@ -17,6 +20,7 @@ public class LocationServiceTest {
 
 	private static LocationService locationService;
 	private static Place losAngeles;
+	private static ExternalNetworkApplication externalNetworkApplication;
 
 	@SuppressWarnings("unused")
 	private Logger log = LoggerFactory.getLogger(getClass());
@@ -24,25 +28,29 @@ public class LocationServiceTest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 		Configuration config = new PropertiesConfiguration("test.properties");
-
-		locationService = new LocationService(config);
-
 		JedisConnectionFactory.initialize(config);
+		locationService = new LocationService(config);		
 		ServiceFactory.initialize(config, null);
 		PlaceAPIFactory.initialize(config);
+		ServiceFactory.initialize(config, null);
 
-		
-		losAngeles = TestPlaceFactory.createLosAngelesAndNeighborhoodsAndBusiness();
+		Application application = ServiceFactory.getApplicationService()
+				.loadApplicationFromConfiguration();
+		externalNetworkApplication = ServiceFactory.getApplicationService()
+				.getExAppByExternalNetworkAndClientPlatform(application,
+						ExternalNetwork.Yelp.ordinal(), ClientPlatform.WEB);
+
+		losAngeles = TestPlaceFactory
+				.createLosAngelesAndNeighborhoodsAndBusiness();
 
 		locationService.create(losAngeles);
 
 	}
 
-	
-
 	@Test
 	public void testSyncYelpNeighborhood() {
-		locationService.syncPlaces(ExternalNetwork.Yelp);
+		locationService.syncPlaces(ExternalNetwork.Yelp,
+				externalNetworkApplication);
 	}
 
 }

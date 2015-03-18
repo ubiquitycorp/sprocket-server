@@ -7,8 +7,11 @@ public class ActiveUsersFound {
 
 	private List<Long> userIds;
 	
-	public ActiveUsersFound(List<Long> userIds) {
+	private Long applicationID;
+	
+	public ActiveUsersFound(List<Long> userIds,Long applicationID) {
 		this.userIds = userIds;
+		this.applicationID = applicationID;
 	}
 	
 	@Override
@@ -19,4 +22,10 @@ public class ActiveUsersFound {
 	public List<Long> getUserIds() {
 		return userIds;
 	}
+
+	public Long getApllicationID() {
+		return applicationID;
+	}
+	
+	
 }

@@ -5,26 +5,26 @@ import com.google.gson.annotations.SerializedName;
 public class FacebookContactDto {
 
 	private String id;
-	
+
 	private String name;
-	
+
 	private String gender;
-	
+
 	@SerializedName("age_range")
 	private FacebookAgeRangeDto ageRange;
-	
+
 	private FacebookPageDto location;
-	
+
 	@SerializedName("first_name")
 	private String firstName;
-	
+
 	private String birthday;
-    
+
 	@SerializedName("last_name")
 	private String lastName;
-	
+
 	private String email;
-    
+
 	private String link;
 
 	public String getId() {
@@ -35,7 +35,6 @@ public class FacebookContactDto {
 		return location;
 	}
 
-
 	public String getBirthday() {
 		return birthday;
 	}
@@ -43,7 +42,6 @@ public class FacebookContactDto {
 	public String getGender() {
 		return gender;
 	}
-
 
 	public FacebookAgeRangeDto getAgeRange() {
 		return ageRange;
@@ -68,7 +66,7 @@ public class FacebookContactDto {
 	public String getLink() {
 		return link;
 	}
-	
+
 	public static class Builder {
 		private String id;
 		private String name;
@@ -77,7 +75,8 @@ public class FacebookContactDto {
 		private String lastName;
 		private String email;
 		private String link;
-		
+		private FacebookAgeRangeDto ageRange;
+
 		public Builder id(String id) {
 			this.id = id;
 			return this;
@@ -87,7 +86,7 @@ public class FacebookContactDto {
 			this.name = name;
 			return this;
 		}
-		
+
 		public Builder firstName(String firstName) {
 			this.firstName = firstName;
 			return this;
@@ -102,7 +101,7 @@ public class FacebookContactDto {
 			this.gender = gender;
 			return this;
 		}
-		
+
 		public Builder email(String email) {
 			this.email = email;
 			return this;
@@ -110,6 +109,11 @@ public class FacebookContactDto {
 
 		public Builder link(String link) {
 			this.link = link;
+			return this;
+		}
+
+		public Builder ageRange(FacebookAgeRangeDto ageRange) {
+			this.ageRange = ageRange;
 			return this;
 		}
 
@@ -126,8 +130,7 @@ public class FacebookContactDto {
 		this.email = builder.email;
 		this.gender = builder.gender;
 		this.link = builder.link;
+		this.ageRange = builder.ageRange;
 	}
-	
-   
-}
 
+}

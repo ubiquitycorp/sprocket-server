@@ -45,7 +45,7 @@ public class RandomListGenerator {
 			videos.add(RandomObjectGenerator.generateVideoContent(userId,
 					lastRequest, i));
 		}
-		for (int i = mid; i <= maxResults; i++) {
+		for (int i = mid + 1; i <= maxResults; i++) {
 			videos.add(RandomObjectGenerator.generateVideoContent(userId,
 					thisRequest, i));
 		}

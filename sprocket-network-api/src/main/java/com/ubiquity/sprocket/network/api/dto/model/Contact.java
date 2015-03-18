@@ -13,12 +13,13 @@ public class Contact {
 	private Gender gender;
 
 	private Image image;
-	
+
 	private String profileUrl;
 
 	private Long lastUpdated;
-	
-	
+
+	private AgeRange ageRange;
+
 	private ExternalIdentity externalIdentity;
 
 	public String getDisplayName() {
@@ -32,7 +33,6 @@ public class Contact {
 	public void setLastUpdated(Long lastUpdated) {
 		this.lastUpdated = lastUpdated;
 	}
-
 
 	public String getFirstName() {
 		return firstName;
@@ -53,11 +53,10 @@ public class Contact {
 	public String getEmail() {
 		return email;
 	}
-	
+
 	public Long getLastUpdated() {
 		return lastUpdated;
 	}
-
 
 	public void setEmail(String email) {
 		this.email = email;
@@ -82,12 +81,15 @@ public class Contact {
 	public Gender getGender() {
 		return gender;
 	}
+
 	
+	public AgeRange getAgeRange() {
+		return ageRange;
+	}
+
 	public ExternalIdentity getExternalIdentity() {
 		return externalIdentity;
 	}
-
-
 
 	public static class Builder {
 		private String displayName;
@@ -99,18 +101,19 @@ public class Contact {
 		private String profileUrl;
 		private Long lastUpdated;
 		private ExternalIdentity externalIdentity;
+		private AgeRange ageRange;
 
 		public Builder displayName(String displayName) {
 			this.displayName = displayName;
 			return this;
 		}
-		
+
 		public Builder firstName(String firstName) {
 			this.firstName = firstName;
 			return this;
 		}
-		
-		public Builder gender(Gender gender){
+
+		public Builder gender(Gender gender) {
 			this.gender = gender;
 			return this;
 		}
@@ -139,9 +142,14 @@ public class Contact {
 			this.lastUpdated = lastUpdated;
 			return this;
 		}
-		
-		public Builder externalIdentity(ExternalIdentity externalIdentity){
-			this.externalIdentity= externalIdentity;
+
+		public Builder externalIdentity(ExternalIdentity externalIdentity) {
+			this.externalIdentity = externalIdentity;
+			return this;
+		}
+
+		public Builder ageRange(AgeRange ageRange) {
+			this.ageRange = ageRange;
 			return this;
 		}
 
@@ -160,6 +168,7 @@ public class Contact {
 		this.profileUrl = builder.profileUrl;
 		this.lastUpdated = builder.lastUpdated;
 		this.externalIdentity = builder.externalIdentity;
+		this.ageRange = builder.ageRange;
 	}
-	
+
 }

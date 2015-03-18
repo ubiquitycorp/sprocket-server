@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.api.ContentAPI;
 import com.ubiquity.integration.api.ContentAPIFactory;
@@ -246,7 +247,7 @@ public class SearchService {
 	 * @param externalNetwork
 	 * @return
 	 */
-	public List<Document> searchLiveDocuments(String searchTerm, User user, ExternalNetwork externalNetwork, Integer page,BigDecimal longitude, BigDecimal latitude,String locator) {
+	public List<Document> searchLiveDocuments(String searchTerm, User user, ExternalNetwork externalNetwork, Integer page,BigDecimal longitude, BigDecimal latitude,String locator, ExternalNetworkApplication externalNetworkApplication) {
 
 		// normalize page
 		page = page == null ? 1 : page;
@@ -263,21 +264,21 @@ public class SearchService {
 		
 		// if it's social, search activities only
 		if(externalNetwork.getNetwork() == Network.Social) {
-			SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, identity.getClientPlatform());
+			SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, identity.getClientPlatform(),externalNetworkApplication);
 			// calculate offset with page utility based on page limits
 			List<Activity> activities = socialAPI.searchActivities(searchTerm, page, resultsLimit, identity);
 			documents = wrapEntitiesInDocuments(activities);
 			
 		} else if(externalNetwork.getNetwork() == Network.Content){
 			// if content, search videos
-			ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, identity.getClientPlatform());
+			ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, identity.getClientPlatform(),externalNetworkApplication);
 			List<VideoContent> videoContent = contentAPI.searchVideos(searchTerm, page, resultsLimit, identity);
 			
 			documents = wrapEntitiesInDocuments(videoContent);
 		}else {
 			// if content, search videos
 			
-			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(externalNetwork, ClientPlatform.WEB);
+			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(externalNetwork, ClientPlatform.WEB,externalNetworkApplication);
 //			UserLocationRepository repo = new UserLocationRepositoryJpaImpl();
 //			UserLocation location = repo.findByUserId(user.getUserId());
 //			if(location!= null)

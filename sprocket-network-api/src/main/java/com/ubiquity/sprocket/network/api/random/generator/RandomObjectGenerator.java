@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.ubiquity.sprocket.network.api.dto.model.Activity;
 import com.ubiquity.sprocket.network.api.dto.model.ActivityType;
+import com.ubiquity.sprocket.network.api.dto.model.AgeRange;
 import com.ubiquity.sprocket.network.api.dto.model.AudioTrack;
 import com.ubiquity.sprocket.network.api.dto.model.Comment;
 import com.ubiquity.sprocket.network.api.dto.model.Contact;
@@ -153,6 +154,7 @@ public class RandomObjectGenerator {
 				.firstName(UUID.randomUUID().toString()).gender(gender)
 				.lastName(UUID.randomUUID().toString())
 				.displayName(UUID.randomUUID().toString())
+				.ageRange(new AgeRange(35, 60))
 				.lastUpdated(System.currentTimeMillis()).image(GeneratePhoto());
 
 		return contactBuilder.build();

@@ -21,7 +21,7 @@
 		<class>com.ubiquity.sprocket.domain.FavoriteItem</class>
 
 		<class>com.ubiquity.integration.domain.VideoContent</class>
-		<class>com.ubiquity.identity.domain.User</class>
+		<class>com.ubiquity.sprocket.domain.SprocketUser</class>
 		<class>com.ubiquity.identity.domain.Admin</class>
 		<class>com.ubiquity.identity.domain.Developer</class>
 		<class>com.ubiquity.identity.domain.Application</class>

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.amqp.MessageQueueProducer;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.SyncStatusMessage;
 import com.ubiquity.sprocket.datasync.worker.manager.SyncProcessor;
@@ -43,12 +44,12 @@ public abstract class Handler {
 	}
 
 	public void canAccept(ExternalIdentity identity,
-			ExternalNetwork network) {
+			ExternalNetwork network, ExternalNetworkApplication externalNetworkApplication) {
 		if (networks.contains(network))
-			syncData(identity, network);
+			syncData(identity, network, externalNetworkApplication);
 
 		if (next != null)
-			next.canAccept(identity, network);
+			next.canAccept(identity, network, externalNetworkApplication);
 	}
 
 	public void setNext(Handler next) {
@@ -64,5 +65,5 @@ public abstract class Handler {
 	}
 
 	abstract protected void syncData(ExternalIdentity identity,
-			ExternalNetwork network);
+			ExternalNetwork network, ExternalNetworkApplication externalNetworkApplication);
 }

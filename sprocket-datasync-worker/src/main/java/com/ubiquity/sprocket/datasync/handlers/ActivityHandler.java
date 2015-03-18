@@ -8,6 +8,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Period;
 
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ExternalNetwork;
@@ -32,10 +33,10 @@ public class ActivityHandler extends Handler {
 	}
 
 	@Override
-	protected void syncData(ExternalIdentity identity, ExternalNetwork network) {
+	protected void syncData(ExternalIdentity identity, ExternalNetwork network, ExternalNetworkApplication externalNetworkApplication) {
 		Long userId = identity.getUser().getUserId();
 		// Sync activities
-		int n = processActivities(identity, network);
+		int n = processActivities(identity, network,externalNetworkApplication);
 		processor.sendStepCompletedMessageToIndividual(backchannel, network,
 				"Synchronized feed", processor.getResoursePath(userId, network,
 						ResourceType.activities), n, userId,
@@ -43,14 +44,14 @@ public class ActivityHandler extends Handler {
 	}
 
 	private int processActivities(ExternalIdentity identity,
-			ExternalNetwork network) {
+			ExternalNetwork network, ExternalNetworkApplication externalNetworkApplication) {
 		List<Activity> synced = null;
 		DateTime start = new DateTime();
 		Long userId = identity.getUser().getUserId();
 		int size = -1;
 		try {
 			SocialService socialService = ServiceFactory.getSocialService();
-			synced = socialService.syncActivities(identity, network);
+			synced = socialService.syncActivities(identity, network,externalNetworkApplication);
 			// index for searching
 			ServiceFactory.getSearchService().indexActivities(userId, synced,
 					false);

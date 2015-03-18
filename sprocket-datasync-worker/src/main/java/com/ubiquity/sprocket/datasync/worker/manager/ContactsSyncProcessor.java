@@ -1,9 +1,12 @@
 package com.ubiquity.sprocket.datasync.worker.manager;
 
 import java.util.List;
+
 import com.niobium.repository.jpa.EntityManagerSupport;
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.sprocket.datasync.handlers.ContactHandler;
+import com.ubiquity.sprocket.domain.SprocketUser;
 
 /***
  * Handles the processing of each feed type
@@ -13,7 +16,7 @@ import com.ubiquity.sprocket.datasync.handlers.ContactHandler;
  */
 public class ContactsSyncProcessor extends SyncProcessor {
 
-	private List<User> users;
+	private List<SprocketUser> users;
 
 	/**
 	 * Starts a processor with the underlying list
@@ -22,7 +25,7 @@ public class ContactsSyncProcessor extends SyncProcessor {
 	 * @param from
 	 * @param to
 	 */
-	public ContactsSyncProcessor(List<User> users) {
+	public ContactsSyncProcessor(List<SprocketUser> users) {
 		log.info("Created ContactSyncProcessor for users {}", users);
 		this.users = users;
 		createChainHandelrs();
@@ -46,7 +49,7 @@ public class ContactsSyncProcessor extends SyncProcessor {
 	 * @return
 	 */
 	@Override
-	public int syncData() {
+	public int syncData(Application application) {
 
 		int numRefreshed = 0;
 
@@ -54,7 +57,7 @@ public class ContactsSyncProcessor extends SyncProcessor {
 			Long startTime, endTime;
 			startTime = System.currentTimeMillis();
 			for (User user : users) {
-				numRefreshed += syncDataForUser(user);
+				numRefreshed += syncDataForUser((SprocketUser)user,application );
 			}
 			endTime = System.currentTimeMillis();
 			log.info("{}: Periodic Sync completed in {} seconds", Thread

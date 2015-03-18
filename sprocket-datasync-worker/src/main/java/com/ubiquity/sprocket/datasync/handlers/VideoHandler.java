@@ -8,6 +8,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Period;
 
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.VideoContent;
@@ -30,9 +31,9 @@ public class VideoHandler extends Handler {
 	}
 
 	@Override
-	protected void syncData(ExternalIdentity identity, ExternalNetwork network) {
+	protected void syncData(ExternalIdentity identity, ExternalNetwork network,ExternalNetworkApplication externalNetworkApplication) {
 		Long userId = identity.getUser().getUserId();
-		int n = processVideos(identity, network);
+		int n = processVideos(identity, network, externalNetworkApplication);
 
 		processor
 				.sendStepCompletedMessageToIndividual(backchannel, network,
@@ -47,14 +48,14 @@ public class VideoHandler extends Handler {
 	 * @param identity
 	 * @param network
 	 */
-	private int processVideos(ExternalIdentity identity, ExternalNetwork network) {
+	private int processVideos(ExternalIdentity identity, ExternalNetwork network, ExternalNetworkApplication externalNetworkApplication) {
 		List<VideoContent> synced = null;
 		DateTime start = new DateTime();
 		Long userId = identity.getUser().getUserId();
 		int size = -1;
 		try {
 			ContentService contentService = ServiceFactory.getContentService();
-			synced = contentService.sync(identity, network);
+			synced = contentService.sync(identity, network,externalNetworkApplication);
 
 			// add videos to search results for this specific user
 			ServiceFactory.getSearchService()

@@ -374,9 +374,7 @@ public class DtoAssembler {
 
 		ExternalIdentity identity = contact.getExternalIdentity();
 		if (identity != null)
-			contactDtoBuilder.identity(new IdentityDto.Builder()
-					.identifier(identity.getIdentifier())
-					.externalNetworkId(identity.getExternalNetwork()).build());
+			contactDtoBuilder.identity(assemble(identity));
 		// Image is optional
 		if (contact.getImage() != null)
 			contactDtoBuilder.imageUrl(contact.getImage().getUrl());

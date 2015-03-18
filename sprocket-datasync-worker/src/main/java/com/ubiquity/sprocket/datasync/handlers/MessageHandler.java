@@ -8,6 +8,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Period;
 
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.service.SocialService;
@@ -31,10 +32,10 @@ public class MessageHandler extends Handler {
 	}
 
 	@Override
-	protected void syncData(ExternalIdentity identity, ExternalNetwork network) {
+	protected void syncData(ExternalIdentity identity, ExternalNetwork network,ExternalNetworkApplication externalNetworkApplication) {
 		Long userId = identity.getUser().getUserId();
 		// Sync messages
-		int n = processMessages(identity, network, null);
+		int n = processMessages(identity, network, null, externalNetworkApplication);
 		processor.sendStepCompletedMessageToIndividual(backchannel, network,
 				"Synchronized messages", processor.getResoursePath(userId,
 						network, ResourceType.messages), n, userId,
@@ -48,7 +49,7 @@ public class MessageHandler extends Handler {
 	 * @param network
 	 */
 	public int processMessages(ExternalIdentity identity,
-			ExternalNetwork network, String lastMessageIdentifier) {
+			ExternalNetwork network, String lastMessageIdentifier,ExternalNetworkApplication externalNetworkApplication) {
 
 		List<com.ubiquity.integration.domain.Message> synced = null;
 		DateTime start = new DateTime();
@@ -58,7 +59,7 @@ public class MessageHandler extends Handler {
 			SocialService socialService = ServiceFactory.getSocialService();
 
 			synced = socialService.syncMessages(identity, network,
-					lastMessageIdentifier, processedMessages);
+					lastMessageIdentifier, processedMessages, externalNetworkApplication);
 
 			// add messages to search results
 			ServiceFactory.getSearchService().indexMessages(

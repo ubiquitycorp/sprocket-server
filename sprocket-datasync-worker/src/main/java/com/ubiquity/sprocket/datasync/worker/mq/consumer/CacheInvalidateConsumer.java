@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
 import com.niobium.repository.jpa.EntityManagerSupport;
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.VideoContent;
@@ -20,6 +21,7 @@ import com.ubiquity.sprocket.datasync.worker.manager.ContactsSyncProcessor;
 import com.ubiquity.sprocket.datasync.worker.manager.DataSyncProcessor;
 import com.ubiquity.sprocket.datasync.worker.manager.SyncProcessor;
 import com.ubiquity.sprocket.domain.FavoritePlace;
+import com.ubiquity.sprocket.domain.SprocketUser;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.definition.ActiveUsersFound;
 import com.ubiquity.sprocket.messaging.definition.ContactsSync;
@@ -172,18 +174,20 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 
 	private void process(ActiveUsersFound activeUsersFound) {
 		List<Long> userIds = activeUsersFound.getUserIds();
-		List<User> users = ServiceFactory.getUserService().findUsersInRange(
+		List<SprocketUser> users = ServiceFactory.getUserService().findSprocketUsersInRange(
 				userIds);
 		SyncProcessor dataSyncManager = new DataSyncProcessor(users);
-		dataSyncManager.syncData();
+		Application application = ServiceFactory.getApplicationService().getApplicationByIdOrDefault(activeUsersFound.getApllicationID());
+		dataSyncManager.syncData(application);
 	}
 
 	private void process(ContactsSync contactsSyncMessage) {
 		List<Long> userIds = contactsSyncMessage.getUserIds();
-		List<User> users = ServiceFactory.getUserService().findUsersInRange(
+		List<SprocketUser> users = ServiceFactory.getUserService().findSprocketUsersInRange(
 				userIds);
+		Application application = ServiceFactory.getApplicationService().getApplicationByIdOrDefault(contactsSyncMessage.getApllicationID());
 		SyncProcessor contactSyncManager = new ContactsSyncProcessor(users);
-		contactSyncManager.syncData();
+		contactSyncManager.syncData(application);
 	}
 
 	@Override
