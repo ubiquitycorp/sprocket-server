@@ -10,8 +10,8 @@ import java.util.List;
 import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -105,7 +105,7 @@ public class UsersEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response authenticatedlinkedin(@PathParam("userId") Long userId,
-			@CookieParam("linkedin_oauth_77fa6kjljumj8x") String cookie)
+			@HeaderParam("cookie") String cookie)
 			throws Exception {
 
 		// load user
@@ -119,9 +119,8 @@ public class UsersEndpoint {
 				.getApplicationService()
 				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
 						ExternalNetwork.LinkedIn.ordinal(), ClientPlatform.WEB);
-		String cookieString = java.net.URLDecoder.decode(cookie, "UTF-8");
 		ExchangeService exchangservice = new ExchangeService(externalNetworkApplication);
-		String[] accesstokens = exchangservice.exchangeToken(cookieString);
+		String[] accesstokens = exchangservice.exchangeToken(cookie);
 
 		if (accesstokens[0] == null || accesstokens[0].equalsIgnoreCase(""))
 			throw new AuthorizationException(
