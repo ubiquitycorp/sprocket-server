@@ -4,7 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import com.ubiquity.sprocket.network.api.cache.CacheFactory;
 import com.ubiquity.sprocket.network.api.dto.model.Activity;
+import com.ubiquity.sprocket.network.api.dto.model.ActivityType;
 import com.ubiquity.sprocket.network.api.dto.model.Comment;
 import com.ubiquity.sprocket.network.api.dto.model.Contact;
 import com.ubiquity.sprocket.network.api.dto.model.Conversation;
@@ -20,11 +22,17 @@ public class RandomListGenerator {
 		int mid = (maxResults / 2) + 1;
 		for (int i = 1; i <= mid; i++) {
 			activities.add(RandomObjectGenerator.generateActivity(userId,
-					lastRequest, i, random.nextInt(6), withComments, withTags));
+					lastRequest, i, random.nextInt(6), withComments, withTags, null));
 		}
 		for (int i = mid; i <= maxResults; i++) {
 			activities.add(RandomObjectGenerator.generateActivity(userId,
-					thisRequest, i, random.nextInt(6), withComments, withTags));
+					thisRequest, i, random.nextInt(6), withComments, withTags, null));
+		}
+		String activityBody = CacheFactory.getLastActivityBody(userId);
+		if (activityBody != null)
+		{
+			activities.add(RandomObjectGenerator.generateActivity(userId,
+					thisRequest, maxResults + 1, ActivityType.STATUS.ordinal(), withComments, withTags, activityBody));
 		}
 		return activities;
 	}

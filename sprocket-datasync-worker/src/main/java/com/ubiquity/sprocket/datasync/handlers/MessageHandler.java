@@ -26,7 +26,8 @@ public class MessageHandler extends Handler {
 		super(processor);
 		networks = EnumSet.of(ExternalNetwork.Twitter,
 				ExternalNetwork.Facebook, ExternalNetwork.Google,
-				ExternalNetwork.Tumblr);
+				ExternalNetwork.Tumblr,
+				ExternalNetwork.SocailMockNetwork);
 	}
 
 	@Override

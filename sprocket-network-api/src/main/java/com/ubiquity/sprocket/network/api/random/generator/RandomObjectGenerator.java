@@ -70,7 +70,8 @@ public class RandomObjectGenerator {
 	}
 
 	public static Activity generateActivity(Long userID, Long lastRequest,
-			int index, int activityType, boolean withComments, boolean withTags) {
+			int index, int activityType, boolean withComments,
+			boolean withTags, String body) {
 		Activity.Builder activityBuilder = new Activity.Builder();
 		activityBuilder
 				.title(UUID.randomUUID().toString())
@@ -84,6 +85,11 @@ public class RandomObjectGenerator {
 				.externalIdentifier(
 						generateIdentifier(userID, ResourceType.activities,
 								lastRequest, index, null));
+		
+		if (body != null)
+		{
+			activityBuilder.body(body);
+		}
 
 		switch (activityType) {
 		case 0:
@@ -113,24 +119,24 @@ public class RandomObjectGenerator {
 		Activity activity = activityBuilder.build();
 		if (withComments)
 			activity.getComments().addAll(
-					GenerateCommentList(userID, lastRequest, activity.getExternalIdentifier()));
+					GenerateCommentList(userID, lastRequest,
+							activity.getExternalIdentifier()));
 		activity.getTags().addAll(GenerateTagList());
 		return activity;
 	}
 
-	public static List<Contact> generateContactList(Long userId)
-	{
-		List<Contact> contacts  = new LinkedList<Contact>();
+	public static List<Contact> generateContactList(Long userId) {
+		List<Contact> contacts = new LinkedList<Contact>();
 		int contactIndex = 1;
 		for (int i = 0; i < 4; i++) {
 			Contact contact = generateContact(userId, contactIndex);
 			contacts.add(contact);
-			
-			contactIndex ++;
+
+			contactIndex++;
 		}
 		return contacts;
 	}
-	
+
 	public static Contact generateContact(Long userId, Integer index) {
 		ExternalIdentity externalIdentity = null;
 		if (index == null) {
@@ -166,15 +172,15 @@ public class RandomObjectGenerator {
 		int commentIndex = 1;
 		List<Comment> comments = new LinkedList<Comment>();
 		for (int i = 0; i < 4; i++) {
-			Comment comment = GenerateComment(userID, lastRequest,
-					index,commentIndex);
+			Comment comment = GenerateComment(userID, lastRequest, index,
+					commentIndex);
 			commentIndex++;
 			for (int j = 0; j < 2; j++) {
 				Comment childReply = GenerateComment(userID, lastRequest,
-						index,commentIndex);
+						index, commentIndex);
 				commentIndex++;
-				childReply.addReply(GenerateComment(userID, lastRequest,
-						index,commentIndex));
+				childReply.addReply(GenerateComment(userID, lastRequest, index,
+						commentIndex));
 				commentIndex++;
 				comment.addReply(childReply);
 				commentIndex++;
