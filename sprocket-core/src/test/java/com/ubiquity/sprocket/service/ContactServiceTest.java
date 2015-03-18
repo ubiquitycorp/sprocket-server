@@ -3,6 +3,8 @@ package com.ubiquity.sprocket.service;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,6 +34,8 @@ public class ContactServiceTest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 
+		Configuration config = new PropertiesConfiguration("test.properties");
+		ServiceFactory.initialize(config, null);
 		contactService = ServiceFactory.getContactService();
 		user = SprocketUserFactory
 				.createUserWithRequiredFieldsUsingApplication(UUID.randomUUID()

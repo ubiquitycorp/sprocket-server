@@ -28,10 +28,8 @@ public class LocationServiceTest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 		Configuration config = new PropertiesConfiguration("test.properties");
-
-		locationService = new LocationService(config);
-
 		JedisConnectionFactory.initialize(config);
+		locationService = new LocationService(config);		
 		ServiceFactory.initialize(config, null);
 		PlaceAPIFactory.initialize(config);
 		ServiceFactory.initialize(config, null);
