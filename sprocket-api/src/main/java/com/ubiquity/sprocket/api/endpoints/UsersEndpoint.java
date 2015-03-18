@@ -73,7 +73,6 @@ import com.ubiquity.sprocket.api.validation.UserLocationUpdateValidation;
 import com.ubiquity.sprocket.domain.SprocketUser;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
-//import com.ubiquity.sprocket.messaging.definition.EventTracked;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.messaging.definition.LocationUpdated;
 import com.ubiquity.sprocket.service.ServiceFactory;
@@ -318,11 +317,6 @@ public class UsersEndpoint {
 		// Save UserId and APIKey in Redis cache database
 		authenticationService.saveAuthkey(user.getUserId(), apiKey);
 
-		// Save application Id in the Redis cache database
-		ServiceFactory.getUserService().saveApplicationId(
-				user.getUserId(),
-				ServiceFactory.getApplicationService().getDefaultApplication()
-						.getAppId());
 		log.debug("Created user {}", user);
 
 		return Response.ok().entity(jsonConverter.convertToPayload(accountDto))

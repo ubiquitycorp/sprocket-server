@@ -8,8 +8,8 @@
 	<!-- Note, parameterize this -->
 	<properties>
 		<app.home>/var/lib/tomcat7/webapps/sprocket-api</app.home>
-                <init.home>/etc/init.d</init.home>
-                <sysconfig.home>/etc/sysconfig</sysconfig.home>
+		<init.home>/etc/init.d</init.home>
+		<sysconfig.home>/etc/sysconfig</sysconfig.home>
 	</properties>
 
 	<!-- turns on resource filtering -->
@@ -20,10 +20,10 @@
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
-                       <resource>
-                                <directory>rpm</directory>
-                                <filtering>true</filtering>
-                        </resource>
+			<resource>
+				<directory>rpm</directory>
+				<filtering>true</filtering>
+			</resource>
 
 		</resources>
 		<testResources>
@@ -95,30 +95,30 @@
 								</source>
 							</sources>
 						</mapping>
-                                                <mapping>
-                                                        <directory>${init.home}</directory>
-                                                        <username>root</username>
-                                                        <groupname>root</groupname>
-                                                        <filemode>755</filemode>
-                                                        <directoryIncluded>false</directoryIncluded>
-                                                        <sources>
-                                                                <source>
-                                                                        <location>rpm/init.d</location>
-                                                                </source>
-                                                        </sources>
-                                                </mapping>
-                                                <mapping>
-                                                        <directory>${sysconfig.home}</directory>
-                                                        <username>root</username>
-                                                        <groupname>root</groupname>
-                                                        <filemode>755</filemode>
-                                                        <directoryIncluded>false</directoryIncluded>
-                                                        <sources>
-                                                                <source>
-                                                                        <location>rpm/sysconfig</location>
-                                                                </source>
-                                                        </sources>
-                                                </mapping>
+						<mapping>
+							<directory>${init.home}</directory>
+							<username>root</username>
+							<groupname>root</groupname>
+							<filemode>755</filemode>
+							<directoryIncluded>false</directoryIncluded>
+							<sources>
+								<source>
+									<location>rpm/init.d</location>
+								</source>
+							</sources>
+						</mapping>
+						<mapping>
+							<directory>${sysconfig.home}</directory>
+							<username>root</username>
+							<groupname>root</groupname>
+							<filemode>755</filemode>
+							<directoryIncluded>false</directoryIncluded>
+							<sources>
+								<source>
+									<location>rpm/sysconfig</location>
+								</source>
+							</sources>
+						</mapping>
 					</mappings>
 					<preinstallScriptlet>
 						<scriptFile>target/classes/undeploy.sh</scriptFile>
