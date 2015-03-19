@@ -38,8 +38,9 @@ public class FacebookApiTest {
 		Configuration configuration = new PropertiesConfiguration(
 				"test.properties");
 		JedisConnectionFactory.initialize(configuration);
+		ServiceFactory.initialize(configuration, null);
 		SocialAPIFactory.initialize(configuration);
-				
+		ServiceFactory.initialize(configuration, null);		
 		EntityManagerSupport.beginTransaction();
 
 		User user = TestUserFactory

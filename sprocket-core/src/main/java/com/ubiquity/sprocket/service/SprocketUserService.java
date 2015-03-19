@@ -1,5 +1,6 @@
 package com.ubiquity.sprocket.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
@@ -10,6 +11,7 @@ import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.service.UserService;
+import com.ubiquity.sprocket.domain.SprocketUser;
 import com.ubiquity.sprocket.repository.SprocketUserRepositoryJpaImpl;
 
 public class SprocketUserService extends UserService {
@@ -72,9 +74,22 @@ public class SprocketUserService extends UserService {
 
 	}
 	
-	public List<Long[]> findAllActiveSprocketUserIds() {
+	public List<BigDecimal[]> findAllActiveSprocketUserIds() {
 		try {
 			return new SprocketUserRepositoryJpaImpl().findAllActiveSprocketUserIds();
+		} finally {
+			EntityManagerSupport.closeEntityManager();
+		}
+	}
+	
+	/***
+	 * find users in the given ids from the DB
+	 * 
+	 * @return all users in DB
+	 */
+	public List<SprocketUser> findSprocketUsersInRange(List<Long> userIds) {
+		try {
+			return new SprocketUserRepositoryJpaImpl().findSprocketUsersInRange(userIds);
 		} finally {
 			EntityManagerSupport.closeEntityManager();
 		}

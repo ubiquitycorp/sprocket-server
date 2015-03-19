@@ -1,5 +1,6 @@
 package com.ubiquity.sprocket.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -113,7 +114,7 @@ public class UserRepositoryTest {
 		EntityManagerSupport.commit();
 		
 		
-		List<Long[]>  users = userRepository
+		List<BigDecimal[]>  users = userRepository
 				.findAllActiveSprocketUserIds();
 		Assert.assertEquals(2, users.size());
 		

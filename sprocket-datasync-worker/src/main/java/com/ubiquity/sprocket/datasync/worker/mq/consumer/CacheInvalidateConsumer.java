@@ -21,6 +21,7 @@ import com.ubiquity.sprocket.datasync.worker.manager.ContactsSyncProcessor;
 import com.ubiquity.sprocket.datasync.worker.manager.DataSyncProcessor;
 import com.ubiquity.sprocket.datasync.worker.manager.SyncProcessor;
 import com.ubiquity.sprocket.domain.FavoritePlace;
+import com.ubiquity.sprocket.domain.SprocketUser;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.definition.ActiveUsersFound;
 import com.ubiquity.sprocket.messaging.definition.ContactsSync;
@@ -173,7 +174,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 
 	private void process(ActiveUsersFound activeUsersFound) {
 		List<Long> userIds = activeUsersFound.getUserIds();
-		List<User> users = ServiceFactory.getUserService().findUsersInRange(
+		List<SprocketUser> users = ServiceFactory.getUserService().findSprocketUsersInRange(
 				userIds);
 		SyncProcessor dataSyncManager = new DataSyncProcessor(users);
 		Application application = ServiceFactory.getApplicationService().getApplicationByIdOrDefault(activeUsersFound.getApllicationID());
@@ -182,7 +183,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 
 	private void process(ContactsSync contactsSyncMessage) {
 		List<Long> userIds = contactsSyncMessage.getUserIds();
-		List<User> users = ServiceFactory.getUserService().findUsersInRange(
+		List<SprocketUser> users = ServiceFactory.getUserService().findSprocketUsersInRange(
 				userIds);
 		Application application = ServiceFactory.getApplicationService().getApplicationByIdOrDefault(contactsSyncMessage.getApllicationID());
 		SyncProcessor contactSyncManager = new ContactsSyncProcessor(users);

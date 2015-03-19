@@ -1,5 +1,6 @@
 package com.ubiquity.sprocket.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.persistence.NoResultException;
@@ -7,6 +8,7 @@ import javax.persistence.Query;
 
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
+import com.ubiquity.sprocket.domain.SprocketUser;
 
 /***
  * extends UserRepositoryJpaImpl and adds new methods for SprocketUser
@@ -50,12 +52,22 @@ public class SprocketUserRepositoryJpaImpl extends UserRepositoryJpaImpl
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Long[]> findAllActiveSprocketUserIds() {
+	public List<BigDecimal[]> findAllActiveSprocketUserIds() {
 		Query query = getEntityManager()
 				.createNativeQuery(
 						"select u.user_id ,u.app_id from user u where u.last_login + 1209600000 > :lastLogin order by u.app_id");
 		query.setParameter("lastLogin", System.currentTimeMillis());
-		return (List<Long[]>)query.getResultList();
+		return (List<BigDecimal[]>)query.getResultList();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<SprocketUser> findSprocketUsersInRange(List<Long> userIds) {
+		assert (!userIds.isEmpty());
+		Query query = getEntityManager().createQuery(
+				"select u from SprocketUser u where u.userId in :userIds");
+		query.setParameter("userIds", userIds);
+		return query.getResultList();
 	}
 
 }

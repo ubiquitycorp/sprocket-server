@@ -6,10 +6,11 @@ import java.util.List;
 public class ContactsSync {
 
 	private List<Long> userIds;
-	private Long apllicationID;
+	private Long applicationID;
 	
-	public ContactsSync(List<Long> userIds) {
+	public ContactsSync(List<Long> userIds,Long applicationID) {
 		this.userIds = userIds;
+		this.applicationID = applicationID;
 	}
 	
 	@Override
@@ -22,7 +23,7 @@ public class ContactsSync {
 	}
 
 	public Long getApllicationID() {
-		return apllicationID;
+		return applicationID;
 	}
 	
 	

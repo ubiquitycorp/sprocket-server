@@ -1,7 +1,7 @@
 package com.ubiquity.content.api;
 
 import java.util.List;
-
+import com.ubiquity.identity.domain.User;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Assert;
@@ -15,6 +15,7 @@ import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
+import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.integration.api.ContentAPI;
 import com.ubiquity.integration.api.ContentAPIFactory;
 import com.ubiquity.integration.domain.ExternalNetwork;
@@ -30,9 +31,10 @@ public class VimeoAPITest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 
+		User user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
 		identity = new ExternalIdentity.Builder()
 				.accessToken("a5f46897abbbd2b83501ea79b4916f44")
-				.clientPlatform(ClientPlatform.WEB)
+				.clientPlatform(ClientPlatform.WEB).inUse(true).user(user)
 				.externalNetwork(ExternalNetwork.YouTube.ordinal()).build();
 		log.debug("authenticated Vimeo with identity {} ", identity);
 

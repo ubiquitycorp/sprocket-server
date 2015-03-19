@@ -54,11 +54,15 @@ public abstract class SyncProcessor {
 		// get identity from message
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.getExternalIdentityById(activated.getIdentityId());
+
+		// Get app_i from Redis
+		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+				identity.getUser().getUserId());
 		// get External application from application
 		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
 				.getApplicationService()
-				.getExAppByExternalNetworkAndClientPlatform(
-						((SprocketUser) identity.getUser()).getCreatedBy(),
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(
+						appId,
 						identity.getExternalNetwork(),
 						identity.getClientPlatform());
 		processSync(identity, externalNetworkApplication);
@@ -104,7 +108,7 @@ public abstract class SyncProcessor {
 	 * @param user
 	 * @return
 	 */
-	public int syncDataForUser(SprocketUser user,Application application) {
+	public int syncDataForUser(SprocketUser user, Application application) {
 		Set<Identity> identities = user.getIdentities();
 		DateTime start = new DateTime();
 
@@ -121,7 +125,8 @@ public abstract class SyncProcessor {
 					// get External application from application
 					ExternalNetworkApplication externalNetworkApplication = ServiceFactory
 							.getApplicationService()
-							.getExAppByExternalNetworkAndClientPlatform(application,
+							.getExAppByExternalNetworkAndClientPlatform(
+									application,
 									externalIdentity.getExternalNetwork(),
 									externalIdentity.getClientPlatform());
 

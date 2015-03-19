@@ -22,7 +22,7 @@ import com.ubiquity.sprocket.domain.SprocketUser;
  */
 public class DataSyncProcessor extends SyncProcessor {
 
-	private List<User> users;
+	private List<SprocketUser> users;
 	
 	SyncNotificationSender notificationProcessor;
 
@@ -33,7 +33,7 @@ public class DataSyncProcessor extends SyncProcessor {
 	 * @param from
 	 * @param to
 	 */
-	public DataSyncProcessor(List<User> users) {
+	public DataSyncProcessor(List<SprocketUser> users) {
 		log.info("Created DataSycnProcessor for users {}", users);
 		this.users = users;
 		createChainHandelrs();
