@@ -53,7 +53,7 @@ public class SearchServiceTest {
 		ServiceFactory.initialize(config, errorsConfiguration);
 		searchService = ServiceFactory.getSearchService();
 
-		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties(null);
 		ServiceFactory.getUserService().create(owner);
 
 		searchService.deleteAll();
@@ -63,7 +63,7 @@ public class SearchServiceTest {
 	public void testLiveSearchWithFacebook() {
 
 		User user = TestUserFactory
-				.createTestUserWithMinimumRequiredProperties();
+				.createTestUserWithMinimumRequiredProperties(null);
 		user.getIdentities()
 				.add(new ExternalIdentity.Builder()
 						.user(user)
@@ -92,7 +92,7 @@ public class SearchServiceTest {
 	public void testLiveSearchWithVimeo() {
 
 		User user = TestUserFactory
-				.createTestUserWithMinimumRequiredProperties();
+				.createTestUserWithMinimumRequiredProperties(null);
 		user.getIdentities().add(
 				new ExternalIdentity.Builder().user(user)
 						.accessToken("a5f46897abbbd2b83501ea79b4916f44")
@@ -117,7 +117,7 @@ public class SearchServiceTest {
 	@Test
 	public void testLiveSearchWithYouTube() {
 		User user = TestUserFactory
-				.createTestUserWithMinimumRequiredProperties();
+				.createTestUserWithMinimumRequiredProperties(null);
 		user.getIdentities()
 				.add(new ExternalIdentity.Builder()
 						.user(user)

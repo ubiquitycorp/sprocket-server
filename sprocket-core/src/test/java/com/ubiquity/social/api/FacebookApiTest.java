@@ -44,7 +44,7 @@ public class FacebookApiTest {
 		EntityManagerSupport.beginTransaction();
 
 		User user = TestUserFactory
-				.createTestUserWithMinimumRequiredProperties();
+				.createTestUserWithMinimumRequiredProperties(null);
 		EntityManagerSupport.commit();
 
 		identity = new ExternalIdentity.Builder()

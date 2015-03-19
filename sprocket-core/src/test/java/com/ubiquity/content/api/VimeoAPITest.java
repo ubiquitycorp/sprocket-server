@@ -31,7 +31,7 @@ public class VimeoAPITest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 
-		User user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		User user = TestUserFactory.createTestUserWithMinimumRequiredProperties(null);
 		identity = new ExternalIdentity.Builder()
 				.accessToken("a5f46897abbbd2b83501ea79b4916f44")
 				.clientPlatform(ClientPlatform.WEB).inUse(true).user(user)

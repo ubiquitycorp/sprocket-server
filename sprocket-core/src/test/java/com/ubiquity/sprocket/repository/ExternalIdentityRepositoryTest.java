@@ -47,7 +47,7 @@ public class ExternalIdentityRepositoryTest {
 		userRepository = new UserRepositoryJpaImpl();
 		
 		// create user and identity as we normally would
-		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		user = TestUserFactory.createTestUserWithMinimumRequiredProperties(null);
 		
 		identity = new ExternalIdentity.Builder()
 			.isActive(Boolean.TRUE)

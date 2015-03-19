@@ -53,8 +53,8 @@ public class GroupMembershipRepositoryTest {
 		contactRepository = new ContactRepositoryJpaImpl();
 
 		// create user and identity as we normally would
-		judy = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-		jack = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		judy = TestUserFactory.createTestUserWithMinimumRequiredProperties(null);
+		jack = TestUserFactory.createTestUserWithMinimumRequiredProperties(null);
 
 		Contact judyFbContact = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(judy, ExternalNetwork.Facebook).build();
 		Contact judyYouTubeContact = TestContactFactory.createContactBuilderWithMininumRequiredFieldsAndExternalNetwork(judy, ExternalNetwork.YouTube).build();

@@ -17,12 +17,11 @@ import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.domain.factory.UserFactory;
 import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.service.ContactService;
-import com.ubiquity.sprocket.domain.SprocketUser;
-import com.ubiquity.sprocket.domain.factory.SprocketUserFactory;
 
 public class ContactServiceTest {
 
@@ -42,10 +41,10 @@ public class ContactServiceTest {
 		SocialAPIFactory.initialize(config);
 		JedisConnectionFactory.initialize(config);
 		contactService = ServiceFactory.getContactService();
-		user = SprocketUserFactory
+		user = UserFactory
 				.createUserWithRequiredFieldsUsingApplication(UUID.randomUUID()
 						.toString(), ClientPlatform.WEB, true, null);
-		ServiceFactory.getUserService().create((SprocketUser) user);
+		ServiceFactory.getUserService().create(user);
 
 		Application application = ServiceFactory.getApplicationService()
 				.loadApplicationFromConfiguration();

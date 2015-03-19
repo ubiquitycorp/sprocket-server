@@ -35,7 +35,7 @@ public class CommentsRepositoryTest {
 		activityRepository = new ActivityRepositoryJpaImpl();
 		userRepository = new UserRepositoryJpaImpl();
 		
-		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties(null);
 		
 		EntityManagerSupport.beginTransaction();
 		userRepository.create(owner);

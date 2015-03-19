@@ -19,9 +19,11 @@ import com.ubiquity.identity.domain.NativeIdentity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.factory.TestApplicationFactory;
 import com.ubiquity.identity.factory.TestDeveloperFactory;
+import com.ubiquity.identity.factory.TestUserFactory;
 import com.ubiquity.identity.repository.ApplicationRepositoryJpaImpl;
 import com.ubiquity.identity.repository.DeveloperRepositoryJpaImpl;
-import com.ubiquity.sprocket.factory.TestSprocketUserFactory;
+import com.ubiquity.identity.repository.UserRepository;
+import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
 
 /***
  * Tests testing basic CRUD operations for a user repository
@@ -34,7 +36,7 @@ public class UserRepositoryTest {
 	private static Logger log = LoggerFactory
 			.getLogger(UserRepositoryTest.class);
 
-	private static SprocketUserRepository userRepository;
+	private static UserRepository userRepository;
 	private static User user;
 	private static NativeIdentity identity;
 
@@ -46,9 +48,9 @@ public class UserRepositoryTest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 		
-		userRepository = new SprocketUserRepositoryJpaImpl();
+		userRepository = new UserRepositoryJpaImpl();
 		
-		user = TestSprocketUserFactory
+		user = TestUserFactory
 				.createTestUserWithMinimumRequiredProperties(null);
 		identity = (NativeIdentity) user.getIdentities().iterator().next();
 		
@@ -106,7 +108,7 @@ public class UserRepositoryTest {
 		new ApplicationRepositoryJpaImpl().create(application);
 		EntityManagerSupport.commit();
 		
-		User user2 = TestSprocketUserFactory
+		User user2 = TestUserFactory
 				.createTestUserWithMinimumRequiredProperties(application);
 		
 		EntityManagerSupport.beginTransaction();
@@ -115,7 +117,7 @@ public class UserRepositoryTest {
 		
 		
 		List<BigDecimal[]>  users = userRepository
-				.findAllActiveSprocketUserIds();
+				.findAllActiveUsersOrderByApps();
 		Assert.assertEquals(2, users.size());
 		
 		user.setLastLogin(System.currentTimeMillis()
@@ -126,7 +128,7 @@ public class UserRepositoryTest {
 		EntityManagerSupport.commit();
 		
 		users = userRepository
-				.findAllActiveSprocketUserIds();
+				.findAllActiveUsersOrderByApps();
 		Assert.assertEquals(1, users.size());
 
 	}

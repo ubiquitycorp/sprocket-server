@@ -44,7 +44,7 @@ public class VideoContentRepositoryTest {
 		videoContentRepository = new VideoContentRepositoryJpaImpl();
 		userRepository = new UserRepositoryJpaImpl();
 		
-		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties(null);
 		persistUser(owner);
 		
 		videoContent = TestVideoContentFactory.createVideoContentWithMininumRequiredFields(owner, ExternalNetwork.YouTube);
@@ -100,7 +100,7 @@ public class VideoContentRepositoryTest {
 		
 		
 		// create a video for another user
-		User anotherUser = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		User anotherUser = TestUserFactory.createTestUserWithMinimumRequiredProperties(null);
 		persistUser(anotherUser);
 		VideoContent videoThatShouldRemain = TestVideoContentFactory.createVideoContentWithMininumRequiredFields(anotherUser, ExternalNetwork.YouTube);
 		persistVideoContent(videoThatShouldRemain);

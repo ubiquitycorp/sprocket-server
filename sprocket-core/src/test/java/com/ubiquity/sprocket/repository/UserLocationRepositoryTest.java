@@ -46,7 +46,7 @@ public class UserLocationRepositoryTest {
 		userRepository = new UserRepositoryJpaImpl();
 		locationRepository = new UserLocationRepositoryJpaImpl();
 
-		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		user = TestUserFactory.createTestUserWithMinimumRequiredProperties(null);
 
 		EntityManagerSupport.beginTransaction();
 		userRepository.create(user);
