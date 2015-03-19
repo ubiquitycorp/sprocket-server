@@ -11,8 +11,6 @@ import com.ubiquity.sprocket.datasync.handlers.Handler;
 import com.ubiquity.sprocket.datasync.handlers.LocalActivityHandler;
 import com.ubiquity.sprocket.datasync.handlers.MessageHandler;
 import com.ubiquity.sprocket.datasync.handlers.VideoHandler;
-import com.ubiquity.sprocket.datasync.worker.manager.SyncProcessor;
-import com.ubiquity.sprocket.domain.SprocketUser;
 
 /***
  * Handles the processing of each feed type
@@ -22,7 +20,7 @@ import com.ubiquity.sprocket.domain.SprocketUser;
  */
 public class DataSyncProcessor extends SyncProcessor {
 
-	private List<SprocketUser> users;
+	private List<User> users;
 	
 	SyncNotificationSender notificationProcessor;
 
@@ -33,7 +31,7 @@ public class DataSyncProcessor extends SyncProcessor {
 	 * @param from
 	 * @param to
 	 */
-	public DataSyncProcessor(List<SprocketUser> users) {
+	public DataSyncProcessor(List<User> users) {
 		log.info("Created DataSycnProcessor for users {}", users);
 		this.users = users;
 		createChainHandelrs();
@@ -82,7 +80,7 @@ public class DataSyncProcessor extends SyncProcessor {
 			Long startTime, endTime;
 			startTime = System.currentTimeMillis();
 			for (User user : users) {
-				numRefreshed += syncDataForUser((SprocketUser)user,application);
+				numRefreshed += syncDataForUser(user,application);
 			}
 			endTime = System.currentTimeMillis();
 			log.info("{}: Periodic Sync completed in {} seconds", Thread

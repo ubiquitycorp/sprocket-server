@@ -21,6 +21,7 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
+import com.ubiquity.identity.service.UserAuthService;
 import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.model.user.AccountDto;
@@ -28,7 +29,6 @@ import com.ubiquity.sprocket.api.dto.model.user.IdentityDto;
 import com.ubiquity.sprocket.api.validation.RemoteAuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.RemoteRegistrationValidation;
 import com.ubiquity.sprocket.service.ServiceFactory;
-import com.ubiquity.sprocket.service.SprocketUserAuthService;
 
 @Path("/1.0/application")
 public class ApplicationEndPoint {
@@ -62,7 +62,7 @@ public class ApplicationEndPoint {
 
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
 				.getClientPlatformId());
-		User user = ((SprocketUserAuthService) authenticationService).register(
+		User user = ((UserAuthService) authenticationService).register(
 				identityDto.getIdentifier(), clientPlatform, Boolean.TRUE,
 				application);
 
@@ -107,7 +107,7 @@ public class ApplicationEndPoint {
 
 		AuthenticationService<User> authenticationService = ServiceFactory
 				.getUserAuthService();
-		User user = ((SprocketUserAuthService) authenticationService)
+		User user = ((UserAuthService) authenticationService)
 				.authenticate(identityDto.getIdentifier(), application);
 		if (user == null)
 			throw new AuthorizationException("Invalid identifier", null);

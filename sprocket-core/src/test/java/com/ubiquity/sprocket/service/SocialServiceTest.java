@@ -19,6 +19,7 @@ import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.domain.factory.UserFactory;
 import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ExternalNetwork;
@@ -29,7 +30,6 @@ import com.ubiquity.integration.service.SocialService;
 import com.ubiquity.location.domain.Location;
 import com.ubiquity.location.domain.Place;
 import com.ubiquity.location.domain.UserLocation;
-import com.ubiquity.sprocket.domain.factory.SprocketUserFactory;
 
 public class SocialServiceTest {
 
@@ -47,7 +47,7 @@ public class SocialServiceTest {
 		JedisConnectionFactory.initialize(configuration);
 		socialService = ServiceFactory.getSocialService();
 
-		user = SprocketUserFactory
+		user = UserFactory
 				.createUserWithRequiredFieldsUsingApplication(UUID.randomUUID()
 						.toString(), ClientPlatform.WEB, true, null);
 		ServiceFactory.getUserService().create(user);

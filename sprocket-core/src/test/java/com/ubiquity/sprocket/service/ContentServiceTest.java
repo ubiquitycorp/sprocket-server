@@ -15,10 +15,10 @@ import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.domain.factory.UserFactory;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.integration.service.ContentService;
-import com.ubiquity.sprocket.domain.factory.SprocketUserFactory;
 
 public class ContentServiceTest {
 	
@@ -33,7 +33,7 @@ public class ContentServiceTest {
 				"test.properties");
 		
 		contentService = ServiceFactory.getContentService();
-		user = SprocketUserFactory
+		user = UserFactory
 				.createUserWithRequiredFieldsUsingApplication(UUID.randomUUID()
 						.toString(), ClientPlatform.WEB, true, null);
 		

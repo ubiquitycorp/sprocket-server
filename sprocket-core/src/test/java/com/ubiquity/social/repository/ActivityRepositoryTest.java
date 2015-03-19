@@ -52,7 +52,7 @@ public class ActivityRepositoryTest {
 		userRepository = new UserRepositoryJpaImpl();
 		interestRepository = new InterestRepositoryJpaImpl();
 		
-		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties(null);
 		
 		EntityManagerSupport.beginTransaction();
 		userRepository.create(owner);

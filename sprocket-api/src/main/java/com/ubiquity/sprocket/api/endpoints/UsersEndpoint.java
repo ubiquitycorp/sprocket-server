@@ -10,8 +10,8 @@ import java.util.List;
 import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -70,7 +70,6 @@ import com.ubiquity.sprocket.api.validation.AuthorizationValidation;
 import com.ubiquity.sprocket.api.validation.RegistrationValidation;
 import com.ubiquity.sprocket.api.validation.ResetValidation;
 import com.ubiquity.sprocket.api.validation.UserLocationUpdateValidation;
-import com.ubiquity.sprocket.domain.SprocketUser;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
@@ -105,23 +104,21 @@ public class UsersEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response authenticatedlinkedin(@PathParam("userId") Long userId,
-			@CookieParam("linkedin_oauth_77fa6kjljumj8x") String cookie)
-			throws Exception {
+			@HeaderParam("cookie") String cookie) throws Exception {
 
 		// load user
-		SprocketUser user = (SprocketUser) ServiceFactory.getUserService()
-				.getUserById(userId);
+		User user = ServiceFactory.getUserService().getUserById(userId);
 		// Get app_i from Redis
 		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
 				userId);
-		
+
 		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
 				.getApplicationService()
 				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
 						ExternalNetwork.LinkedIn.ordinal(), ClientPlatform.WEB);
-		String cookieString = java.net.URLDecoder.decode(cookie, "UTF-8");
-		ExchangeService exchangservice = new ExchangeService(externalNetworkApplication);
-		String[] accesstokens = exchangservice.exchangeToken(cookieString);
+		ExchangeService exchangservice = new ExchangeService(
+				externalNetworkApplication);
+		String[] accesstokens = exchangservice.exchangeToken(cookie);
 
 		if (accesstokens[0] == null || accesstokens[0].equalsIgnoreCase(""))
 			throw new AuthorizationException(
@@ -368,14 +365,13 @@ public class UsersEndpoint {
 				.getNetworkById(identityDto.getExternalNetworkId());
 
 		// load user
-		SprocketUser user = (SprocketUser) ServiceFactory.getUserService()
-				.getUserById(userId);
+		User user = ServiceFactory.getUserService().getUserById(userId);
 		// Get app_i from Redis
 		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
 				userId);
 
 		// log.info("identifier = " +
-		// ((SprocketUser)user).getExternalIdentifier());
+		// (user).getExternalIdentifier());
 		// Load External Application
 		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
 				.getApplicationService()
@@ -439,8 +435,7 @@ public class UsersEndpoint {
 		List<ExternalIdentity> identities = null;
 
 		// load user
-		SprocketUser user = (SprocketUser) ServiceFactory.getUserService()
-				.getUserById(userId);
+		User user = ServiceFactory.getUserService().getUserById(userId);
 
 		// Get app_i from Redis
 		Long appId = ServiceFactory.getUserService().retrieveApplicationId(

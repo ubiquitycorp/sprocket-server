@@ -43,7 +43,7 @@ public class UserContactRepositoryTest {
 		userRepository = new UserRepositoryJpaImpl();
 		contactRepository = new ContactRepositoryJpaImpl();
 
-		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties(null);
 
 		EntityManagerSupport.beginTransaction();
 		userRepository.create(owner);
