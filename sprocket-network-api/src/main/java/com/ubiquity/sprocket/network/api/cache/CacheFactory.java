@@ -8,15 +8,12 @@ import com.niobium.repository.CacheRedisImpl;
 public class CacheFactory {
 	private static Cache cache;
 	private static Cache accessTokenCache;
-	private static Cache activityBodyCache;
 
 	public static void initialize(Configuration configuration) {
 		cache = new CacheRedisImpl(
 				configuration.getInt("redis.user.session.database"));
 		accessTokenCache = new CacheRedisImpl(
 				configuration.getInt("redis.access.token.session.database"));
-		activityBodyCache = new CacheRedisImpl(
-				configuration.getInt("redis.activity.body.session.database"));
 	}
 
 	public static Long getLastRequestTime(Long userId) {
@@ -58,14 +55,4 @@ public class CacheFactory {
 		return maxUserID;
 	}
 	
-	public static void setLastActivityBody(Long userId, String body)
-	{
-		activityBodyCache.put(userId.toString(), body);
-	}
-	
-	public static String getLastActivityBody(Long userId)
-	{
-		String cachedlastActivityBody = activityBodyCache.get(userId.toString());
-		return cachedlastActivityBody;
-	}
 }

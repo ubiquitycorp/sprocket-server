@@ -120,7 +120,7 @@ public class RedditEndPoint {
 	@Consumes("application/json")
 	public Response postActivity(@HeaderParam("Authorization") String accessToken,@HeaderParam("User-Agent") String userAgent,@QueryParam("sr") String subReddit ,@QueryParam("text") String text,@QueryParam("title") String title,@QueryParam("url") String url,@QueryParam("kind") String kind ,@QueryParam("captcha") String captcha,@QueryParam("iden") String captchaIden,@QueryParam("api_type") String apiType){
 		Long userId = CacheFactory.findOrCreateUser(accessToken);
-		CacheFactory.setLastActivityBody(userId, text);
+		RedditMockNetwork.postActivity(userId, text, title, url, kind);
 		return Response.ok()
 				.entity(jsonConverter.convertToPayload(RedditMockNetwork.getjsonResponse())).build();
 	}

@@ -4,9 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import com.ubiquity.sprocket.network.api.cache.CacheFactory;
 import com.ubiquity.sprocket.network.api.dto.model.Activity;
-import com.ubiquity.sprocket.network.api.dto.model.ActivityType;
 import com.ubiquity.sprocket.network.api.dto.model.Comment;
 import com.ubiquity.sprocket.network.api.dto.model.Contact;
 import com.ubiquity.sprocket.network.api.dto.model.Conversation;
@@ -14,26 +12,24 @@ import com.ubiquity.sprocket.network.api.dto.model.VideoContent;
 
 public class RandomListGenerator {
 	private static Random random = new Random();
+	public static List<Activity> postedActivities = new LinkedList<Activity>();
 
 	public static List<Activity> GenerateActivityList(Long userId,
 			Long lastRequest, Long thisRequest, boolean withComments,
 			boolean withTags, Integer maxResults) {
 		List<Activity> activities = new LinkedList<Activity>();
+		activities.addAll(postedActivities);
+		maxResults -= postedActivities.size();
 		int mid = (maxResults / 2) + 1;
 		for (int i = 1; i <= mid; i++) {
 			activities.add(RandomObjectGenerator.generateActivity(userId,
-					lastRequest, i, random.nextInt(6), withComments, withTags, null));
+					lastRequest, i, random.nextInt(6), withComments, withTags));
 		}
 		for (int i = mid; i <= maxResults; i++) {
 			activities.add(RandomObjectGenerator.generateActivity(userId,
-					thisRequest, i, random.nextInt(6), withComments, withTags, null));
+					thisRequest, i, random.nextInt(6), withComments, withTags));
 		}
-		String activityBody = CacheFactory.getLastActivityBody(userId);
-		if (activityBody != null)
-		{
-			activities.add(RandomObjectGenerator.generateActivity(userId,
-					thisRequest, maxResults + 1, ActivityType.STATUS.ordinal(), withComments, withTags, activityBody));
-		}
+
 		return activities;
 	}
 

@@ -71,8 +71,7 @@ public class RandomObjectGenerator {
 	}
 
 	public static Activity generateActivity(Long userID, Long lastRequest,
-			int index, int activityType, boolean withComments,
-			boolean withTags, String body) {
+			int index, int activityType, boolean withComments, boolean withTags) {
 		Activity.Builder activityBuilder = new Activity.Builder();
 		activityBuilder
 				.title(UUID.randomUUID().toString())
@@ -86,11 +85,6 @@ public class RandomObjectGenerator {
 				.externalIdentifier(
 						generateIdentifier(userID, ResourceType.activities,
 								lastRequest, index, null));
-		
-		if (body != null)
-		{
-			activityBuilder.body(body);
-		}
 
 		switch (activityType) {
 		case 0:
@@ -124,6 +118,32 @@ public class RandomObjectGenerator {
 							activity.getExternalIdentifier()));
 		activity.getTags().addAll(GenerateTagList());
 		return activity;
+	}
+
+	public static Activity generateActivity(Long userId, String body,
+			String title, String link, String kind, int index) {
+
+		Activity.Builder activityBuilder = new Activity.Builder();
+		activityBuilder
+				.title(title)
+				.body(body)
+				.creationDate(System.currentTimeMillis())
+				.postedBy(generateContact(userId, index))
+				.rating(RandomObjectGenerator.GenerateRating())
+				.commentsNum(random.nextInt(300))
+				.ownerVote(random.nextInt(3) - 1)
+				.lastUpdated(System.currentTimeMillis())
+				.externalIdentifier(
+						generateIdentifier(userId, ResourceType.activities,
+								System.currentTimeMillis(), index, null))
+				.link(link);
+
+		if (kind.equals("link"))
+			activityBuilder.activityType(ActivityType.LINK);
+		else if (kind.equals("self"))
+			activityBuilder.activityType(ActivityType.STATUS);
+
+		return activityBuilder.build();
 	}
 
 	public static List<Contact> generateContactList(Long userId) {
