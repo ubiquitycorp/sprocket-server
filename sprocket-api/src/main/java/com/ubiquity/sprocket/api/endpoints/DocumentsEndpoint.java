@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
+import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Message;
@@ -30,7 +31,6 @@ import com.ubiquity.sprocket.api.dto.model.DocumentDto;
 import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
 import com.ubiquity.sprocket.domain.Document;
-import com.ubiquity.sprocket.domain.SprocketUser;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedDocument;
@@ -154,10 +154,9 @@ public class DocumentsEndpoint {
 		// Get app_i from Redis
 		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
 				userId);
-		
-		SprocketUser user = (SprocketUser) ServiceFactory.getUserService()
-				.getUserById(userId);
-		
+
+		User user = ServiceFactory.getUserService().getUserById(userId);
+
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.findExternalIdentity(userId, externalNetwork);
 

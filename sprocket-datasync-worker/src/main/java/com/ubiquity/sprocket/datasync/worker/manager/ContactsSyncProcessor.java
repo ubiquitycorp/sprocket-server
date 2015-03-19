@@ -6,7 +6,6 @@ import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.sprocket.datasync.handlers.ContactHandler;
-import com.ubiquity.sprocket.domain.SprocketUser;
 
 /***
  * Handles the processing of each feed type
@@ -16,7 +15,7 @@ import com.ubiquity.sprocket.domain.SprocketUser;
  */
 public class ContactsSyncProcessor extends SyncProcessor {
 
-	private List<SprocketUser> users;
+	private List<User> users;
 
 	/**
 	 * Starts a processor with the underlying list
@@ -25,7 +24,7 @@ public class ContactsSyncProcessor extends SyncProcessor {
 	 * @param from
 	 * @param to
 	 */
-	public ContactsSyncProcessor(List<SprocketUser> users) {
+	public ContactsSyncProcessor(List<User> users) {
 		log.info("Created ContactSyncProcessor for users {}", users);
 		this.users = users;
 		createChainHandelrs();
@@ -57,7 +56,7 @@ public class ContactsSyncProcessor extends SyncProcessor {
 			Long startTime, endTime;
 			startTime = System.currentTimeMillis();
 			for (User user : users) {
-				numRefreshed += syncDataForUser((SprocketUser)user,application );
+				numRefreshed += syncDataForUser(user,application );
 			}
 			endTime = System.currentTimeMillis();
 			log.info("{}: Periodic Sync completed in {} seconds", Thread
