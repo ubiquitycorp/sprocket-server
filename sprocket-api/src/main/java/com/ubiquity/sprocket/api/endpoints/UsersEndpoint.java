@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.cloud.RemoteAsset;
 import com.ubiquity.api.exception.HttpException;
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
@@ -299,10 +300,15 @@ public class UsersEndpoint {
 
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
 				.getClientPlatformId());
+
+		// retrieve default application
+		Application defaultApp = ServiceFactory.getApplicationService()
+				.getDefaultApplication();
+		
 		User user = authenticationService.register(identityDto.getUsername(),
 				identityDto.getPassword(), "", "",
 				identityDto.getDisplayName(), identityDto.getEmail(),
-				clientPlatform, Boolean.TRUE);
+				clientPlatform, Boolean.TRUE, defaultApp);
 
 		// user now has a single, native identity
 		String apiKey = AuthenticationService.generateAPIKey();

@@ -71,7 +71,7 @@ public class ExternalIdentityRepositoryTest {
 
 	@Test
 	public void testFindSocialIdentityByUserIdAndProvider() throws Exception {
-		ExternalIdentity persisted = externalIdentityRepository.getExternalIdentityByUserAndNetwork(user.getUserId(), ExternalNetwork.Facebook);
+		ExternalIdentity persisted = externalIdentityRepository.getExternalIdentityByUserIdAndNetwork(user.getUserId(), ExternalNetwork.Facebook);
 		Assert.assertNotNull(persisted);
 		Assert.assertEquals(persisted.getIdentityId(), identity.getIdentityId());
 	
@@ -79,7 +79,7 @@ public class ExternalIdentityRepositoryTest {
 	
 	@Test
 	public void testUpdateSocialIdentity() throws Exception {
-		ExternalIdentity persisted = externalIdentityRepository.getExternalIdentityByUserAndNetwork(user.getUserId(), ExternalNetwork.Facebook);
+		ExternalIdentity persisted = externalIdentityRepository.getExternalIdentityByUserIdAndNetwork(user.getUserId(), ExternalNetwork.Facebook);
 		String newToken = UUID.randomUUID().toString();
 		persisted.setAccessToken(newToken);
 		
@@ -87,7 +87,7 @@ public class ExternalIdentityRepositoryTest {
 		userRepository.update(user);
 		EntityManagerSupport.commit();
 		
-		persisted = externalIdentityRepository.getExternalIdentityByUserAndNetwork(user.getUserId(), ExternalNetwork.Facebook);
+		persisted = externalIdentityRepository.getExternalIdentityByUserIdAndNetwork(user.getUserId(), ExternalNetwork.Facebook);
 		Assert.assertEquals(persisted.getAccessToken(), newToken);
 
 		
