@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
 
-
 import com.niobium.common.serialize.JsonConverter;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.domain.Activity;
@@ -220,6 +219,8 @@ public class DtoAssembler {
 						.description(
 								(String) fields
 										.get(SearchKeys.Fields.FIELD_DESCRIPTION))
+						.publishedAt(
+								(Long) fields.get(SearchKeys.Fields.FIELD_DATE))
 						.ownerId(ownerId).build();
 			}
 		} else if (dataType.equals(Message.class.getSimpleName())) {
@@ -417,8 +418,8 @@ public class DtoAssembler {
 		if (videoContent.getThumb() != null)
 			videoBuilder.thumb(new ImageDto(videoContent.getThumb().getUrl()));
 
-		videoBuilder.title(videoContent.getTitle()).description(
-				videoContent.getDescription())
+		videoBuilder.title(videoContent.getTitle())
+				.description(videoContent.getDescription())
 				.publishedAt(videoContent.getPublishedAt());
 
 		return videoBuilder.build();
@@ -767,7 +768,8 @@ public class DtoAssembler {
 		AdminInterestType adminInterestType = AdminInterestType
 				.getAdminInterestTypeFromId(adminInterestDto.getInterestType());
 		if (adminInterestType.equals(AdminInterestType.INTEREST)) {
-			adminInterest = new Interest(adminInterestDto.getId(),adminInterestDto.getName(),
+			adminInterest = new Interest(adminInterestDto.getId(),
+					adminInterestDto.getName(),
 					adminInterestDto.getParentInterestId());
 		} else if (adminInterestType
 				.equals(AdminInterestType.EXTERNAL_INTEREST)) {
@@ -778,10 +780,9 @@ public class DtoAssembler {
 		} else if (adminInterestType
 				.equals(AdminInterestType.UNMAPPED_INTEREST)) {
 			adminInterest = new UnmappedInterest.Builder()
-			.externalNetwork(adminInterestDto.getExternalNetwork())
-			.unmappedId(adminInterestDto.getId())
-			.name(adminInterestDto.getName())
-			.build();
+					.externalNetwork(adminInterestDto.getExternalNetwork())
+					.unmappedId(adminInterestDto.getId())
+					.name(adminInterestDto.getName()).build();
 		}
 		return adminInterest;
 	}
@@ -817,12 +818,12 @@ public class DtoAssembler {
 		return configurationRulesDto;
 
 	}
-	
-	public static List<ExternalNetworkConfigurationDto> getNetworks()
-	{
+
+	public static List<ExternalNetworkConfigurationDto> getNetworks() {
 		List<ExternalNetworkConfigurationDto> networks = new LinkedList<ExternalNetworkConfigurationDto>();
 		for (ExternalNetwork externalNetwork : ExternalNetwork.values()) {
-			networks.add(new ExternalNetworkConfigurationDto(externalNetwork, null));
+			networks.add(new ExternalNetworkConfigurationDto(externalNetwork,
+					null));
 		}
 		return networks;
 	}
