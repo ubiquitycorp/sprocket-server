@@ -418,7 +418,8 @@ public class DtoAssembler {
 			videoBuilder.thumb(new ImageDto(videoContent.getThumb().getUrl()));
 
 		videoBuilder.title(videoContent.getTitle()).description(
-				videoContent.getDescription());
+				videoContent.getDescription())
+				.publishedAt(videoContent.getPublishedAt());
 
 		return videoBuilder.build();
 	}
@@ -693,7 +694,8 @@ public class DtoAssembler {
 						ExternalNetwork.getNetworkById(videoDto
 								.getExternalNetworkId()))
 				.thumb(new Image(videoDto.getThumb().getUrl()))
-				.lastUpdated(System.currentTimeMillis()).build();
+				.lastUpdated(System.currentTimeMillis())
+				.publishedAt(videoDto.getPublishedAt()).build();
 		return content;
 
 	}
