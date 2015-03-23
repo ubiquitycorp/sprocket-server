@@ -207,7 +207,8 @@ public class SearchService {
 
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, VideoContent.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, videoContent.getExternalNetwork().ordinal());
-
+			document.getFields().put(SearchKeys.Fields.FIELD_DATE, videoContent.getPublishedAt());
+			
 			if(isEngaged){
 				clicks = searchEngine.findClicksById(id);
 				clicks++;
