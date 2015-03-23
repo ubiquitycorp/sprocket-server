@@ -226,6 +226,8 @@ public class DtoAssembler {
 						.description(
 								(String) fields
 										.get(SearchKeys.Fields.FIELD_DESCRIPTION))
+						.publishedAt(
+								(Long) fields.get(SearchKeys.Fields.FIELD_DATE))
 						.ownerId(ownerId).build();
 			}
 		} else if (dataType.equals(Message.class.getSimpleName())) {
@@ -421,8 +423,9 @@ public class DtoAssembler {
 		if (videoContent.getThumb() != null)
 			videoBuilder.thumb(new ImageDto(videoContent.getThumb().getUrl()));
 
-		videoBuilder.title(videoContent.getTitle()).description(
-				videoContent.getDescription());
+		videoBuilder.title(videoContent.getTitle())
+				.description(videoContent.getDescription())
+				.publishedAt(videoContent.getPublishedAt());
 
 		return videoBuilder.build();
 	}
@@ -697,7 +700,8 @@ public class DtoAssembler {
 						ExternalNetwork.getNetworkById(videoDto
 								.getExternalNetworkId()))
 				.thumb(new Image(videoDto.getThumb().getUrl()))
-				.lastUpdated(System.currentTimeMillis()).build();
+				.lastUpdated(System.currentTimeMillis())
+				.publishedAt(videoDto.getPublishedAt()).build();
 		return content;
 
 	}
