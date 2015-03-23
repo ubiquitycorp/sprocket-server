@@ -727,9 +727,9 @@
 				<datasync.worker.processes>1</datasync.worker.processes>
 				<datasync.worker.size>1024</datasync.worker.size>
 				<syslog.host>localhost</syslog.host>
-				<redis.host>sprocket-redis</redis.host>
+				<redis.host>localhost</redis.host>
 				<hibernate.debug>false</hibernate.debug>
-				<solr.api.host>sprocket-search</solr.api.host>
+				<solr.api.host>localhost</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
 				
 				<!--<social.facebook.api.host>http://localhost/sprocket-network-api/api/1.0/facebook</social.facebook.api.host>-->
@@ -810,23 +810,23 @@
 				</db.pool.idleConnectionTestPeriod>
 				<db.username>sprocketusr</db.username>
 				<db.password>sprocket9801</db.password>
-				<db.host>sprocket-rds</db.host>
+				<db.host>localhost</db.host>
 				<hibernate.schema.auto>none</hibernate.schema.auto>
 				<stripe.api.client>pk_test_ujJiLWzAZymWRzD10MqT2tej
 				</stripe.api.client>
 				<stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO
 				</stripe.api.secret>
 				<repo.env>swisscom</repo.env>
-				<mq.queue.cacheinvalidate.host>sprocket-rabbitmq
+				<mq.queue.cacheinvalidate.host>localhost
 				</mq.queue.cacheinvalidate.host>
 				<mq.queue.cacheinvalidate.username>netappusr
 				</mq.queue.cacheinvalidate.username>
 				<mq.queue.cacheinvalidate.password>blackdeer
 				</mq.queue.cacheinvalidate.password>
-				<mq.queue.track.host>sprocket-rabbitmq</mq.queue.track.host>
+				<mq.queue.track.host>localhost</mq.queue.track.host>
 				<mq.queue.track.username>netappusr</mq.queue.track.username>
 				<mq.queue.track.password>blackdeer</mq.queue.track.password>
-				<mq.host>sprocket-rabbitmq</mq.host>
+				<mq.host>localhost</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
 				<!-- xmpp configuration -->
