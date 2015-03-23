@@ -304,7 +304,7 @@ public class UsersEndpoint {
 		// retrieve default application
 		Application defaultApp = ServiceFactory.getApplicationService()
 				.getDefaultApplication();
-		
+
 		User user = authenticationService.register(identityDto.getUsername(),
 				identityDto.getPassword(), "", "",
 				identityDto.getDisplayName(), identityDto.getEmail(),
@@ -319,6 +319,10 @@ public class UsersEndpoint {
 
 		// Save UserId and APIKey in Redis cache database
 		authenticationService.saveAuthkey(user.getUserId(), apiKey);
+
+		// Save application Id in the Redis
+		ServiceFactory.getUserService().saveApplicationId(user.getUserId(),
+				defaultApp.getAppId());
 
 		log.debug("Created user {}", user);
 

@@ -73,7 +73,7 @@ public class ContactRepositoryTest {
 	}
 
 	@Test
-	public void testFindByOwnerIDAndExternalNetworkAndExternalIdentitfier() {
+	public void testFndByExternalIdentitfierAndExternalNetwork() {
 		Contact c = contactRepository
 				.findByExternalIdentitfierAndExternalNetwork(twitterContact
 						.getExternalIdentity().getIdentifier(),
