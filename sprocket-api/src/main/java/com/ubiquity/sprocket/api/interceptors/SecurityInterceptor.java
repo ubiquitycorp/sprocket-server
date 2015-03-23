@@ -39,7 +39,6 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 	@Override
 	public void filter(ContainerRequestContext requestContext)
 			throws IOException {
-		// TODO Auto-generated method stub
 		ResourceMethodInvoker methodInvoker = (ResourceMethodInvoker) requestContext
 				.getProperty("org.jboss.resteasy.core.ResourceMethodInvoker");
 		Method method = methodInvoker.getMethod();
