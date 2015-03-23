@@ -21,7 +21,7 @@ public class RandomListGenerator {
 		activities.addAll(postedActivities);
 		maxResults -= postedActivities.size();
 		int mid = (maxResults / 2) + 1;
-		for (int i = 1; i <= mid; i++) {
+		for (int i = 1; i < mid; i++) {
 			activities.add(RandomObjectGenerator.generateActivity(userId,
 					lastRequest, i, random.nextInt(6), withComments, withTags));
 		}
