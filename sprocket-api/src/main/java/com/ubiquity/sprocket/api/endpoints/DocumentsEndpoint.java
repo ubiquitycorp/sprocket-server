@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
@@ -163,12 +164,13 @@ public class DocumentsEndpoint {
 		if (identity == null && externalNetwork != ExternalNetwork.Yelp)
 			throw new IllegalArgumentException(
 					"User does not have an identity for this provider");
-
+		ClientPlatform clientplaform = ClientPlatform.WEB;
+		if (externalNetwork != ExternalNetwork.Yelp)
+			clientplaform = identity.getClientPlatform();
 		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
 				.getApplicationService()
 				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
-						identity.getExternalNetwork(),
-						identity.getClientPlatform());
+						externalNetworkId,clientplaform );
 
 		if (externalNetwork != ExternalNetwork.Yelp)
 			ServiceFactory.getSocialService().checkValidityOfExternalIdentity(

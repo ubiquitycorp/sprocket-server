@@ -53,7 +53,8 @@ public class SearchServiceTest {
 		ServiceFactory.initialize(config, errorsConfiguration);
 		searchService = ServiceFactory.getSearchService();
 
-		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties(null);
+		owner = TestUserFactory
+				.createTestUserWithMinimumRequiredProperties(null);
 		ServiceFactory.getUserService().create(owner);
 
 		searchService.deleteAll();
@@ -235,7 +236,7 @@ public class SearchServiceTest {
 		List<Document> documents = searchService.searchIndexedDocuments(
 				activity.getTitle(), null, ExternalNetwork.Facebook);
 		log.debug("documents: {}", documents);
-		Assert.assertTrue(documents.size() == 1);
+		Assert.assertEquals(1, documents.size());
 
 		documents = searchService.searchIndexedDocuments(activity.getTitle(),
 				owner.getUserId(), ExternalNetwork.Facebook);
@@ -314,7 +315,7 @@ public class SearchServiceTest {
 		List<Document> documents = searchService.searchIndexedDocuments(
 				videoContent.getTitle(), owner.getUserId());
 
-		Assert.assertTrue(documents.size() == 1);
+		Assert.assertEquals(1, documents.size());
 		Document result = documents.get(0);
 		Assert.assertEquals(VideoContent.class.getSimpleName(), result
 				.getFields().get(SearchKeys.Fields.FIELD_DATA_TYPE));

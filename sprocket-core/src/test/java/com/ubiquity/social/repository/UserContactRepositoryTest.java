@@ -124,10 +124,10 @@ public class UserContactRepositoryTest {
 						ExternalNetwork.Twitter);
 		Assert.assertEquals(contacts.size(), 2);
 
-		List<Long> contactsIds = new LinkedList<Long>();
-		contactsIds.add(twitterUserContact.getContact().getContactId());
+		List<Long> userContactsIds = new LinkedList<Long>();
+		userContactsIds.add(twitterUserContact.getUserContactId());
 		EntityManagerSupport.beginTransaction();
-		userContactRepository.deleteWithoutIds(owner.getUserId(), contactsIds,
+		userContactRepository.deleteWithoutIds(owner.getUserId(), userContactsIds,
 				ExternalNetwork.Twitter);
 		EntityManagerSupport.commit();
 

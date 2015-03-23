@@ -4,14 +4,17 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
+import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.Developer;
 import com.ubiquity.identity.domain.Identity;
@@ -24,6 +27,7 @@ import com.ubiquity.identity.repository.ApplicationRepositoryJpaImpl;
 import com.ubiquity.identity.repository.DeveloperRepositoryJpaImpl;
 import com.ubiquity.identity.repository.UserRepository;
 import com.ubiquity.identity.repository.UserRepositoryJpaImpl;
+import com.ubiquity.sprocket.service.ServiceFactory;
 
 /***
  * Tests testing basic CRUD operations for a user repository
@@ -45,9 +49,12 @@ public class UserRepositoryTest {
 		EntityManagerSupport.closeEntityManager();
 	}
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		
+	@Before
+	public void setUp() throws Exception {
+		Configuration configuration = new PropertiesConfiguration(
+				"test.properties");
+		JedisConnectionFactory.initialize(configuration);
+		ServiceFactory.initialize(configuration, null);
 		userRepository = new UserRepositoryJpaImpl();
 		
 		user = TestUserFactory

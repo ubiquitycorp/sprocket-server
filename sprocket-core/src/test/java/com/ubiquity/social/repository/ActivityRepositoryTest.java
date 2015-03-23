@@ -138,7 +138,7 @@ public class ActivityRepositoryTest {
 		List<Activity> allActivities = activityRepository.findByOwnerId(owner.getUserId());
 		Assert.assertFalse(allActivities.isEmpty());
 		Activity persisted = allActivities.get(0);
-		Assert.assertTrue(persisted.getActivityId().longValue() == statusActivity.getActivityId().longValue());
+		Assert.assertEquals(statusActivity.getActivityId().longValue(),persisted.getActivityId().longValue());
 	}
 	
 	@Test

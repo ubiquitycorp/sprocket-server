@@ -31,7 +31,8 @@ public class VimeoAPITest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 
-		User user = TestUserFactory.createTestUserWithMinimumRequiredProperties(null);
+		User user = TestUserFactory
+				.createTestUserWithMinimumRequiredProperties(null);
 		identity = new ExternalIdentity.Builder()
 				.accessToken("a5f46897abbbd2b83501ea79b4916f44")
 				.clientPlatform(ClientPlatform.WEB).inUse(true).user(user)
@@ -69,7 +70,7 @@ public class VimeoAPITest {
 				identity.getClientPlatform(), externalApplication);
 		List<VideoContent> videos = contentApi.searchVideos("karate", 1, 25,
 				identity);
-		Assert.assertTrue(videos.size() == 25); // just test the size returns
+		Assert.assertEquals(25, videos.size()); // just test the size returns
 												// for now
 		for (VideoContent video : videos)
 			log.debug("video: {}", video);

@@ -35,20 +35,20 @@ public class YouTubeAPITest {
 				.identifier(UUID.randomUUID().toString())
 				.clientPlatform(ClientPlatform.Android)
 				.externalNetwork(ExternalNetwork.YouTube.ordinal())
-				.accessToken("")
-				.refreshToken("")
-				.expiresAt(1L)
-				.build();
+				.accessToken("").refreshToken("").expiresAt(1L).build();
 		log.debug("authenticated YouTube with identity {} ", identity);
 
 		// intialize services
 		Configuration config = new PropertiesConfiguration("test.properties");
 		JedisConnectionFactory.initialize(config);
 		ContentAPIFactory.initialize(config);
-		ServiceFactory.initialize(config, null); 
-		Application application =  ServiceFactory.getApplicationService().loadApplicationFromConfiguration();
-		externalApplication = ServiceFactory.getApplicationService().getExAppByExternalNetworkAndClientPlatform(application,
-				identity.getExternalNetwork(), identity.getClientPlatform());
+		ServiceFactory.initialize(config, null);
+		Application application = ServiceFactory.getApplicationService()
+				.loadApplicationFromConfiguration();
+		externalApplication = ServiceFactory.getApplicationService()
+				.getExAppByExternalNetworkAndClientPlatform(application,
+						identity.getExternalNetwork(),
+						identity.getClientPlatform());
 	}
 
 	@Test
@@ -58,7 +58,7 @@ public class YouTubeAPITest {
 				identity.getClientPlatform(), externalApplication);
 		List<VideoContent> videos = contentApi.searchVideos("Karate", 1, 25,
 				identity);
-		Assert.assertTrue(videos.size() == 25);
+		Assert.assertEquals(25, videos.size());
 
 		VideoContent firstFromPageOne = videos.get(0);
 
