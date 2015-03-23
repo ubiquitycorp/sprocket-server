@@ -235,15 +235,16 @@ public class DatabaseSeed {
 	}
 
 	private void goober(Configuration configuration) {
-		ServiceFactory.initialize(configuration, null);
-		Application application = ServiceFactory.getApplicationService()
-				.loadApplicationFromConfiguration();
-		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
-				.getApplicationService()
-				.getExAppByExternalNetworkAndClientPlatform(application,
-						ExternalNetwork.Yelp.ordinal(), ClientPlatform.WEB);
-		ServiceFactory.getLocationService().syncPlaces(ExternalNetwork.Yelp,
-				externalNetworkApplication);
+//		ServiceFactory.initialize(configuration, null);
+//		
+//		Application application = ServiceFactory.getApplicationService()
+//				.loadApplicationFromConfiguration();
+//		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
+//				.getApplicationService()
+//				.getExAppByExternalNetworkAndClientPlatform(application,
+//						ExternalNetwork.Yelp.ordinal(), ClientPlatform.WEB);
+//		ServiceFactory.getLocationService().syncPlaces(ExternalNetwork.Yelp,
+//				externalNetworkApplication);
 	}
 
 	private void loadParentInterestWithFile(Interest parent, String resource)

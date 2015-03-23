@@ -197,7 +197,7 @@ public class ServiceFactory {
 	 * 
 	 * @return
 	 */
-	public static AuthenticationService<Developer> getDevloperAuthService() {
+	public static AuthenticationService<Developer> getDeveloperAuthService() {
 		if (developerAuthService == null)
 			developerAuthService = new DeveloperAuthService(configuration);
 		return developerAuthService;

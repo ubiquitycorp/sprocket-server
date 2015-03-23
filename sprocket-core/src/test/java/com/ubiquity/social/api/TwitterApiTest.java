@@ -14,13 +14,17 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.content.api.VimeoAPITest;
 import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.Developer;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.factory.TestDeveloperFactory;
+import com.ubiquity.identity.repository.DeveloperRepositoryJpaImpl;
 import com.ubiquity.integration.api.SocialAPI;
 import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.integration.domain.Activity;
@@ -43,7 +47,7 @@ public class TwitterApiTest {
 				"test.properties");
 
 		JedisConnectionFactory.initialize(configuration);
-		ServiceFactory.initialize(configuration, null); 
+		ServiceFactory.initialize(configuration, null);
 		SocialAPIFactory.initialize(configuration);
 		User user = new User.Builder().lastUpdated(System.currentTimeMillis())
 				.firstName(UUID.randomUUID().toString())
@@ -56,14 +60,26 @@ public class TwitterApiTest {
 				.accessToken(
 						"2576165924-bjuqdtF54hoIw4fufobnX6O6DCaHfFhp4riitH1")
 				.secretToken("8StcfxfvMzdyuUFRcmf7dtn9kI1VTAvFCoB0deZZy8qkW")
-				.identifier("2576165924")
-				.clientPlatform(ClientPlatform.WEB)
-				.externalNetwork(ExternalNetwork.Twitter.ordinal())
-				.user(user).build();
-		
-		Application application =  ServiceFactory.getApplicationService().loadApplicationFromConfiguration();
-		externalNetworkApplication = ServiceFactory.getApplicationService().getExAppByExternalNetworkAndClientPlatform(application,
-				identity.getExternalNetwork(), identity.getClientPlatform());
+				.identifier("2576165924").clientPlatform(ClientPlatform.WEB)
+				.externalNetwork(ExternalNetwork.Twitter.ordinal()).user(user)
+				.build();
+
+		Developer developer = TestDeveloperFactory
+				.createTestDeveloperWithMinimumRequiredProperties();
+
+		EntityManagerSupport.beginTransaction();
+		new DeveloperRepositoryJpaImpl().create(developer);
+		EntityManagerSupport.commit();
+
+		Application application = ServiceFactory.getApplicationService()
+				.createDefaultAppIFNotExsists(developer,
+						UUID.randomUUID().toString(),
+						UUID.randomUUID().toString());
+
+		externalNetworkApplication = ServiceFactory.getApplicationService()
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(
+						application.getAppId(), identity.getExternalNetwork(),
+						identity.getClientPlatform());
 		log.debug("authenticated Twitter with identity {} ", identity);
 	}
 
@@ -71,17 +87,15 @@ public class TwitterApiTest {
 	public void sendMessage() {
 
 		SocialAPI twitterAPI = SocialAPIFactory.createProvider(
-				ExternalNetwork.Twitter, ClientPlatform.WEB,externalNetworkApplication);
+				ExternalNetwork.Twitter, ClientPlatform.WEB,
+				externalNetworkApplication);
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH-mm-ss");
 		Date date = new Date();
 		String message = dateFormat.format(date);
-		Contact c = new Contact.Builder()
-				.externalIdentity(
-						new ExternalIdentity.Builder()
-								.externalNetwork(
-										ExternalNetwork.Twitter.ordinal())
-								.identifier("2576165924").build())
-				.build();
+		Contact c = new Contact.Builder().externalIdentity(
+				new ExternalIdentity.Builder()
+						.externalNetwork(ExternalNetwork.Twitter.ordinal())
+						.identifier("2576165924").build()).build();
 		Boolean sent = twitterAPI.sendMessage(identity, c, null, message, "");
 		Assert.assertTrue(sent);
 	}
@@ -90,7 +104,8 @@ public class TwitterApiTest {
 	public void listMessages() {
 
 		SocialAPI twitterAPI = SocialAPIFactory.createProvider(
-				ExternalNetwork.Twitter, ClientPlatform.WEB,externalNetworkApplication);
+				ExternalNetwork.Twitter, ClientPlatform.WEB,
+				externalNetworkApplication);
 		List<Message> messages = twitterAPI.listMessages(identity, null, null);
 		Assert.assertFalse(messages.isEmpty());
 		// all fb messages will have conversations
@@ -106,7 +121,8 @@ public class TwitterApiTest {
 	public void postTweet() {
 
 		SocialAPI twitterAPI = SocialAPIFactory.createProvider(
-				ExternalNetwork.Twitter, ClientPlatform.WEB,externalNetworkApplication);
+				ExternalNetwork.Twitter, ClientPlatform.WEB,
+				externalNetworkApplication);
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH-mm-ss");
 		Date date = new Date();
 		String message = dateFormat.format(date);
@@ -123,7 +139,8 @@ public class TwitterApiTest {
 	public void listActivities() {
 
 		SocialAPI twitterAPI = SocialAPIFactory.createProvider(
-				ExternalNetwork.Twitter, ClientPlatform.WEB,externalNetworkApplication);
+				ExternalNetwork.Twitter, ClientPlatform.WEB,
+				externalNetworkApplication);
 		List<Activity> activities = twitterAPI.listActivities(identity);
 		Assert.assertFalse(activities.isEmpty());
 		// all fb messages will have conversations
@@ -138,7 +155,8 @@ public class TwitterApiTest {
 	public void searchActivities() {
 
 		SocialAPI twitterAPI = SocialAPIFactory.createProvider(
-				ExternalNetwork.Twitter, ClientPlatform.WEB,externalNetworkApplication);
+				ExternalNetwork.Twitter, ClientPlatform.WEB,
+				externalNetworkApplication);
 		List<Activity> activities = twitterAPI.searchActivities("test", 1, 5,
 				identity);
 		Assert.assertFalse(activities.isEmpty());

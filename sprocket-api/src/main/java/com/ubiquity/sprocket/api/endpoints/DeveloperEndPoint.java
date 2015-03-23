@@ -69,7 +69,7 @@ public class DeveloperEndPoint {
 				DeveloperDto.class, RegistrationValidation.class);
 
 		AuthenticationService<Developer> authenticationService = ServiceFactory
-				.getDevloperAuthService();
+				.getDeveloperAuthService();
 		Developer developer = authenticationService.register(
 				developerDto.getUsername(), developerDto.getPassword(), null,
 				null, developerDto.getDisplayName(), developerDto.getEmail(),
@@ -105,7 +105,7 @@ public class DeveloperEndPoint {
 		DeveloperDto developerDto = jsonConverter.convertFromPayload(payload,
 				DeveloperDto.class, AuthenticationValidation.class);
 		AuthenticationService<Developer> developerAuthService = ServiceFactory
-				.getDevloperAuthService();
+				.getDeveloperAuthService();
 		Developer developer = developerAuthService.authenticate(
 				developerDto.getUsername(), developerDto.getPassword());
 		if (developer == null)

@@ -1,6 +1,7 @@
 package com.ubiquity.sprocket.datasync.worker.manager;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -10,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.amqp.MessageQueueProducer;
-import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.Identity;
@@ -100,7 +100,7 @@ public abstract class SyncProcessor {
 
 	}
 
-	public abstract int syncData(Application application);
+	public abstract int syncData(List<ExternalNetworkApplication> exApps);
 
 	/**
 	 * Refresh data for specific user in all social networks
@@ -108,7 +108,7 @@ public abstract class SyncProcessor {
 	 * @param user
 	 * @return
 	 */
-	public int syncDataForUser(User user, Application application) {
+	public int syncDataForUser(User user, List<ExternalNetworkApplication> exApps) {
 		Set<Identity> identities = user.getIdentities();
 		DateTime start = new DateTime();
 
@@ -126,7 +126,7 @@ public abstract class SyncProcessor {
 					ExternalNetworkApplication externalNetworkApplication = ServiceFactory
 							.getApplicationService()
 							.getExAppByExternalNetworkAndClientPlatform(
-									application,
+									exApps,
 									externalIdentity.getExternalNetwork(),
 									externalIdentity.getClientPlatform());
 

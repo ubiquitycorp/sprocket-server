@@ -3,7 +3,7 @@ package com.ubiquity.sprocket.datasync.worker.manager;
 import java.util.List;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.identity.domain.Application;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.sprocket.datasync.handlers.ContactHandler;
 
@@ -48,7 +48,7 @@ public class ContactsSyncProcessor extends SyncProcessor {
 	 * @return
 	 */
 	@Override
-	public int syncData(Application application) {
+	public int syncData(List<ExternalNetworkApplication> exApps) {
 
 		int numRefreshed = 0;
 
@@ -56,7 +56,7 @@ public class ContactsSyncProcessor extends SyncProcessor {
 			Long startTime, endTime;
 			startTime = System.currentTimeMillis();
 			for (User user : users) {
-				numRefreshed += syncDataForUser(user,application );
+				numRefreshed += syncDataForUser(user,exApps );
 			}
 			endTime = System.currentTimeMillis();
 			log.info("{}: Periodic Sync completed in {} seconds", Thread
