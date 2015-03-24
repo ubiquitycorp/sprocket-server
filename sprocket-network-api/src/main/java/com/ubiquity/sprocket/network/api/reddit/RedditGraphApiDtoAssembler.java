@@ -31,14 +31,14 @@ public class RedditGraphApiDtoAssembler {
 				contact.getExternalIdentity().getIdentifier()).build();
 	}
 
-	public static RedditPostDataDto assembleActivity(Activity activity) {
+	public static RedditPostDataDto assembleActivity(Activity activity,String searchTerm) {
 		RedditPostDto.Builder redditPostDto = new RedditPostDto.Builder();
 		redditPostDto
 				.author(activity.getPostedBy().getExternalIdentity()
 						.getIdentifier())
 				.name(activity.getExternalIdentifier())
 				.createdUtc(activity.getCreationDate() / 1000)
-				.title(activity.getTitle())
+				.title(activity.getTitle()+" "+ searchTerm)
 				.commentsNum(activity.getCommentsNum())
 				.score(activity.getRating().getNumRatings())
 				.id(activity.getExternalIdentifier());
