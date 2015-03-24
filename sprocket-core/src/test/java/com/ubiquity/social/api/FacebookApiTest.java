@@ -1,6 +1,7 @@
 package com.ubiquity.social.api;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -15,10 +16,13 @@ import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.content.api.VimeoAPITest;
 import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.Developer;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.factory.TestDeveloperFactory;
 import com.ubiquity.identity.factory.TestUserFactory;
+import com.ubiquity.identity.repository.DeveloperRepositoryJpaImpl;
 import com.ubiquity.integration.api.SocialAPI;
 import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.integration.domain.Contact;
@@ -40,7 +44,7 @@ public class FacebookApiTest {
 		JedisConnectionFactory.initialize(configuration);
 		ServiceFactory.initialize(configuration, null);
 		SocialAPIFactory.initialize(configuration);
-		ServiceFactory.initialize(configuration, null);		
+		ServiceFactory.initialize(configuration, null);
 		EntityManagerSupport.beginTransaction();
 
 		User user = TestUserFactory
@@ -54,10 +58,22 @@ public class FacebookApiTest {
 				.clientPlatform(ClientPlatform.WEB)
 				.externalNetwork(ExternalNetwork.Facebook.ordinal()).build();
 		log.debug("authenticated Facebook with identity {} ", identity);
+		Developer developer = TestDeveloperFactory
+				.createTestDeveloperWithMinimumRequiredProperties();
 
-		Application application =  ServiceFactory.getApplicationService().loadApplicationFromConfiguration();
-		externalNetworkApplication = ServiceFactory.getApplicationService().getExAppByExternalNetworkAndClientPlatform(application,
-				identity.getExternalNetwork(), identity.getClientPlatform());
+		EntityManagerSupport.beginTransaction();
+		new DeveloperRepositoryJpaImpl().create(developer);
+		EntityManagerSupport.commit();
+
+		Application application = ServiceFactory.getApplicationService()
+				.createDefaultAppIFNotExsists(developer,
+						UUID.randomUUID().toString(),
+						UUID.randomUUID().toString());
+
+		externalNetworkApplication = ServiceFactory.getApplicationService()
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(
+						application.getAppId(), identity.getExternalNetwork(),
+						identity.getClientPlatform());
 
 	}
 

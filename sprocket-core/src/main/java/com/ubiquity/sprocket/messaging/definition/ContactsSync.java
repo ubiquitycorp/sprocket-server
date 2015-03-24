@@ -22,7 +22,7 @@ public class ContactsSync {
 		return userIds;
 	}
 
-	public Long getApllicationID() {
+	public Long getApplicationID() {
 		return applicationID;
 	}
 	

@@ -59,7 +59,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 							.getFirst("userId");
 				} else if (method.isAnnotationPresent(DeveloperSecure.class)) {
 					authenticationService = ServiceFactory
-							.getDevloperAuthService();
+							.getDeveloperAuthService();
 					userId = requestContext.getUriInfo().getPathParameters()
 							.getFirst("developerId");
 				}

@@ -74,7 +74,8 @@ public class ContactsSyncJob implements Job {
 
 	private void sendSyncContactsMessage(List<Long> userIds, Long applicationID)
 			throws IOException {
-
+		if(userIds ==null || userIds.size()==0)
+			return;
 		ContactsSync content = new ContactsSync(userIds, applicationID);
 
 		// serialize and send it

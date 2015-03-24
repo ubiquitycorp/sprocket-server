@@ -23,7 +23,7 @@ public class ActiveUsersFound {
 		return userIds;
 	}
 
-	public Long getApllicationID() {
+	public Long getApplicationID() {
 		return applicationID;
 	}
 	

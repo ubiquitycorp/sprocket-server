@@ -11,11 +11,15 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.Developer;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
+import com.ubiquity.identity.factory.TestDeveloperFactory;
+import com.ubiquity.identity.repository.DeveloperRepositoryJpaImpl;
 import com.ubiquity.integration.api.ContentAPI;
 import com.ubiquity.integration.api.ContentAPIFactory;
 import com.ubiquity.integration.domain.ExternalNetwork;
@@ -43,11 +47,22 @@ public class YouTubeAPITest {
 		JedisConnectionFactory.initialize(config);
 		ContentAPIFactory.initialize(config);
 		ServiceFactory.initialize(config, null);
+
+		Developer developer = TestDeveloperFactory
+				.createTestDeveloperWithMinimumRequiredProperties();
+
+		EntityManagerSupport.beginTransaction();
+		new DeveloperRepositoryJpaImpl().create(developer);
+		EntityManagerSupport.commit();
+
 		Application application = ServiceFactory.getApplicationService()
-				.loadApplicationFromConfiguration();
+				.createDefaultAppIFNotExsists(developer,
+						UUID.randomUUID().toString(),
+						UUID.randomUUID().toString());
+
 		externalApplication = ServiceFactory.getApplicationService()
-				.getExAppByExternalNetworkAndClientPlatform(application,
-						identity.getExternalNetwork(),
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(
+						application.getAppId(), identity.getExternalNetwork(),
 						identity.getClientPlatform());
 	}
 

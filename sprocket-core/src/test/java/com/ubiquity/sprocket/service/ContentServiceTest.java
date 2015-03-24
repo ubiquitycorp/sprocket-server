@@ -10,12 +10,16 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.niobium.repository.CollectionVariant;
+import com.niobium.repository.jpa.EntityManagerSupport;
 import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.Developer;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.domain.factory.UserFactory;
+import com.ubiquity.identity.factory.TestDeveloperFactory;
+import com.ubiquity.identity.repository.DeveloperRepositoryJpaImpl;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.integration.service.ContentService;
@@ -33,16 +37,25 @@ public class ContentServiceTest {
 				"test.properties");
 		
 		contentService = ServiceFactory.getContentService();
+		Developer developer = TestDeveloperFactory
+				.createTestDeveloperWithMinimumRequiredProperties();
+		
+		EntityManagerSupport.beginTransaction();
+		new DeveloperRepositoryJpaImpl().create(developer);
+		EntityManagerSupport.commit();
+		
+		Application application = ServiceFactory.getApplicationService()
+				.createDefaultAppIFNotExsists(developer,UUID.randomUUID().toString(),UUID.randomUUID().toString());
+		
 		user = UserFactory
 				.createUserWithRequiredFieldsUsingApplication(UUID.randomUUID()
-						.toString(), ClientPlatform.WEB, true, null);
+						.toString(), ClientPlatform.WEB, true, application);
 		
 		ServiceFactory.getUserService().create(user);
 		
 		ServiceFactory.initialize(configuration, null); 
 		
-		Application application =  ServiceFactory.getApplicationService().loadApplicationFromConfiguration();
-		externalNetworkApplication = ServiceFactory.getApplicationService().getExAppByExternalNetworkAndClientPlatform(application,
+		externalNetworkApplication = ServiceFactory.getApplicationService().getExAppByAppIdAndExternalNetworkAndClientPlatform(application.getAppId(),
 				ExternalNetwork.Facebook.ordinal(),
 				ClientPlatform.WEB);
 		List<ExternalIdentity> externalIdentities = ServiceFactory

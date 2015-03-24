@@ -10,11 +10,15 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.Developer;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
+import com.ubiquity.identity.factory.TestDeveloperFactory;
+import com.ubiquity.identity.repository.DeveloperRepositoryJpaImpl;
 import com.ubiquity.integration.api.SocialAPI;
 import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.integration.domain.Contact;
@@ -43,10 +47,18 @@ public class GoogleApiTest {
 		SocialAPIFactory.initialize(config);
 		ServiceFactory.initialize(config, null);
 
+		Developer developer = TestDeveloperFactory
+				.createTestDeveloperWithMinimumRequiredProperties();
+		
+		EntityManagerSupport.beginTransaction();
+		new DeveloperRepositoryJpaImpl().create(developer);
+		EntityManagerSupport.commit();
+		
 		Application application = ServiceFactory.getApplicationService()
-				.loadApplicationFromConfiguration();
+				.createDefaultAppIFNotExsists(developer,UUID.randomUUID().toString(),UUID.randomUUID().toString());
+		
 		externalNetworkApplication = ServiceFactory.getApplicationService()
-				.getExAppByExternalNetworkAndClientPlatform(application,
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(application.getAppId(),
 						identity.getExternalNetwork(),
 						identity.getClientPlatform());
 	}

@@ -65,8 +65,11 @@ public class DataSyncJob implements Job {
 				thisApplication = userApplicationIds[1] == null ? -1L : Long
 						.valueOf(userApplicationIds[1].toString());
 
-				if (!currentApplicationID.equals(thisApplication) || currntBlockSize == maxBlockSize) {
-					sendSyncActiveUsersMessage(userIds, currentApplicationID==-1?null:currentApplicationID);
+				if (!currentApplicationID.equals(thisApplication)
+						|| currntBlockSize == maxBlockSize) {
+					sendSyncActiveUsersMessage(userIds,
+							currentApplicationID == -1 ? null
+									: currentApplicationID);
 					userIds = new ArrayList<Long>();
 					currntBlockSize = 0;
 					currentApplicationID = thisApplication;
@@ -75,9 +78,11 @@ public class DataSyncJob implements Job {
 				userIds.add(thisUser);
 				currntBlockSize++;
 			}
-			
-			if(currntBlockSize>0){
-				sendSyncActiveUsersMessage(userIds, currentApplicationID==-1?null:currentApplicationID);
+
+			if (currntBlockSize > 0) {
+				sendSyncActiveUsersMessage(userIds,
+						currentApplicationID == -1 ? null
+								: currentApplicationID);
 			}
 
 		} catch (Exception e) {
@@ -87,6 +92,8 @@ public class DataSyncJob implements Job {
 
 	private void sendSyncActiveUsersMessage(List<Long> userIds,
 			Long applicationID) throws IOException {
+		if(userIds ==null || userIds.size()==0)
+			return;
 		ActiveUsersFound content = new ActiveUsersFound(userIds, applicationID);
 
 		// serialize and send it

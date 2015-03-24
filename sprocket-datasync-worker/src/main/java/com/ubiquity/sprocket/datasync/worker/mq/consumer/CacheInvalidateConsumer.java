@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
 import com.niobium.repository.jpa.EntityManagerSupport;
-import com.ubiquity.identity.domain.Application;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.VideoContent;
@@ -176,17 +176,17 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		List<User> users = ServiceFactory.getUserService().findSprocketUsersInRange(
 				userIds);
 		SyncProcessor dataSyncManager = new DataSyncProcessor(users);
-		Application application = ServiceFactory.getApplicationService().getApplicationByIdOrDefault(activeUsersFound.getApllicationID());
-		dataSyncManager.syncData(application);
+		List<ExternalNetworkApplication> exApp = ServiceFactory.getDeveloperService().getExternalApplicationsByAppID(activeUsersFound.getApplicationID());
+		dataSyncManager.syncData(exApp);
 	}
 
 	private void process(ContactsSync contactsSyncMessage) {
 		List<Long> userIds = contactsSyncMessage.getUserIds();
 		List<User> users = ServiceFactory.getUserService().findSprocketUsersInRange(
 				userIds);
-		Application application = ServiceFactory.getApplicationService().getApplicationByIdOrDefault(contactsSyncMessage.getApllicationID());
 		SyncProcessor contactSyncManager = new ContactsSyncProcessor(users);
-		contactSyncManager.syncData(application);
+		List<ExternalNetworkApplication> exApp = ServiceFactory.getDeveloperService().getExternalApplicationsByAppID(contactsSyncMessage.getApplicationID());
+		contactSyncManager.syncData(exApp);
 	}
 
 	@Override

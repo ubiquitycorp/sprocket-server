@@ -7,19 +7,23 @@ import java.util.UUID;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.Developer;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.factory.TestDeveloperFactory;
 import com.ubiquity.identity.factory.TestUserFactory;
+import com.ubiquity.identity.repository.DeveloperRepositoryJpaImpl;
 import com.ubiquity.integration.api.ContentAPIFactory;
 import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.integration.domain.Activity;
@@ -40,9 +44,10 @@ public class SearchServiceTest {
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private static User owner;
+	private static Application application;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeClass
+	public static void setUp() throws Exception {
 		Configuration config = new PropertiesConfiguration("test.properties");
 		Configuration errorsConfiguration = new PropertiesConfiguration(
 				"messages.properties");
@@ -58,6 +63,18 @@ public class SearchServiceTest {
 		ServiceFactory.getUserService().create(owner);
 
 		searchService.deleteAll();
+		
+		Developer developer = TestDeveloperFactory
+				.createTestDeveloperWithMinimumRequiredProperties();
+		
+		EntityManagerSupport.beginTransaction();
+		new DeveloperRepositoryJpaImpl().create(developer);
+		EntityManagerSupport.commit();
+		
+		application = ServiceFactory.getApplicationService()
+				.createDefaultAppIFNotExsists(developer,UUID.randomUUID().toString(),UUID.randomUUID().toString());
+		
+		
 	}
 
 	@Test
@@ -74,11 +91,10 @@ public class SearchServiceTest {
 						.externalNetwork(ExternalNetwork.Facebook.ordinal())
 						.build());
 
-		Application application = ServiceFactory.getApplicationService()
-				.loadApplicationFromConfiguration();
+		
 		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
 				.getApplicationService()
-				.getExAppByExternalNetworkAndClientPlatform(application,
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(application.getAppId(),
 						ExternalNetwork.Facebook.ordinal(),
 						ClientPlatform.Android);
 		List<Document> documents = searchService.searchLiveDocuments("Karate",
@@ -101,11 +117,9 @@ public class SearchServiceTest {
 						.externalNetwork(ExternalNetwork.Vimeo.ordinal())
 						.build());
 
-		Application application = ServiceFactory.getApplicationService()
-				.loadApplicationFromConfiguration();
 		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
 				.getApplicationService()
-				.getExAppByExternalNetworkAndClientPlatform(application,
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(application.getAppId(),
 						ExternalNetwork.Vimeo.ordinal(), ClientPlatform.Android);
 		List<Document> documents = searchService.searchLiveDocuments("Karate",
 				user, ExternalNetwork.Vimeo, 1, null, null, null,
@@ -127,11 +141,10 @@ public class SearchServiceTest {
 						.clientPlatform(ClientPlatform.Android)
 						.externalNetwork(ExternalNetwork.YouTube.ordinal())
 						.build());
-		Application application = ServiceFactory.getApplicationService()
-				.loadApplicationFromConfiguration();
+		
 		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
 				.getApplicationService()
-				.getExAppByExternalNetworkAndClientPlatform(application,
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(application.getAppId(),
 						ExternalNetwork.Vimeo.ordinal(), ClientPlatform.Android);
 		List<Document> documents = searchService.searchLiveDocuments("Karate",
 				user, ExternalNetwork.YouTube, 1, null, null, null,
@@ -262,7 +275,7 @@ public class SearchServiceTest {
 		List<Document> documents = searchService.searchIndexedDocuments(
 				videoContent.getTitle(), null);
 		log.debug("documents {}", documents);
-		Assert.assertTrue(documents.size() == 1);
+		Assert.assertEquals(1, documents.size());
 
 	}
 
@@ -286,7 +299,7 @@ public class SearchServiceTest {
 		List<Document> documents = searchService.searchIndexedDocuments(
 				activity.getTitle(), owner.getUserId());
 		log.debug("documents: {}", documents);
-		Assert.assertTrue(documents.size() == 1);
+		Assert.assertEquals(1, documents.size());
 		Document result = documents.get(0);
 
 		Assert.assertEquals(Activity.class.getSimpleName(), result.getFields()

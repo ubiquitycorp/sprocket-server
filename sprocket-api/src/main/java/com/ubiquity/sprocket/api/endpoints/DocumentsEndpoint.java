@@ -167,6 +167,7 @@ public class DocumentsEndpoint {
 		ClientPlatform clientplaform = ClientPlatform.WEB;
 		if (externalNetwork != ExternalNetwork.Yelp)
 			clientplaform = identity.getClientPlatform();
+		
 		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
 				.getApplicationService()
 				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
