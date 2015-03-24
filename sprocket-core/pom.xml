@@ -13,9 +13,6 @@
 	<version>0.3.1</version>
 
 	<build>
-
-
-
 		<finalName>sprocket-core</finalName>
 		<resources>
 			<resource>
