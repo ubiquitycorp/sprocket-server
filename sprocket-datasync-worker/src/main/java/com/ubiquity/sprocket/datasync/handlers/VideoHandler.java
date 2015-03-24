@@ -26,7 +26,8 @@ public class VideoHandler extends Handler {
 
 	public VideoHandler(DataSyncProcessor processor) {
 		super(processor);
-		networks = EnumSet.of(ExternalNetwork.YouTube, ExternalNetwork.Vimeo);
+		networks = EnumSet.of(ExternalNetwork.YouTube, ExternalNetwork.Vimeo,
+				ExternalNetwork.ContentMockNetwork);
 	}
 
 	@Override

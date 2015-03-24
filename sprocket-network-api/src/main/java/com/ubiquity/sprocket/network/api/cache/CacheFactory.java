@@ -48,10 +48,11 @@ public class CacheFactory {
 		String userId = accessTokenCache.get("MAXuserID");
 		if (userId == null) {
 			userId = "10";
-		} 
-		Long maxUserID = Long.parseLong(userId) +1;
+		}
+		Long maxUserID = Long.parseLong(userId) + 1;
 		accessTokenCache.put("MAXuserID", maxUserID.toString());
 		accessTokenCache.put(accessToken, maxUserID.toString());
 		return maxUserID;
 	}
+	
 }

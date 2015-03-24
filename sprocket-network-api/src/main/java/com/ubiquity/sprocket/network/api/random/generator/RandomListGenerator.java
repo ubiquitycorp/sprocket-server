@@ -12,13 +12,16 @@ import com.ubiquity.sprocket.network.api.dto.model.VideoContent;
 
 public class RandomListGenerator {
 	private static Random random = new Random();
+	public static List<Activity> postedActivities = new LinkedList<Activity>();
 
 	public static List<Activity> GenerateActivityList(Long userId,
 			Long lastRequest, Long thisRequest, boolean withComments,
 			boolean withTags, Integer maxResults) {
 		List<Activity> activities = new LinkedList<Activity>();
+		activities.addAll(postedActivities);
+		maxResults -= postedActivities.size();
 		int mid = (maxResults / 2) + 1;
-		for (int i = 1; i <= mid; i++) {
+		for (int i = 1; i < mid; i++) {
 			activities.add(RandomObjectGenerator.generateActivity(userId,
 					lastRequest, i, random.nextInt(6), withComments, withTags));
 		}
@@ -26,6 +29,7 @@ public class RandomListGenerator {
 			activities.add(RandomObjectGenerator.generateActivity(userId,
 					thisRequest, i, random.nextInt(6), withComments, withTags));
 		}
+
 		return activities;
 	}
 

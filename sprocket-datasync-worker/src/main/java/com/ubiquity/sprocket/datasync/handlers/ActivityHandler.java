@@ -28,7 +28,8 @@ public class ActivityHandler extends Handler {
 		super(processor);
 		networks = EnumSet.of(ExternalNetwork.Twitter,
 				ExternalNetwork.Facebook, ExternalNetwork.LinkedIn,
-				ExternalNetwork.Tumblr, ExternalNetwork.Reddit);
+				ExternalNetwork.Tumblr, ExternalNetwork.Reddit,
+				ExternalNetwork.SocailMockNetwork);
 	}
 
 	@Override
@@ -59,12 +60,13 @@ public class ActivityHandler extends Handler {
 		} catch (AuthorizationException e) {
 			identity.setIsActive(false);
 			ServiceFactory.getExternalIdentityService().update(identity);
-			log.error("Could not process activities for identity {}: set active to false ,exception: {}", identity,
-					ExceptionUtils.getStackTrace(e));
+			log.error(
+					"Could not process activities for identity {}: set active to false ,exception: {}",
+					identity, ExceptionUtils.getStackTrace(e));
 			return -1;
 		} catch (Exception e) {
-			log.error("Could not process activities for identity{}: {}", identity,
-					ExceptionUtils.getStackTrace(e));
+			log.error("Could not process activities for identity{}: {}",
+					identity, ExceptionUtils.getStackTrace(e));
 			return -1;
 		} finally {
 			size = (synced == null) ? -1 : synced.size();

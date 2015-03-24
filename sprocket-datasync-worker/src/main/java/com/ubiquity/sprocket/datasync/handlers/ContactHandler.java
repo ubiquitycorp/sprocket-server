@@ -27,7 +27,8 @@ public class ContactHandler extends Handler {
 	public ContactHandler(SyncProcessor processor) {
 		super(processor);
 		networks = EnumSet.of(ExternalNetwork.Facebook,
-				ExternalNetwork.LinkedIn, ExternalNetwork.Google);
+				ExternalNetwork.LinkedIn, ExternalNetwork.Google,
+				ExternalNetwork.SocailMockNetwork);
 	}
 
 	@Override

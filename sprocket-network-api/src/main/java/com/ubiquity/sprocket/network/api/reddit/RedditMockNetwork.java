@@ -25,38 +25,57 @@ public class RedditMockNetwork {
 		RedditPostDataContainerDto redditPostDataContainerDto = new RedditPostDataContainerDto();
 		List<Activity> activities = RandomListGenerator.GenerateActivityList(
 				userId, lastRequest, thisRequest, false, false, maxResults);
-		for (Activity activity : activities){
-			redditPostDataContainerDto.getData().getChildren().add(RedditGraphApiDtoAssembler.assembleActivity(activity));
+		for (Activity activity : activities) {
+			redditPostDataContainerDto.getData().getChildren()
+					.add(RedditGraphApiDtoAssembler.assembleActivity(activity));
 		}
 		return redditPostDataContainerDto;
 	}
-	public static RedditJsonResponseContainerDto getjsonResponse(){
+
+	public static void postActivity(Long userId, String body, String title,
+			String link, String kind) {
+		int index = RandomListGenerator.postedActivities.size();
+		
+		if (index == 20)
+		{
+			RandomListGenerator.postedActivities.remove(0);
+		}
+		Activity postedActivity = RandomObjectGenerator.generateActivity(userId, body, title, link, kind, index);
+		RandomListGenerator.postedActivities.add(postedActivity);
+	}
+
+	public static RedditJsonResponseContainerDto getjsonResponse() {
 		RedditJsonResponseContainerDto json = new RedditJsonResponseContainerDto();
 		return json;
 	}
+
 	public static List<RedditCommentDataContainerDto> getComments(Long userId,
-			Long lastRequest, Long thisRequest, int maxResults,String article) {
+			Long lastRequest, Long thisRequest, int maxResults, String article) {
 		List<RedditCommentDataContainerDto> redditCommentDataContainerDtos = new LinkedList<RedditCommentDataContainerDto>();
 		redditCommentDataContainerDtos.add(new RedditCommentDataContainerDto());
 		RedditCommentDataContainerDto redditCommentDataContainerDto = new RedditCommentDataContainerDto();
-		List<Comment> comments = RandomListGenerator.GenerateCommentList(userId, lastRequest, article);
-		for (Comment comment : comments){
-			redditCommentDataContainerDto.getData().getChildren().add(assembleComment(comment));
+		List<Comment> comments = RandomListGenerator.GenerateCommentList(
+				userId, lastRequest, article);
+		for (Comment comment : comments) {
+			redditCommentDataContainerDto.getData().getChildren()
+					.add(assembleComment(comment));
 		}
 		redditCommentDataContainerDtos.add(redditCommentDataContainerDto);
 		return redditCommentDataContainerDtos;
 	}
 
-	private static RedditCommentDataDto assembleComment(Comment comment){
-		RedditCommentDataDto redditCommentDataDto = RedditGraphApiDtoAssembler.assembleComment(comment);
-		if(comment.getReplies() != null && comment.getReplies().size()>0){
-			RedditCommentDataContainerDto redditCommentDataContainerDto = new RedditCommentDataContainerDto(); 
-			for(Comment reply : comment.getReplies())
-			{
-				redditCommentDataContainerDto.getData().getChildren().add(assembleComment(reply));
+	private static RedditCommentDataDto assembleComment(Comment comment) {
+		RedditCommentDataDto redditCommentDataDto = RedditGraphApiDtoAssembler
+				.assembleComment(comment);
+		if (comment.getReplies() != null && comment.getReplies().size() > 0) {
+			RedditCommentDataContainerDto redditCommentDataContainerDto = new RedditCommentDataContainerDto();
+			for (Comment reply : comment.getReplies()) {
+				redditCommentDataContainerDto.getData().getChildren()
+						.add(assembleComment(reply));
 			}
-			redditCommentDataDto.getData().setReplies(redditCommentDataContainerDto);
-		}else{
+			redditCommentDataDto.getData().setReplies(
+					redditCommentDataContainerDto);
+		} else {
 			redditCommentDataDto.getData().setReplies("");
 		}
 		return redditCommentDataDto;
