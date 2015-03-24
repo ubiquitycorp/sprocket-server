@@ -11,12 +11,17 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.Developer;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.factory.TestDeveloperFactory;
 import com.ubiquity.identity.factory.TestUserFactory;
+import com.ubiquity.identity.repository.DeveloperRepositoryJpaImpl;
 import com.ubiquity.integration.api.ContentAPI;
 import com.ubiquity.integration.api.ContentAPIFactory;
 import com.ubiquity.integration.domain.ExternalNetwork;
@@ -37,7 +42,21 @@ public class MockNetworkContentAPITest {
 		ServiceFactory.initialize(configuration, null);
 		ContentAPIFactory.initialize(configuration);
 		JedisConnectionFactory.initialize(configuration);
-
+		
+		Developer developer = TestDeveloperFactory
+				.createTestDeveloperWithMinimumRequiredProperties();
+		
+		EntityManagerSupport.beginTransaction();
+		new DeveloperRepositoryJpaImpl().create(developer);
+		EntityManagerSupport.commit();
+		
+		Application application = ServiceFactory.getApplicationService()
+				.createDefaultAppIFNotExsists(developer,UUID.randomUUID().toString(),UUID.randomUUID().toString());
+		
+		externalApplication = ServiceFactory.getApplicationService()
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(application.getAppId(),
+						identity.getExternalNetwork(), identity.getClientPlatform());
+		
 		User user = TestUserFactory
 				.createTestUserWithMinimumRequiredProperties(null);
 		identity = new ExternalIdentity.Builder()
@@ -45,11 +64,6 @@ public class MockNetworkContentAPITest {
 				.accessToken(UUID.randomUUID().toString())
 				.externalNetwork(ExternalNetwork.ContentMockNetwork.ordinal())
 				.build();
-
-		externalApplication = ServiceFactory.getApplicationService()
-				.getExAppByExternalNetworkAndClientPlatform(null,
-						identity.getExternalNetwork(),
-						identity.getClientPlatform());
 	}
 
 	@Test
