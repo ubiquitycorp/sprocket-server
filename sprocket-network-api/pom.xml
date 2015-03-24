@@ -72,12 +72,12 @@
 				</executions>
 				<configuration>
 					<copyright>2013, Ubiquity</copyright>
-					<distribution>Sprocket API</distribution>
+					<distribution>Sprocket Network API</distribution>
 					<group>Application/Mobile</group>
 					<packager>Ubiquity</packager>
 					<prefix>/var/lib/tomcat7</prefix>
 					<defineStatements>
-						<defineStatement>stop and start sprocket api</defineStatement>
+						<defineStatement>stop and start sprocket network api</defineStatement>
 					</defineStatements>
 					<mappings>
 						<mapping>
