@@ -21,13 +21,13 @@ public class RedditMockNetwork {
 	}
 
 	public static RedditPostDataContainerDto getHotPosts(Long userId,
-			Long lastRequest, Long thisRequest, int maxResults) {
+			Long lastRequest, Long thisRequest, int maxResults,String searchTerm) {
 		RedditPostDataContainerDto redditPostDataContainerDto = new RedditPostDataContainerDto();
 		List<Activity> activities = RandomListGenerator.GenerateActivityList(
 				userId, lastRequest, thisRequest, false, false, maxResults);
 		for (Activity activity : activities) {
 			redditPostDataContainerDto.getData().getChildren()
-					.add(RedditGraphApiDtoAssembler.assembleActivity(activity));
+					.add(RedditGraphApiDtoAssembler.assembleActivity(activity,searchTerm));
 		}
 		return redditPostDataContainerDto;
 	}

@@ -53,17 +53,18 @@ public class MockNetworkContentAPITest {
 		Application application = ServiceFactory.getApplicationService()
 				.createDefaultAppIFNotExsists(developer,UUID.randomUUID().toString(),UUID.randomUUID().toString());
 		
+		User user = TestUserFactory
+				.createTestUserWithMinimumRequiredProperties(null);
+		identity = new ExternalIdentity.Builder()
+				.clientPlatform(ClientPlatform.Android).inUse(true).user(user)
+				.accessToken(UUID.randomUUID().toString())
+				.externalNetwork(ExternalNetwork.ContentMockNetwork.ordinal())
+				.build();
+		
 		externalApplication = ServiceFactory.getApplicationService()
 				.getExAppByAppIdAndExternalNetworkAndClientPlatform(application.getAppId(),
 						identity.getExternalNetwork(), identity.getClientPlatform());
 		
-		User user = TestUserFactory
-				.createTestUserWithMinimumRequiredProperties(null);
-		identity = new ExternalIdentity.Builder()
-				.clientPlatform(ClientPlatform.WEB).inUse(true).user(user)
-				.accessToken(UUID.randomUUID().toString())
-				.externalNetwork(ExternalNetwork.ContentMockNetwork.ordinal())
-				.build();
 	}
 
 	@Test

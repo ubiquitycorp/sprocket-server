@@ -63,7 +63,7 @@ public class RedditEndPoint {
 				lastRequestTime = thisRequestTime;
 				CacheFactory.setLastRequestTime(userId, lastRequestTime);
 			}
-			RedditPostDataContainerDto redditData = RedditMockNetwork.getHotPosts(userId, lastRequestTime, thisRequestTime,limit);
+			RedditPostDataContainerDto redditData = RedditMockNetwork.getHotPosts(userId, lastRequestTime, thisRequestTime,limit,"");
 			CacheFactory.checkUpdatedRequestTime(userId,lastRequestTime,thisRequestTime);
 			return Response.ok().entity(jsonConverter.convertToPayload(redditData)).build();
 		}else{
@@ -106,7 +106,7 @@ public class RedditEndPoint {
 				lastRequestTime = thisRequestTime;
 				CacheFactory.setLastRequestTime(userId, lastRequestTime);
 			}
-			RedditPostDataContainerDto redditData = RedditMockNetwork.getHotPosts(userId, lastRequestTime, thisRequestTime,limit);
+			RedditPostDataContainerDto redditData = RedditMockNetwork.getHotPosts(userId, lastRequestTime, thisRequestTime,limit,searchTerm);
 			CacheFactory.checkUpdatedRequestTime(userId,lastRequestTime,thisRequestTime);
 			return Response.ok().entity(jsonConverter.convertToPayload(redditData)).build();
 		}else{
