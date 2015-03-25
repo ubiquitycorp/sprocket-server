@@ -6,6 +6,7 @@
 
 	<persistence-unit name="manager" transaction-type="RESOURCE_LOCAL">
 
+
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
 		<class>com.ubiquity.location.domain.Place</class>
@@ -16,12 +17,6 @@
 		<class>com.ubiquity.sprocket.domain.RecommendedActivity</class>
 		<class>com.ubiquity.sprocket.domain.RecommendedVideo</class>
 
-		<class>com.ubiquity.sprocket.domain.GroupMembership</class>
-		<class>com.ubiquity.sprocket.domain.EngagedVideo</class>
-		<class>com.ubiquity.sprocket.domain.EngagedActivity</class>
-		<class>com.ubiquity.sprocket.domain.EngagedDocument</class>
-		<class>com.ubiquity.sprocket.domain.EngagedItem</class>
-
 		<class>com.ubiquity.sprocket.domain.FavoritePlace</class>
 		<class>com.ubiquity.sprocket.domain.FavoriteItem</class>
 
@@ -30,8 +25,9 @@
 		<class>com.ubiquity.identity.domain.Admin</class>
 		<class>com.ubiquity.identity.domain.Developer</class>
 		<class>com.ubiquity.identity.domain.Application</class>
+		<class>com.ubiquity.identity.domain.ExternalNetworkApplication</class>
 		<class>com.ubiquity.identity.domain.SecRole</class>
-		<class>com.ubiquity.identity.domain.Identity</class>
+		<class>com.ubiquity.identity.domain.Identity</class> 
 		<class>com.ubiquity.identity.domain.NativeIdentity</class>
 		<class>com.ubiquity.identity.domain.ExternalIdentity</class>
 		<class>com.ubiquity.integration.domain.Contact</class>
@@ -43,8 +39,11 @@
 		<class>com.ubiquity.integration.domain.Event</class>
 		<class>com.ubiquity.integration.domain.Comment</class>
 		<class>com.ubiquity.integration.domain.UnmappedInterest</class>
+		<class>com.ubiquity.integration.domain.UserContact</class>
 
 		<class>com.ubiquity.sprocket.domain.Configuration</class>
+
+
 		<properties>
 
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
@@ -58,6 +57,7 @@
 			<property name="hibernate.transaction.flush_before_completion"
 				value="true" />
 
+			<!-- Connection Pooling settings -->
 			<property name="hibernate.connection.provider_class"
 				value="com.niobium.repository.jpa.provider.BoneCPConnectionProvider" />
 			<property name="bonecp.idleConnectionTestPeriodInMinutes"
@@ -72,12 +72,8 @@
 
 			<property name="bonecp.statementsCacheSize" value="100" />
 
-
 			<property name="hibernate.hbm2ddl.auto" value="${hibernate.schema.auto}" />
-
 
 		</properties>
 	</persistence-unit>
-
-
 </persistence>
