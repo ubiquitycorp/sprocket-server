@@ -34,6 +34,8 @@ public class MockNetworkContentAPITest {
 			.getLogger(MockNetworkContentAPITest.class);
 	private static ExternalNetworkApplication externalApplication;
 	private static ExternalIdentity identity;
+	private static int videosLimitPerPage;
+	private static int numOfPages;
 
 	@BeforeClass
 	public static void setUp() throws Exception {
@@ -64,7 +66,8 @@ public class MockNetworkContentAPITest {
 		externalApplication = ServiceFactory.getApplicationService()
 				.getExAppByAppIdAndExternalNetworkAndClientPlatform(application.getAppId(),
 						identity.getExternalNetwork(), identity.getClientPlatform());
-		
+		videosLimitPerPage = configuration.getInt("videos.limit.perpage");
+		numOfPages = configuration.getInt("linkedin.activity.limit");
 	}
 
 	@Test
@@ -72,7 +75,8 @@ public class MockNetworkContentAPITest {
 		ContentAPI contentApi = ContentAPIFactory.createProvider(
 				ExternalNetwork.getNetworkById(identity.getExternalNetwork()),
 				identity.getClientPlatform(), externalApplication);
-		List<VideoContent> videos = contentApi.listVideos(identity);
+		
+		List<VideoContent> videos = contentApi.listVideos(identity, videosLimitPerPage, numOfPages);
 		for (VideoContent video : videos)
 			log.debug("video: {}", video);
 	}
