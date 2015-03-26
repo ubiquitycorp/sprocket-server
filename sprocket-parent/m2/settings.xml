@@ -402,7 +402,7 @@
 				<mq.host>sprocket-rabbitmq-stage-01.ubiquitycorp.net</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
-				<xmpp.host>54.183.230.115</xmpp.host>
+				<xmpp.host>sprocket-ejabberd-stage-01.ubiquitycorp.net</xmpp.host>
 				<xmpp.port>5222</xmpp.port>
 				<xmpp.domain>localhost</xmpp.domain>
 				<xmpp.user>bot</xmpp.user>
