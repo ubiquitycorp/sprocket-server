@@ -22,12 +22,7 @@ then
  SPROCKET_WORKER_SIZE=$SPROCKET_LARGE
 fi
 
-<<<<<<< HEAD
-echo "Available Memory: ${AVAILMEM}MB"
-echo "Sprocket Worker Size: ${SPROCKET_WORKER_SIZE}MB"
-$JAVA -Xmx${SPROCKET_WORKER_SIZE}m -cp ${SPROCKET_WORKER_NAME} com.ubiquity.sprocket.backchannel.worker.BackChannelWorker
-=======
 $LOGGER "Available Memory: ${AVAILMEM}MB"
 $LOGGER "Sprocket Worker Size: ${SPROCKET_WORKER_SIZE}MB"
-$JAVA -Xmx${SPROCKET_WORKER_SIZE}m -jar ${SPROCKET_WORKER_NAME}
->>>>>>> develop
+$JAVA -Xmx${SPROCKET_WORKER_SIZE}m -cp ${SPROCKET_WORKER_NAME} com.ubiquity.sprocket.backchannel.worker.BackChannelWorker
+

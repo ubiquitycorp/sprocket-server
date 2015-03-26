@@ -17,7 +17,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "puppet_server" do |puppet|
     puppet.puppet_server = "ubiquity-provision.ubiquitybc.net"
     puppet.puppet_node = "dev-#{ENV['WORKSTATION']}-sprocket.ubiquitybc.net"
-    puppet.options = "--verbose --pluginsync --environment exp --configtimeout 600  --waitforcert 60"
+    puppet.options = "--verbose --pluginsync --environment dev --configtimeout 600  --waitforcert 60"
   end
 
   # The url from where the 'config.vm.box' box will be fetched if it
