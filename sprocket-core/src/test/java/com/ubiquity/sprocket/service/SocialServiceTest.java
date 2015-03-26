@@ -108,7 +108,7 @@ public class SocialServiceTest {
 		// find Contacts for user
 		CollectionVariant<Activity> activitiesCollections = socialService
 				.findActivityByOwnerIdAndSocialNetwork(user.getUserId(),
-						externalNetwork, 1L, false);
+						externalNetwork, 1L);
 		Assert.assertFalse(activitiesCollections.getCollection().isEmpty());
 	}
 
