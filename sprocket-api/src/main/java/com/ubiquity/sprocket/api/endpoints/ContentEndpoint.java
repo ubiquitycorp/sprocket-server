@@ -36,7 +36,7 @@ public class ContentEndpoint {
 	@POST
 	@Path("/users/{userId}/videos/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
-//	@Secure
+    @Secure
 	public Response engaged(@PathParam("userId") Long userId, InputStream payload) throws IOException {
 
 		// convert payload
