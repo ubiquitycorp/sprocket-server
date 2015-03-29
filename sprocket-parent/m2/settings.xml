@@ -284,9 +284,9 @@
 				<datasync.worker.processes>2</datasync.worker.processes>
 				<datasync.worker.size>2048</datasync.worker.size>
 
-				<redis.host>54.183.115.14</redis.host>
+				<redis.host>sprocket-redis-stage-01.ubiquitycorp.net</redis.host>
 				<hibernate.debug>false</hibernate.debug>
-				<solr.api.host>54.219.144.172</solr.api.host>
+				<solr.api.host>sprocket-search-stage.ubiquitycorp.net</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
 
 				<!--<social.facebook.api.host>http://localhost/sprocket-network-api/api/1.0/facebook</social.facebook.api.host> -->
@@ -390,19 +390,19 @@
 				<stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO
 				</stripe.api.secret>
 				<repo.env>stage</repo.env>
-				<mq.queue.cacheinvalidate.host>54.215.203.15
+				<mq.queue.cacheinvalidate.host>sprocket-rabbitmq-stage-01.ubiquitycorp.net
 				</mq.queue.cacheinvalidate.host>
 				<mq.queue.cacheinvalidate.username>netappusr
 				</mq.queue.cacheinvalidate.username>
 				<mq.queue.cacheinvalidate.password>blackdeer
 				</mq.queue.cacheinvalidate.password>
-				<mq.queue.track.host>54.215.203.15</mq.queue.track.host>
+				<mq.queue.track.host>sprocket-rabbitmq-stage-01.ubiquitycorp.net</mq.queue.track.host>
 				<mq.queue.track.username>netappusr</mq.queue.track.username>
 				<mq.queue.track.password>blackdeer</mq.queue.track.password>
-				<mq.host>54.215.203.15</mq.host>
+				<mq.host>sprocket-rabbitmq-stage-01.ubiquitycorp.net</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
-				<xmpp.host>54.183.230.115</xmpp.host>
+				<xmpp.host>sprocket-ejabberd-stage-01.ubiquitycorp.net</xmpp.host>
 				<xmpp.port>5222</xmpp.port>
 				<xmpp.domain>localhost</xmpp.domain>
 				<xmpp.user>bot</xmpp.user>

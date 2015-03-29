@@ -34,6 +34,8 @@ public class VimeoAPITest {
 	private static Logger log = LoggerFactory.getLogger(VimeoAPITest.class);
 	private static ExternalNetworkApplication externalApplication;
 	private static ExternalIdentity identity;
+	private static Integer page;
+	private static Integer perPage;
 
 	@BeforeClass
 	public static void setUp() throws Exception {
@@ -43,11 +45,14 @@ public class VimeoAPITest {
 		identity = new ExternalIdentity.Builder()
 				.accessToken("a5f46897abbbd2b83501ea79b4916f44")
 				.clientPlatform(ClientPlatform.WEB).inUse(true).user(user)
-				.externalNetwork(ExternalNetwork.YouTube.ordinal()).build();
+				.externalNetwork(ExternalNetwork.Vimeo.ordinal()).build();
 		log.debug("authenticated Vimeo with identity {} ", identity);
 
 		Configuration configuration = new PropertiesConfiguration(
 				"test.properties");
+		
+		perPage = configuration.getInt("videos.limit.perpage");
+		page = configuration.getInt("videos.page.num");
 
 		JedisConnectionFactory.initialize(configuration);
 		ContentAPIFactory.initialize(configuration);
@@ -76,7 +81,7 @@ public class VimeoAPITest {
 		ContentAPI contentApi = ContentAPIFactory.createProvider(
 				ExternalNetwork.getNetworkById(identity.getExternalNetwork()),
 				identity.getClientPlatform(), externalApplication);
-		List<VideoContent> videos = contentApi.listVideos(identity);
+		List<VideoContent> videos = contentApi.listVideos(identity, page, perPage);
 		for (VideoContent video : videos)
 			log.debug("video: {}", video);
 	}
