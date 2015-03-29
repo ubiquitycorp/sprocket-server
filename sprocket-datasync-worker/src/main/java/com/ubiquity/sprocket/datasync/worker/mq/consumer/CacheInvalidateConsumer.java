@@ -10,8 +10,11 @@ import org.slf4j.LoggerFactory;
 import com.niobium.amqp.AbstractConsumerThread;
 import com.niobium.amqp.MessageQueueChannel;
 import com.niobium.repository.jpa.EntityManagerSupport;
+import com.ubiquity.identity.domain.Application;
+import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.domain.factory.ExternalIdentityFactory;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.location.domain.Place;
@@ -79,7 +82,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			log.error("Could not process, message: {}, root cause message: {}",
 					ExceptionUtils.getMessage(e),
 					ExceptionUtils.getFullStackTrace(e));
-			//e.printStackTrace();
+			// e.printStackTrace();
 		}
 	}
 
@@ -113,17 +116,16 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 		log.debug("found: {}", engagedDocument);
 
 		String dataType = engagedDocument.getDataType();
+		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+				engagedDocument.getUserId());
+
 		if (dataType.equalsIgnoreCase(Activity.class.getSimpleName())) {
 			// persist it or update the activity if it exists already
 			log.debug(Thread.currentThread().getName()
 					+ " saving the activity to db...");
 			Activity activity = engagedDocument.getActivity();
-			activity = ServiceFactory.getSocialService().findOrCreate(activity);
 
-			// index for search (this will update the index if the record exists
-			// already)
-			ServiceFactory.getSearchService().indexActivities(null,
-					Arrays.asList(new Activity[] { activity }), true);
+			engageActivity(activity, null, appId);
 
 		} else if (dataType
 				.equalsIgnoreCase(VideoContent.class.getSimpleName())) {
@@ -131,6 +133,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 			log.debug(Thread.currentThread().getName()
 					+ " saving the video to db...");
 			VideoContent videoContent = engagedDocument.getVideoContent();
+
 			videoContent = ServiceFactory.getContentService().findOrCreate(
 					videoContent);
 
@@ -159,33 +162,51 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 
 	private void process(UserEngagedActivity engagedActivity) {
 		// build it
+		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+				engagedActivity.getUserId());
 		Activity activity = engagedActivity.getActivity();
 
+		engageActivity(activity, engagedActivity.getUserId(), appId);
+	}
+
+	private void engageActivity(Activity activity, Long userId, Long appId) {
+		ExternalIdentity oldIdentity = activity.getPostedBy()
+				.getExternalIdentity();
+
+		ExternalIdentity identity = ExternalIdentityFactory
+				.createExternalIdentityWithApplication(
+						oldIdentity.getExternalNetwork(),
+						oldIdentity.getIdentifier(), new Application(appId));
+
+		activity.getPostedBy().setExternalIdentity(identity);
 		// persist it or update it if it exists already
 		ServiceFactory.getSocialService().findOrCreate(activity);
 
 		// index for search (this will update the index if the record exists
 		// already)
-		ServiceFactory.getSearchService().indexActivities(
-				engagedActivity.getUserId(),
+		ServiceFactory.getSearchService().indexActivities(userId,
 				Arrays.asList(new Activity[] { activity }), true);
 	}
 
 	private void process(ActiveUsersFound activeUsersFound) {
 		List<Long> userIds = activeUsersFound.getUserIds();
-		List<User> users = ServiceFactory.getUserService().findSprocketUsersInRange(
-				userIds);
+		List<User> users = ServiceFactory.getUserService()
+				.findSprocketUsersInRange(userIds);
 		SyncProcessor dataSyncManager = new DataSyncProcessor(users);
-		List<ExternalNetworkApplication> exApp = ServiceFactory.getDeveloperService().getExternalApplicationsByAppID(activeUsersFound.getApplicationID());
+		List<ExternalNetworkApplication> exApp = ServiceFactory
+				.getDeveloperService().getExternalApplicationsByAppID(
+						activeUsersFound.getApplicationID());
 		dataSyncManager.syncData(exApp);
 	}
 
 	private void process(ContactsSync contactsSyncMessage) {
 		List<Long> userIds = contactsSyncMessage.getUserIds();
-		List<User> users = ServiceFactory.getUserService().findSprocketUsersInRange(
-				userIds);
+		List<User> users = ServiceFactory.getUserService()
+				.findSprocketUsersInRange(userIds);
 		SyncProcessor contactSyncManager = new ContactsSyncProcessor(users);
-		List<ExternalNetworkApplication> exApp = ServiceFactory.getDeveloperService().getExternalApplicationsByAppID(contactsSyncMessage.getApplicationID());
+		List<ExternalNetworkApplication> exApp = ServiceFactory
+				.getDeveloperService().getExternalApplicationsByAppID(
+						contactsSyncMessage.getApplicationID());
 		contactSyncManager.syncData(exApp);
 	}
 
