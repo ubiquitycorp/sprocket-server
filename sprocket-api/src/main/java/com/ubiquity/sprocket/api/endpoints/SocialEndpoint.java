@@ -41,7 +41,7 @@ import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
 import com.ubiquity.sprocket.api.dto.containers.ContactsDto;
-import com.ubiquity.sprocket.api.dto.containers.ContactsSyncedDto;
+import com.ubiquity.sprocket.api.dto.containers.DataSyncedDto;
 import com.ubiquity.sprocket.api.dto.containers.MessagesDto;
 import com.ubiquity.sprocket.api.dto.model.social.ActivityDto;
 import com.ubiquity.sprocket.api.dto.model.social.ContactDto;
@@ -88,7 +88,6 @@ public class SocialEndpoint {
 	@Secure
 	public Response activities(@PathParam("userId") Long userId,
 			@PathParam("socialNetworkId") Integer socialProviderId,
-			@HeaderParam("delta") Boolean delta,
 			@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		ActivitiesDto results = new ActivitiesDto();
 
@@ -97,7 +96,7 @@ public class SocialEndpoint {
 
 		CollectionVariant<Activity> variant = ServiceFactory.getSocialService()
 				.findActivityByOwnerIdAndSocialNetwork(userId, socialNetwork,
-						ifModifiedSince, delta);
+						ifModifiedSince);
 
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
@@ -109,6 +108,45 @@ public class SocialEndpoint {
 
 		return Response.ok().header("Last-Modified", variant.getLastModified())
 				.entity(jsonConverter.convertToPayload(results)).build();
+	}
+
+	@GET
+	@Path("users/{userId}/providers/{socialNetworkId}/activities/synced")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secure
+	public Response getModifiedActivities(@PathParam("userId") Long userId,
+			@PathParam("socialNetworkId") Integer socialProviderId,
+			@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
+
+		ExternalNetwork socialNetwork = ExternalNetwork
+				.getNetworkById(socialProviderId);
+
+		CollectionVariant<Activity> variant = ServiceFactory.getSocialService()
+				.findActivityByOwnerIdAndSocialNetworkAndModifiedSince(userId, socialNetwork,
+						ifModifiedSince);
+
+		// Throw a 304 if if there is no variant (no change)
+		if (variant == null)
+			return Response.notModified().build();
+
+		// Convert entire list to DTO
+		DataSyncedDto<ActivityDto> result = new DataSyncedDto<ActivityDto>();
+		for (Activity activity : variant.getCollection()) {
+
+			if (activity.isDeleted())
+				result.getDeleted().add(activity.getActivityId());
+			else {
+				ActivityDto activityDto = DtoAssembler.assemble(activity);
+				if (activity.getCreatedAt() > ifModifiedSince) {
+					result.getAdded().add(activityDto);
+				} else {
+					result.getUpdated().add(activityDto);
+				}
+			}
+		}
+
+		return Response.ok().header("Last-Modified", variant.getLastModified())
+				.entity(jsonConverter.convertToPayload(result)).build();
 	}
 
 	@GET
@@ -161,7 +199,7 @@ public class SocialEndpoint {
 			return Response.notModified().build();
 		}
 		// Convert entire list to DTO
-		ContactsSyncedDto result = new ContactsSyncedDto();
+		DataSyncedDto<ContactDto> result = new DataSyncedDto<ContactDto>();
 		for (UserContact contact : variant.getCollection()) {
 
 			if (contact.IsDeleted())
@@ -515,7 +553,7 @@ public class SocialEndpoint {
 	 */
 	private ExternalNetworkApplication checkValidityOfExternalIdentity(
 			Long userId, ExternalIdentity identity) {
-		
+
 		// Get app_i from Redis
 		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
 				userId);

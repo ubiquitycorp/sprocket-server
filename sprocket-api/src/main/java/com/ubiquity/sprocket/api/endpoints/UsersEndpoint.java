@@ -105,7 +105,7 @@ public class UsersEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
 	public Response authenticatedlinkedin(@PathParam("userId") Long userId,
-			@HeaderParam("cookie") String cookie) throws Exception {
+			@HeaderParam("linkedin_cookie") String cookie) throws Exception {
 
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
@@ -119,7 +119,8 @@ public class UsersEndpoint {
 						ExternalNetwork.LinkedIn.ordinal(), ClientPlatform.WEB);
 		ExchangeService exchangservice = new ExchangeService(
 				externalNetworkApplication);
-		String[] accesstokens = exchangservice.exchangeToken(cookie);
+		String cookieString = java.net.URLDecoder.decode(cookie, "UTF-8");
+		String[] accesstokens = exchangservice.exchangeToken(cookieString);
 
 		if (accesstokens[0] == null || accesstokens[0].equalsIgnoreCase(""))
 			throw new AuthorizationException(
