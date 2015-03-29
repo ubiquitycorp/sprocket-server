@@ -496,7 +496,7 @@ public class DtoAssembler {
 
 		activityDtoBuilder.body(activity.getBody())
 				.type(activity.getActivityType().toString().toLowerCase())
-				.date(activity.getCreationDate())
+				.date(activity.getPostedDate())
 				.externalNetworkId(activity.getExternalNetwork().ordinal())
 				.title(activity.getTitle()).link(activity.getLink())
 				.externalIdentifier(activity.getExternalIdentifier())

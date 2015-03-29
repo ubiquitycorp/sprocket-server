@@ -156,7 +156,7 @@ public class SearchService {
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Activity.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, activity.getExternalNetwork().ordinal());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_IDENTIFIER, activity.getExternalIdentifier());
-			document.getFields().put(SearchKeys.Fields.FIELD_DATE, activity.getCreationDate());
+			document.getFields().put(SearchKeys.Fields.FIELD_DATE, activity.getPostedDate());
 			document.getFields().put(SearchKeys.Fields.FIELD_COMMENTNUM, activity.getCommentsNum());
 			if(activity.getRating() !=null)
 				document.getFields().put(SearchKeys.Fields.FIELD_RATING_NUM_RATING, activity.getRating().getNumRatings());

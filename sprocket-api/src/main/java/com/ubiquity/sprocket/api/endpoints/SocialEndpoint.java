@@ -137,7 +137,7 @@ public class SocialEndpoint {
 				result.getDeleted().add(activity.getActivityId());
 			else {
 				ActivityDto activityDto = DtoAssembler.assemble(activity);
-				if (activity.getCreationDate() > ifModifiedSince) {
+				if (activity.getCreatedAt() > ifModifiedSince) {
 					result.getAdded().add(activityDto);
 				} else {
 					result.getUpdated().add(activityDto);
