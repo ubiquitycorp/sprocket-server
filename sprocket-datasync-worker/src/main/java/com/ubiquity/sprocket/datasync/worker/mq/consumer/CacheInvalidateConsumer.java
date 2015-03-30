@@ -191,7 +191,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 	private void process(ActiveUsersFound activeUsersFound) {
 		List<Long> userIds = activeUsersFound.getUserIds();
 		List<User> users = ServiceFactory.getUserService()
-				.findSprocketUsersInRange(userIds);
+				.findUsersInRange(userIds);
 		SyncProcessor dataSyncManager = new DataSyncProcessor(users);
 		List<ExternalNetworkApplication> exApp = ServiceFactory
 				.getDeveloperService().getExternalApplicationsByAppID(
@@ -202,7 +202,7 @@ public class CacheInvalidateConsumer extends AbstractConsumerThread {
 	private void process(ContactsSync contactsSyncMessage) {
 		List<Long> userIds = contactsSyncMessage.getUserIds();
 		List<User> users = ServiceFactory.getUserService()
-				.findSprocketUsersInRange(userIds);
+				.findUsersInRange(userIds);
 		SyncProcessor contactSyncManager = new ContactsSyncProcessor(users);
 		List<ExternalNetworkApplication> exApp = ServiceFactory
 				.getDeveloperService().getExternalApplicationsByAppID(

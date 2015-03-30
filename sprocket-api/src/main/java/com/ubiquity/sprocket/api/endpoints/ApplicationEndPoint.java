@@ -111,6 +111,9 @@ public class ApplicationEndPoint {
 				.authenticate(identityDto.getIdentifier(), application);
 		if (user == null)
 			throw new AuthorizationException("Invalid identifier", null);
+		else if (!user.isActive())
+			throw new AuthorizationException("Your account is locked",
+					null);
 
 		// update user last login
 		user.setLastLogin(System.currentTimeMillis());

@@ -8,7 +8,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +49,8 @@ public class UserRepositoryTest {
 		EntityManagerSupport.closeEntityManager();
 	}
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeClass
+	public static void setUp() throws Exception {
 		Configuration configuration = new PropertiesConfiguration(
 				"test.properties");
 		JedisConnectionFactory.initialize(configuration);

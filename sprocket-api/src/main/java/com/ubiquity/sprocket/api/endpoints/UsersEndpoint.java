@@ -251,6 +251,9 @@ public class UsersEndpoint {
 		if (user == null)
 			throw new AuthorizationException("Username / password incorrect",
 					null);
+		else if (!user.isActive())
+			throw new AuthorizationException("Your account is locked",
+					null);
 
 		// update user last login
 		user.setLastLogin(System.currentTimeMillis());
