@@ -41,5 +41,5 @@ INSERT INTO external_network_application (ex_app_id, external_network, consumer_
 -- IOS
 INSERT INTO external_network_application (ex_app_id, external_network, consumer_key, user_agent, redirect_url, app_id, is_deleted, last_updated, created_at) VALUES (12, 10, "xvOJZJMeG5HQZw", "ios:com.ubiquiy.sprocketQAMobile:v1.0.1 (by /u/ubiquitybc)", "http://sprocket-qa.ubiquitycorp.com?nw=reddit", 1, 0, UNIX_TIMESTAMP()*1000, UNIX_TIMESTAMP()*1000);
 -- Web
-INSERT INTO external_network_application (ex_app_id, xternal_network, consumer_key, consumer_secret, user_agent, redirect_url, app_id, is_deleted, last_updated, created_at) VALUES (13, 10, "zJ60a4wDHj6oMQ", "3t4KMhBuPrtAeS2sBoGRboqieng", "web:com.ubiquiy.sprocketQAWeb:v1.0.1 (by /u/ubiquitybc)", "http://sprocket-qa.ubiquitycorp.com?nw=reddit", 1, 0, UNIX_TIMESTAMP()*1000, UNIX_TIMESTAMP()*1000);
+INSERT INTO external_network_application (ex_app_id, external_network, consumer_key, consumer_secret, user_agent, redirect_url, app_id, is_deleted, last_updated, created_at) VALUES (13, 10, "zJ60a4wDHj6oMQ", "3t4KMhBuPrtAeS2sBoGRboqieng", "web:com.ubiquiy.sprocketQAWeb:v1.0.1 (by /u/ubiquitybc)", "http://sprocket-qa.ubiquitycorp.com?nw=reddit", 1, 0, UNIX_TIMESTAMP()*1000, UNIX_TIMESTAMP()*1000);
 

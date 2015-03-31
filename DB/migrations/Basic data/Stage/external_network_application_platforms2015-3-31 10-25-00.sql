@@ -1,5 +1,5 @@
 USE sprocket;
-select * from external_network_application_platforms;
+DELETE FROM external_network_application_platforms;
 
 -- Twitter
 INSERT INTO external_network_application_platforms (ex_app_id, client_platform) VALUES (1, 0);
