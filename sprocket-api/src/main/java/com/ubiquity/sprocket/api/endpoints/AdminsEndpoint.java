@@ -33,6 +33,7 @@ import com.ubiquity.sprocket.api.dto.containers.InterestsDto;
 import com.ubiquity.sprocket.api.dto.model.admin.AdminDto;
 import com.ubiquity.sprocket.api.dto.model.admin.AdminInterestDto;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
+import com.ubiquity.sprocket.service.AnalyticsService;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/admins")
@@ -41,7 +42,12 @@ public class AdminsEndpoint {
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 
 	private Logger log = LoggerFactory.getLogger(getClass());
-
+	
+	private AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
+	private AuthenticationService<Admin> authenticationService = ServiceFactory
+			.getAdminAuthService();
+	
+	
 	@POST
 	@Path("/{adminId}/externalInterest")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -56,7 +62,7 @@ public class AdminsEndpoint {
 		List<AdminInterest> addList = new LinkedList<AdminInterest>();
 		for (AdminInterestDto adminIterets : externalInterests.getAdd())
 			addList.add(DtoAssembler.assemble(adminIterets));
-		Boolean finished = ServiceFactory.getAnalyticsService()
+		Boolean finished = analyticsService
 				.updateAdminInterests(deleteList, addList);
 		if (finished)
 			return Response.ok().build();
@@ -78,8 +84,6 @@ public class AdminsEndpoint {
 		AdminDto adminDto = jsonConverter.convertFromPayload(payload,
 				AdminDto.class, AuthenticationValidation.class);
 
-		AuthenticationService<Admin> authenticationService = ServiceFactory
-				.getAdminAuthService();
 		Admin admin = authenticationService.authenticate(
 				adminDto.getUsername(), adminDto.getPassword());
 		if (admin == null)
@@ -109,7 +113,7 @@ public class AdminsEndpoint {
 
 		InterestsDto interestsDto = new InterestsDto();
 		
-		CollectionVariant<Interest> variant = ServiceFactory.getAnalyticsService().findInterests(ifModifiedSince);
+		CollectionVariant<Interest> variant = analyticsService.findInterests(ifModifiedSince);
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
 			return Response.notModified().build();
@@ -131,7 +135,7 @@ public class AdminsEndpoint {
 		AdminInterestsDto interestsDto = new AdminInterestsDto();
 		
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
-		CollectionVariant<ExternalInterest> variant = ServiceFactory.getAnalyticsService().findExternalInterestsByExternalNetworkId(externalNetwork);
+		CollectionVariant<ExternalInterest> variant = analyticsService.findExternalInterestsByExternalNetworkId(externalNetwork);
 		// Throw a 304 if if there is no variant (no change)
 //		if (variant == null)
 //			return Response.notModified().build();
@@ -154,7 +158,7 @@ public class AdminsEndpoint {
 		AdminInterestsDto interestsDto = new AdminInterestsDto();
 		
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
-		CollectionVariant<UnmappedInterest> variant = ServiceFactory.getAnalyticsService().findUnmappedInterestByExternalNetworkId(externalNetwork);
+		CollectionVariant<UnmappedInterest> variant = analyticsService.findUnmappedInterestByExternalNetworkId(externalNetwork);
 		// Throw a 304 if if there is no variant (no change)
 //		if (variant == null)
 //			return Response.notModified().build();

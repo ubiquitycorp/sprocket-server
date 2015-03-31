@@ -32,12 +32,17 @@ import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.messaging.definition.PlaceLocationUpdated;
 import com.ubiquity.sprocket.messaging.definition.UserFavoritePlace;
+import com.ubiquity.sprocket.service.FavoriteService;
+import com.ubiquity.sprocket.service.LocationService;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/places")
 public class PlacesEndpoint {
 	private Logger log = LoggerFactory.getLogger(getClass());
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
+	
+	private LocationService locationService = ServiceFactory.getLocationService();
+	private FavoriteService favoriteService = ServiceFactory.getFavoriteService();
 
 	@GET
 	@Path("/users/{userId}/regions/{region}/neighborhoods")
@@ -50,7 +55,7 @@ public class PlacesEndpoint {
 			throws IOException {
 		PlacesDto results = new PlacesDto();
 
-		CollectionVariant<Place> variant = ServiceFactory.getLocationService()
+		CollectionVariant<Place> variant = locationService
 				.getAllCitiesAndNeighborhoods(region, ifModifiedSince, delta);
 
 		// Throw a 304 if if there is no variant (no change)
@@ -79,7 +84,7 @@ public class PlacesEndpoint {
 		PlacesDto results = new PlacesDto();
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(socialProviderId);
-		List<Place> places = ServiceFactory.getLocationService()
+		List<Place> places = locationService
 				.findPlacesByInterestId(placeId, interestId, externalNetwork);
 
 		for (Place place : places) {
@@ -99,16 +104,16 @@ public class PlacesEndpoint {
 			@PathParam("userId") Long userId,
 			@PathParam("externalNetworkId") Integer socialNetworkId,
 			@QueryParam("interestId") List<Long> interestId) throws IOException {
-		UserLocation userLocation = ServiceFactory.getLocationService()
+		UserLocation userLocation = locationService
 				.getLocation(userId);
 		if (userLocation == null) {
-			Long lastModified = ServiceFactory.getLocationService()
+			Long lastModified = locationService
 					.checkUpdateLocationInProgress(userId);
 			if (lastModified == null)
 				throw new IllegalArgumentException(
 						"User location is not available");
 			else {
-				userLocation = ServiceFactory.getLocationService()
+				userLocation = locationService
 						.getLocation(userId);
 				if (userLocation == null)
 					return Response.notModified().build();
@@ -119,7 +124,7 @@ public class PlacesEndpoint {
 		PlacesDto results = new PlacesDto();
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(socialNetworkId);
-		List<Place> places = ServiceFactory.getLocationService()
+		List<Place> places = locationService
 				.findPlacesByInterestId(
 						userLocation.getNearestPlace().getPlaceId(),
 						interestId, externalNetwork);
@@ -148,7 +153,7 @@ public class PlacesEndpoint {
 		PlacesDto results = new PlacesDto();
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(socialProviderId);
-		CollectionVariant<Place> places = ServiceFactory.getFavoriteService()
+		CollectionVariant<Place> places = favoriteService
 				.getFavoritePlacesByOwnerIdandProvider(userId, externalNetwork,
 						ifModifiedSince, delta);
 		if (places == null)
@@ -177,7 +182,7 @@ public class PlacesEndpoint {
 		PlacesDto results = new PlacesDto();
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(socialProviderId);
-		CollectionVariant<Place> places = ServiceFactory.getFavoriteService()
+		CollectionVariant<Place> places = favoriteService
 				.getFavoritePlacesByOwnerIdandProviderAndPlaceId(userId,
 						externalNetwork, placeId, ifModifiedSince, delta);
 		if (places == null)
@@ -201,7 +206,7 @@ public class PlacesEndpoint {
 			@HeaderParam("delta") Boolean delta,
 			@HeaderParam("If-Modified-Since") Long ifModifiedSince)
 			throws IOException {
-		UserLocation userLocation = ServiceFactory.getLocationService()
+		UserLocation userLocation = locationService
 				.getLocation(userId);
 		if (userLocation == null)
 			throw new IllegalArgumentException("User location is not available");
@@ -209,7 +214,7 @@ public class PlacesEndpoint {
 		PlacesDto results = new PlacesDto();
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(socialProviderId);
-		CollectionVariant<Place> places = ServiceFactory.getFavoriteService()
+		CollectionVariant<Place> places = favoriteService
 				.getFavoritePlacesByOwnerIdandProviderAndPlaceId(userId,
 						externalNetwork,
 						userLocation.getNearestPlace().getPlaceId(),
@@ -250,7 +255,7 @@ public class PlacesEndpoint {
 		GeoboxDto geoDto = jsonConverter.convertFromPayload(payload,
 				GeoboxDto.class, PlaceLocationUpdateValidation.class);
 
-		Place place = ServiceFactory.getLocationService().getPlaceByID(placeId);
+		Place place = locationService.getPlaceByID(placeId);
 		if (place != null)
 			if (place.getExternalNetwork() != null)
 				sendTrackAndSyncMessage(placeId, geoDto);
