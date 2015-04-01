@@ -14,6 +14,8 @@ import javax.ws.rs.core.Response;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
+import com.ubiquity.api.annotations.Active;
+import com.ubiquity.api.annotations.Secure;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.domain.Category;
 import com.ubiquity.integration.domain.ExternalNetwork;
@@ -21,7 +23,6 @@ import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.VideosDto;
 import com.ubiquity.sprocket.api.dto.model.media.VideoDto;
-import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
@@ -37,6 +38,7 @@ public class ContentEndpoint {
 	@Path("/users/{userId}/videos/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
     @Secure
+    @Active
 	public Response engaged(@PathParam("userId") Long userId, InputStream payload) throws IOException {
 
 		// convert payload
@@ -51,6 +53,7 @@ public class ContentEndpoint {
 	@Path("/users/{userId}/providers/{externalNetworkId}/videos")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
+	@Active
 	public Response videos(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("delta") Boolean delta, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		VideosDto results = new VideosDto();

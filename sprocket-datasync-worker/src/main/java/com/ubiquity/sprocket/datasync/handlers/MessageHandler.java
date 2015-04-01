@@ -14,6 +14,7 @@ import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.service.SocialService;
 import com.ubiquity.sprocket.datasync.worker.manager.ResourceType;
 import com.ubiquity.sprocket.datasync.worker.manager.SyncProcessor;
+import com.ubiquity.sprocket.domain.ConfigurationRules;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 /***
@@ -27,19 +28,24 @@ public class MessageHandler extends Handler {
 		super(processor);
 		networks = EnumSet.of(ExternalNetwork.Twitter,
 				ExternalNetwork.Facebook, ExternalNetwork.Google,
-				ExternalNetwork.Tumblr,
-				ExternalNetwork.SocailMockNetwork);
+				ExternalNetwork.Tumblr, ExternalNetwork.SocailMockNetwork);
 	}
 
 	@Override
-	protected void syncData(ExternalIdentity identity, ExternalNetwork network,ExternalNetworkApplication externalNetworkApplication) {
+	protected void syncData(ExternalIdentity identity, ExternalNetwork network,
+			ExternalNetworkApplication externalNetworkApplication) {
 		Long userId = identity.getUser().getUserId();
-		// Sync messages
-		int n = processMessages(identity, network, null, externalNetworkApplication);
-		processor.sendStepCompletedMessageToIndividual(backchannel, network,
-				"Synchronized messages", processor.getResoursePath(userId,
-						network, ResourceType.messages), n, userId,
-				ResourceType.messages);
+		// check if syncing messages is enabled or not
+		if (makeDecision(ConfigurationRules.messagesEnabled, network)) {
+			// Sync messages
+			int n = processMessages(identity, network, null,
+					externalNetworkApplication);
+			processor.sendStepCompletedMessageToIndividual(backchannel,
+					network, "Synchronized messages", processor
+							.getResoursePath(userId, network,
+									ResourceType.messages), n, userId,
+					ResourceType.messages);
+		}
 	}
 
 	/***
@@ -49,7 +55,8 @@ public class MessageHandler extends Handler {
 	 * @param network
 	 */
 	public int processMessages(ExternalIdentity identity,
-			ExternalNetwork network, String lastMessageIdentifier,ExternalNetworkApplication externalNetworkApplication) {
+			ExternalNetwork network, String lastMessageIdentifier,
+			ExternalNetworkApplication externalNetworkApplication) {
 
 		List<com.ubiquity.integration.domain.Message> synced = null;
 		DateTime start = new DateTime();
@@ -59,7 +66,8 @@ public class MessageHandler extends Handler {
 			SocialService socialService = ServiceFactory.getSocialService();
 
 			synced = socialService.syncMessages(identity, network,
-					lastMessageIdentifier, processedMessages, externalNetworkApplication);
+					lastMessageIdentifier, processedMessages,
+					externalNetworkApplication);
 
 			// add messages to search results
 			ServiceFactory.getSearchService().indexMessages(
@@ -68,7 +76,8 @@ public class MessageHandler extends Handler {
 		} catch (AuthorizationException e) {
 			identity.setIsActive(false);
 			ServiceFactory.getExternalIdentityService().update(identity);
-			log.error("Could not process messages for identity {}: set active to false ,exception: {}",
+			log.error(
+					"Could not process messages for identity {}: set active to false ,exception: {}",
 					identity, ExceptionUtils.getStackTrace(e));
 		} catch (Exception e) {
 			log.error("Could not process messages for identity: {}", identity,
@@ -81,5 +90,4 @@ public class MessageHandler extends Handler {
 		}
 		return size;
 	}
-
 }

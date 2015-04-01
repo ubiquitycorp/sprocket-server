@@ -14,6 +14,7 @@ import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.sprocket.datasync.worker.manager.ResourceType;
 import com.ubiquity.sprocket.datasync.worker.manager.SyncProcessor;
+import com.ubiquity.sprocket.domain.ConfigurationRules;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 /***
@@ -29,34 +30,43 @@ public class LocalActivityHandler extends Handler {
 	}
 
 	@Override
-	protected void syncData(ExternalIdentity identity, ExternalNetwork network,ExternalNetworkApplication externalNetworkApplication) {
+	protected void syncData(ExternalIdentity identity, ExternalNetwork network,
+			ExternalNetworkApplication externalNetworkApplication) {
 		Long userId = identity.getUser().getUserId();
-		// Sync local feed
-		int n = processLocalActivities(identity, network, externalNetworkApplication);
-		processor.sendStepCompletedMessageToIndividual(backchannel, network,
-				"Synchronized local feed", processor.getResoursePath(userId,
-						network, ResourceType.localfeed), n, userId,
-				ResourceType.localfeed);
+		// check if syncing localfeed is enabled or not
+		if (makeDecision(ConfigurationRules.localfeedEnabled, network)) {
+			// Sync local feed
+			int n = processLocalActivities(identity, network,
+					externalNetworkApplication);
+			processor.sendStepCompletedMessageToIndividual(backchannel,
+					network, "Synchronized local feed", processor
+							.getResoursePath(userId, network,
+									ResourceType.localfeed), n, userId,
+					ResourceType.localfeed);
+		}
 	}
 
 	private int processLocalActivities(ExternalIdentity identity,
-			ExternalNetwork network,ExternalNetworkApplication externalNetworkApplication) {
+			ExternalNetwork network,
+			ExternalNetworkApplication externalNetworkApplication) {
 		List<Activity> synced = null;
 		DateTime start = new DateTime();
 		Long userId = identity.getUser().getUserId();
 		int size = -1;
 		try {
 			synced = ServiceFactory.getSocialService().syncLocalNewsFeed(
-					identity, network,true, externalNetworkApplication);
-			int activitiesSize =synced.size();
-			if(activitiesSize ==0){
-				activitiesSize = ServiceFactory.getSocialService().getCountOfLastLocalActivities(identity,network);
+					identity, network, true, externalNetworkApplication);
+			int activitiesSize = synced.size();
+			if (activitiesSize == 0) {
+				activitiesSize = ServiceFactory.getSocialService()
+						.getCountOfLastLocalActivities(identity, network);
 			}
-			
+
 		} catch (AuthorizationException e) {
 			identity.setIsActive(false);
 			ServiceFactory.getExternalIdentityService().update(identity);
-			log.error("Unable to sync local activities for identity {}: set active to false ,exception: {}",
+			log.error(
+					"Unable to sync local activities for identity {}: set active to false ,exception: {}",
 					identity, ExceptionUtils.getStackTrace(e));
 			return -1;
 		} catch (Exception e) {
@@ -65,9 +75,9 @@ public class LocalActivityHandler extends Handler {
 		} finally {
 			size = (synced == null) ? -1 : synced.size();
 			log.debug(" Processed {} local activities in {} seconds for user "
-					+ userId, size, new Period(start, new DateTime()).getSeconds());
+					+ userId, size,
+					new Period(start, new DateTime()).getSeconds());
 		}
 		return size;
 	}
-
 }

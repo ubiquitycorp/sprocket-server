@@ -14,6 +14,7 @@ import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.SyncStatusMessage;
 import com.ubiquity.sprocket.datasync.worker.manager.SyncProcessor;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
+import com.ubiquity.sprocket.service.ServiceFactory;
 
 /***
  * 
@@ -43,8 +44,8 @@ public abstract class Handler {
 		}
 	}
 
-	public void canAccept(ExternalIdentity identity,
-			ExternalNetwork network, ExternalNetworkApplication externalNetworkApplication) {
+	public void canAccept(ExternalIdentity identity, ExternalNetwork network,
+			ExternalNetworkApplication externalNetworkApplication) {
 		if (networks.contains(network))
 			syncData(identity, network, externalNetworkApplication);
 
@@ -55,15 +56,23 @@ public abstract class Handler {
 	public void setNext(Handler next) {
 		this.next = next;
 	}
-	
+
 	public Handler getNext() {
 		return next;
 	}
-	
+
 	public Map<String, SyncStatusMessage> getProcessedMessages() {
 		return processedMessages;
 	}
 
+	protected Boolean makeDecision(String key, ExternalNetwork network) {
+		return ServiceFactory.getClientConfigurationService().getValue(key,
+				network);
+	}
+	
 	abstract protected void syncData(ExternalIdentity identity,
-			ExternalNetwork network, ExternalNetworkApplication externalNetworkApplication);
+			ExternalNetwork network,
+			ExternalNetworkApplication externalNetworkApplication);
+
+	
 }

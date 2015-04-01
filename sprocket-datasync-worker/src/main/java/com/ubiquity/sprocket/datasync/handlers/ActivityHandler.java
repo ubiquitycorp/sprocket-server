@@ -15,6 +15,7 @@ import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.service.SocialService;
 import com.ubiquity.sprocket.datasync.worker.manager.SyncProcessor;
 import com.ubiquity.sprocket.datasync.worker.manager.ResourceType;
+import com.ubiquity.sprocket.domain.ConfigurationRules;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 /***
@@ -33,25 +34,34 @@ public class ActivityHandler extends Handler {
 	}
 
 	@Override
-	protected void syncData(ExternalIdentity identity, ExternalNetwork network, ExternalNetworkApplication externalNetworkApplication) {
+	protected void syncData(ExternalIdentity identity, ExternalNetwork network,
+			ExternalNetworkApplication externalNetworkApplication) {
 		Long userId = identity.getUser().getUserId();
-		// Sync activities
-		int n = processActivities(identity, network,externalNetworkApplication);
-		processor.sendStepCompletedMessageToIndividual(backchannel, network,
-				"Synchronized feed", processor.getResoursePath(userId, network,
-						ResourceType.activities), n, userId,
-				ResourceType.activities);
+
+		// check if syncing activities is enabled or not
+		if (makeDecision(ConfigurationRules.activitiesEnabled, network)) {
+			// Sync activities
+			int n = processActivities(identity, network,
+					externalNetworkApplication);
+			processor.sendStepCompletedMessageToIndividual(backchannel,
+					network, "Synchronized feed", processor.getResoursePath(
+							userId, network, ResourceType.activities), n,
+					userId, ResourceType.activities);
+		}
 	}
 
 	private int processActivities(ExternalIdentity identity,
-			ExternalNetwork network, ExternalNetworkApplication externalNetworkApplication) {
+			ExternalNetwork network,
+			ExternalNetworkApplication externalNetworkApplication) {
+
 		List<Activity> synced = null;
 		DateTime start = new DateTime();
 		Long userId = identity.getUser().getUserId();
 		int size = -1;
 		try {
 			SocialService socialService = ServiceFactory.getSocialService();
-			synced = socialService.syncActivities(identity, network,externalNetworkApplication);
+			synced = socialService.syncActivities(identity, network,
+					externalNetworkApplication);
 			// index for searching
 			ServiceFactory.getSearchService().indexActivities(userId, synced,
 					false);
@@ -77,5 +87,4 @@ public class ActivityHandler extends Handler {
 
 		return size;
 	}
-
 }

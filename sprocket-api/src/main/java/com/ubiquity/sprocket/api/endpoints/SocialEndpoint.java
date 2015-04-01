@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
 import com.niobium.repository.jpa.EntityManagerSupport;
+import com.ubiquity.api.annotations.Active;
+import com.ubiquity.api.annotations.Secure;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.integration.domain.Activity;
@@ -50,7 +52,6 @@ import com.ubiquity.sprocket.api.dto.model.social.PostActivityDto;
 import com.ubiquity.sprocket.api.dto.model.social.PostCommentDto;
 import com.ubiquity.sprocket.api.dto.model.social.PostVoteDto;
 import com.ubiquity.sprocket.api.dto.model.social.SendMessageDto;
-import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
@@ -68,6 +69,7 @@ public class SocialEndpoint {
 	@Path("/users/{userId}/activities/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
+	@Active
 	public Response engaged(@PathParam("userId") Long userId,
 			InputStream payload) throws IOException {
 
@@ -83,11 +85,12 @@ public class SocialEndpoint {
 	}
 
 	@GET
-	@Path("users/{userId}/providers/{socialNetworkId}/activities")
+	@Path("users/{userId}/providers/{externalNetworkId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
+	@Active
 	public Response activities(@PathParam("userId") Long userId,
-			@PathParam("socialNetworkId") Integer socialProviderId,
+			@PathParam("externalNetworkId") Integer socialProviderId,
 			@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		ActivitiesDto results = new ActivitiesDto();
 
@@ -111,11 +114,12 @@ public class SocialEndpoint {
 	}
 
 	@GET
-	@Path("users/{userId}/providers/{socialNetworkId}/activities/synced")
+	@Path("users/{userId}/providers/{externalNetworkId}/activities/synced")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
+	@Active
 	public Response getModifiedActivities(@PathParam("userId") Long userId,
-			@PathParam("socialNetworkId") Integer socialProviderId,
+			@PathParam("externalNetworkId") Integer socialProviderId,
 			@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		ExternalNetwork socialNetwork = ExternalNetwork
@@ -153,6 +157,7 @@ public class SocialEndpoint {
 	@Path("users/{userId}/contacts")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
+	@Active
 	public Response contacts(@PathParam("userId") Long userId) {
 
 		// Manager will return contacts if they have been modified, else it will
@@ -182,6 +187,7 @@ public class SocialEndpoint {
 	@Path("users/{userId}/contacts/synced")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
+	@Active
 	public Response getModifiedContacts(@PathParam("userId") Long userId,
 			@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		log.debug("Listing contacts modified since: {}", ifModifiedSince);
@@ -229,11 +235,12 @@ public class SocialEndpoint {
 	 * @return
 	 */
 	@GET
-	@Path("users/{userId}/providers/{socialNetworkId}/localfeed")
+	@Path("users/{userId}/providers/{externalNetworkId}/localfeed")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
+	@Active
 	public Response getLocalFeed(@PathParam("userId") Long userId,
-			@PathParam("socialNetworkId") Integer socialProviderId,
+			@PathParam("externalNetworkId") Integer socialProviderId,
 			@HeaderParam("If-Modified-Since") Long ifModifiedSince,
 			@HeaderParam("delta") Boolean delta) {
 		ActivitiesDto results = new ActivitiesDto();
@@ -273,11 +280,12 @@ public class SocialEndpoint {
 	 * @return
 	 */
 	@GET
-	@Path("users/{userId}/providers/{socialNetworkId}/messages")
+	@Path("users/{userId}/providers/{externalNetworkId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
+	@Active
 	public Response messages(@PathParam("userId") Long userId,
-			@PathParam("socialNetworkId") Integer socialProviderId,
+			@PathParam("externalNetworkId") Integer socialProviderId,
 			@HeaderParam("delta") Boolean delta,
 			@HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 		try {
@@ -323,6 +331,7 @@ public class SocialEndpoint {
 	@Path("users/{userId}/providers/{externalNetworkId}/messages")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
+	@Active
 	public Response sendmessage(@PathParam("userId") Long userId,
 			@PathParam("externalNetworkId") Integer externalNetworkId,
 			InputStream payload) throws org.apache.http.HttpException {
@@ -366,6 +375,7 @@ public class SocialEndpoint {
 	@Path("users/{userId}/providers/{externalNetworkId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
+	@Active
 	public Response postActivity(@PathParam("userId") Long userId,
 			@PathParam("externalNetworkId") Integer externalNetworkId,
 			InputStream payload) throws HttpException {
@@ -418,11 +428,12 @@ public class SocialEndpoint {
 	 * @throws org.jets3t.service.impl.rest.HttpException
 	 */
 	@POST
-	@Path("users/{userId}/providers/{socialNetworkId}/comment")
+	@Path("users/{userId}/providers/{externalNetworkId}/comment")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
+	@Active
 	public Response postComment(@PathParam("userId") Long userId,
-			@PathParam("socialNetworkId") Integer socialProviderId,
+			@PathParam("externalNetworkId") Integer socialProviderId,
 			InputStream payload)
 			throws org.jets3t.service.impl.rest.HttpException {
 
@@ -452,11 +463,12 @@ public class SocialEndpoint {
 	}
 
 	@POST
-	@Path("users/{userId}/providers/{socialNetworkId}/vote")
+	@Path("users/{userId}/providers/{externalNetworkId}/vote")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
+	@Active
 	public Response postVote(@PathParam("userId") Long userId,
-			@PathParam("socialNetworkId") Integer socialProviderId,
+			@PathParam("externalNetworkId") Integer socialProviderId,
 			InputStream payload)
 			throws org.jets3t.service.impl.rest.HttpException {
 
@@ -495,12 +507,12 @@ public class SocialEndpoint {
 	 * @throws IOException
 	 */
 	@GET
-	@Path("users/{userId}/providers/{socialNetworkId}/captcha")
+	@Path("users/{userId}/providers/{externalNetworkId}/captcha")
 	@Consumes(MediaType.APPLICATION_JSON)
 	// /@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	@Secure
 	public Response requestCaptcha(@PathParam("userId") Long userId,
-			@PathParam("socialNetworkId") Integer socialProviderId)
+			@PathParam("externalNetworkId") Integer socialProviderId)
 			throws IOException {
 
 		ExternalNetwork externalNetwork = ExternalNetwork

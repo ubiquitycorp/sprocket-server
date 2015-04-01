@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.CollectionVariant;
+import com.ubiquity.api.annotations.Secure;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.location.domain.Place;
 import com.ubiquity.location.domain.UserLocation;
@@ -26,7 +27,6 @@ import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.PlacesDto;
 import com.ubiquity.sprocket.api.dto.model.GeoboxDto;
 import com.ubiquity.sprocket.api.dto.model.PlaceDto;
-import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.PlaceLocationUpdateValidation;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;

@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.ext.Provider;
@@ -13,9 +16,14 @@ import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ubiquity.api.annotations.Active;
+import com.ubiquity.api.annotations.Secure;
 import com.ubiquity.api.exception.ErrorKeys;
 import com.ubiquity.identity.service.AuthenticationService;
 import com.ubiquity.integration.api.exception.AuthorizationException;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.sprocket.domain.ConfigurationRules;
+import com.ubiquity.sprocket.service.ClientConfigurationService;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 /***
@@ -42,6 +50,15 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 		ResourceMethodInvoker methodInvoker = (ResourceMethodInvoker) requestContext
 				.getProperty("org.jboss.resteasy.core.ResourceMethodInvoker");
 		Method method = methodInvoker.getMethod();
+
+		if (method.isAnnotationPresent(Active.class)) {
+			Integer externalNetworkId = Integer.parseInt(requestContext
+					.getUriInfo().getPathParameters()
+					.getFirst("externalNetworkId"));
+			if (!checkAvailability(externalNetworkId, method))
+				throw new UnsupportedOperationException();
+		}
+
 		if (method.isAnnotationPresent(Secure.class)
 				|| method.isAnnotationPresent(DeveloperSecure.class)) {
 			List<String> values = requestContext.getHeaders().get(
@@ -65,12 +82,6 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 				}
 				log.debug("Recieved user_id :" + userId + ",apiKey :" + apiKey);
 
-				// boolean isValid =
-				// ServiceFactory.getUserService().isValid(Long.parseLong(userId));
-				// if (!isValid)
-				// throw new
-				// IllegalArgumentException(ServiceFactory.getErrorsConfigurationService().getErrorMessage(ErrorKeys.USER_NOT_EXIST));
-
 				// get the user id
 				if (!authenticationService.isAuthenticated(userId, apiKey)) {
 					throw new AuthorizationException(ServiceFactory
@@ -84,4 +95,55 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 		}
 	}
 
+	private Boolean checkAvailability(Integer externalNetworkId, Method method) {
+		Boolean isEnabled = false;
+		ClientConfigurationService service = ServiceFactory
+				.getClientConfigurationService();
+		String path = method.getAnnotation(Path.class).value();
+
+		ExternalNetwork network = ExternalNetwork
+				.getNetworkById(externalNetworkId);
+		if (method.isAnnotationPresent(GET.class)) {
+			if (path.endsWith("messages")) {
+				isEnabled = service.getValue(
+						ConfigurationRules.messagesEnabled, network);
+			} else if (path.endsWith("activities")
+					|| path.endsWith("activities/synced")) {
+				isEnabled = service.getValue(
+						ConfigurationRules.activitiesEnabled, network);
+			} else if (path.endsWith("contacts")
+					|| path.endsWith("contacts/synced")) {
+				isEnabled = service.getValue(
+						ConfigurationRules.contactsEnabled, network);
+			} else if (path.endsWith("localfeed")) {
+				isEnabled = service.getValue(
+						ConfigurationRules.localfeedEnabled, network);
+			} else if (path.endsWith("videos")) {
+				isEnabled = service.getValue(ConfigurationRules.videosEnabled,
+						network);
+			} else if (path.endsWith("engaged")) {
+				isEnabled = service.getValue(
+						ConfigurationRules.favoriteEnabled, network);
+			}
+			
+		} else if (method.isAnnotationPresent(POST.class)) {
+			if (path.endsWith("messages")) {
+				isEnabled = service.getValue(
+						ConfigurationRules.messagesPost, network);
+			} else if (path.endsWith("activities")) {
+				isEnabled = service.getValue(
+						ConfigurationRules.activitiesPost, network);
+			} else if (path.endsWith("comment")) {
+				isEnabled = service.getValue(
+						ConfigurationRules.activitiesCommentContribute, network);
+			} else if (path.endsWith("vote")) {
+				isEnabled = service.getValue(
+						ConfigurationRules.activitiesCommentRateContribute, network);
+			} else if (path.endsWith("activities")) {
+				isEnabled = service.getValue(
+						ConfigurationRules.activitiesPost, network);
+			}
+		}
+		return isEnabled;
+	}
 }

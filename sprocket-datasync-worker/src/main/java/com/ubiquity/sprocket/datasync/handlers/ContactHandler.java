@@ -15,6 +15,7 @@ import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.service.ContactService;
 import com.ubiquity.sprocket.datasync.worker.manager.ResourceType;
 import com.ubiquity.sprocket.datasync.worker.manager.SyncProcessor;
+import com.ubiquity.sprocket.domain.ConfigurationRules;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 /***
@@ -32,29 +33,37 @@ public class ContactHandler extends Handler {
 	}
 
 	@Override
-	protected void syncData(ExternalIdentity identity, ExternalNetwork network, ExternalNetworkApplication externalNetworkApplication) {
+	protected void syncData(ExternalIdentity identity, ExternalNetwork network,
+			ExternalNetworkApplication externalNetworkApplication) {
 		Long userId = identity.getUser().getUserId();
-		// Sync activities
-		int n = processContacts(identity, network, externalNetworkApplication);
-		processor.sendStepCompletedMessageToIndividual(backchannel, network,
-				"Synchronized contacts", processor.getResoursePath(userId,
-						network, ResourceType.contacts), n, userId,
-				ResourceType.contacts);
+		// check if syncing contacts is enabled or not
+		if (makeDecision(ConfigurationRules.contactsEnabled, network)) {
+			// Sync contacts
+			int n = processContacts(identity, network,
+					externalNetworkApplication);
+			processor.sendStepCompletedMessageToIndividual(backchannel,
+					network, "Synchronized contacts", processor
+							.getResoursePath(userId, network,
+									ResourceType.contacts), n, userId,
+					ResourceType.contacts);
+		}
 	}
 
 	private int processContacts(ExternalIdentity identity,
-			ExternalNetwork network, ExternalNetworkApplication externalNetworkApplication) {
+			ExternalNetwork network,
+			ExternalNetworkApplication externalNetworkApplication) {
 		List<Contact> synced = null;
 		DateTime start = new DateTime();
 		Long userId = identity.getUser().getUserId();
 		int size = -1;
 		try {
 			ContactService contactService = ServiceFactory.getContactService();
-			synced = contactService.syncContacts(identity, externalNetworkApplication);
+			synced = contactService.syncContacts(identity,
+					externalNetworkApplication);
 			// index for searching
 
 			// log.debug(" indexing activities for identity {}", identity);
-			
+
 		} catch (AuthorizationException e) {
 			identity.setIsActive(false);
 			ServiceFactory.getExternalIdentityService().update(identity);
@@ -69,8 +78,7 @@ public class ContactHandler extends Handler {
 					" Processed {} contacts in {} seconds for user " + userId,
 					size, new Period(start, new DateTime()).getSeconds());
 		}
-		
+
 		return size;
 	}
-
 }

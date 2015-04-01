@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
 import com.niobium.repository.cloud.RemoteAsset;
+import com.ubiquity.api.annotations.Secure;
 import com.ubiquity.api.exception.HttpException;
 import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
@@ -64,7 +65,6 @@ import com.ubiquity.sprocket.api.dto.model.user.AccountDto;
 import com.ubiquity.sprocket.api.dto.model.user.IdentityDto;
 import com.ubiquity.sprocket.api.dto.model.user.LocationDto;
 import com.ubiquity.sprocket.api.dto.model.user.ResetPasswordDto;
-import com.ubiquity.sprocket.api.interceptors.Secure;
 import com.ubiquity.sprocket.api.validation.ActivationValidation;
 import com.ubiquity.sprocket.api.validation.AuthenticationValidation;
 import com.ubiquity.sprocket.api.validation.AuthorizationValidation;
