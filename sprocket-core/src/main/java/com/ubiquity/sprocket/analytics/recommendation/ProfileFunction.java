@@ -13,6 +13,7 @@ import com.ubiquity.integration.domain.AgeRange;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.Gender;
 import com.ubiquity.location.domain.UserLocation;
+import com.ubiquity.sprocket.domain.Profile;
 
 public class ProfileFunction implements Function<Profile, Vector> {
 

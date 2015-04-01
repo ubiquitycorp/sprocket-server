@@ -23,7 +23,7 @@ import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
  * Tests testing basic CRUD operations for a location repository
  * 
  * @author chris
- *
+ * 
  */
 public class UserLocationRepositoryTest {
 
@@ -31,10 +31,10 @@ public class UserLocationRepositoryTest {
 
 	private UserRepository userRepository;
 	private UserLocationRepository locationRepository;
-	
+
 	private UserLocation location;
 	private User user;
-	
+
 	@After
 	public void tearDown() throws Exception {
 		EntityManagerSupport.closeEntityManager();
@@ -45,29 +45,33 @@ public class UserLocationRepositoryTest {
 
 		userRepository = new UserRepositoryJpaImpl();
 		locationRepository = new UserLocationRepositoryJpaImpl();
-		
-		user = TestUserFactory.createTestUserWithMinimumRequiredProperties();
-		
-		EntityManagerSupport.beginTransaction();
-		userRepository.create(user);		
-		EntityManagerSupport.commit();
 
-		location = new UserLocation.Builder().location(
-				new Location.Builder().latitude(new BigDecimal(59.93939393)).longitude(new BigDecimal(-34.3030303)).build()).lastUpdated(System.currentTimeMillis()).user(user).build();
+		user = TestUserFactory.createTestUserWithMinimumRequiredProperties(null);
 
 		EntityManagerSupport.beginTransaction();
-		locationRepository.create(location);		
+		userRepository.create(user);
 		EntityManagerSupport.commit();
-		
+
+		location = new UserLocation.Builder()
+				.location(
+						new Location.Builder()
+								.latitude(new BigDecimal(59.93939393))
+								.longitude(new BigDecimal(-34.3030303)).build())
+				.lastUpdated(System.currentTimeMillis()).user(user)
+				.timestamp(System.currentTimeMillis()).build();
+
+		EntityManagerSupport.beginTransaction();
+		locationRepository.create(location);
+		EntityManagerSupport.commit();
+
 		log.info("id {}", user.getUserId());
 	}
 
 	@Test
 	public void testFindByUser() throws Exception {
-		UserLocation persisted = locationRepository.findByUserId(user.getUserId());
+		UserLocation persisted = locationRepository.findByUserId(user
+				.getUserId());
 		Assert.assertNotNull(persisted);
 	}
-
-	
 
 }

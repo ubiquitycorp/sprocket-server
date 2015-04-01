@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.niobium.common.serialize.JsonConverter;
-import com.ubiquity.sprocket.api.dto.model.AccountDto;
+import com.ubiquity.sprocket.api.dto.model.user.AccountDto;
 import com.ubiquity.sprocket.api.validation.MessageServiceAuthenticationValidation;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
@@ -27,7 +27,7 @@ public class InternalServicesEndpoint {
 		AccountDto accountDto = jsonConverter.convertFromPayload(payload,
 				AccountDto.class, MessageServiceAuthenticationValidation.class);
 		
-		Boolean isAuthenticated = ServiceFactory.getAuthenticationService().isUserAuthenticated(
+		Boolean isAuthenticated = ServiceFactory.getUserAuthService().isAuthenticated(
 				String.valueOf(accountDto.getUserId()), accountDto.getAuthToken());
 		if(isAuthenticated)
 			return Response.ok().build();

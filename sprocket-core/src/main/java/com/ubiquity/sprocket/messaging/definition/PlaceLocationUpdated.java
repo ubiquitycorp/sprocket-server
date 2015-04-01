@@ -1,9 +1,6 @@
 package com.ubiquity.sprocket.messaging.definition;
 
-import java.math.BigDecimal;
-
 import com.ubiquity.location.domain.Geobox;
-import com.ubiquity.location.domain.Location;
 
 
 public class PlaceLocationUpdated {

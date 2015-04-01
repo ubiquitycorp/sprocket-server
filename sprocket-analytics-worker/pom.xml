@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>sprocket-analytics-worker</artifactId>
 	<name>Sprocket Analytics Worker</name>
-	<version>0.1.16</version>
+	<version>0.1.20</version>
 	<parent>
 		<groupId>com.ubiquity</groupId>
 		<artifactId>sprocket-parent</artifactId>
@@ -35,7 +35,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
+				<version>2.5</version>
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
@@ -52,7 +52,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.4</version>
+				<version>2.5.3</version>
 				<configuration>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
@@ -152,7 +152,7 @@
 							<tasks>
 								<copy todir="/var/www/html/repository/${repo.env}" flatten="true"
 									overwrite="true" verbose="true" failonerror="true">
-									<fileset dir="target/rpm/${build.finalName}/RPMS/noarch/"
+									<fileset dir="target/rpm/${project.build.finalName}/RPMS/noarch/"
 										includes="**.rpm" />
 								</copy>
 							</tasks>
@@ -173,7 +173,7 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>sprocket-core</artifactId>
-			<version>0.2.2</version>
+			<version>0.3.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.jboss.resteasy</groupId>

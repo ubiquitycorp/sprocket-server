@@ -10,45 +10,68 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.Developer;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
+import com.ubiquity.identity.factory.TestDeveloperFactory;
+import com.ubiquity.identity.repository.DeveloperRepositoryJpaImpl;
 import com.ubiquity.integration.api.SocialAPI;
 import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.sprocket.service.ServiceFactory;
 
 public class GoogleApiTest {
-	
+
 	private static Logger log = LoggerFactory.getLogger(GoogleApiTest.class);
-	
+	private static ExternalNetworkApplication externalNetworkApplication;
 	private static ExternalIdentity identity;
-	
+
 	@BeforeClass
 	public static void setUp() throws Exception {
-		identity = new ExternalIdentity.Builder().identifier(UUID.randomUUID().toString())
-				.accessToken("ya29.bACf9_KhJVCIKykAAAAqXAdu9HfJhMXajQ-Kl28idRQ_tEJhHgv4IeQjPEQ87STxwi9wu6FqiX99HX4t6rQ").build();
+		// TODO add vaild access and refresh token
+		identity = new ExternalIdentity.Builder()
+				.identifier(UUID.randomUUID().toString()).accessToken("")
+				.refreshToken("").expiresAt(1L)
+				.clientPlatform(ClientPlatform.WEB)
+				.externalNetwork(ExternalNetwork.Google.ordinal()).build();
 		log.debug("authenticated google with identity {} ", identity);
-		
+
 		// intialize services
 		Configuration config = new PropertiesConfiguration("test.properties");
 		JedisConnectionFactory.initialize(config);
 		SocialAPIFactory.initialize(config);
+		ServiceFactory.initialize(config, null);
+
+		Developer developer = TestDeveloperFactory
+				.createTestDeveloperWithMinimumRequiredProperties();
 		
+		EntityManagerSupport.beginTransaction();
+		new DeveloperRepositoryJpaImpl().create(developer);
+		EntityManagerSupport.commit();
+		
+		Application application = ServiceFactory.getApplicationService()
+				.createDefaultAppIFNotExsists(developer,UUID.randomUUID().toString(),UUID.randomUUID().toString());
+		
+		externalNetworkApplication = ServiceFactory.getApplicationService()
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(application.getAppId(),
+						identity.getExternalNetwork(),
+						identity.getClientPlatform());
 	}
 
-	
 	@Test
 	public void testAuthenticatedReturnsGenderAndAgeRange() {
-		SocialAPI socialApi = SocialAPIFactory.createProvider(ExternalNetwork.Gmail, ClientPlatform.Android);
+		SocialAPI socialApi = SocialAPIFactory.createProvider(
+				ExternalNetwork.getNetworkById(identity.getExternalNetwork()),
+				identity.getClientPlatform(), externalNetworkApplication);
 		Contact contact = socialApi.authenticateUser(identity);
-		Assert.assertTrue(contact.getGender() != null);	
-		Assert.assertTrue(contact.getAgeRange() != null);
+		Assert.assertTrue(contact.getGender() == null);
+		Assert.assertTrue(contact.getAgeRange() == null);
 
-		
 	}
-
-	
-	
 
 }

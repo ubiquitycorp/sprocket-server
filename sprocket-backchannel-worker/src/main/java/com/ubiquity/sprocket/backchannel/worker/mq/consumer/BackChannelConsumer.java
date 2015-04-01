@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.amqp.AbstractConsumerThread;
+import com.niobium.amqp.ConsumerStrategy;
 import com.niobium.amqp.MessageQueueChannel;
 import com.niobium.xmpp.XMPPConnector;
 import com.ubiquity.messaging.MessageConverter;
@@ -23,7 +24,7 @@ public class BackChannelConsumer extends AbstractConsumerThread {
 	 * Establishes connection to location update queue
 	 */
 	public BackChannelConsumer(MessageQueueChannel queueChannel, XMPPConnector xmppConnector) {
-		super(queueChannel);
+		super(queueChannel, ConsumerStrategy.Bulk);
 		this.xmppConnector = xmppConnector;
 	}
 
@@ -41,6 +42,13 @@ public class BackChannelConsumer extends AbstractConsumerThread {
 				System.exit(0);
 			}
 		}
+	}
+
+	@Override
+	protected void handleException(Throwable e) {
+		// TODO Auto-generated method stub
+		log.info("Exeception : {}", e.getMessage());
+		
 	}
 
 }

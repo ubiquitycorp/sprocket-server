@@ -1,4 +1,5 @@
 use sprocket;
+SET FOREIGN_KEY_CHECKS=0;
 #intersts tables
 delete from activity_interests;
 #delete from external_interest;
@@ -9,22 +10,27 @@ delete from favorite_item;
 #recommended
 delete from recommended_activity;
 delete from recommended_video;
-delete from engaged_item;
 delete from group_membership;
 #activities,messages and vedios 
 delete from activity ;
-delete from message;
-delete from conversation_contact;
-delete from conversation;
+delete from comment;
+#################Drop those tables because of having large data ##########################
+drop table message;
+drop table conversation_contact;
+drop table conversation;
+##########################################################################################
 delete from video_content;
 delete from event;
-delete from contact;
+delete from user_contact;
 #place
 delete from user_location;
 #delete from place where parent_id is not null;
 #identities and users
 
-#delete from external_identity;
-#delete from native_identity;
-#delete from identity;
-#delete from user;
+delete from contact;
+delete from external_identity;
+delete from native_identity;
+delete from identity;
+delete from user_location;
+delete from user;
+SET FOREIGN_KEY_CHECKS=1;

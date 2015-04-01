@@ -52,7 +52,7 @@ public class ActivityRepositoryTest {
 		userRepository = new UserRepositoryJpaImpl();
 		interestRepository = new InterestRepositoryJpaImpl();
 		
-		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties(null);
 		
 		EntityManagerSupport.beginTransaction();
 		userRepository.create(owner);
@@ -138,7 +138,7 @@ public class ActivityRepositoryTest {
 		List<Activity> allActivities = activityRepository.findByOwnerId(owner.getUserId());
 		Assert.assertFalse(allActivities.isEmpty());
 		Activity persisted = allActivities.get(0);
-		Assert.assertTrue(persisted.getActivityId().longValue() == statusActivity.getActivityId().longValue());
+		Assert.assertEquals(statusActivity.getActivityId().longValue(),persisted.getActivityId().longValue());
 	}
 	
 	@Test

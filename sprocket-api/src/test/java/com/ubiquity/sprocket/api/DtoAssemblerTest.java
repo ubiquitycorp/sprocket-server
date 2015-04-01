@@ -11,7 +11,7 @@ import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Message;
 import com.ubiquity.integration.factory.TestMessageFactory;
-import com.ubiquity.sprocket.api.dto.model.MessageDto;
+import com.ubiquity.sprocket.api.dto.model.social.MessageDto;
 
 /***
  * Tests the routines that assemble entity object into api dto objects that have special processing or logic that needs to 
@@ -44,7 +44,7 @@ public class DtoAssemblerTest {
 		MessageDto latestMessageDto = messageDtoList.get(0);
 		// and 2 conversation items
 		Assert.assertTrue(latestMessageDto.getConversation().size() == 3);
-		MessageDto nextMessageDto = latestMessageDto.getConversation().getFirst();
+		latestMessageDto.getConversation().getFirst();
 		// test that the next message in the conversation was after the top message
 //		Assert.assertTrue(latestMessageDto.getDate().longValue() > nextMessageDto.getDate().longValue());
 //		MessageDto lastMessageDto = latestMessageDto.getConversation().getLast();

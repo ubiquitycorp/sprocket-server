@@ -7,8 +7,6 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ubiquity.sprocket.service.ServiceFactory;
-
 public class AssignmentSyncJob implements Job {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
@@ -21,7 +19,7 @@ public class AssignmentSyncJob implements Job {
 			log.info("Executing assignment sync job start {}", start);
 			
 			
-			ServiceFactory.getAnalyticsService().assignAll();
+			// this is where the recommendation engine would run and assign groups
 			
 			long finish = System.currentTimeMillis();
 			log.info("Finished assignment sync job {}, duration: {}", finish, new Duration(finish));

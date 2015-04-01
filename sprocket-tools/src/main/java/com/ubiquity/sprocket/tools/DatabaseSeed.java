@@ -12,6 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.identity.domain.Application;
+import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.integration.api.PlaceAPIFactory;
 import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.integration.domain.ExternalInterest;
@@ -121,7 +124,7 @@ public class DatabaseSeed {
 		LocationService locationService = ServiceFactory.getLocationService();
 
 		List<String> neighborhoods = IOUtils.readLines(this.getClass()
-				.getResourceAsStream("/neighborhoods.txt"), "UTF-8");
+				.getResourceAsStream("/neighborhoods_swiss.txt"), "UTF-8");
 
 		// strip
 		Place currentCity = null;
@@ -146,7 +149,7 @@ public class DatabaseSeed {
 						e1.printStackTrace();
 					}
 					currentCity = locationService.getOrCreatePlaceByName(city,
-							locator, null, "locality");
+							locator, "ca", null, "locality");
 
 				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
@@ -158,8 +161,6 @@ public class DatabaseSeed {
 					if (currentCity == null)
 						continue;
 
-					
-
 					try {
 						Thread.sleep(200l);
 					} catch (InterruptedException e1) {
@@ -170,8 +171,8 @@ public class DatabaseSeed {
 					// if place is not null, get the neighborhood
 					String description = neighborhood + ", " + locator;
 					Place place = locationService.getOrCreatePlaceByName(
-							neighborhood, description, null, new String[] {
-									"neighborhood", "locality" });
+							neighborhood, description, "ch", null,
+							new String[] { "neighborhood", "locality" });
 					if (place == null) {
 						log.info(
 								"failed to create neighborhood by description {} in {}",
@@ -210,10 +211,12 @@ public class DatabaseSeed {
 	public static void main(String[] args) {
 		final DatabaseSeed loader = new DatabaseSeed();
 		try {
-			loader.initialize(new PropertiesConfiguration("tools.properties"));
-			//loader.seedPlacesFromNeighborhoodsFeed();
-			loader.seedInterests();
-			//loader.goober();
+			Configuration configuration = new PropertiesConfiguration(
+					"tools.properties");
+			loader.initialize(configuration);
+			// loader.seedPlacesFromNeighborhoodsFeed();
+			// loader.seedInterests();
+			loader.goober(configuration);
 		} catch (ConfigurationException e) {
 			log.error("Unable to configure service", e);
 			System.exit(-1);
@@ -231,9 +234,17 @@ public class DatabaseSeed {
 		});
 	}
 
-	private void goober() {
-		LocationService locationService = ServiceFactory.getLocationService();
-		locationService.syncPlaces(ExternalNetwork.Yelp);
+	private void goober(Configuration configuration) {
+//		ServiceFactory.initialize(configuration, null);
+//		
+//		Application application = ServiceFactory.getApplicationService()
+//				.loadApplicationFromConfiguration();
+//		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
+//				.getApplicationService()
+//				.getExAppByExternalNetworkAndClientPlatform(application,
+//						ExternalNetwork.Yelp.ordinal(), ClientPlatform.WEB);
+//		ServiceFactory.getLocationService().syncPlaces(ExternalNetwork.Yelp,
+//				externalNetworkApplication);
 	}
 
 	private void loadParentInterestWithFile(Interest parent, String resource)

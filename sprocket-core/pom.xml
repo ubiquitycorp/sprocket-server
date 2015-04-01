@@ -10,12 +10,9 @@
 	<artifactId>sprocket-core</artifactId>
 	<name>Sprocket Core</name>
 
-	<version>0.2.2</version>
+	<version>0.3.1</version>
 
 	<build>
-
-
-
 		<finalName>sprocket-core</finalName>
 		<resources>
 			<resource>
@@ -65,21 +62,26 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-integration</artifactId>
-			<version>0.1.22</version>
+			<version>0.2.21</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-messaging</artifactId>
-			<version>0.1</version>
+			<version>0.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.niobium</groupId>
 			<artifactId>niobium-amqp</artifactId>
-			<version>0.2</version>
+			<version>0.2.5</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.niobium</groupId>
+			<artifactId>niobium-data-access</artifactId>
+			<version>0.9.9</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.solr</groupId>
@@ -105,11 +107,22 @@
 			<version>17.0</version>
 		</dependency>
 
+
 		<!-- analytics -->
 		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-core_2.10</artifactId>
 			<version>1.0.1</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>hadoop-client</artifactId>
+					<groupId>org.apache.hadoop</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jets3t</artifactId>
+					<groupId>net.java.dev.jets3t</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -117,10 +130,6 @@
 			<artifactId>spark-mllib_2.10</artifactId>
 			<version>1.0.1</version>
 		</dependency>
-
-	
-
-
 
 
 		<!-- testing -->
@@ -131,8 +140,6 @@
 			<scope>test</scope>
 		</dependency>
 
-
-
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-identity-test</artifactId>
@@ -141,8 +148,6 @@
 			<scope>test</scope>
 			<optional>false</optional>
 		</dependency>
-
-
 
 		<dependency>
 			<groupId>com.ubiquity</groupId>

@@ -7,6 +7,8 @@ import static org.quartz.TriggerBuilder.newTrigger;
 import static org.quartz.TriggerKey.triggerKey;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -20,16 +22,25 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.niobium.common.thread.ThreadPool;
+import com.niobium.repository.hbase.HBaseConnectionFactory;
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
 import com.ubiquity.sprocket.analytics.worker.jobs.AssignmentSyncJob;
 import com.ubiquity.sprocket.analytics.worker.jobs.RecommendationSyncJob;
+import com.ubiquity.sprocket.analytics.worker.mq.consumer.TrackConsumer;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
-
+/***
+ * Analytics worker is responsible for tracking events and scheduling jobs to support anaytics and the recommendation engine.
+ * 
+ * @author chris
+ *
+ */
 public class AnalyticsWorker {
 
+	private static final int DEFAULT_NUM_CONSUMERS = 10;
 	protected static Logger log = LoggerFactory.getLogger(AnalyticsWorker.class);
 
 	public void destroy() {
@@ -40,10 +51,21 @@ public class AnalyticsWorker {
 
 		startServices(configuration, errorsConfiguration);
 
-		log.info("Service initialized.");
+		log.info("Service initialized.");		
 
-		startScheduler();
+		List<TrackConsumer> consumers = new LinkedList<TrackConsumer>();
+		try {			
+			for(int i = 0; i < DEFAULT_NUM_CONSUMERS; i++)
+				consumers.add(new TrackConsumer(MessageQueueFactory.createTrackConsumerChannel()));
+		} catch (IOException e) {
+			log.error("Unable to start service", e);
+			System.exit(0);
+		}
 
+		// start the thread pool with 1 thread per consumer
+		ThreadPool<TrackConsumer> threadPool = new ThreadPool<TrackConsumer>();
+		threadPool.start(consumers);
+		
 		while (true) {
 			try {
 				Thread.sleep(1000);
@@ -54,6 +76,10 @@ public class AnalyticsWorker {
 		}
 	}
 
+	/***
+	 * Returns the worker. If basic dependencies can't be met, the worker will exit.
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		final AnalyticsWorker worker = new AnalyticsWorker();
 		try {
@@ -61,13 +87,13 @@ public class AnalyticsWorker {
 					new PropertiesConfiguration("messages.properties"));
 		} catch (ConfigurationException e) {
 			log.error("Unable to configure service", e);
-			System.exit(-1);
+			System.exit(1);
 		} catch (SchedulerException e) {
 			log.error("Unable to schedule service", e);
-			System.exit(-1);
+			System.exit(1);
 		} catch (IOException e) {
 			log.error("Unable to connect to dependent service", e);
-			System.exit(-1);
+			System.exit(1);
 		}
 
 		Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -80,18 +106,30 @@ public class AnalyticsWorker {
 
 	}
 
+	/**
+	 * Initializes any connections to dependent subsystems
+	 * 
+	 * @param configuration
+	 * @param errorsConfiguration
+	 * @throws IOException
+	 */
 	private void startServices(Configuration configuration, Configuration errorsConfiguration) throws IOException {
 		ServiceFactory.initialize(configuration, errorsConfiguration);
 		JedisConnectionFactory.initialize(configuration);
 		MessageQueueFactory.initialize(configuration);
+		HBaseConnectionFactory.initialize(configuration);
 	}
 
+	/***
+	 * Cleans up connections to dependent subsystem
+	 */
 	private void stopServices() {
 		JedisConnectionFactory.destroyPool();
 		EntityManagerSupport.closeEntityManagerFactory();
-		// TODO: we need an mq disconnect
+		HBaseConnectionFactory.close();
 	}
 	
+	@SuppressWarnings("unused")
 	private void startScheduler() throws SchedulerException {
 		Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
 		scheduler.start();

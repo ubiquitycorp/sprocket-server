@@ -73,10 +73,10 @@ public class InterestRepositoryTest {
 	
 	@Test
 	public void testFindExternalByNameAndExternalNetwork() {
-		ExternalInterest persisted = externalInterestRepository.getByNameAndExternalNetwork(tagFromExternalNetwork, ExternalNetwork.Facebook);
+		ExternalInterest persisted = externalInterestRepository.getByNameAndExternalNetworkAndInterestId(tagFromExternalNetwork, ExternalNetwork.Facebook ,interest.getInterestId());
 		Assert.assertNotNull(persisted);
 		
-		persisted = externalInterestRepository.getByNameAndExternalNetwork(tagFromExternalNetwork, ExternalNetwork.YouTube);
+		persisted = externalInterestRepository.getByNameAndExternalNetworkAndInterestId(tagFromExternalNetwork, ExternalNetwork.YouTube,interest.getInterestId());
 		Assert.assertNull(persisted);
 	}
 	

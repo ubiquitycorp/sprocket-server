@@ -21,8 +21,12 @@ public class SearchKeys {
 		public static final String FIELD_CONTACT_DISPLAY_NAME = "contact_display_name";
 		public static final String FIELD_CONTACT_IDENTIFIER = "contact_identifier";
 		public static final String FIELD_CONTACT_THUMBNAIL = "contact_thumbnail";
+		
+		public static final String FIELD_RATING_NUM_RATING = "rating_num_ratings";
+		public static final String FIELD_COMMENTNUM = "comment_num";
 
 		public static final String FIELD_URL = "url";
+		public static final String FIELD_EMBED_CODE = "embed_code";
 		public static final String FIELD_ACTIVITY_TYPE = "activity_type";
 		public static final String FIELD_OWNER_ID = "owner_id";
 		public static final String FIELD_CLICKS = "clicks";

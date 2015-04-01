@@ -33,7 +33,7 @@ public class LocationUpdateConsumer extends AbstractConsumerThread {
 		// Currently just automatically fan these out to all parties
 		try {
 			Message message = messageConverter.deserialize(msg, Message.class);
-			log.info("message received: {}", message);
+			log.debug("message received: {}", message);
 			if(message.getType().equals(
 					LocationUpdated.class.getSimpleName()))
 				process((LocationUpdated) message.getContent());
@@ -81,5 +81,12 @@ public class LocationUpdateConsumer extends AbstractConsumerThread {
 			// this will update the place's location in the SQL data store
 			ServiceFactory.getLocationService().updatePlace(place);
 		}
+	}
+
+	@Override
+	protected void handleException(Throwable e) {
+		// TODO Auto-generated method stub
+		log.info("Exeception : {}", e.getMessage());
+		
 	}
 }

@@ -46,13 +46,12 @@ public class MessageRepositoryTest {
 
 	@Before
 	public void setUp() throws Exception {
-
 		messageRepository = new MessageRepositoryJpaImpl();
 		userRepository = new UserRepositoryJpaImpl();
 		contactRepository = new ContactRepositoryJpaImpl();
 
 		
-		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties();
+		owner = TestUserFactory.createTestUserWithMinimumRequiredProperties(null);
 		
 		EntityManagerSupport.beginTransaction();
 		userRepository.create(owner);

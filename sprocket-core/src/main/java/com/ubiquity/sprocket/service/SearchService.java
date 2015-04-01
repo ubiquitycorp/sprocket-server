@@ -1,5 +1,6 @@
 package com.ubiquity.sprocket.service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.integration.api.ContentAPI;
 import com.ubiquity.integration.api.ContentAPIFactory;
@@ -26,9 +28,6 @@ import com.ubiquity.integration.domain.Network;
 import com.ubiquity.integration.domain.VideoContent;
 import com.ubiquity.integration.service.ExternalIdentityService;
 import com.ubiquity.location.domain.Place;
-import com.ubiquity.location.domain.UserLocation;
-import com.ubiquity.location.repository.UserLocationRepository;
-import com.ubiquity.location.repository.UserLocationRepositoryJpaImpl;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchEngine;
@@ -141,6 +140,7 @@ public class SearchService {
 			// if it's a video, set the url and thumbnail to the video url and image respectively
 			if(type == ActivityType.VIDEO) {
 				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getVideo().getUrl());
+				document.getFields().put(SearchKeys.Fields.FIELD_EMBED_CODE, activity.getVideo().getEmbedCode());
 				// use image as thumb
 				if(activity.getImage() != null)
 					document.getFields().put(SearchKeys.Fields.FIELD_THUMBNAIL, activity.getImage().getUrl());
@@ -148,13 +148,18 @@ public class SearchService {
 				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getImage().getUrl());
 			} else if(type == ActivityType.LINK) {
 				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getLink());
+			}	else if(type == ActivityType.EMBEDEDHTML) {
+				document.getFields().put(SearchKeys.Fields.FIELD_URL, activity.getLink());
 			}
 
 			document.getFields().put(SearchKeys.Fields.FIELD_ACTIVITY_TYPE, activity.getActivityType().toString());
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, Activity.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, activity.getExternalNetwork().ordinal());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_IDENTIFIER, activity.getExternalIdentifier());
-			document.getFields().put(SearchKeys.Fields.FIELD_DATE, activity.getCreationDate());
+			document.getFields().put(SearchKeys.Fields.FIELD_DATE, activity.getPostedDate());
+			document.getFields().put(SearchKeys.Fields.FIELD_COMMENTNUM, activity.getCommentsNum());
+			if(activity.getRating() !=null)
+				document.getFields().put(SearchKeys.Fields.FIELD_RATING_NUM_RATING, activity.getRating().getNumRatings());
 			
 			if(isEngaged){
 				clicks = searchEngine.findClicksById(id);
@@ -202,7 +207,8 @@ public class SearchService {
 
 			document.getFields().put(SearchKeys.Fields.FIELD_DATA_TYPE, VideoContent.class.getSimpleName());
 			document.getFields().put(SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, videoContent.getExternalNetwork().ordinal());
-
+			document.getFields().put(SearchKeys.Fields.FIELD_DATE, videoContent.getPublishedAt());
+			
 			if(isEngaged){
 				clicks = searchEngine.findClicksById(id);
 				clicks++;
@@ -242,7 +248,7 @@ public class SearchService {
 	 * @param externalNetwork
 	 * @return
 	 */
-	public List<Document> searchLiveDocuments(String searchTerm, User user, ExternalNetwork externalNetwork, Integer page) {
+	public List<Document> searchLiveDocuments(String searchTerm, User user, ExternalNetwork externalNetwork, Integer page,BigDecimal longitude, BigDecimal latitude,String locator, ExternalNetworkApplication externalNetworkApplication) {
 
 		// normalize page
 		page = page == null ? 1 : page;
@@ -259,29 +265,32 @@ public class SearchService {
 		
 		// if it's social, search activities only
 		if(externalNetwork.getNetwork() == Network.Social) {
-			SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, identity.getClientPlatform());
+			SocialAPI socialAPI = SocialAPIFactory.createProvider(externalNetwork, identity.getClientPlatform(),externalNetworkApplication);
 			// calculate offset with page utility based on page limits
 			List<Activity> activities = socialAPI.searchActivities(searchTerm, page, resultsLimit, identity);
 			documents = wrapEntitiesInDocuments(activities);
 			
 		} else if(externalNetwork.getNetwork() == Network.Content){
 			// if content, search videos
-			ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, identity.getClientPlatform());
+			ContentAPI contentAPI = ContentAPIFactory.createProvider(externalNetwork, identity.getClientPlatform(),externalNetworkApplication);
 			List<VideoContent> videoContent = contentAPI.searchVideos(searchTerm, page, resultsLimit, identity);
 			
 			documents = wrapEntitiesInDocuments(videoContent);
 		}else {
 			// if content, search videos
-			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(externalNetwork, ClientPlatform.WEB);
-			UserLocationRepository repo = new UserLocationRepositoryJpaImpl();
-			UserLocation location = repo.findByUserId(user.getUserId());
-			if(location!= null)
+			
+			PlaceAPI placeAPI = PlaceAPIFactory.createProvider(externalNetwork, ClientPlatform.WEB,externalNetworkApplication);
+//			UserLocationRepository repo = new UserLocationRepositoryJpaImpl();
+//			UserLocation location = repo.findByUserId(user.getUserId());
+//			if(location!= null)
+//			{
+			if(longitude != null && latitude != null)
 			{
-				List<Place> places = placeAPI.searchPlacesWithinPlace(searchTerm, location.getNearestPlace(), null, page, resultsLimit>20?20:resultsLimit);			
+				List<Place> places = placeAPI.searchPlacesWithLongAndLatAndLocator(searchTerm, longitude,latitude,locator, null, page, resultsLimit>20?20:resultsLimit);			
 				documents = wrapEntitiesInDocuments(places);
 			}
 			else{
-				throw new IllegalArgumentException("User doesn't set his location yet");
+				throw new IllegalArgumentException("longitude/latitude can't be null");
 			}
 		}
 

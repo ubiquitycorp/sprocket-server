@@ -30,6 +30,7 @@ public class ExternalNetworkExceptionMapper implements ExceptionMapper<ExternalN
 		
 		ErrorDto response = new ErrorDto();
 		response.getMessages().add(e.getMessage());
+		response.setProviderName(e.getExternalNetwork().toString());
 		response.setCode(ServerErrorCode.ExternalAPI.getCode());
 		return Response.status(e.getResponseCode()).entity(new Gson().toJson(response)).build();
 

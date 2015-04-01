@@ -3,6 +3,7 @@ FREE=/usr/bin/free
 AWK=/bin/awk
 GREP=/bin/grep
 JAVA=/usr/bin/java
+LOGGER=/usr/bin/logger
 
 SPROCKET_WORKER_CFG=/etc/sysconfig/sprocket-worker
 
@@ -21,6 +22,7 @@ then
  SPROCKET_WORKER_SIZE=$SPROCKET_LARGE
 fi
 
-echo "Available Memory: ${AVAILMEM}MB"
-echo "Sprocket Worker Size: ${SPROCKET_WORKER_SIZE}MB"
-$JAVA -Xmx${SPROCKET_WORKER_SIZE}m -jar ${SPROCKET_WORKER_NAME}
+$LOGGER "Available Memory: ${AVAILMEM}MB"
+$LOGGER "Sprocket Worker Size: ${SPROCKET_WORKER_SIZE}MB"
+$JAVA -Xmx${SPROCKET_WORKER_SIZE}m -cp ${SPROCKET_WORKER_NAME} com.ubiquity.sprocket.location.worker.LocationWorker
+
