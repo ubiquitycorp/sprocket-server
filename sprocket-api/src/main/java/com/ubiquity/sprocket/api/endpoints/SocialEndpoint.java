@@ -30,6 +30,7 @@ import com.ubiquity.api.annotations.Active;
 import com.ubiquity.api.annotations.Secure;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
+import com.ubiquity.identity.service.UserService;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.Captcha;
 import com.ubiquity.integration.domain.Contact;
@@ -39,6 +40,10 @@ import com.ubiquity.integration.domain.PostActivity;
 import com.ubiquity.integration.domain.PostComment;
 import com.ubiquity.integration.domain.PostVote;
 import com.ubiquity.integration.domain.UserContact;
+import com.ubiquity.integration.service.ApplicationService;
+import com.ubiquity.integration.service.ContactService;
+import com.ubiquity.integration.service.ExternalIdentityService;
+import com.ubiquity.integration.service.SocialService;
 import com.ubiquity.location.domain.UserLocation;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ActivitiesDto;
@@ -56,6 +61,7 @@ import com.ubiquity.sprocket.api.validation.EngagementValidation;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedActivity;
+import com.ubiquity.sprocket.service.LocationService;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/social")
@@ -64,6 +70,13 @@ public class SocialEndpoint {
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
+	
+	private SocialService socialService = ServiceFactory.getSocialService();
+	private ContactService contactService = ServiceFactory.getContactService();
+	private LocationService locationService = ServiceFactory.getLocationService();
+	private UserService userService = ServiceFactory.getUserService();
+	private ExternalIdentityService externalIdentityService = ServiceFactory.getExternalIdentityService();
+	private ApplicationService applicationService = ServiceFactory.getApplicationService();
 
 	@POST
 	@Path("/users/{userId}/activities/engaged")
@@ -97,7 +110,7 @@ public class SocialEndpoint {
 		ExternalNetwork socialNetwork = ExternalNetwork
 				.getNetworkById(socialProviderId);
 
-		CollectionVariant<Activity> variant = ServiceFactory.getSocialService()
+		CollectionVariant<Activity> variant = socialService
 				.findActivityByOwnerIdAndSocialNetwork(userId, socialNetwork,
 						ifModifiedSince);
 
@@ -125,7 +138,7 @@ public class SocialEndpoint {
 		ExternalNetwork socialNetwork = ExternalNetwork
 				.getNetworkById(socialProviderId);
 
-		CollectionVariant<Activity> variant = ServiceFactory.getSocialService()
+		CollectionVariant<Activity> variant = socialService
 				.findActivityByOwnerIdAndSocialNetworkAndModifiedSince(userId, socialNetwork,
 						ifModifiedSince);
 
@@ -162,7 +175,7 @@ public class SocialEndpoint {
 
 		// Manager will return contacts if they have been modified, else it will
 		// be empty
-		List<Contact> variant = ServiceFactory.getContactService()
+		List<Contact> variant = contactService
 				.findContactsForActiveNetworksByOwnerId(userId);
 
 		// Convert entire list to DTO
@@ -195,8 +208,7 @@ public class SocialEndpoint {
 		// Manager will return contacts if they have been modified, else it will
 		// be empty
 
-		CollectionVariant<UserContact> variant = ServiceFactory
-				.getContactService()
+		CollectionVariant<UserContact> variant = contactService
 				.findModifiedContactsForActiveNetworksByOwnerId(userId,
 						ifModifiedSince);
 
@@ -248,14 +260,14 @@ public class SocialEndpoint {
 		ExternalNetwork socialNetwork = ExternalNetwork
 				.getNetworkById(socialProviderId);
 
-		UserLocation userLocation = ServiceFactory.getLocationService()
+		UserLocation userLocation = locationService
 				.getLocation(userId);
 		// returns empty list if user has not set his location yet
 		if (userLocation == null)
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(results)).build();
 
-		CollectionVariant<Activity> variant = ServiceFactory.getSocialService()
+		CollectionVariant<Activity> variant = socialService
 				.findActivityByPlaceIdAndSocialNetwork(
 						userLocation.getNearestPlace().getPlaceId(),
 						socialNetwork, ifModifiedSince, delta);
@@ -294,8 +306,7 @@ public class SocialEndpoint {
 			ExternalNetwork socialNetwork = ExternalNetwork
 					.getNetworkById(socialProviderId);
 
-			CollectionVariant<Message> variant = ServiceFactory
-					.getSocialService().findMessagesByOwnerIdAndSocialNetwork(
+			CollectionVariant<Message> variant = socialService.findMessagesByOwnerIdAndSocialNetwork(
 							userId, socialNetwork, ifModifiedSince, delta);
 
 			// Throw a 304 if if there is no variant (no change)
@@ -341,21 +352,21 @@ public class SocialEndpoint {
 				payload, SendMessageDto.class);
 
 		// load user
-		ServiceFactory.getUserService().getUserById(userId);
+		userService.getUserById(userId);
 		// get social network
 		ExternalNetwork socialNetwork = ExternalNetwork
 				.getNetworkById(externalNetworkId);
 		// get the identity from DB
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+		ExternalIdentity identity = externalIdentityService
 				.findExternalIdentity(userId, socialNetwork);
 
-		Contact contact = ServiceFactory.getContactService().getByContactId(
+		Contact contact = contactService.getByContactId(
 				sendMessageDto.getReceiverId());
 		// get External network and check the validity of identity
 		ExternalNetworkApplication externalNetworkApplication = checkValidityOfExternalIdentity(
 				userId, identity);
 
-		ServiceFactory.getSocialService().sendMessage(identity, socialNetwork,
+		socialService.sendMessage(identity, socialNetwork,
 				contact, sendMessageDto.getReceiverName(),
 				sendMessageDto.getText(), sendMessageDto.getSubject(),
 				externalNetworkApplication);
@@ -390,7 +401,7 @@ public class SocialEndpoint {
 		ExternalNetwork socialNetwork = ExternalNetwork
 				.getNetworkById(externalNetworkId);
 		// get the identity from DB
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+		ExternalIdentity identity = externalIdentityService
 				.findExternalIdentity(userId, socialNetwork);
 
 		if (identity == null)
@@ -412,7 +423,7 @@ public class SocialEndpoint {
 				.captcha(postActivityDto.getCaptcha())
 				.captchaIden(postActivityDto.getCaptchaIden()).build();
 
-		ServiceFactory.getSocialService().postActivity(identity, socialNetwork,
+		socialService.postActivity(identity, socialNetwork,
 				postActivity, externalNetworkApplication);
 
 		return Response.ok().build();
@@ -442,12 +453,12 @@ public class SocialEndpoint {
 				payload, PostCommentDto.class);
 
 		// load user
-		ServiceFactory.getUserService().getUserById(userId);
+		userService.getUserById(userId);
 		// get social network
 		ExternalNetwork socialNetwork = ExternalNetwork
 				.getNetworkById(socialProviderId);
 		// get the identity from DB
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+		ExternalIdentity identity = externalIdentityService
 				.findExternalIdentity(userId, socialNetwork);
 
 		// get External network and check the validity of identity
@@ -455,7 +466,7 @@ public class SocialEndpoint {
 				userId, identity);
 
 		PostComment postComment = DtoAssembler.assemble(postCommentDto);
-		ServiceFactory.getSocialService().postComment(identity, socialNetwork,
+		socialService.postComment(identity, socialNetwork,
 				postComment, externalNetworkApplication);
 
 		return Response.ok().build();
@@ -477,12 +488,12 @@ public class SocialEndpoint {
 				PostVoteDto.class);
 
 		// load user
-		ServiceFactory.getUserService().getUserById(userId);
+		userService.getUserById(userId);
 		// get social network
 		ExternalNetwork socialNetwork = ExternalNetwork
 				.getNetworkById(socialProviderId);
 		// get the identity from DB
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+		ExternalIdentity identity = externalIdentityService
 				.findExternalIdentity(userId, socialNetwork);
 
 		// get External network and check the validity of identity
@@ -491,7 +502,7 @@ public class SocialEndpoint {
 
 		PostVote postComment = DtoAssembler.assemble(postVoteDto);
 
-		ServiceFactory.getSocialService().postVote(identity, socialNetwork,
+		socialService.postVote(identity, socialNetwork,
 				postComment, externalNetworkApplication);
 
 		return Response.ok().build();
@@ -518,14 +529,14 @@ public class SocialEndpoint {
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(socialProviderId);
 
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+		ExternalIdentity identity = externalIdentityService
 				.findExternalIdentity(userId, externalNetwork);
 
 		// get External network and check the validity of identity
 		ExternalNetworkApplication externalNetworkApplication = checkValidityOfExternalIdentity(
 				userId, identity);
 
-		Captcha captcha = ServiceFactory.getSocialService().requestCaptcha(
+		Captcha captcha = socialService.requestCaptcha(
 				identity, externalNetwork, externalNetworkApplication);
 
 		final byte[] image = captcha.getImage();
@@ -567,16 +578,15 @@ public class SocialEndpoint {
 			Long userId, ExternalIdentity identity) {
 
 		// Get app_i from Redis
-		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+		Long appId = userService.retrieveApplicationId(
 				userId);
 
 		// Load external network application
-		ExternalNetworkApplication externalNetworkApp = ServiceFactory
-				.getApplicationService()
+		ExternalNetworkApplication externalNetworkApp = applicationService
 				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
 						identity.getExternalNetwork(),
 						identity.getClientPlatform());
-		ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
+		socialService.checkValidityOfExternalIdentity(
 				identity, externalNetworkApp);
 		return externalNetworkApp;
 	}

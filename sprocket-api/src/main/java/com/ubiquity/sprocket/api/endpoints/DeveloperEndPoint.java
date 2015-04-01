@@ -47,6 +47,11 @@ public class DeveloperEndPoint {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 
+	private AuthenticationService<Developer> developerAuthService = ServiceFactory
+			.getDeveloperAuthService();
+	private DeveloperService developerService = ServiceFactory
+			.getDeveloperService();
+	
 	@GET
 	@Path("/ping")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -68,9 +73,7 @@ public class DeveloperEndPoint {
 		DeveloperDto developerDto = jsonConverter.convertFromPayload(payload,
 				DeveloperDto.class, RegistrationValidation.class);
 
-		AuthenticationService<Developer> authenticationService = ServiceFactory
-				.getDeveloperAuthService();
-		Developer developer = authenticationService.register(
+		Developer developer = developerAuthService.register(
 				developerDto.getUsername(), developerDto.getPassword(), null,
 				null, developerDto.getDisplayName(), developerDto.getEmail(),
 				null, true);
@@ -81,7 +84,7 @@ public class DeveloperEndPoint {
 				.developerId(developer.getDeveloperId()).apiKey(apiKey).build();
 
 		// Save developerId and APIKey in Redis cache database
-		authenticationService.saveAuthkey(developer.getDeveloperId(), apiKey);
+		developerAuthService.saveAuthkey(developer.getDeveloperId(), apiKey);
 
 		log.debug("Created Developer {}", developer);
 
@@ -104,8 +107,7 @@ public class DeveloperEndPoint {
 
 		DeveloperDto developerDto = jsonConverter.convertFromPayload(payload,
 				DeveloperDto.class, AuthenticationValidation.class);
-		AuthenticationService<Developer> developerAuthService = ServiceFactory
-				.getDeveloperAuthService();
+
 		Developer developer = developerAuthService.authenticate(
 				developerDto.getUsername(), developerDto.getPassword());
 		if (developer == null)
@@ -141,9 +143,7 @@ public class DeveloperEndPoint {
 			@PathParam("developerId") Long developerId) throws IOException {
 		ApplicationDto applicationDto = jsonConverter.convertFromPayload(
 				payload, ApplicationDto.class);
-		DeveloperService developerService = ServiceFactory
-				.getDeveloperService();
-
+		
 		Developer developer = developerService.getDeveloperById(developerId);
 		Application application = developerService.createApp(developer,
 				applicationDto.getName(), applicationDto.getDescription());
@@ -170,9 +170,6 @@ public class DeveloperEndPoint {
 	@DeveloperSecure
 	public Response getApplications(@PathParam("developerId") Long developerId)
 			throws IOException {
-
-		DeveloperService developerService = ServiceFactory
-				.getDeveloperService();
 
 		List<Application> applications = new LinkedList<Application>();
 		applications = developerService
@@ -203,8 +200,6 @@ public class DeveloperEndPoint {
 	public Response getApplication(@PathParam("developerId") Long developerId,
 			@PathParam("applicationId") Long applicationId) throws IOException {
 
-		DeveloperService developerService = ServiceFactory
-				.getDeveloperService();
 		Application application;
 		application = developerService.getApplicationById(
 				developerId, applicationId);
@@ -237,9 +232,6 @@ public class DeveloperEndPoint {
 				.convertFromPayload(payload, ExternalApplicationDto.class);
 		
 		externalAppDto.validate();
-		
-		DeveloperService developerService = ServiceFactory
-				.getDeveloperService();
 
 		Application application = developerService
 				.getApplicationById(developerId, applicationId);
@@ -276,8 +268,6 @@ public class DeveloperEndPoint {
 				.convertFromPayload(payload, ExternalApplicationDto.class);
 		
 		externalAppDto.validate(); 
-		DeveloperService developerService = ServiceFactory
-				.getDeveloperService();
 
 		Application application = developerService
 				.getApplicationById(developerId, applicationId);
@@ -309,8 +299,6 @@ public class DeveloperEndPoint {
 			@PathParam("applicationId") Long applicationId,
 			@PathParam("externalApplicationId") Long externalApplicationId)
 			throws IOException {
-		DeveloperService developerService = ServiceFactory
-				.getDeveloperService();
 
 		Application application = developerService
 				.getApplicationById(developerId, applicationId);
@@ -336,8 +324,6 @@ public class DeveloperEndPoint {
 			@PathParam("developerId") Long developerId,
 			@PathParam("applicationId") Long applicationId) throws IOException {
 
-		DeveloperService developerService = ServiceFactory
-				.getDeveloperService();
 		List<ExternalNetworkApplication> externalNetworkApplications = developerService
 				.getExternalApplicationByApplicationId(developerId,
 						applicationId);

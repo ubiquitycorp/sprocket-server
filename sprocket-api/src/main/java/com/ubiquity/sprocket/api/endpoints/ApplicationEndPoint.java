@@ -21,7 +21,9 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
+import com.ubiquity.identity.service.DeveloperService;
 import com.ubiquity.identity.service.UserAuthService;
+import com.ubiquity.identity.service.UserService;
 import com.ubiquity.integration.api.exception.AuthorizationException;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.model.user.AccountDto;
@@ -36,6 +38,11 @@ public class ApplicationEndPoint {
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
 
 	private Logger log = LoggerFactory.getLogger(getClass());
+	
+	private AuthenticationService<User> authenticationService = ServiceFactory
+			.getUserAuthService();
+	private UserService userService = ServiceFactory.getUserService();
+	private DeveloperService developerService = ServiceFactory.getDeveloperService();
 
 	/***
 	 * This method registers user using an external identifier provided by a
@@ -57,8 +64,6 @@ public class ApplicationEndPoint {
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
 				IdentityDto.class, RemoteRegistrationValidation.class);
 
-		AuthenticationService<User> authenticationService = ServiceFactory
-				.getUserAuthService();
 
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
 				.getClientPlatformId());
@@ -77,7 +82,7 @@ public class ApplicationEndPoint {
 		authenticationService.saveAuthkey(user.getUserId(), apiKey);
 		
 		// Save application Id in the Redis 
-		ServiceFactory.getUserService().saveApplicationId(user.getUserId(), application.getAppId());
+		userService.saveApplicationId(user.getUserId(), application.getAppId());
 		log.debug("Created user {}", user);
 
 		return Response.ok().entity(jsonConverter.convertToPayload(accountDto))
@@ -105,16 +110,17 @@ public class ApplicationEndPoint {
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
 				IdentityDto.class, RemoteAuthenticationValidation.class);
 
-		AuthenticationService<User> authenticationService = ServiceFactory
-				.getUserAuthService();
 		User user = ((UserAuthService) authenticationService)
 				.authenticate(identityDto.getIdentifier(), application);
 		if (user == null)
 			throw new AuthorizationException("Invalid identifier", null);
+		else if (!user.isActive())
+			throw new AuthorizationException("Your account is locked",
+					null);
 
 		// update user last login
 		user.setLastLogin(System.currentTimeMillis());
-		ServiceFactory.getUserService().update(user);
+		userService.update(user);
 
 		String apiKey = authenticationService.generateAPIKeyIfNotExsits(user
 				.getUserId());
@@ -160,7 +166,7 @@ public class ApplicationEndPoint {
 			throw new AuthorizationException("Invalid authorization header", null);
 		
 		log.info(credentials[0] + " " + credentials[1]);
-		Application application = ServiceFactory.getDeveloperService()
+		Application application = developerService
 				.getApplicationByAppkeyAndAppSecret(credentials[0],
 						credentials[1]);
 		return application;

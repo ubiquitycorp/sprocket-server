@@ -28,14 +28,16 @@ import com.ubiquity.sprocket.service.ServiceFactory;
 public class ClientEndpoint {
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
+	private DeveloperService developerService = ServiceFactory.getDeveloperService();
+	private ClientConfigurationService configurationService = ServiceFactory
+			.getClientConfigurationService();
 
 	@GET
 	@Path("/configuration")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response config() throws IOException {
 		ConfigurationDto results = new ConfigurationDto();
-		ClientConfigurationService configurationService = ServiceFactory
-				.getClientConfigurationService();
+		
 		results.getServices().putAll(configurationService.getServices());
 		results.setRules(DtoAssembler
 				.assembleConfigurationList(configurationService.getRules()));
@@ -50,15 +52,12 @@ public class ClientEndpoint {
 			throws IOException {
 		ApplicationDto applicationDto = jsonConverter.convertFromPayload(
 				payload, ApplicationDto.class, AuthenticationValidation.class);
-		DeveloperService developerService = ServiceFactory
-				.getDeveloperService();
 		
 		Application application = developerService
 				.getApplicationByAppkeyAndAppSecret(applicationDto.getAppKey(),
 						applicationDto.getAppSecret());
 		
-		List<ExternalNetworkApplication> externalNetworkApplications = ServiceFactory
-				.getDeveloperService().getExternalApplicationByApplicationId(
+		List<ExternalNetworkApplication> externalNetworkApplications = developerService.getExternalApplicationByApplicationId(
 						application.getOwner().getDeveloperId(), application.getAppId());
 		
 		ExternalApplicationsDto result = new ExternalApplicationsDto();

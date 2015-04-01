@@ -40,6 +40,7 @@ import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.Identity;
 import com.ubiquity.identity.domain.User;
 import com.ubiquity.identity.service.AuthenticationService;
+import com.ubiquity.identity.service.UserService;
 import com.ubiquity.integration.api.ContentAPI;
 import com.ubiquity.integration.api.ContentAPIFactory;
 import com.ubiquity.integration.api.SocialAPI;
@@ -52,9 +53,13 @@ import com.ubiquity.integration.domain.Contact;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Network;
 import com.ubiquity.integration.domain.SocialToken;
+import com.ubiquity.integration.service.ApplicationService;
+import com.ubiquity.integration.service.ContactService;
+import com.ubiquity.integration.service.ExternalIdentityService;
 import com.ubiquity.media.domain.AudioTrack;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
+import com.ubiquity.media.service.MediaService;
 import com.ubiquity.messaging.format.Message;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.ContactsDto;
@@ -75,6 +80,7 @@ import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.messaging.definition.ExternalIdentityActivated;
 import com.ubiquity.sprocket.messaging.definition.LocationUpdated;
+import com.ubiquity.sprocket.service.LocationService;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/users")
@@ -83,6 +89,15 @@ public class UsersEndpoint {
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
+	
+	private UserService userService = ServiceFactory.getUserService();
+	private ApplicationService applicationService = ServiceFactory.getApplicationService();
+	private ExternalIdentityService externalIdentityService = ServiceFactory.getExternalIdentityService();
+	private ContactService contactService = ServiceFactory.getContactService();
+	private AuthenticationService<User> authenticationService = ServiceFactory
+			.getUserAuthService();
+	private MediaService mediaService = ServiceFactory.getMediaService();
+	private LocationService locationService = ServiceFactory.getLocationService();
 
 	@GET
 	@Path("/ping")
@@ -108,13 +123,12 @@ public class UsersEndpoint {
 			@HeaderParam("linkedin_cookie") String cookie) throws Exception {
 
 		// load user
-		User user = ServiceFactory.getUserService().getUserById(userId);
+		User user = userService.getUserById(userId);
 		// Get app_i from Redis
-		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+		Long appId = userService.retrieveApplicationId(
 				userId);
 
-		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
-				.getApplicationService()
+		ExternalNetworkApplication externalNetworkApplication = applicationService
 				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
 						ExternalNetwork.LinkedIn.ordinal(), ClientPlatform.WEB);
 		ExchangeService exchangservice = new ExchangeService(
@@ -127,8 +141,7 @@ public class UsersEndpoint {
 					"Autontication Failed no oAuth_token_returned", null);
 
 		// create the identity if it does not exist; or use the existing one
-		List<ExternalIdentity> identities = ServiceFactory
-				.getExternalIdentityService().createOrUpdateExternalIdentity(
+		List<ExternalIdentity> identities = externalIdentityService.createOrUpdateExternalIdentity(
 						user, accesstokens[0], accesstokens[1], null,
 						ClientPlatform.WEB, ExternalNetwork.LinkedIn, null,
 						true, externalNetworkApplication);
@@ -143,7 +156,7 @@ public class UsersEndpoint {
 
 		try {
 
-			Contact contact = ServiceFactory.getContactService()
+			Contact contact = contactService
 					.getBySocialIdentityId(user.getUserId(),
 							identity.getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
@@ -173,7 +186,7 @@ public class UsersEndpoint {
 			InputStream payload) throws Exception {
 
 		// load user
-		ServiceFactory.getUserService().getUserById(userId);
+		userService.getUserById(userId);
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
 				IdentityDto.class, AuthorizationValidation.class);
 		// ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
@@ -182,11 +195,10 @@ public class UsersEndpoint {
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identityDto.getExternalNetworkId());
 		// Get app_i from Redis
-		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+		Long appId = userService.retrieveApplicationId(
 				userId);
 		// load External Network application
-		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
-				.getApplicationService()
+		ExternalNetworkApplication externalNetworkApplication = applicationService
 				.getExAppByAppIdAndExternalNetworkAndClientPlatform(
 						appId,
 						externalNetwork.ordinal(),
@@ -244,17 +256,18 @@ public class UsersEndpoint {
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
 				IdentityDto.class, AuthenticationValidation.class);
 
-		AuthenticationService<User> authenticationService = ServiceFactory
-				.getUserAuthService();
 		User user = authenticationService.authenticate(
 				identityDto.getUsername(), identityDto.getPassword());
 		if (user == null)
 			throw new AuthorizationException("Username / password incorrect",
 					null);
+		else if (!user.isActive())
+			throw new AuthorizationException("Your account is locked",
+					null);
 
 		// update user last login
 		user.setLastLogin(System.currentTimeMillis());
-		ServiceFactory.getUserService().update(user);
+		userService.update(user);
 		// create api key and pass back associated identities for this user (in
 		// case of a login from a different device)
 
@@ -296,15 +309,11 @@ public class UsersEndpoint {
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
 				IdentityDto.class, RegistrationValidation.class);
 
-		AuthenticationService<User> authenticationService = ServiceFactory
-				.getUserAuthService();
-
 		ClientPlatform clientPlatform = ClientPlatform.getEnum(identityDto
 				.getClientPlatformId());
 
 		// retrieve default application
-		Application defaultApp = ServiceFactory.getApplicationService()
-				.getDefaultApplication();
+		Application defaultApp = applicationService.getDefaultApplication();
 
 		User user = authenticationService.register(identityDto.getUsername(),
 				identityDto.getPassword(), "", "",
@@ -322,7 +331,7 @@ public class UsersEndpoint {
 		authenticationService.saveAuthkey(user.getUserId(), apiKey);
 
 		// Save application Id in the Redis
-		ServiceFactory.getUserService().saveApplicationId(user.getUserId(),
+		userService.saveApplicationId(user.getUserId(),
 				defaultApp.getAppId());
 
 		log.debug("Created user {}", user);
@@ -347,7 +356,7 @@ public class UsersEndpoint {
 			throws IOException {
 
 		// load user
-		List<Contact> contacts = ServiceFactory.getContactService()
+		List<Contact> contacts = contactService
 				.findAllContactByUserIdentities(userId);
 
 		ContactsDto contactsDto = new ContactsDto();
@@ -376,21 +385,19 @@ public class UsersEndpoint {
 				.getNetworkById(identityDto.getExternalNetworkId());
 
 		// load user
-		User user = ServiceFactory.getUserService().getUserById(userId);
+		User user = userService.getUserById(userId);
 		// Get app_i from Redis
-		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+		Long appId = userService.retrieveApplicationId(
 				userId);
 
 		// log.info("identifier = " +
 		// (user).getExternalIdentifier());
 		// Load External Application
-		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
-				.getApplicationService()
+		ExternalNetworkApplication externalNetworkApplication = applicationService
 				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
 						externalNetwork.ordinal(), clientPlatform);
 		// create the identity if it does not exist; or use the existing one
-		List<ExternalIdentity> identities = ServiceFactory
-				.getExternalIdentityService().createOrUpdateExternalIdentity(
+		List<ExternalIdentity> identities = externalIdentityService.createOrUpdateExternalIdentity(
 						user, identityDto.getAccessToken(),
 						identityDto.getSecretToken(),
 						identityDto.getRefreshToken(), clientPlatform,
@@ -405,7 +412,7 @@ public class UsersEndpoint {
 		// sendEventTrackedMessage(user, identity);
 		try {
 
-			Contact contact = ServiceFactory.getContactService()
+			Contact contact = contactService
 					.getBySocialIdentityId(userId,
 							identities.get(0).getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
@@ -446,15 +453,14 @@ public class UsersEndpoint {
 		List<ExternalIdentity> identities = null;
 
 		// load user
-		User user = ServiceFactory.getUserService().getUserById(userId);
+		User user = userService.getUserById(userId);
 
 		// Get app_i from Redis
-		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+		Long appId = userService.retrieveApplicationId(
 				userId);
 
 		// load External Network application
-		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
-				.getApplicationService()
+		ExternalNetworkApplication externalNetworkApplication = applicationService
 				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
 						externalNetwork.ordinal(), clientPlatform);
 		if (externalNetwork.network == Network.Content) {
@@ -466,7 +472,7 @@ public class UsersEndpoint {
 					identityDto.getCode(), identityDto.getRedirectUrl());
 
 			// create the identity if it does not exist; or use the existing one
-			identities = ServiceFactory.getExternalIdentityService()
+			identities = externalIdentityService
 					.createOrUpdateExternalIdentity(user, accessToken,
 							identityDto.getSecretToken(),
 							identityDto.getRefreshToken(), clientPlatform,
@@ -488,7 +494,7 @@ public class UsersEndpoint {
 					identityDto.getCode(), identityDto.getOauthToken(),
 					identityDto.getOauthTokenSecret(), redirectUri);
 
-			identities = ServiceFactory.getExternalIdentityService()
+			identities = externalIdentityService
 					.createOrUpdateExternalIdentity(user,
 							externalidentity.getAccessToken(),
 							externalidentity.getSecretToken(),
@@ -506,7 +512,7 @@ public class UsersEndpoint {
 		// sendEventTrackedMessage(user, identity);
 
 		try {
-			Contact contact = ServiceFactory.getContactService()
+			Contact contact = contactService
 					.getBySocialIdentityId(userId,
 							identities.get(0).getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
@@ -544,12 +550,11 @@ public class UsersEndpoint {
 				.getNetworkById(exchangeTokenDto.getExternalNetworkId());
 
 		// Get app_i from Redis
-		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+		Long appId = userService.retrieveApplicationId(
 				userId);
 
 		// load External Network application
-		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
-				.getApplicationService()
+		ExternalNetworkApplication externalNetworkApplication = applicationService
 				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
 						externalNetwork.ordinal(), ClientPlatform.WEB);
 		SocialAPI socialApi = SocialAPIFactory.createProvider(externalNetwork,
@@ -576,7 +581,7 @@ public class UsersEndpoint {
 	public Response sendResetEmail(InputStream payload) throws IOException {
 		IdentityDto identityDto = jsonConverter.convertFromPayload(payload,
 				IdentityDto.class, ResetValidation.class);
-		ServiceFactory.getUserService().sendResetPasswordEmail(
+		userService.sendResetPasswordEmail(
 				identityDto.getUsername());
 		return Response.ok().build();
 	}
@@ -594,7 +599,7 @@ public class UsersEndpoint {
 	public Response resetPassword(InputStream payload) throws IOException {
 		ResetPasswordDto resetPasswordDto = jsonConverter.convertFromPayload(
 				payload, ResetPasswordDto.class);
-		ServiceFactory.getUserService().resetPassword(
+		userService.resetPassword(
 				resetPasswordDto.getToken(), resetPasswordDto.getPassword());
 		return Response.ok().build();
 	}
@@ -639,11 +644,11 @@ public class UsersEndpoint {
 		String fileName = "";
 		RemoteAsset media = null;
 		// 50 MB size of memory
-		int maxMemorySize = ServiceFactory.getUserService().getMaxMemorySize();
+		int maxMemorySize = userService.getMaxMemorySize();
 		// 500 MB size of file
-		long maxRequestSize = ServiceFactory.getUserService().getMaxFileSize();
+		long maxRequestSize = userService.getMaxFileSize();
 
-		String tempDir = ServiceFactory.getUserService().getFileRepository();
+		String tempDir = userService.getFileRepository();
 		File tempDirectory = new File(tempDir);
 		// Create a factory for disk-based file items
 		// DiskFileItemFactory factory = new
@@ -704,7 +709,7 @@ public class UsersEndpoint {
 								"Unsupported media type");
 
 					media.setInputStream(item.getInputStream());
-					ServiceFactory.getMediaService().create(media);
+					mediaService.create(media);
 					long endTime = System.currentTimeMillis();
 
 					log.info("media uploaded successfully:\n url:"
@@ -747,7 +752,7 @@ public class UsersEndpoint {
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(syncDto.getExternalNetworkId());
 
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+		ExternalIdentity identity = externalIdentityService
 				.findExternalIdentity(userId, externalNetwork);
 
 		User user = new User(userId);
@@ -788,7 +793,7 @@ public class UsersEndpoint {
 				.longitude(locationDto.getLongitude())
 				.altitude(locationDto.getAltitude()).build();
 
-		ServiceFactory.getLocationService().addUpdateLocationInCache(userId);
+		locationService.addUpdateLocationInCache(userId);
 		// serialize and send it
 		String message = MessageConverterFactory.getMessageConverter()
 				.serialize(new Message(content));

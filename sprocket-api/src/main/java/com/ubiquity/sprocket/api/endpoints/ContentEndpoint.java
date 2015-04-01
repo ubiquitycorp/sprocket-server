@@ -20,6 +20,8 @@ import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.integration.domain.Category;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.VideoContent;
+import com.ubiquity.integration.service.ContentService;
+import com.ubiquity.integration.service.ExternalIdentityService;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.VideosDto;
 import com.ubiquity.sprocket.api.dto.model.media.VideoDto;
@@ -33,6 +35,9 @@ import com.ubiquity.sprocket.service.ServiceFactory;
 public class ContentEndpoint {
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
+	
+	private ContentService contentService = ServiceFactory.getContentService();
+	private ExternalIdentityService externalIdentityService = ServiceFactory.getExternalIdentityService();
 
 	@POST
 	@Path("/users/{userId}/videos/engaged")
@@ -59,7 +64,7 @@ public class ContentEndpoint {
 		VideosDto results = new VideosDto();
 		
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
-		CollectionVariant<VideoContent> variant = ServiceFactory.getContentService().findAllVideosByOwnerIdAndContentNetwork(userId, externalNetwork, ifModifiedSince,delta);
+		CollectionVariant<VideoContent> variant = contentService.findAllVideosByOwnerIdAndContentNetwork(userId, externalNetwork, ifModifiedSince,delta);
 
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
@@ -79,7 +84,7 @@ public class ContentEndpoint {
 		}
 		if(!history && externalNetwork == ExternalNetwork.YouTube)
 		{
-			ExternalIdentity identity = ServiceFactory.getExternalIdentityService().findExternalIdentity(userId, externalNetwork);
+			ExternalIdentity identity = externalIdentityService.findExternalIdentity(userId, externalNetwork);
 			if (!identity.getEmail().toLowerCase().contains("@gmail"))
 				results.setHistoryEmptyMessage("Please note that YouTube doesn't allow retrieving history if you log in with a service account");
 		}

@@ -27,7 +27,8 @@ import com.ubiquity.sprocket.service.ServiceFactory;
 public class AnalyticsEndpoint {
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
-
+	private AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
+	
 	@GET
 	@Path("users/{userId}/recommendations")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -45,7 +46,7 @@ public class AnalyticsEndpoint {
 
 		InterestsDto interestsDto = new InterestsDto();
 		
-		CollectionVariant<Interest> variant = ServiceFactory.getAnalyticsService().findInterests(ifModifiedSince);
+		CollectionVariant<Interest> variant = analyticsService.findInterests(ifModifiedSince);
 		// Throw a 304 if if there is no variant (no change)
 		if (variant == null)
 			return Response.notModified().build();
@@ -68,7 +69,7 @@ public class AnalyticsEndpoint {
 		InterestsDto interestsDto = new InterestsDto();
 		
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
-		CollectionVariant<Interest> variant = ServiceFactory.getAnalyticsService().findInterestsByExternalNetworkId(externalNetwork, ifModifiedSince);
+		CollectionVariant<Interest> variant = analyticsService.findInterestsByExternalNetworkId(externalNetwork, ifModifiedSince);
 		// Throw a 304 if if there is no variant (no change)
 		
 		
@@ -89,7 +90,6 @@ public class AnalyticsEndpoint {
 	public Response recommendedActivitiesByProvider(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		RecommendationsDto recommendationsDto = new RecommendationsDto();
-		AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
 
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 
@@ -117,7 +117,6 @@ public class AnalyticsEndpoint {
 	public Response recommendedVideosByProvider(@PathParam("userId") Long userId, @PathParam("externalNetworkId") Integer externalNetworkId, @HeaderParam("If-Modified-Since") Long ifModifiedSince) {
 
 		RecommendationsDto recommendationsDto = new RecommendationsDto();
-		AnalyticsService analyticsService = ServiceFactory.getAnalyticsService();
 
 		ExternalNetwork externalNetwork = ExternalNetwork.getNetworkById(externalNetworkId);
 

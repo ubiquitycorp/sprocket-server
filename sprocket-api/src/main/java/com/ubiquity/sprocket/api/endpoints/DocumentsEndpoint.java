@@ -23,10 +23,14 @@ import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
 import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
+import com.ubiquity.identity.service.UserService;
 import com.ubiquity.integration.domain.Activity;
 import com.ubiquity.integration.domain.ExternalNetwork;
 import com.ubiquity.integration.domain.Message;
 import com.ubiquity.integration.domain.VideoContent;
+import com.ubiquity.integration.service.ApplicationService;
+import com.ubiquity.integration.service.ExternalIdentityService;
+import com.ubiquity.integration.service.SocialService;
 import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.DocumentsDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
@@ -35,6 +39,7 @@ import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedDocument;
+import com.ubiquity.sprocket.service.SearchService;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
 @Path("/1.0/documents")
@@ -43,6 +48,12 @@ public class DocumentsEndpoint {
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private JsonConverter jsonConverter = JsonConverter.getInstance();
+	
+	private SearchService searchService = ServiceFactory.getSearchService();
+	private UserService userService = ServiceFactory.getUserService();
+	private ExternalIdentityService externalIdentityService = ServiceFactory.getExternalIdentityService();
+	private ApplicationService applicationService = ServiceFactory.getApplicationService();
+	private SocialService socialService = ServiceFactory.getSocialService();
 
 	@POST
 	@Path("/users/{userId}/live/engaged")
@@ -75,7 +86,7 @@ public class DocumentsEndpoint {
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(externalNetworkId);
 
-		List<Document> documents = ServiceFactory.getSearchService()
+		List<Document> documents = searchService
 				.searchIndexedDocuments(q, null, externalNetwork);
 		for (Document document : documents) {
 			result.getDocuments().add(DtoAssembler.assemble(document));
@@ -98,7 +109,7 @@ public class DocumentsEndpoint {
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(externalNetworkId);
 
-		List<Document> documents = ServiceFactory.getSearchService()
+		List<Document> documents = searchService
 				.searchIndexedDocuments(q, userId, externalNetwork);
 		for (Document document : documents) {
 			result.getDocuments().add(DtoAssembler.assemble(document));
@@ -127,7 +138,7 @@ public class DocumentsEndpoint {
 			throws IOException {
 		DocumentsDto result = new DocumentsDto(q);
 
-		List<Document> documents = ServiceFactory.getSearchService()
+		List<Document> documents = searchService
 				.searchIndexedDocumentsWithinAllProviders(q, userId);
 		for (Document document : documents) {
 			result.getDocuments().add(DtoAssembler.assemble(document));
@@ -153,12 +164,12 @@ public class DocumentsEndpoint {
 				.getNetworkById(externalNetworkId);
 
 		// Get app_i from Redis
-		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+		Long appId = userService.retrieveApplicationId(
 				userId);
 
-		User user = ServiceFactory.getUserService().getUserById(userId);
+		User user = userService.getUserById(userId);
 
-		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+		ExternalIdentity identity = externalIdentityService
 				.findExternalIdentity(userId, externalNetwork);
 
 		if (identity == null && externalNetwork != ExternalNetwork.Yelp)
@@ -168,16 +179,15 @@ public class DocumentsEndpoint {
 		if (externalNetwork != ExternalNetwork.Yelp)
 			clientplaform = identity.getClientPlatform();
 		
-		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
-				.getApplicationService()
+		ExternalNetworkApplication externalNetworkApplication = applicationService
 				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
 						externalNetworkId,clientplaform );
 
 		if (externalNetwork != ExternalNetwork.Yelp)
-			ServiceFactory.getSocialService().checkValidityOfExternalIdentity(
+			socialService.checkValidityOfExternalIdentity(
 					identity, externalNetworkApplication);
 
-		List<Document> documents = ServiceFactory.getSearchService()
+		List<Document> documents = searchService
 				.searchLiveDocuments(q, user, externalNetwork, page, longitude,
 						latitude, locator, externalNetworkApplication);
 
