@@ -345,19 +345,26 @@ public class SearchService {
 	 * @param socialNetwork
 	 * @return
 	 */
-	public List<Document> searchIndexedDocumentsWithinAllProviders(String searchTerm, Long userIdFilter) {
+	public List<Document> searchIndexedDocumentsWithinAllProviders(String searchTerm, Long userIdFilter, 
+			boolean searchPrivateEnabled, boolean searchMostPopularEnabled) {
 
 		// filters
 		Map<String, Object> filters = new HashMap<String, Object>();
 
 		List<Long> values = new LinkedList<Long>();
 		// private user data has owner id within all providers
-		Long ownerId = SearchKeys.generateOwnerId(userIdFilter);
-		values.add(ownerId);
+		if (searchPrivateEnabled){
+			Long ownerId = SearchKeys.generateOwnerId(userIdFilter);
+			values.add(ownerId);
+		}
 		
 		// most popular data has no owner within all providers
-		Long noOwner = SearchKeys.generateOwnerId(null);
-		values.add(noOwner);
+		if (searchMostPopularEnabled)
+		{
+			Long noOwner = SearchKeys.generateOwnerId(null);
+			values.add(noOwner);
+		}
+		
 		filters.put(SearchKeys.Fields.FIELD_OWNER_ID, values);
 		Integer resultsLimit = networkNumbers * networkLimit;
 		return searchEngine.searchDocuments(searchTerm, createFieldsToSearchOver(), filters, SolrOperator.OR, SearchKeys.Fields.FIELD_EXTERNAL_NETWORK_ID, networkLimit, resultsLimit);

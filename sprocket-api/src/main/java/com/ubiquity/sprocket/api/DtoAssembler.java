@@ -36,6 +36,7 @@ import com.ubiquity.location.domain.Location;
 import com.ubiquity.location.domain.Place;
 import com.ubiquity.media.domain.Image;
 import com.ubiquity.media.domain.Video;
+import com.ubiquity.sprocket.api.dto.containers.CategoriesDto;
 import com.ubiquity.sprocket.api.dto.containers.ConfigurationRulesDto;
 import com.ubiquity.sprocket.api.dto.model.AddressDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
@@ -59,6 +60,7 @@ import com.ubiquity.sprocket.api.dto.model.social.RatingDto;
 import com.ubiquity.sprocket.api.dto.model.user.IdentityDto;
 import com.ubiquity.sprocket.api.dto.model.user.LocationDto;
 import com.ubiquity.sprocket.domain.Configuration;
+import com.ubiquity.sprocket.domain.ConfigurationRules;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchKeys;
 
@@ -797,13 +799,23 @@ public class DtoAssembler {
 		ConfigurationRulesDto configurationRulesDto = new ConfigurationRulesDto();
 		ExternalNetwork externalNetwork = null;
 		ExternalNetworkConfigurationDto externalNetworkConfigurationDto = null;
+		JsonConverter jsonConverter = JsonConverter.getInstance();
 		for (Configuration config : rules) {
 			if (config.getExternalNetwork() == null) {
 				configurationRulesDto.getGeneralRules().put(config.getName(),
 						config.getValue());
 			} else if (config.getExternalNetwork() == externalNetwork) {
-				externalNetworkConfigurationDto.getRules().put(
-						config.getName(), config.getValue());
+				if (config.getName().equals(
+						ConfigurationRules.activitiesCategories) || config.getName().equals(
+								ConfigurationRules.videosCategories)) {
+					CategoriesDto categoriesDto = jsonConverter.convert(
+							config.getValue(), CategoriesDto.class);
+					externalNetworkConfigurationDto.getRules().put(
+							config.getName(), categoriesDto.getCategories());
+				} else {
+					externalNetworkConfigurationDto.getRules().put(
+							config.getName(), config.getValue());
+				}
 			} else {
 				if (externalNetworkConfigurationDto != null) {
 					configurationRulesDto.getProviders().add(
@@ -812,8 +824,18 @@ public class DtoAssembler {
 				externalNetworkConfigurationDto = new ExternalNetworkConfigurationDto(
 						config.getExternalNetwork());
 				externalNetwork = config.getExternalNetwork();
-				externalNetworkConfigurationDto.getRules().put(
-						config.getName(), config.getValue());
+				if (config.getName().equals(
+						ConfigurationRules.activitiesCategories) || config.getName().equals(
+								ConfigurationRules.videosCategories)) {
+					CategoriesDto categoriesDto = jsonConverter.convert(
+							config.getValue(), CategoriesDto.class);
+					externalNetworkConfigurationDto.getRules().put(
+							config.getName(), categoriesDto.getCategories());
+				} else {
+					externalNetworkConfigurationDto.getRules().put(
+							config.getName(), config.getValue());
+				}
+
 			}
 		}
 		if (externalNetworkConfigurationDto != null) {

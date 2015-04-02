@@ -23,5 +23,14 @@ public interface ConfigurationRules {
 	public static final String activitiesCommentRateDisplay = "activities.comment.rate.display";
 	public static final String activitiesCommentRateType = "activities.comment.rate.type";
 	public static final String activitiesCommentRateContribute = "activities.comment.rate.contribute";
+	public static final String activitiesCategories = "activities.categories";
+	public static final String activitiesRecommended = "activities.recommended.enabled";
+	public static final String activitiesEngaged = "activities.engaged";
+	public static final String videosCategories = "videos.categories";
+	public static final String videosRecommended = "videos.recommended.enabled";
+	public static final String videosEngaged = "videos.engaged";
+	public static final String searchLiveEnabled = "search.live.enabled";
+	public static final String searchPrivateEnabled = "search.private.enabled";
+	public static final String searchMostPopularEnabled = "search.mostpopular.enabled";
 
 }

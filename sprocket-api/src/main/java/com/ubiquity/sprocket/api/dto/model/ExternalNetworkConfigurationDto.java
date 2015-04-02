@@ -1,7 +1,6 @@
 package com.ubiquity.sprocket.api.dto.model;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.TreeMap;
 
 import com.ubiquity.integration.domain.ExternalNetwork;
 
@@ -10,21 +9,21 @@ public class ExternalNetworkConfigurationDto {
 	private ExternalNetwork externalNetwork;
 	private Integer externalNetworkId;
 	private Boolean isActive;
-	private Map<String, Object> rules = null;
+	private TreeMap<String, Object> rules = null;
 
 	public ExternalNetworkConfigurationDto(ExternalNetwork externalNetwork) {
 		this.externalNetwork = externalNetwork;
 		this.externalNetworkId = ExternalNetwork.ordinalOrDefault(externalNetwork);
-		rules = new HashMap<String, Object>();
+		rules = new TreeMap<String, Object>();
 	}
 	
-	public ExternalNetworkConfigurationDto(ExternalNetwork externalNetwork, Map<String, Object> rules) {
+	public ExternalNetworkConfigurationDto(ExternalNetwork externalNetwork, TreeMap<String, Object> rules) {
 		this.externalNetwork = externalNetwork;
 		this.externalNetworkId = ExternalNetwork.ordinalOrDefault(externalNetwork);
 		this.rules = rules;
 	}
 
-	public Map<String, Object> getRules() {
+	public TreeMap<String, Object> getRules() {
 		return rules;
 	}
 

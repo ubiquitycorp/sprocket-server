@@ -46,8 +46,12 @@ public class ClientConfigurationService {
 
 		for (com.ubiquity.sprocket.domain.Configuration config : rules) {
 			if (config.getExternalNetwork() != null
+					&& network != null
 					&& config.getExternalNetwork().equals(network)
 					&& config.getName().equals(key)) {
+				return config.getValue();
+			} else if (config.getName().equals(key))
+			{
 				return config.getValue();
 			}
 		}

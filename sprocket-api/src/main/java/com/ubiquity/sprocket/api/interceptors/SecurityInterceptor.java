@@ -52,10 +52,27 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 		Method method = methodInvoker.getMethod();
 
 		if (method.isAnnotationPresent(Active.class)) {
-			Integer externalNetworkId = Integer.parseInt(requestContext
+			String externalNetworkPathParam = requestContext
 					.getUriInfo().getPathParameters()
-					.getFirst("externalNetworkId"));
-			if (!checkAvailability(externalNetworkId, method))
+					.getFirst("externalNetworkId");
+			
+			Integer externalNetworkId = null;
+			if (externalNetworkPathParam != null)
+			{
+				externalNetworkId = Integer.parseInt(externalNetworkPathParam);
+			}
+			
+			String userIdPathParam = requestContext
+					.getUriInfo().getPathParameters()
+					.getFirst("userId");
+			Long userId = null;
+			
+			if (userIdPathParam != null)
+			{
+				userId = Long.parseLong(userIdPathParam);
+			}
+			
+			if (!checkAvailability(externalNetworkId, userId, method))
 				throw new UnsupportedOperationException();
 		}
 
@@ -95,14 +112,18 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 		}
 	}
 
-	private Boolean checkAvailability(Integer externalNetworkId, Method method) {
+	private Boolean checkAvailability(Integer externalNetworkId, Long userId, Method method) {
 		Boolean isEnabled = false;
 		ClientConfigurationService service = ServiceFactory
 				.getClientConfigurationService();
 		String path = method.getAnnotation(Path.class).value();
 
-		ExternalNetwork network = ExternalNetwork
-				.getNetworkById(externalNetworkId);
+		ExternalNetwork network = null;
+		if (externalNetworkId != null)
+		{
+			network = ExternalNetwork.getNetworkById(externalNetworkId);
+		}
+		
 		if (method.isAnnotationPresent(GET.class)) {
 			if (path.endsWith("messages")) {
 				isEnabled = service.getValue(
@@ -121,9 +142,25 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 			} else if (path.endsWith("videos")) {
 				isEnabled = service.getValue(ConfigurationRules.videosEnabled,
 						network);
-			} else if (path.endsWith("engaged")) {
-				isEnabled = service.getValue(
-						ConfigurationRules.favoriteEnabled, network);
+			} else if (path.endsWith("activities/recommended"))
+			{
+				isEnabled = service.getValue(ConfigurationRules.activitiesRecommended, network);
+			} else if (path.endsWith("videos/recommended"))
+			{
+				isEnabled = service.getValue(ConfigurationRules.videosRecommended, network);
+			} else if (path.endsWith("live"))
+			{
+				isEnabled = service.getValue(ConfigurationRules.searchLiveEnabled,network);
+			} else if (path.endsWith("indexed"))
+			{
+				if (userId == null)
+				{
+					isEnabled = service.getValue(ConfigurationRules.searchLiveEnabled,network);
+				} else if (network != null)
+				{
+					isEnabled = service.getValue(ConfigurationRules.searchPrivateEnabled,network);
+				}
+				
 			}
 			
 		} else if (method.isAnnotationPresent(POST.class)) {
@@ -139,9 +176,15 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 			} else if (path.endsWith("vote")) {
 				isEnabled = service.getValue(
 						ConfigurationRules.activitiesCommentRateContribute, network);
-			} else if (path.endsWith("activities")) {
+			}  else if (path.endsWith("activities/engaged")) {
 				isEnabled = service.getValue(
-						ConfigurationRules.activitiesPost, network);
+						ConfigurationRules.activitiesEngaged, network);
+			} else if (path.endsWith("videos/engaged")) {
+				isEnabled = service.getValue(
+						ConfigurationRules.videosEngaged, network);
+			} else if (path.endsWith("live/engaged"))
+			{
+				isEnabled = service.getValue(ConfigurationRules.searchLiveEnabled, network);
 			}
 		}
 		return isEnabled;

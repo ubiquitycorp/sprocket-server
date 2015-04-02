@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.niobium.common.serialize.JsonConverter;
+import com.ubiquity.api.annotations.Active;
 import com.ubiquity.api.annotations.Secure;
 import com.ubiquity.identity.domain.ClientPlatform;
 import com.ubiquity.identity.domain.ExternalIdentity;
@@ -35,10 +36,12 @@ import com.ubiquity.sprocket.api.DtoAssembler;
 import com.ubiquity.sprocket.api.dto.containers.DocumentsDto;
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
 import com.ubiquity.sprocket.api.validation.EngagementValidation;
+import com.ubiquity.sprocket.domain.ConfigurationRules;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.messaging.MessageConverterFactory;
 import com.ubiquity.sprocket.messaging.MessageQueueFactory;
 import com.ubiquity.sprocket.messaging.definition.UserEngagedDocument;
+import com.ubiquity.sprocket.service.ClientConfigurationService;
 import com.ubiquity.sprocket.service.SearchService;
 import com.ubiquity.sprocket.service.ServiceFactory;
 
@@ -59,6 +62,7 @@ public class DocumentsEndpoint {
 	@Path("/users/{userId}/live/engaged")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
+	@Active
 	public Response engaged(@PathParam("userId") Long userId,
 			InputStream payload) throws IOException {
 
@@ -77,6 +81,7 @@ public class DocumentsEndpoint {
 	@GET
 	@Path("providers/{externalNetworkId}/indexed")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Active
 	public Response searchIndexed(
 			@PathParam("externalNetworkId") Integer externalNetworkId,
 			@QueryParam("q") String q, @QueryParam("page") Integer page)
@@ -100,6 +105,7 @@ public class DocumentsEndpoint {
 	@Path("users/{userId}/providers/{externalNetworkId}/indexed")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
+	@Active
 	public Response searchIndexed(@PathParam("userId") Long userId,
 			@PathParam("externalNetworkId") Integer externalNetworkId,
 			@QueryParam("q") String q, @QueryParam("page") Integer page)
@@ -136,10 +142,24 @@ public class DocumentsEndpoint {
 	public Response searchIndexed(@PathParam("userId") Long userId,
 			@QueryParam("q") String q, @QueryParam("page") Integer page)
 			throws IOException {
+		ClientConfigurationService service = ServiceFactory
+				.getClientConfigurationService();
+		boolean searchPrivateEnabled = service.getValue(
+				ConfigurationRules.searchPrivateEnabled, null);
+		boolean searchMostPopularEnabled = service.getValue(
+				ConfigurationRules.searchMostPopularEnabled, null);
+		
+		if (!searchMostPopularEnabled && !searchPrivateEnabled)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
 		DocumentsDto result = new DocumentsDto(q);
 
 		List<Document> documents = searchService
-				.searchIndexedDocumentsWithinAllProviders(q, userId);
+				.searchIndexedDocumentsWithinAllProviders(q, userId,
+						searchPrivateEnabled, searchMostPopularEnabled);
+		
 		for (Document document : documents) {
 			result.getDocuments().add(DtoAssembler.assemble(document));
 		}
@@ -152,6 +172,7 @@ public class DocumentsEndpoint {
 	@Path("users/{userId}/providers/{externalNetworkId}/live")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Secure
+	@Active
 	public Response searchLive(@PathParam("userId") Long userId,
 			@PathParam("externalNetworkId") Integer externalNetworkId,
 			@QueryParam("q") String q, @QueryParam("page") Integer page,
