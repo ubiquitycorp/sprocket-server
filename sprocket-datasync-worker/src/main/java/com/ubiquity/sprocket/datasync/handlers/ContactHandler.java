@@ -27,12 +27,13 @@ public class ContactHandler extends Handler {
 	public ContactHandler(SyncProcessor processor) {
 		super(processor);
 		networks = EnumSet.of(ExternalNetwork.Facebook,
-				ExternalNetwork.LinkedIn, ExternalNetwork.Google,
-				ExternalNetwork.SocailMockNetwork);
+				ExternalNetwork.LinkedIn, ExternalNetwork.GooglePlus,
+				ExternalNetwork.Gmail, ExternalNetwork.SocailMockNetwork);
 	}
 
 	@Override
-	protected void syncData(ExternalIdentity identity, ExternalNetwork network, ExternalNetworkApplication externalNetworkApplication) {
+	protected void syncData(ExternalIdentity identity, ExternalNetwork network,
+			ExternalNetworkApplication externalNetworkApplication) {
 		Long userId = identity.getUser().getUserId();
 		// Sync activities
 		int n = processContacts(identity, network, externalNetworkApplication);
@@ -43,18 +44,20 @@ public class ContactHandler extends Handler {
 	}
 
 	private int processContacts(ExternalIdentity identity,
-			ExternalNetwork network, ExternalNetworkApplication externalNetworkApplication) {
+			ExternalNetwork network,
+			ExternalNetworkApplication externalNetworkApplication) {
 		List<Contact> synced = null;
 		DateTime start = new DateTime();
 		Long userId = identity.getUser().getUserId();
 		int size = -1;
 		try {
 			ContactService contactService = ServiceFactory.getContactService();
-			synced = contactService.syncContacts(identity, externalNetworkApplication);
+			synced = contactService.syncContacts(identity,
+					externalNetworkApplication);
 			// index for searching
 
 			// log.debug(" indexing activities for identity {}", identity);
-			
+
 		} catch (AuthorizationException e) {
 			identity.setIsActive(false);
 			ServiceFactory.getExternalIdentityService().update(identity);
@@ -69,7 +72,7 @@ public class ContactHandler extends Handler {
 					" Processed {} contacts in {} seconds for user " + userId,
 					size, new Period(start, new DateTime()).getSeconds());
 		}
-		
+
 		return size;
 	}
 

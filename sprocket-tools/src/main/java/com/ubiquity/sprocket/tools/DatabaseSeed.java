@@ -12,9 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import com.niobium.repository.jpa.EntityManagerSupport;
 import com.niobium.repository.redis.JedisConnectionFactory;
-import com.ubiquity.identity.domain.Application;
-import com.ubiquity.identity.domain.ClientPlatform;
-import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.integration.api.PlaceAPIFactory;
 import com.ubiquity.integration.api.SocialAPIFactory;
 import com.ubiquity.integration.domain.ExternalInterest;
@@ -235,16 +232,17 @@ public class DatabaseSeed {
 	}
 
 	private void goober(Configuration configuration) {
-//		ServiceFactory.initialize(configuration, null);
-//		
-//		Application application = ServiceFactory.getApplicationService()
-//				.loadApplicationFromConfiguration();
-//		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
-//				.getApplicationService()
-//				.getExAppByExternalNetworkAndClientPlatform(application,
-//						ExternalNetwork.Yelp.ordinal(), ClientPlatform.WEB);
-//		ServiceFactory.getLocationService().syncPlaces(ExternalNetwork.Yelp,
-//				externalNetworkApplication);
+		// ServiceFactory.initialize(configuration, null);
+		//
+		// Application application = ServiceFactory.getApplicationService()
+		// .loadApplicationFromConfiguration();
+		// ExternalNetworkApplication externalNetworkApplication =
+		// ServiceFactory
+		// .getApplicationService()
+		// .getExAppByExternalNetworkAndClientPlatform(application,
+		// ExternalNetwork.Yelp.ordinal(), ClientPlatform.WEB);
+		// ServiceFactory.getLocationService().syncPlaces(ExternalNetwork.Yelp,
+		// externalNetworkApplication);
 	}
 
 	private void loadParentInterestWithFile(Interest parent, String resource)

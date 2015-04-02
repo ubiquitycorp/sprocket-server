@@ -38,7 +38,7 @@ public class GoogleApiTest {
 				.identifier(UUID.randomUUID().toString()).accessToken("")
 				.refreshToken("").expiresAt(1L)
 				.clientPlatform(ClientPlatform.WEB)
-				.externalNetwork(ExternalNetwork.Google.ordinal()).build();
+				.externalNetwork(ExternalNetwork.GooglePlus.ordinal()).build();
 		log.debug("authenticated google with identity {} ", identity);
 
 		// intialize services

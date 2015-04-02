@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.NoResultException;
@@ -129,19 +128,18 @@ public class UsersEndpoint {
 					"Autontication Failed no oAuth_token_returned", null);
 
 		// create the identity if it does not exist; or use the existing one
-		List<ExternalIdentity> identities = ServiceFactory
-				.getExternalIdentityService().createOrUpdateExternalIdentity(
-						user, accesstokens[0], accesstokens[1], null,
-						ClientPlatform.WEB, ExternalNetwork.LinkedIn, null,
-						true, externalNetworkApplication);
+		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
+				.createOrUpdateExternalIdentity(user, accesstokens[0],
+						accesstokens[1], null, ClientPlatform.WEB,
+						ExternalNetwork.LinkedIn, null,
+						externalNetworkApplication);
 
-		ExternalIdentity identity = identities.get(0);
 		IdentityDto result = new IdentityDto.Builder()
 				.identifier(identity.getIdentifier())
 				.clientPlatformId(identity.getClientPlatform().ordinal())
 				.build();
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identities, result.getClientPlatformId());
+		sendActivatedMessage(user, identity, result.getClientPlatformId());
 
 		try {
 
@@ -254,8 +252,7 @@ public class UsersEndpoint {
 			throw new AuthorizationException("Username / password incorrect",
 					null);
 		else if (!user.isActive())
-			throw new AuthorizationException("Your account is locked",
-					null);
+			throw new AuthorizationException("Your account is locked", null);
 
 		// update user last login
 		user.setLastLogin(System.currentTimeMillis());
@@ -399,25 +396,23 @@ public class UsersEndpoint {
 						identityDto.getAccessToken(),
 						identityDto.getSecretToken(),
 						identityDto.getRefreshToken(), clientPlatform,
-						externalNetwork, identityDto.getExpiresIn(), true,
+						externalNetwork, identityDto.getExpiresIn(),
 						externalNetworkApplication);
 
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identities,
-				identityDto.getClientPlatformId());
+		sendActivatedMessage(user, identity, identityDto.getClientPlatformId());
 
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(userId,
-							identities.get(0).getIdentityId());
+					.getBySocialIdentityId(userId, identity.getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
 		} catch (NoResultException ex) {
-			IdentityDto result = DtoAssembler.assemble(identities.get(0));
+			IdentityDto result = DtoAssembler.assemble(identity);
 			return Response.ok().entity(jsonConverter.convertToPayload(result))
 					.build();
 		}
@@ -443,13 +438,24 @@ public class UsersEndpoint {
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
 
+		// Get app_i from Redis
+		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+				userId);
+
+		// Load External Application
+		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
+				.getApplicationService()
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
+						externalNetwork.ordinal(), clientPlatform);
+
 		// create the identity if it does not exist; or use the existing one
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.createOrUpdateExternalIdentity(user,
 						identityDto.getAccessToken(),
 						identityDto.getSecretToken(),
 						identityDto.getRefreshToken(), clientPlatform,
-						externalNetwork, identityDto.getExpiresIn());
+						externalNetwork, identityDto.getExpiresIn(),
+						externalNetworkApplication);
 
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto.getClientPlatformId());
@@ -459,7 +465,8 @@ public class UsersEndpoint {
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identity.getIdentityId());
+					.getBySocialIdentityId(userId, identity.getIdentityId());
+
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
@@ -494,17 +501,27 @@ public class UsersEndpoint {
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
 
+		// Get app_i from Redis
+		Long appId = ServiceFactory.getUserService().retrieveApplicationId(
+				userId);
+
+		// Load External Application
+		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
+				.getApplicationService()
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
+						externalNetwork.ordinal(), clientPlatform);
+
 		// create the identity if it does not exist; or use the existing one
 		ExternalIdentity identity = ServiceFactory.getExternalIdentityService()
 				.createOrUpdateEmailIdentity(user, identityDto.getUsername(),
 						identityDto.getPassword(), clientPlatform,
-						externalNetwork);
+						externalNetwork, externalNetworkApplication);
 		// now send the message activated message to cache invalidate
 		sendActivatedMessage(user, identity, identityDto.getClientPlatformId());
 		try {
 
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(identity.getIdentityId());
+					.getBySocialIdentityId(userId, identity.getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
@@ -542,6 +559,7 @@ public class UsersEndpoint {
 		ExternalNetwork externalNetwork = ExternalNetwork
 				.getNetworkById(identityDto.getExternalNetworkId());
 		ExternalIdentity identity = null;
+
 		// load user
 		User user = ServiceFactory.getUserService().getUserById(userId);
 
@@ -567,45 +585,48 @@ public class UsersEndpoint {
 					.createOrUpdateExternalIdentity(user, accessToken,
 							identityDto.getSecretToken(),
 							identityDto.getRefreshToken(), clientPlatform,
-							externalNetwork, null, true,
-							externalNetworkApplication);
+							externalNetwork, null, externalNetworkApplication);
 		} else if (externalNetwork.network == Network.Social) {
 			SocialAPI socialApi = SocialAPIFactory
 					.createProvider(externalNetwork, clientPlatform,
 							externalNetworkApplication);
 			String redirectUri = identityDto.getRedirectUrl();
-			if ((externalNetwork.equals(ExternalNetwork.Google) || externalNetwork
+			if ((externalNetwork.equals(ExternalNetwork.GooglePlus) || externalNetwork
 					.equals(ExternalNetwork.YouTube))
 					&& clientPlatform.equals(ClientPlatform.WEB)) {
 				redirectUri = "postmessage";
 			}
+			// the expiredAt value in externalIdentity object returned from
+			// getAccessToken() is equal to expiresIn value
+			ExternalIdentity externalidentity = socialApi.getAccessToken(
+					identityDto.getCode(), identityDto.getOauthToken(),
+					identityDto.getOauthTokenSecret(), redirectUri);
 
-			identities = ServiceFactory.getExternalIdentityService()
+			identity = ServiceFactory.getExternalIdentityService()
 					.createOrUpdateExternalIdentity(user,
 							externalidentity.getAccessToken(),
 							externalidentity.getSecretToken(),
 							externalidentity.getRefreshToken(), clientPlatform,
 							externalNetwork, externalidentity.getExpiredAt(),
-							true, externalNetworkApplication);
+							externalNetworkApplication);
 
 		}
+
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identities,
-				identityDto.getClientPlatformId());
+		sendActivatedMessage(user, identity, identityDto.getClientPlatformId());
 
 		// send off to analytics tracker
 		// sendEventTrackedMessage(user, identity);
 
 		try {
 			Contact contact = ServiceFactory.getContactService()
-					.getBySocialIdentityId(userId,
-							identities.get(0).getIdentityId());
+					.getBySocialIdentityId(userId, identity.getIdentityId());
 			ContactDto contactDto = DtoAssembler.assemble(contact);
 			return Response.ok()
 					.entity(jsonConverter.convertToPayload(contactDto)).build();
 		} catch (NoResultException ex) {
 			IdentityDto result = new IdentityDto.Builder().identifier(
-					identities.get(0).getIdentifier()).build();
+					identity.getIdentifier()).build();
 			return Response.ok().entity(jsonConverter.convertToPayload(result))
 					.build();
 		}
@@ -843,30 +864,26 @@ public class UsersEndpoint {
 
 		User user = new User(userId);
 
-		List<ExternalIdentity> identities = new LinkedList<ExternalIdentity>();
-		identities.add(identity);
 		// now send the message activated message to cache invalidate
-		sendActivatedMessage(user, identities, clientPlatform.ordinal());
+		sendActivatedMessage(user, identity, clientPlatform.ordinal());
 
 		return Response.ok().build();
 
 	}
 
-	private void sendActivatedMessage(User user,
-			List<ExternalIdentity> identities, Integer clientPlatformId)
-			throws IOException {
-		for (ExternalIdentity identity : identities) {
-			ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
-					.clientPlatformId(clientPlatformId)
-					.userId(user.getUserId())
-					.identityId(identity.getIdentityId()).build();
+	private void sendActivatedMessage(User user, ExternalIdentity identity,
+			Integer clientPlatformId) throws IOException {
 
-			// serialize and send it
-			String message = MessageConverterFactory.getMessageConverter()
-					.serialize(new Message(content));
-			MessageQueueFactory.getCacheInvalidationQueueProducer().write(
-					message.getBytes());
-		}
+		ExternalIdentityActivated content = new ExternalIdentityActivated.Builder()
+				.clientPlatformId(clientPlatformId).userId(user.getUserId())
+				.identityId(identity.getIdentityId()).build();
+
+		// serialize and send it
+		String message = MessageConverterFactory.getMessageConverter()
+				.serialize(new Message(content));
+		MessageQueueFactory.getCacheInvalidationQueueProducer().write(
+				message.getBytes());
+
 	}
 
 	private void sendLocationMessage(Long userId, LocationDto locationDto)

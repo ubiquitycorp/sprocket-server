@@ -195,7 +195,7 @@ public class ExternalApplicationDto {
 			if (consumerSecret == null)
 				throw new IllegalArgumentException(
 						"consumerSecret couldn't be null.");
-		} else if (externalNetworkId == ExternalNetwork.Google.ordinal()) {
+		} else if (externalNetworkId == ExternalNetwork.GooglePlus.ordinal()) {
 			if (consumerSecret == null)
 				throw new IllegalArgumentException(
 						"consumerSecret couldn't be null.");

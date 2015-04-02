@@ -62,15 +62,13 @@ public class ContactServiceTest {
 		externalNetworkApplication = ServiceFactory.getApplicationService()
 				.getExAppByAppIdAndExternalNetworkAndClientPlatform(application.getAppId(),
 						ExternalNetwork.Facebook.ordinal(), ClientPlatform.WEB);
-		List<ExternalIdentity> externalIdentities = ServiceFactory
+		identity = ServiceFactory
 				.getExternalIdentityService().createOrUpdateExternalIdentity(
 						user, UUID.randomUUID().toString(),
 						UUID.randomUUID().toString(),
 						UUID.randomUUID().toString(), ClientPlatform.WEB,
-						ExternalNetwork.Facebook, 3600L, true,
+						ExternalNetwork.Facebook, 3600L,
 						externalNetworkApplication);
-		identity = externalIdentities.get(0);
-
 	}
 
 	@Test

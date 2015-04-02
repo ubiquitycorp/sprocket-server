@@ -26,16 +26,18 @@ public class MessageHandler extends Handler {
 	public MessageHandler(SyncProcessor processor) {
 		super(processor);
 		networks = EnumSet.of(ExternalNetwork.Twitter,
-				ExternalNetwork.Facebook, ExternalNetwork.Google,
-				ExternalNetwork.Tumblr,
+				ExternalNetwork.Facebook, ExternalNetwork.GooglePlus,
+				ExternalNetwork.Gmail, ExternalNetwork.Tumblr,
 				ExternalNetwork.SocailMockNetwork);
 	}
 
 	@Override
-	protected void syncData(ExternalIdentity identity, ExternalNetwork network,ExternalNetworkApplication externalNetworkApplication) {
+	protected void syncData(ExternalIdentity identity, ExternalNetwork network,
+			ExternalNetworkApplication externalNetworkApplication) {
 		Long userId = identity.getUser().getUserId();
 		// Sync messages
-		int n = processMessages(identity, network, null, externalNetworkApplication);
+		int n = processMessages(identity, network, null,
+				externalNetworkApplication);
 		processor.sendStepCompletedMessageToIndividual(backchannel, network,
 				"Synchronized messages", processor.getResoursePath(userId,
 						network, ResourceType.messages), n, userId,
@@ -49,7 +51,8 @@ public class MessageHandler extends Handler {
 	 * @param network
 	 */
 	public int processMessages(ExternalIdentity identity,
-			ExternalNetwork network, String lastMessageIdentifier,ExternalNetworkApplication externalNetworkApplication) {
+			ExternalNetwork network, String lastMessageIdentifier,
+			ExternalNetworkApplication externalNetworkApplication) {
 
 		List<com.ubiquity.integration.domain.Message> synced = null;
 		DateTime start = new DateTime();
@@ -59,7 +62,8 @@ public class MessageHandler extends Handler {
 			SocialService socialService = ServiceFactory.getSocialService();
 
 			synced = socialService.syncMessages(identity, network,
-					lastMessageIdentifier, processedMessages, externalNetworkApplication);
+					lastMessageIdentifier, processedMessages,
+					externalNetworkApplication);
 
 			// add messages to search results
 			ServiceFactory.getSearchService().indexMessages(
@@ -68,7 +72,8 @@ public class MessageHandler extends Handler {
 		} catch (AuthorizationException e) {
 			identity.setIsActive(false);
 			ServiceFactory.getExternalIdentityService().update(identity);
-			log.error("Could not process messages for identity {}: set active to false ,exception: {}",
+			log.error(
+					"Could not process messages for identity {}: set active to false ,exception: {}",
 					identity, ExceptionUtils.getStackTrace(e));
 		} catch (Exception e) {
 			log.error("Could not process messages for identity: {}", identity,
