@@ -71,7 +71,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 			{
 				userId = Long.parseLong(userIdPathParam);
 			}
-			
+			// check if it is allowed to use endpoint
 			if (!checkAvailability(externalNetworkId, userId, method))
 				throw new UnsupportedOperationException();
 		}
@@ -112,6 +112,13 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 		}
 	}
 
+	/**
+	 * This method checks the availability of using endpoints, by checking network and general rules
+	 * @param externalNetworkId
+	 * @param userId
+	 * @param method POST or GET method
+	 * @return
+	 */
 	private Boolean checkAvailability(Integer externalNetworkId, Long userId, Method method) {
 		Boolean isEnabled = false;
 		ClientConfigurationService service = ServiceFactory
@@ -155,12 +162,19 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 			{
 				if (userId == null)
 				{
+					// There is no bookmarked search if there is no live search
 					isEnabled = service.getValue(ConfigurationRules.searchLiveEnabled,network);
 				} else if (network != null)
 				{
+					// checking if searching private data is available
 					isEnabled = service.getValue(ConfigurationRules.searchPrivateEnabled,network);
 				}
 				
+			} else if (path.endsWith("favorites") 
+					|| path.endsWith("favorites/places/{placeId}") 
+					|| path.endsWith("favorites/places/current"))
+			{
+				isEnabled = service.getValue(ConfigurationRules.favoriteEnabled, network);
 			}
 			
 		} else if (method.isAnnotationPresent(POST.class)) {
