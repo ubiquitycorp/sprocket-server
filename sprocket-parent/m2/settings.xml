@@ -577,7 +577,7 @@
 		</profile>
 
 		<profile>
-			<id>swisscom</id>
+			<id>unbranded</id>
 			<properties>
 				<app.log.level>INFO</app.log.level>
 				<loggly.customer.token>4ed5a2fe-f74b-47f8-ba62-ab0ac09e7505
@@ -642,7 +642,7 @@
 				</content.vimeo.mobile.clientId>
 				<content.vimeo.mobile.clientSecret>6814eea3b1195e9f8cd81688481c76688fea1120
 				</content.vimeo.mobile.clientSecret>
-				<constants.resetUrl>swisscom.ubiquitycorp.com/#/reset?token=
+				<constants.resetUrl>unbranded.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>
 				<yelp.consumerKey>mnm5G8XclwYIwbED8HV4EQ</yelp.consumerKey>
 				<yelp.consumerSecret>3X5_IqGMVRE9dwb_pxV23FxS68k
@@ -675,7 +675,7 @@
 				</stripe.api.client>
 				<stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO
 				</stripe.api.secret>
-				<repo.env>swisscom</repo.env>
+				<repo.env>unbranded</repo.env>
 				<mq.queue.cacheinvalidate.host>localhost
 				</mq.queue.cacheinvalidate.host>
 				<mq.queue.cacheinvalidate.username>netappusr
@@ -715,7 +715,7 @@
 			<activation>
 				<property>
 					<name>env</name>
-					<value>swisscom</value>
+					<value>unbranded</value>
 				</property>
 			</activation>
 		</profile>
