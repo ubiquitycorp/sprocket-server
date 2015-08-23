@@ -669,7 +669,7 @@
 				</db.pool.idleConnectionTestPeriod>
 				<db.username>sprocketusr</db.username>
 				<db.password>sprocket9801</db.password>
-				<db.host>localhost</db.host>
+				<db.host>sprocket-rds</db.host>
 				<hibernate.schema.auto>none</hibernate.schema.auto>
 				<stripe.api.client>pk_test_ujJiLWzAZymWRzD10MqT2tej
 				</stripe.api.client>
