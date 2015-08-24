@@ -586,9 +586,9 @@
 				<datasync.worker.processes>1</datasync.worker.processes>
 				<datasync.worker.size>1024</datasync.worker.size>
 				<syslog.host>localhost</syslog.host>
-				<redis.host>localhost</redis.host>
+				<redis.host>sprocket-redis</redis.host>
 				<hibernate.debug>false</hibernate.debug>
-				<solr.api.host>localhost</solr.api.host>
+				<solr.api.host>sprocket-search</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
 				
 				<!--<social.facebook.api.host>http://localhost/sprocket-network-api/api/1.0/facebook</social.facebook.api.host>-->
@@ -682,14 +682,14 @@
 				</mq.queue.cacheinvalidate.username>
 				<mq.queue.cacheinvalidate.password>blackdeer
 				</mq.queue.cacheinvalidate.password>
-				<mq.queue.track.host>localhost</mq.queue.track.host>
+				<mq.queue.track.host>sprocket-rabbitmq</mq.queue.track.host>
 				<mq.queue.track.username>netappusr</mq.queue.track.username>
 				<mq.queue.track.password>blackdeer</mq.queue.track.password>
-				<mq.host>localhost</mq.host>
+				<mq.host>sprocket-rabbitmq</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
 				<!-- xmpp configuration -->
-				<xmpp.host>localhost</xmpp.host>
+				<xmpp.host>sprocket-ejabberd</xmpp.host>
 				<xmpp.port>5222</xmpp.port>
 				<xmpp.domain>localhost</xmpp.domain>
 				<xmpp.user>bot</xmpp.user>
