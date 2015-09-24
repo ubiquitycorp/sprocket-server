@@ -397,7 +397,7 @@
 				</db.pool.idleConnectionTestPeriod>
 				<db.username>sprocketusr</db.username>
 				<db.password>sprocket9801</db.password>
-				<db.host>sprocket-stage-rds.cvgtvh3iosnx.us-west-1.rds.amazonaws.com
+				<db.host>sprocket-stage-rds.ubiquitycorp.net
 				</db.host>
 				<hibernate.schema.auto>none</hibernate.schema.auto>
 				<stripe.api.client>pk_test_ujJiLWzAZymWRzD10MqT2tej
