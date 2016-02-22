@@ -88,7 +88,7 @@
 				</social.reddit.installed.consumerSecret>
 				<social.reddit.web.userAgent>web:com.ubiquiy.sprocketDevWeb:v1.0.1 (by /u/ubiquitybc)
 				</social.reddit.web.userAgent>
-				<social.reddit.installed.userAgent>andriod:com.ubiquiy.sprocketDevMobile:v1.0.1 (by /u/ubiquitybc)
+				<social.reddit.installed.userAgent>android:com.ubiquiy.sprocketDevMobile:v1.0.1 (by /u/ubiquitybc)
 				</social.reddit.installed.userAgent>
 				<social.reddit.redirectUI>http://local.sprocket.com?nw=reddit</social.reddit.redirectUI>
 				<db.pool.maxActive>50</db.pool.maxActive>
@@ -235,7 +235,7 @@
 				</social.reddit.installed.consumerSecret>
 				<social.reddit.web.userAgent>web:com.ubiquiy.sprocketQAWeb:v1.0.2 (by /u/ubiquitybc)
 				</social.reddit.web.userAgent>
-				<social.reddit.installed.userAgent>andriod:com.ubiquiy.sprocketQAMobile:v1.0.2 (by /u/ubiquitybc)
+				<social.reddit.installed.userAgent>android:com.ubiquiy.sprocketQAMobile:v1.0.2 (by /u/ubiquitybc)
 				</social.reddit.installed.userAgent>
 				<social.reddit.redirectUI>http://sprocket-qa.ubiquitycorp.com?nw=reddit</social.reddit.redirectUI>
 				
@@ -383,7 +383,7 @@
 				</social.reddit.installed.consumerSecret>
 				<social.reddit.web.userAgent>web:com.ubiquiy.sprocketStageWeb:v1.0.1 (by /u/ubiquitybc)
 				</social.reddit.web.userAgent>
-				<social.reddit.installed.userAgent>andriod:com.ubiquiy.sprocketStageMobile:v1.0.1 (by /u/ubiquitybc)
+				<social.reddit.installed.userAgent>android:com.ubiquiy.sprocketStageMobile:v1.0.1 (by /u/ubiquitybc)
 				</social.reddit.installed.userAgent>
 				<social.reddit.redirectUI>http://sprocket-web-stage.ubiquitycorp.com?nw=reddit</social.reddit.redirectUI>
 
@@ -515,7 +515,7 @@
 				</social.reddit.installed.consumerSecret>
 				<social.reddit.web.userAgent>web:com.ubiquiy.sprocketWeb:v1.0.1 (by /u/ubiquitybc)
 				</social.reddit.web.userAgent>
-				<social.reddit.installed.userAgent>andriod:com.ubiquiy.sprocketMobile:v1.0.1 (by /u/ubiquitybc)
+				<social.reddit.installed.userAgent>android:com.ubiquiy.sprocketMobile:v1.0.1 (by /u/ubiquitybc)
 				</social.reddit.installed.userAgent>
 
 				<constants.resetUrl>http://sprocket-web-prod.ubiquitycorp.com/#/reset?token=
