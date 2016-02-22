@@ -28,12 +28,13 @@
 				<filtering>false</filtering>
 			</resource>
 		</resources>
+<!-- disable tests
 		<testResources>
 			<testResource>
 				<directory>src/test/resources</directory>
 				<filtering>true</filtering>
 			</testResource>
-		</testResources>
+		</testResources> -->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
