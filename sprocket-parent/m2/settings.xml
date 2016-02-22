@@ -304,12 +304,12 @@
 			<properties>
 				<app.log.level>INFO</app.log.level>
 				<syslog.host>localhost</syslog.host>
-				<tomcat.processes>4</tomcat.processes>
+				<tomcat.processes>1</tomcat.processes>
 
-				<datasync.worker.processes>2</datasync.worker.processes>
-				<datasync.worker.size>2048</datasync.worker.size>
+				<datasync.worker.processes>1</datasync.worker.processes>
+				<datasync.worker.size>256</datasync.worker.size>
 
-				<redis.host>sprocket-redis-stage-01.ubiquitycorp.net</redis.host>
+				<redis.host>localhost</redis.host>
 				<hibernate.debug>false</hibernate.debug>
 				<solr.api.host>sprocket-search-stage.ubiquitycorp.net</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
@@ -397,34 +397,33 @@
 				</db.pool.idleConnectionTestPeriod>
 				<db.username>sprocketusr</db.username>
 				<db.password>sprocket9801</db.password>
-				<db.host>sprocket-stage-rds.ubiquitycorp.net
-				</db.host>
+				<db.host>localhost</db.host>
 				<hibernate.schema.auto>none</hibernate.schema.auto>
 				<stripe.api.client>pk_test_ujJiLWzAZymWRzD10MqT2tej
 				</stripe.api.client>
 				<stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO
 				</stripe.api.secret>
 				<repo.env>stage</repo.env>
-				<mq.queue.cacheinvalidate.host>sprocket-rabbitmq-stage-01.ubiquitycorp.net
+				<mq.queue.cacheinvalidate.host>localhost
 				</mq.queue.cacheinvalidate.host>
 				<mq.queue.cacheinvalidate.username>netappusr
 				</mq.queue.cacheinvalidate.username>
 				<mq.queue.cacheinvalidate.password>blackdeer
 				</mq.queue.cacheinvalidate.password>
-				<mq.queue.track.host>sprocket-rabbitmq-stage-01.ubiquitycorp.net</mq.queue.track.host>
+				<mq.queue.track.host>localhost</mq.queue.track.host>
 				<mq.queue.track.username>netappusr</mq.queue.track.username>
 				<mq.queue.track.password>blackdeer</mq.queue.track.password>
-				<mq.host>sprocket-rabbitmq-stage-01.ubiquitycorp.net</mq.host>
+				<mq.host>localhost</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
-				<xmpp.host>sprocket-ejabberd-stage-01.ubiquitycorp.net</xmpp.host>
+				<xmpp.host>localhost</xmpp.host>
 				<xmpp.port>5222</xmpp.port>
 				<xmpp.domain>localhost</xmpp.domain>
 				<xmpp.user>bot</xmpp.user>
 				<xmpp.password>sprocket9801</xmpp.password>
 				<xmpp.resource>localhost</xmpp.resource>
 				<!-- mail configuration -->
-				<mail.host>email-smtp.us-west-2.amazonaws.com</mail.host>
+				<mail.host>localhost</mail.host>
 				<mail.port>465</mail.port>
 				<mail.from>no-reply\@sprocketlive.com</mail.from>
 				<mail.username>AKIAIBIMFN7QRWAVFV2A</mail.username>
