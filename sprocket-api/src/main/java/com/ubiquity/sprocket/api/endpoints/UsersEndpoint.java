@@ -387,6 +387,7 @@ public class UsersEndpoint {
 		// log.info("identifier = " +
 		// (user).getExternalIdentifier());
 		// Load External Application
+ 		log.debug("appId = " + appId + ", externalNetwork.ordinal() = " + externalNetwork.ordinal() + ", clientPlatform = " + clientPlatform);
 		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
 				.getApplicationService()
 				.getExAppByAppIdAndExternalNetworkAndClientPlatform(appId,
