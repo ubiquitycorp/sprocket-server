@@ -306,10 +306,10 @@
 				<syslog.host>localhost</syslog.host>
 				<tomcat.processes>1</tomcat.processes>
 
-				<datasync.worker.processes>1</datasync.worker.processes>
-				<datasync.worker.size>256</datasync.worker.size>
+				<datasync.worker.processes>2</datasync.worker.processes>
+				<datasync.worker.size>2048</datasync.worker.size>
 
-				<redis.host>localhost</redis.host>
+				<redis.host>sprocket-redis-stage.ubiquitycorp.net</redis.host>
 				<hibernate.debug>false</hibernate.debug>
 				<solr.api.host>sprocket-search-stage.ubiquitycorp.net</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
@@ -385,9 +385,9 @@
 				</social.reddit.web.userAgent>
 				<social.reddit.installed.userAgent>android:com.ubiquiy.sprocketStageMobile:v1.0.1 (by /u/ubiquitybc)
 				</social.reddit.installed.userAgent>
-				<social.reddit.redirectUI>http://sprocket-web-stage.ubiquitycorp.com?nw=reddit</social.reddit.redirectUI>
+				<social.reddit.redirectUI>https://sprocket-web-stage.ubiquitycorp.com?nw=reddit</social.reddit.redirectUI>
 
-				<constants.resetUrl>http://sprocket-web-stage.ubiquitycorp.com/#/reset?token=
+				<constants.resetUrl>https://sprocket-web-stage.ubiquitycorp.com/#/reset?token=
 				</constants.resetUrl>
 				<db.pool.maxActive>50</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
@@ -397,7 +397,7 @@
 				</db.pool.idleConnectionTestPeriod>
 				<db.username>sprocketusr</db.username>
 				<db.password>sprocket9801</db.password>
-				<db.host>localhost</db.host>
+				<db.host>sprocket-mysql-stage.ubiquitycorp.net</db.host>
 				<hibernate.schema.auto>none</hibernate.schema.auto>
 				<stripe.api.client>pk_test_ujJiLWzAZymWRzD10MqT2tej
 				</stripe.api.client>
@@ -410,18 +410,18 @@
 				</mq.queue.cacheinvalidate.username>
 				<mq.queue.cacheinvalidate.password>blackdeer
 				</mq.queue.cacheinvalidate.password>
-				<mq.queue.track.host>localhost</mq.queue.track.host>
+				<mq.queue.track.host>sprocket-rabbitmq-stage.ubiquitycorp.net</mq.queue.track.host>
 				<mq.queue.track.username>netappusr</mq.queue.track.username>
 				<mq.queue.track.password>blackdeer</mq.queue.track.password>
 				<mq.host>localhost</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
-				<xmpp.host>localhost</xmpp.host>
+				<xmpp.host>sprocket-ejabberd-stage.ubiquitycorp.net</xmpp.host>
 				<xmpp.port>5222</xmpp.port>
-				<xmpp.domain>localhost</xmpp.domain>
+				<xmpp.domain>sprocket-ejabberd-stage.ubiquitycorp.net</xmpp.domain>
 				<xmpp.user>bot</xmpp.user>
 				<xmpp.password>sprocket9801</xmpp.password>
-				<xmpp.resource>localhost</xmpp.resource>
+				<xmpp.resource>sprocket-ejabberd-stage.ubiquitycorp.net</xmpp.resource>
 				<!-- mail configuration -->
 				<mail.host>localhost</mail.host>
 				<mail.port>465</mail.port>
