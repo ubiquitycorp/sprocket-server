@@ -398,7 +398,7 @@
 				<db.username>sprocketusr</db.username>
 				<db.password>sprocket9801</db.password>
 				<db.host>sprocket-mysql-stage.ubiquitycorp.net</db.host>
-				<hibernate.schema.auto>none</hibernate.schema.auto>
+				<hibernate.schema.auto>update</hibernate.schema.auto>
 				<stripe.api.client>pk_test_ujJiLWzAZymWRzD10MqT2tej
 				</stripe.api.client>
 				<stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO
