@@ -47,7 +47,7 @@
 				</social.google.ios.apikey>
 				<social.google.web.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I
 				</social.google.web.apikey>
-				<social.google.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I
+				<social.google.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I 
 				</social.google.apikey>
 				<social.google.web.clientId>963651180860-gdgpmd4pqpsetql8932mrgbif8f4t89p.apps.googleusercontent.com
 				</social.google.web.clientId>
@@ -343,7 +343,8 @@
 				</social.google.android.apikey>
 				<social.google.ios.apikey>AIzaSyDcW0lXISh704Z6tVwru78yLLuG6629bAk
 				</social.google.ios.apikey>
-				<social.google.web.apikey>AIzaSyAAohwXAj4cwNQt5Gjylf7ZV7ObZiMZH_o
+				<!-- <social.google.web.apikey>AIzaSyAAohwXAj4cwNQt5Gjylf7ZV7ObZiMZH_o -->
+				<social.google.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I 
 				</social.google.web.apikey>
 				<social.google.web.clientId>41815987463-mbca1f4ojnj29qed9abor6rjsbat61ld.apps.googleusercontent.com
 				</social.google.web.clientId>
