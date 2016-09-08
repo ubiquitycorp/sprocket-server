@@ -8,180 +8,336 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ubiquity.content.domain.VideoContent;
+import com.niobium.repository.jpa.EntityManagerSupport;
+import com.niobium.repository.redis.JedisConnectionFactory;
+import com.ubiquity.identity.domain.Application;
 import com.ubiquity.identity.domain.ClientPlatform;
+import com.ubiquity.identity.domain.Developer;
 import com.ubiquity.identity.domain.ExternalIdentity;
+import com.ubiquity.identity.domain.ExternalNetworkApplication;
 import com.ubiquity.identity.domain.User;
-import com.ubiquity.identity.factory.UserFactory;
-import com.ubiquity.media.domain.Image;
-import com.ubiquity.media.domain.Video;
-import com.ubiquity.social.domain.Activity;
-import com.ubiquity.social.domain.Contact;
-import com.ubiquity.social.domain.Message;
-import com.ubiquity.external.domain.ExternalNetwork;
+import com.ubiquity.identity.factory.TestDeveloperFactory;
+import com.ubiquity.identity.factory.TestUserFactory;
+import com.ubiquity.identity.repository.DeveloperRepositoryJpaImpl;
+import com.ubiquity.integration.api.ContentAPIFactory;
+import com.ubiquity.integration.api.SocialAPIFactory;
+import com.ubiquity.integration.domain.Activity;
+import com.ubiquity.integration.domain.Contact;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Message;
+import com.ubiquity.integration.domain.VideoContent;
+import com.ubiquity.integration.factory.TestActivityFactory;
+import com.ubiquity.integration.factory.TestContactFactory;
+import com.ubiquity.integration.factory.TestMessageFactory;
+import com.ubiquity.integration.factory.TestVideoContentFactory;
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchKeys;
 
 public class SearchServiceTest {
 
 	private static SearchService searchService;
-
 	private Logger log = LoggerFactory.getLogger(getClass());
+
+	private static User owner;
+	private static Application application;
 
 	@BeforeClass
 	public static void setUp() throws Exception {
 		Configuration config = new PropertiesConfiguration("test.properties");
-		searchService = new SearchService(config);
+		Configuration errorsConfiguration = new PropertiesConfiguration(
+				"messages.properties");
+
+		JedisConnectionFactory.initialize(config);
+		SocialAPIFactory.initialize(config);
+		ContentAPIFactory.initialize(config);
+		ServiceFactory.initialize(config, errorsConfiguration);
+		searchService = ServiceFactory.getSearchService();
+
+		owner = TestUserFactory
+				.createTestUserWithMinimumRequiredProperties(null);
+		ServiceFactory.getUserService().create(owner);
 
 		searchService.deleteAll();
+		
+		Developer developer = TestDeveloperFactory
+				.createTestDeveloperWithMinimumRequiredProperties();
+		
+		EntityManagerSupport.beginTransaction();
+		new DeveloperRepositoryJpaImpl().create(developer);
+		EntityManagerSupport.commit();
+		
+		application = ServiceFactory.getApplicationService()
+				.createDefaultAppIFNotExsists(developer,UUID.randomUUID().toString(),UUID.randomUUID().toString());
+		
+		
 	}
 
-	
 	@Test
-	public void testLiveSearch() {
+	public void testLiveSearchWithFacebook() {
+
+		User user = TestUserFactory
+				.createTestUserWithMinimumRequiredProperties(null);
+		user.getIdentities()
+				.add(new ExternalIdentity.Builder()
+						.user(user)
+						.accessToken(
+								"CAAIQjk0elpEBAHOw7lgI0DEXgr9WZATxvFqWIwZCdbq7PuxEkBD3fjLE1oP6Www1J8T21f1XITpNDijPu2xlaoh8AdviGZCLIIzp5eTmrfnuWcy6D1OKn6GRliPuJQZA5LmUxqTRthADMuhbGUXPiYllUgl09CUfevjSSMSphsyBwPFZCLy9fX8QFYYieYRUZD")
+						.clientPlatform(ClientPlatform.WEB)
+						.externalNetwork(ExternalNetwork.Facebook.ordinal())
+						.build());
+
 		
-		User user = UserFactory.createTestUserWithMinimumRequiredProperties();
-		user.getIdentities().add(new ExternalIdentity.Builder().user(user).accessToken("CAACEdEose0cBAJDovo29F6NOZCBZCFJUTGpCaOhJsCOzvLCGZA8aMWrZApIwvd5xNwkROgkabPFDgFoJhLVfrmTsiIRSTTtmmZCAtdlr7y776bC40Aj4tf5vcKWjyZCmbsgEd9bVtA9zcFMcqV8kaVZBhpYkBvxNLPz2V2mINqctf3V92odSyXPDcXQviaJqHYZD").externalNetwork(ExternalNetwork.Facebook.ordinal()).build());
-		List<Document> documents = searchService.searchLiveActivities("Karate", user, ExternalNetwork.Facebook, ClientPlatform.WEB, 1);
+		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
+				.getApplicationService()
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(application.getAppId(),
+						ExternalNetwork.Facebook.ordinal(),
+						ClientPlatform.Android);
+		List<Document> documents = searchService.searchLiveDocuments("Karate",
+				user, ExternalNetwork.Facebook, 1, null, null, null,
+				externalNetworkApplication);
 		log.debug("documents: {}", documents);
-		
+		Assert.assertFalse(documents.isEmpty());
+
 	}
 
+	@Test
+	public void testLiveSearchWithVimeo() {
+
+		User user = TestUserFactory
+				.createTestUserWithMinimumRequiredProperties(null);
+		user.getIdentities().add(
+				new ExternalIdentity.Builder().user(user)
+						.accessToken("a5f46897abbbd2b83501ea79b4916f44")
+						.clientPlatform(ClientPlatform.WEB)
+						.externalNetwork(ExternalNetwork.Vimeo.ordinal())
+						.build());
+
+		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
+				.getApplicationService()
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(application.getAppId(),
+						ExternalNetwork.Vimeo.ordinal(), ClientPlatform.Android);
+		List<Document> documents = searchService.searchLiveDocuments("Karate",
+				user, ExternalNetwork.Vimeo, 1, null, null, null,
+				externalNetworkApplication);
+		log.debug("documents: {}", documents);
+		Assert.assertFalse(documents.isEmpty());
+
+	}
+
+	@Test
+	public void testLiveSearchWithYouTube() {
+		User user = TestUserFactory
+				.createTestUserWithMinimumRequiredProperties(null);
+		user.getIdentities()
+				.add(new ExternalIdentity.Builder()
+						.user(user)
+						.accessToken(
+								"ya29.YADq4neRcxr8kiIAAABXuPKmNyMLWRUfEOtm3zfio0Ua5xIuW9sho7Mbms1nCTs96nsseog3eWo7vq2sdLw")
+						.clientPlatform(ClientPlatform.Android)
+						.externalNetwork(ExternalNetwork.YouTube.ordinal())
+						.build());
+		
+		ExternalNetworkApplication externalNetworkApplication = ServiceFactory
+				.getApplicationService()
+				.getExAppByAppIdAndExternalNetworkAndClientPlatform(application.getAppId(),
+						ExternalNetwork.Vimeo.ordinal(), ClientPlatform.Android);
+		List<Document> documents = searchService.searchLiveDocuments("Karate",
+				user, ExternalNetwork.YouTube, 1, null, null, null,
+				externalNetworkApplication);
+		log.debug("documents: {}", documents);
+		Assert.assertFalse(documents.isEmpty());
+	}
+
+	@Test
+	public void testLiveSearchWithLinkedIn() {
+
+	}
+
+	@Test
+	public void testLiveSearchWithTwitter() {
+
+	}
+
+	@Ignore
 	@Test
 	public void testAddMessagesReturnsInBasicSearch() {
 		// build partial doc with the fields being indexed
-		Message message = new Message.Builder()
-		.messageId(new java.util.Random().nextLong())
-		.owner(new User.Builder().userId(1l).build())
-		.body(UUID.randomUUID().toString())
-		.externalNetwork(ExternalNetwork.Facebook)
-		.title(UUID.randomUUID().toString()).sender(
-				new Contact.Builder().displayName("Jack").build())
-				.externalNetwork(ExternalNetwork.Facebook)
-				.build();
+		Contact sender = TestContactFactory
+				.createContactWithMininumRequiredFieldsAndExternalNetwork(
+						owner, ExternalNetwork.Facebook);
+		Message message = TestMessageFactory
+				.createMessageWithMininumRequiredFields(owner, sender,
+						ExternalNetwork.Facebook, UUID.randomUUID().toString());
 
-		searchService.indexMessages(
+		// ServiceFactory.getSocialService().create(message);
+		searchService.indexMessages(message.getOwner().getUserId(),
 				Arrays.asList(new Message[] { message }));
 
-		// search by sender display name, making sure that only this entity shows up and it's of type "Message"
-		List<Document> documents = searchService.searchIndexedDocuments("Jack", 1l);
+		// search by sender display name, making sure that only this entity
+		// shows up and it's of type "Message"
+		List<Document> documents = searchService.searchIndexedDocuments(
+				message.getTitle(), owner.getUserId());
 
 		Assert.assertTrue(documents.size() == 1);
 		Document result = documents.get(0);
-		Assert.assertEquals(Message.class.getSimpleName(), result.getFields().get(SearchKeys.Fields.FIELD_DATA_TYPE));
+		Assert.assertEquals(Message.class.getSimpleName(), result.getFields()
+				.get(SearchKeys.Fields.FIELD_DATA_TYPE));
 
-		testUserAndSocialNetworkFilter(message.getSender().getDisplayName(), 1l, ExternalNetwork.Facebook);
+	}
 
+	@Test
+	public void testAddPublicVideoUserFilter() {
+		// create an activity with no owner
+		VideoContent videoContent = TestVideoContentFactory
+				.createVideoContentWithMininumRequiredFields(null,
+						ExternalNetwork.YouTube);
+		ServiceFactory.getContentService().create(videoContent);
+
+		// save with no use filter
+		searchService.indexVideos(null,
+				Arrays.asList(new VideoContent[] { videoContent }), true);
+
+		// search for this user; should return public even though the user
+		// fitler is set
+		List<Document> documents = searchService.searchIndexedDocuments(
+				videoContent.getDescription(), null, ExternalNetwork.YouTube);
+		log.debug("documents: {}", documents);
+		Assert.assertTrue(documents.size() == 1);
+
+		// save with user filter
+		searchService.indexVideos(owner.getUserId(),
+				Arrays.asList(new VideoContent[] { videoContent }), true);
+
+		// search for this user; should return when searching with this user
+		// filter specified
+		documents = searchService.searchIndexedDocuments(
+				videoContent.getDescription(), owner.getUserId(),
+				ExternalNetwork.YouTube);
+		log.debug("documents: {}", documents);
+		Assert.assertTrue(documents.size() == 1);
+
+		// search for this user; should not return when a different user is
+		// specified
+		documents = searchService.searchIndexedDocuments(
+				videoContent.getDescription(), owner.getUserId() + 1,
+				ExternalNetwork.YouTube);
+		log.debug("documents: {}", documents);
+		Assert.assertTrue(documents.isEmpty());
+
+	}
+
+	@Test
+	public void testAddPublicActivityUserFilter() {
+		Activity activity = TestActivityFactory
+				.createActivityWithMininumRequirements(null,
+						ExternalNetwork.Facebook);
+		Contact postedBy = TestContactFactory
+				.createContactWithMininumRequiredFieldsAndExternalNetwork(
+						owner, ExternalNetwork.Facebook);
+		activity.setPostedBy(postedBy);
+
+		searchService.indexActivities(null,
+				Arrays.asList(new Activity[] { activity }), true);
+
+		// search by sender display name, making sure that only this entity
+		// shows up and it's of type "Message"
+		List<Document> documents = searchService.searchIndexedDocuments(
+				activity.getTitle(), null, ExternalNetwork.Facebook);
+		log.debug("documents: {}", documents);
+		Assert.assertEquals(1, documents.size());
+
+		documents = searchService.searchIndexedDocuments(activity.getTitle(),
+				owner.getUserId(), ExternalNetwork.Facebook);
+		log.debug("documents: {}", documents);
+		Assert.assertTrue(documents.isEmpty());
 
 	}
 
 	@Test
 	public void testDedupe() {
-		// build a video content with random strings so that it contains the same signature 
-		VideoContent videoContent = new VideoContent.Builder()
-		.videoContentId(new java.util.Random().nextLong())
-		.category(UUID.randomUUID().toString())
-		.title(UUID.randomUUID().toString())
-		.video(new Video.Builder().itemKey(UUID.randomUUID().toString()).build())
-		.thumb(new Image("http://"+UUID.randomUUID().toString()+".com"))
-		.description(UUID.randomUUID().toString()).build();
+		// build a video content with random strings so that it contains the
+		// same signature
+		VideoContent videoContent = TestVideoContentFactory
+				.createVideoContentWithMininumRequiredFields(owner,
+						ExternalNetwork.YouTube);
+		ServiceFactory.getContentService().create(videoContent);
 		// add 2
-		searchService.indexVideos(
-				Arrays.asList(new VideoContent[] { videoContent, videoContent }), 1l);
+		searchService.indexVideos(null, Arrays.asList(new VideoContent[] {
+				videoContent, videoContent }), false);
 
-		// search, making sure that only this entity shows up and it's of type "VideoContent"
-		List<Document> documents = searchService.searchIndexedDocuments(videoContent.getTitle(), 1l);
+		// search, making sure that only this entity shows up and it's of type
+		// "VideoContent"
+		List<Document> documents = searchService.searchIndexedDocuments(
+				videoContent.getTitle(), null);
 		log.debug("documents {}", documents);
-		Assert.assertTrue(documents.size() == 1);
+		Assert.assertEquals(1, documents.size());
 
 	}
-
-
 
 	@Test
 	public void testAddActivitiesReturnsInBasicSearch() {
 		// build partial doc with the fields being indexed
-		Activity activity = new Activity.Builder()
-		.activityId(new java.util.Random().nextLong())
-		.owner(new User.Builder().userId(1l).build())
-		.body(UUID.randomUUID().toString())
-		.externalNetwork(ExternalNetwork.LinkedIn)
-		.title(UUID.randomUUID().toString()).postedBy(
-				new Contact.Builder().displayName("Bob").build())
-				.build();
-		searchService.indexActivities(
-				Arrays.asList(new Activity[] { activity }));
 
-		// search by sender display name, making sure that only this entity shows up and it's of type "Message"
-		List<Document> documents = searchService.searchIndexedDocuments("Bob", 1l);
+		Activity activity = TestActivityFactory
+				.createActivityWithMininumRequirements(owner,
+						ExternalNetwork.LinkedIn);
+		Contact postedBy = TestContactFactory
+				.createContactWithMininumRequiredFieldsAndExternalNetwork(
+						owner, ExternalNetwork.LinkedIn);
+		activity.setPostedBy(postedBy);
+
+		searchService.indexActivities(owner.getUserId(),
+				Arrays.asList(new Activity[] { activity }), true);
+
+		// search by sender display name, making sure that only this entity
+		// shows up and it's of type "Message"
+		List<Document> documents = searchService.searchIndexedDocuments(
+				activity.getTitle(), owner.getUserId());
 		log.debug("documents: {}", documents);
-		Assert.assertTrue(documents.size() == 1);
+		Assert.assertEquals(1, documents.size());
 		Document result = documents.get(0);
-		Assert.assertEquals(Activity.class.getSimpleName(), result.getFields().get(SearchKeys.Fields.FIELD_DATA_TYPE));
 
-		
-		testUserAndSocialNetworkFilter(activity.getPostedBy().getDisplayName(), 1l, ExternalNetwork.LinkedIn);
+		Assert.assertEquals(Activity.class.getSimpleName(), result.getFields()
+				.get(SearchKeys.Fields.FIELD_DATA_TYPE));
 
-
+		Assert.assertEquals(activity.getTitle(),
+				result.getFields().get(SearchKeys.Fields.FIELD_TITLE));
+		Assert.assertEquals(activity.getBody(),
+				result.getFields().get(SearchKeys.Fields.FIELD_BODY));
 
 	}
 
 	@Test
 	public void testAddVideoReturnsInBasicSearch() {
 		// build partial doc with the fields being indexed
-		VideoContent videoContent = new VideoContent.Builder()
-		.videoContentId(new java.util.Random().nextLong())
-		.category(UUID.randomUUID().toString())
-		.title("video")
-		.video(new Video.Builder().itemKey(UUID.randomUUID().toString()).build())
-		.thumb(new Image("http://"+UUID.randomUUID().toString()+".com"))
-		.description(UUID.randomUUID().toString()).build();
+		VideoContent videoContent = TestVideoContentFactory
+				.createVideoContentWithMininumRequiredFields(owner,
+						ExternalNetwork.YouTube);
+		ServiceFactory.getContentService().create(videoContent);
 
-		searchService.indexVideos(
-				Arrays.asList(new VideoContent[] { videoContent }), 1l);
+		searchService.indexVideos(owner.getUserId(),
+				Arrays.asList(new VideoContent[] { videoContent }), false);
 
-		// search, making sure that only this entity shows up and it's of type "VideoContent"
-		List<Document> documents = searchService.searchIndexedDocuments("video", 1l);
+		// search, making sure that only this entity shows up and it's of type
+		// "VideoContent"
+		List<Document> documents = searchService.searchIndexedDocuments(
+				videoContent.getTitle(), owner.getUserId());
 
-		Assert.assertTrue(documents.size() == 1);
+		Assert.assertEquals(1, documents.size());
 		Document result = documents.get(0);
-		Assert.assertEquals(VideoContent.class.getSimpleName(), result.getFields().get(SearchKeys.Fields.FIELD_DATA_TYPE));
+		Assert.assertEquals(VideoContent.class.getSimpleName(), result
+				.getFields().get(SearchKeys.Fields.FIELD_DATA_TYPE));
 
-		// test the user filter
-		documents = searchService.searchIndexedDocuments(videoContent.getTitle(), 2l);
-		Assert.assertTrue(documents.isEmpty());
-		
-
-
-
-	}	
-
-	/***
-	 * Convenience method for testing if the social network and user id filters persisted
-	 * 
-	 * @param searchTerm
-	 * @param userId
-	 * @param socialNetwork
-	 */
-	private void testUserAndSocialNetworkFilter(String searchTerm, Long userId, ExternalNetwork socialNetwork) {
-		// test the user filter
-		List<Document> documents = searchService.searchIndexedDocuments(searchTerm, userId + 1);
+		// test the user filter with a different user id
+		documents = searchService.searchIndexedDocuments(
+				videoContent.getTitle(), owner.getUserId() + 1);
 		Assert.assertTrue(documents.isEmpty());
 
-		// test the social filter
-		documents = searchService.searchIndexedDocuments(searchTerm, userId, socialNetwork);
-		Assert.assertTrue(!documents.isEmpty());
-
-		ExternalNetwork anotherNetwork = socialNetwork.ordinal() == 0 ? ExternalNetwork.values()[1] : ExternalNetwork.values()[0];
-		// pick a network that is not the passed in network
-		documents = searchService.searchIndexedDocuments(searchTerm, 1l, anotherNetwork);
-		Assert.assertTrue(documents.isEmpty());
 	}
-
-
 
 }

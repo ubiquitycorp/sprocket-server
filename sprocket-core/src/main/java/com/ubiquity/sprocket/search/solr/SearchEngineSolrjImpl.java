@@ -10,6 +10,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ubiquity.sprocket.domain.Document;
 import com.ubiquity.sprocket.search.SearchEngine;
+import com.ubiquity.sprocket.search.SearchKeys;
 
 public class SearchEngineSolrjImpl implements SearchEngine {
 
@@ -68,15 +70,37 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 
 	}
 
-	public List<Document> searchDocuments(String searchTerm, String[] fields, Map<String, Object> filters) {
+	public List<Document> searchDocuments(String searchTerm, String[] fields, Map<String, Object> filters, SolrOperator operator) {
 		List<Document> documents = new LinkedList<Document>();
 
 		// assemble query with filters
 		SolrQuery query = new SolrQuery();
-		query.setQuery(createQueryString(searchTerm, fields));
-		query.setFilterQueries(createFilterArguments(filters));
+		query.setQuery(createQueryString(searchTerm, fields, operator));
+		query.setFilterQueries(createFilterArguments(filters, operator));
 		// do the search
-		SolrDocumentList results = search(query);
+		SolrDocumentList results = search(query, false);
+
+		// add to return list
+		for (SolrDocument result : results)
+			documents.add(SolrApiDtoAssembler.assemble(result));
+		return documents;
+	}
+	
+	public List<Document> searchDocuments(String searchTerm, String[] fields, Map<String, Object> filters, 
+											SolrOperator operator, String groupField, Integer groupLimit, Integer resultsLimit) {
+		List<Document> documents = new LinkedList<Document>();
+
+		// assemble query with filters
+		SolrQuery query = new SolrQuery();
+		query.setQuery(createQueryString(searchTerm, fields, operator));
+		query.setFilterQueries(createFilterArguments(filters, operator));
+		query.setParam("group", true);
+		query.setParam("group.field",groupField);
+		query.setParam("group.limit",groupLimit.toString());
+		query.setParam("group.format", "simple");
+		query.setRows(resultsLimit);
+		// do the search
+		SolrDocumentList results = search(query, true);
 
 		// add to return list
 		for (SolrDocument result : results)
@@ -91,9 +115,9 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 	 * 
 	 * @return
 	 */
-	private String createQueryString(String searchTerm, String[] fields) {
+	private String createQueryString(String searchTerm, String[] fields, SolrOperator operator) {
 
-		StringBuilder queryBuilder = new StringBuilder("{!type=dismax qf='");
+		StringBuilder queryBuilder = new StringBuilder("{!type=dismax q.op=" + operator.name() + " qf='");
 		int i;
 		for(i = 0; i < fields.length - 1; i++)
 			queryBuilder.append(fields[i]).append(" "); 
@@ -103,13 +127,29 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 		return queryBuilder.toString();
 	}
 	
-	private String[] createFilterArguments(Map<String, Object> filter) {
+	private String[] createFilterArguments(Map<String, Object> filter, SolrOperator operator) {
+	
 		String[] filters = new String[filter.size()];
 		int i = 0;
 		for(String key : filter.keySet()) {
 			Object value = filter.get(key);
-			filters[i] = key + ":" + value;
-			i++;
+			if(value instanceof List){
+				@SuppressWarnings("unchecked")
+				List<Object> values = (List<Object>) value;
+				filters[i] = "";
+				//Add multi-values separated by spaces as key:value pair
+				for (Object object : values) {
+					filters[i] += key + ":" + object + " ";
+				}
+			} else
+				filters[i] = key + ":" + value + " ";
+			// Only add new filter entity if it is AND condition
+			if(operator.equals(SolrOperator.AND))
+				i++;
+		}
+	
+		for(String argument : filters) {
+			log.debug("solr filter arg: {}", argument);
 		}
 		return filters;
 	}
@@ -119,14 +159,18 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 	 * @param query
 	 * @return
 	 */
-	private SolrDocumentList search(SolrQuery query) {
+	private SolrDocumentList search(SolrQuery query, Boolean isGroupResult) {
 		QueryResponse response;
 		try {
 			response = server.query(query);
 		} catch (SolrServerException e) {
 			throw new RuntimeException(e);
 		}
-		SolrDocumentList results = response.getResults();
+		SolrDocumentList results;
+		if(isGroupResult)
+			results = response.getGroupResponse().getValues().get(0).getValues().get(0).getResult();
+		else
+			results = response.getResults();
 		return results;
 	}
 
@@ -139,6 +183,28 @@ public class SearchEngineSolrjImpl implements SearchEngine {
 			throw new RuntimeException(e);
 		}
 		
+	}
+
+	@Override
+	public Integer findClicksById(String id) {
+		QueryResponse response;
+		try {
+			SolrQuery query = new SolrQuery();
+			query.setQuery(SearchKeys.Fields.FIELD_ID + ":" + ClientUtils.escapeQueryChars(id));
+			
+			query.setParam("fl", SearchKeys.Fields.FIELD_ID + "," + SearchKeys.Fields.FIELD_CLICKS);
+			response = server.query(query);
+		} catch (SolrServerException e) {
+			throw new RuntimeException(e);
+		}
+		if(response.getResults().size() > 0){
+			SolrDocument doc = response.getResults().get(0);
+			if(doc.get(SearchKeys.Fields.FIELD_CLICKS) != null)
+				return Integer.parseInt(doc.get(SearchKeys.Fields.FIELD_CLICKS).toString());
+			else
+				return 0;
+		} else
+			return 0;
 	}
 
 }

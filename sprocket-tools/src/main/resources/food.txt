@@ -1,0 +1,40 @@
+Restaurants
+	African
+	American
+	Asian
+	Chinese
+	Eastern European
+	European
+	French
+	Indian
+	Italian
+	Japanese
+	Latin American
+	Mexican
+	Middle East
+	Australian
+	Cuisine
+	Genre
+Recipes
+	American
+	Chinese
+	Thai
+	Italian
+	French
+	Mexican
+	Fast Food
+	Desserts
+	African
+	Asian
+	Middle Eastern
+	Latin American
+	Japanese
+	Other
+	Breakfast & Brunch
+	European
+	Eastern European
+Junk Food
+	Cookies
+	Candy
+	Ice Cream
+	Chocolate

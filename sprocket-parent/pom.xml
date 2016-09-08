@@ -31,28 +31,34 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.6.1</version>
+			<version>1.7.7</version>
 		</dependency>
+		
+	
 
 		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.0.6</version>
+			<groupId>log4j</groupId>
+ 			<artifactId>log4j</artifactId> 
+ 			<version>1.2.17</version> 
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-api</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
+		</dependency> 
 		
 	</dependencies>
 
 	<modules>
         <module>../sprocket-api</module>
+        <module>../sprocket-network-api</module>
 		<module>../sprocket-core</module>
 		<module>../sprocket-datasync-worker</module>
-		<module>../sprocket-tracker-worker</module>
+		<module>../sprocket-analytics-worker</module>
+		<module>../sprocket-location-worker</module>
+		<module>../sprocket-backchannel-worker</module>
+		
 	</modules>
 
 </project>

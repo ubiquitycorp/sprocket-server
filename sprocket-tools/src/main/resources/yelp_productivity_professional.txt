@@ -1,0 +1,47 @@
+Legal
+	lawyers
+	bankruptcy
+	businesslawyers
+	criminaldefense
+	duilawyers
+	divorce
+	employmentlawyers
+	estateplanning
+	general_litigation
+	iplaw
+	immigrationlawyers
+	patentlaw
+	personal_injury
+	realestatelawyers
+	taxlaw
+	tenantlaw
+	legalservices
+Services
+	accountants
+	advertising
+	personalassistants
+	editorialservices
+	payroll
+	marketing
+	officecleaning
+	publicrelations
+	security
+	graphicdesign
+	matchmakers
+	shredding
+	signmaking
+	isps
+	privateinvestigation
+	taxidermy
+	translationservices
+	videofilmproductions
+	softwaredevelopment
+	web_design
+	architects
+	boatrepair
+Career
+	employmentagencies
+	careercounseling
+	talentagencies
+	lifecoach
+	

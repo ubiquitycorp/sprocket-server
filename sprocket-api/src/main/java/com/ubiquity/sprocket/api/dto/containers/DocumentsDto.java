@@ -3,7 +3,11 @@ package com.ubiquity.sprocket.api.dto.containers;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import com.ubiquity.sprocket.api.dto.model.DocumentDto;
+import com.ubiquity.sprocket.api.validation.EngagementValidation;
 
 /**
  * Dto container class wrapping a list of documents with pagination
@@ -12,16 +16,27 @@ import com.ubiquity.sprocket.api.dto.model.DocumentDto;
  */
 public class DocumentsDto {
 	
+	@NotNull(groups = { EngagementValidation.class })
+	private String searchTerm;
+	
+	@NotNull(groups = { EngagementValidation.class })
+	@Size(min = 1, groups = { EngagementValidation.class })
 	private List<DocumentDto> documents = new LinkedList<DocumentDto>();
 
-	private PaginationDto pagination = new PaginationDto();
 	
+	public DocumentsDto(String searchTerm) {
+		super();
+		this.searchTerm = searchTerm;
+	}
+
 	public List<DocumentDto> getDocuments() {
 		return documents;
 	}
 
-	public PaginationDto getPagination() {
-		return pagination;
-	}	
+	public String getSearchTerm() {
+		return searchTerm;
+	}
+	
+	
 
 }

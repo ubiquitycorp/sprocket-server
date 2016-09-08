@@ -1,0 +1,38 @@
+Mobile
+	Puzzle Games (like Candy Crush)
+	Strategy Games (like Clash of Clan)
+	Action Games (like Republique)
+	RPG’s (like Baldur’s Gate)
+	Free Runner’s (Jetpack)
+	Card Games (G.I. Joe Battleground)
+	Social Casinos
+Console
+	Action Games (like Diablo)
+	RPG (like Dragon Age)
+	MMORPG (like DC Universe)
+	First Person Shooter (like Call of Duty)
+	Sports Games (like Madden)
+	Strategy Games
+	Social Games (like Guitar Heroes)
+	Racing Games (like Mario Cart)
+PC
+	Action Games (like Diablo)
+	RPG (like Dragon Age)
+	MMORPG (like World of Warcraft)
+	First Person Shooter (like Call of Duty)
+	Sports Games (like Madden)
+	Strategy Games (like Age of Empires)
+	Social Games (like Yahoo Games)
+Outdoor
+	Basketball
+	Flag football
+	Softball
+	Bochi ball
+	Soccer
+	More that are listed in sports
+Board
+	Children’s Games
+	Casino Games
+	Card Games
+	Miniature’s
+	Strategy

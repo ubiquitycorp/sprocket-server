@@ -9,9 +9,10 @@
 	</parent>
 	<artifactId>sprocket-core</artifactId>
 	<name>Sprocket Core</name>
-	<version>0.1.16</version>
-	<build>
 
+	<version>0.3.1</version>
+
+	<build>
 		<finalName>sprocket-core</finalName>
 		<resources>
 			<resource>
@@ -24,11 +25,12 @@
 				<filtering>false</filtering>
 			</resource>
 		</resources>
+
 		<testResources>
 			<testResource>
 				<directory>src/test/resources</directory>
 				<filtering>true</filtering>
-			</testResource>
+			</testResource> 
 		</testResources>
 		<plugins>
 			<plugin>
@@ -61,20 +63,25 @@
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-integration</artifactId>
-			<version>0.1.28</version>
+			<version>0.2.21</version>
 		</dependency>
-	
 
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-messaging</artifactId>
-			<version>0.1</version>
+			<version>0.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.niobium</groupId>
 			<artifactId>niobium-amqp</artifactId>
-			<version>0.2</version>
+			<version>0.2.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.niobium</groupId>
+			<artifactId>niobium-data-access</artifactId>
+			<version>0.9.9</version>
 		</dependency>
 
 		<dependency>
@@ -102,6 +109,29 @@
 		</dependency>
 
 
+		<!-- analytics -->
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-core_2.10</artifactId>
+			<version>1.0.1</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>hadoop-client</artifactId>
+					<groupId>org.apache.hadoop</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jets3t</artifactId>
+					<groupId>net.java.dev.jets3t</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-mllib_2.10</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+
 
 		<!-- testing -->
 		<dependency>
@@ -110,20 +140,16 @@
 			<version>5.1.6</version>
 			<scope>test</scope>
 		</dependency>
-		
-
 
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-identity-test</artifactId>
-			<version>0.1.1</version>
+			<version>0.1.2</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 			<optional>false</optional>
 		</dependency>
-		
-		
-		
+
 		<dependency>
 			<groupId>com.ubiquity</groupId>
 			<artifactId>ubc-integration-test</artifactId>

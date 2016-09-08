@@ -3,9 +3,14 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/domain-core/domain-core.iml" filepath="$PROJECT_DIR$/domain-core/domain-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/niobium-parent.iml" filepath="$PROJECT_DIR$/niobium-parent.iml" />
       <module fileurl="file://$PROJECT_DIR$/persistence/persistence.iml" filepath="$PROJECT_DIR$/persistence/persistence.iml" />
       <module fileurl="file://$PROJECT_DIR$/services-framework.iml" filepath="$PROJECT_DIR$/services-framework.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sprocket-api/sprocket-api.iml" filepath="$PROJECT_DIR$/sprocket-api/sprocket-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sprocket-core/sprocket-core.iml" filepath="$PROJECT_DIR$/sprocket-core/sprocket-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sprocket-datasync-worker/sprocket-datasync-worker.iml" filepath="$PROJECT_DIR$/sprocket-datasync-worker/sprocket-datasync-worker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sprocket-parent/sprocket-parent.iml" filepath="$PROJECT_DIR$/sprocket-parent/sprocket-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sprocket-tracker-worker/sprocket-tracker-worker.iml" filepath="$PROJECT_DIR$/sprocket-tracker-worker/sprocket-tracker-worker.iml" />
     </modules>
   </component>
 </project>
-

@@ -5,12 +5,14 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.ubiquity.api.domain.ServerErrorCode;
 import com.ubiquity.api.dto.model.ErrorDto;
-import com.ubiquity.social.api.exception.AuthorizationException;
+import com.ubiquity.integration.api.exception.AuthorizationException;
 
 /***
  * 
@@ -29,14 +31,21 @@ public class AuthorizationExceptionMapper implements ExceptionMapper<Authorizati
 	 * Returns error response and sets the response code
 	 */
 	public Response toResponse(AuthorizationException e) {
-		log.error("[ERROR]", e);
+		
 		
 		ErrorDto response = new ErrorDto();
 		response.getMessages().add(e.getMessage());
+		if(e.getExternalNetwork() != null){
+			log.error("[ERROR] {}", ExceptionUtils.getRootCauseMessage(e));
+			response.setCode(ServerErrorCode.ExternalAPI.getCode());
+			response.setProviderName(e.getExternalNetwork().toString());
+		}
+		else{
+			log.warn("[WARN] {}", ExceptionUtils.getRootCauseMessage(e));
+			response.setCode(ServerErrorCode.SprocketAPI.getCode());
+		}
 		
 		return Response.status(Status.UNAUTHORIZED).entity(new Gson().toJson(response)).build();
-
-
 	}
 
 }

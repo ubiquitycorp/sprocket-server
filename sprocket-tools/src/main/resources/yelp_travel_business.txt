@@ -1,0 +1,17 @@
+Transportation
+	airports
+	carrental
+	trainstations
+	transport
+	airlines
+	airport_shuttles
+	buses
+	ferries
+	limos
+	publictransport
+	taxis
+	trains
+	travelservices
+Accommodations
+	hotels
+	resorts

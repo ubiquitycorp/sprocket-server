@@ -1,0 +1,1273 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "SprocketVPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "172.31.0.0/16",
+        "InstanceTenancy": "default",
+        "EnableDnsSupport": "true",
+        "EnableDnsHostnames": "true"
+      }
+    },
+    "SprocketAZ1cSubnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "172.31.0.0/20",
+        "AvailabilityZone": "us-west-1c",
+        "VpcId": {
+          "Ref": "SprocketVPC"
+        }
+      }
+    },
+    "SprocketAZ1aSubnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "172.31.16.0/20",
+        "AvailabilityZone": "us-west-1a",
+        "VpcId": {
+          "Ref": "SprocketVPC"
+        }
+      }
+    },
+    "SprocketGateway": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        
+      }
+    },
+    "SprocketDHCPOptions": {
+      "Type": "AWS::EC2::DHCPOptions",
+      "Properties": {
+        "DomainName": "sprocket",
+        "DomainNameServers": [
+          "AmazonProvidedDNS"
+        ]
+      }
+    },
+    "SprocketACL": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Ref": "SprocketVPC"
+        }
+      }
+    },
+    "SprocketRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "SprocketVPC"
+        }
+      }
+    },
+    "SprocketAPIELB": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties": {
+        "Subnets": [
+          {
+            "Ref": "SprocketAZ1cSubnet"
+          },
+          {
+            "Ref": "SprocketAZ1aSubnet"
+          }
+        ],
+        "HealthCheck": {
+          "HealthyThreshold": "2",
+          "Interval": "30",
+          "Target": "HTTP:8080/sprocket-api/api/1.0/users/ping",
+          "Timeout": "15",
+          "UnhealthyThreshold": "2"
+        },
+        "Instances": [
+          {
+            "Ref": "SprocketAPIStage01"
+          },
+          {
+            "Ref": "SprocketAPIStage02"
+          }
+        ],
+        "SecurityGroups": [
+          {
+            "Ref": "sgApplicationServer"
+          },
+          {
+            "Ref": "sgdefault"
+          }
+        ],
+        "Listeners": [
+          {
+            "InstancePort": "8080",
+            "LoadBalancerPort": "80",
+            "Protocol": "HTTP",
+            "InstanceProtocol": "HTTP"
+          },
+          {
+            "InstancePort": "8080",
+            "LoadBalancerPort": "443",
+            "Protocol": "HTTPS",
+            "InstanceProtocol": "HTTP",
+            "SSLCertificateId": "arn:aws:iam::881946585260:server-certificate/start-ubiquity"
+          }
+        ]
+      }
+    },
+    "SprocketStageELB": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties": {
+        "Subnets": [
+          {
+            "Ref": "SprocketAZ1cSubnet"
+          },
+          {
+            "Ref": "SprocketAZ1aSubnet"
+          }
+        ],
+        "HealthCheck": {
+          "HealthyThreshold": "10",
+          "Interval": "30",
+          "Target": "HTTP:80/index.html",
+          "Timeout": "5",
+          "UnhealthyThreshold": "2"
+        },
+        "Instances": [
+          {
+            "Ref": "SprocketAPIStage01"
+          },
+          {
+            "Ref": "SprocketAPIStage02"
+          }
+        ],
+        "SecurityGroups": [
+          {
+            "Ref": "sgApplicationServer"
+          },
+          {
+            "Ref": "sgdefault"
+          }
+        ],
+        "Listeners": [
+          {
+            "InstancePort": "80",
+            "LoadBalancerPort": "443",
+            "Protocol": "HTTPS",
+            "InstanceProtocol": "HTTP",
+            "SSLCertificateId": "arn:aws:iam::881946585260:server-certificate/start-ubiquity"
+          },
+          {
+            "InstancePort": "80",
+            "LoadBalancerPort": "80",
+            "Protocol": "HTTP",
+            "InstanceProtocol": "HTTP"
+          }
+        ]
+      }
+    },
+    "rdsinit": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "FALSE",
+        "ImageId": "ami-8a093bcf",
+        "UserData": {
+         "Fn::Base64": {
+          "Fn::Join": [
+            "\n",
+            [
+             "#!/bin/sh",
+	"HOSTNAME=CLOUDNAME-rds-init",
+        "vardir=/var/lib/puppet",
+	"echo NETWORKING=yes > /etc/sysconfig/network",
+	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
+	"echo 127.0.0.1   $HOSTNAME localhost localhost.localdomain localhost4 localhost4.localdomain4 > /etc/hosts",
+	"echo ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6 >> /etc/hosts",
+	"echo [main] > /etc/puppet/puppet.conf",
+	"echo logdir = /var/log/puppet >> /etc/puppet/puppet.conf",
+	"echo rundir = /var/run/puppet >> /etc/puppet/puppet.conf",
+	"echo ssldir = $vardir/ssl >> /etc/puppet/puppet.conf",
+	"echo server = PUPPETSERVER >> /etc/puppet/puppet.conf",
+	"echo pluginsync = true >> /etc/puppet/puppet.conf",
+
+	"echo [agent] >> /etc/puppet/puppet.conf",
+	"echo classfile = $vardir/classes.txt >> /etc/puppet/puppet.conf",
+	"echo environment = swisscom >> /etc/puppet/puppet.conf",
+	"echo certname = ${HOSTNAME}.ubiquitybc.net >> /etc/puppet/puppet.conf",
+	"echo runinterval = 5m >> /etc/puppet/puppet.conf",
+	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
+        "echo database:",  { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] },
+        "find /var/lib/puppet -type f -exec rm '{}' \\; ",
+        "rm -f /var/lib/puppet/ssl/certs/*CUSTOMER*.pem",
+	"hostname $HOSTNAME",
+	"puppet agent -t --waitforcert 60",
+	"puppet agent -t",
+	"puppet agent -t"
+            ]
+           ]
+          }
+	},
+        "InstanceType": "t1.micro",
+        "KernelId": "aki-eb7e26ae",
+        "KeyName": "ubiquity",
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "CLOUDNAME-rds-init"
+          },
+          {
+            "Key": "Database",
+            "Value": { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] }
+          }
+
+
+        ],
+        "Volumes": [
+          {
+            "Device": "/dev/sdb",
+            "VolumeId": {
+              "Ref": "rdsinitvolume"
+            }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "DeviceIndex": 0,
+            "SubnetId": {
+              "Ref": "SprocketAZ1cSubnet"
+            },
+            "PrivateIpAddresses": [
+              {
+                "PrivateIpAddress": "172.31.15.18",
+                "Primary": "true"
+              }
+            ],
+            "GroupSet": [
+              {
+                "Ref": "sgRedis"
+              }
+            ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "SprocketAPIStage01": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "FALSE",
+        "ImageId": "ami-8a093bcf",
+        "UserData": {
+         "Fn::Base64": {
+          "Fn::Join": [
+            "\n",
+            [
+             "#!/bin/sh",
+	"HOSTNAME=CLOUDNAME-sprocket-api-CUSTOMER-01",
+        "vardir=/var/lib/puppet",
+	"echo NETWORKING=yes > /etc/sysconfig/network",
+	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
+	"echo 127.0.0.1   $HOSTNAME localhost localhost.localdomain localhost4 localhost4.localdomain4 > /etc/hosts",
+	"echo ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6 >> /etc/hosts",
+	"echo [main] > /etc/puppet/puppet.conf",
+	"echo logdir = /var/log/puppet >> /etc/puppet/puppet.conf",
+	"echo rundir = /var/run/puppet >> /etc/puppet/puppet.conf",
+	"echo ssldir = $vardir/ssl >> /etc/puppet/puppet.conf",
+	"echo server = PUPPETSERVER >> /etc/puppet/puppet.conf",
+	"echo pluginsync = true >> /etc/puppet/puppet.conf",
+
+	"echo [agent] >> /etc/puppet/puppet.conf",
+	"echo classfile = $vardir/classes.txt >> /etc/puppet/puppet.conf",
+	"echo environment = swisscom >> /etc/puppet/puppet.conf",
+	"echo certname = ${HOSTNAME}.ubiquitybc.net >> /etc/puppet/puppet.conf",
+	"echo runinterval = 5m >> /etc/puppet/puppet.conf",
+	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
+        "echo database:",  { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] },
+        "find /var/lib/puppet -type f -exec rm '{}' \\; ",
+        "rm -f /var/lib/puppet/ssl/certs/*CUSTOMER*.pem",
+	"hostname $HOSTNAME",
+	"puppet agent -t --waitforcert 60",
+	"puppet agent -t",
+	"puppet agent -t"
+            ]
+           ]
+          }
+	},
+        "InstanceType": "m3.large",
+        "KernelId": "aki-eb7e26ae",
+        "KeyName": "ubiquity",
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "CLOUDNAME-sprocket-api-CUSTOMER-01"
+          }
+        ],
+        "Volumes": [
+          {
+            "Device": "/dev/sdb",
+            "VolumeId": {
+              "Ref": "SprocketAPIStage01Volume"
+            }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "DeviceIndex": 0,
+            "SubnetId": {
+              "Ref": "SprocketAZ1cSubnet"
+            },
+            "PrivateIpAddresses": [
+              {
+                "PrivateIpAddress": "172.31.15.11",
+                "Primary": "true"
+              }
+            ],
+            "GroupSet": [
+              {
+                "Ref": "sgApplicationServer"
+              }
+            ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "SprocketAPIStage02": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "FALSE",
+        "ImageId": "ami-8a093bcf",
+        "UserData": {
+         "Fn::Base64": {
+          "Fn::Join": [
+            "\n",
+            [
+             "#!/bin/sh",
+	"HOSTNAME=CLOUDNAME-sprocket-api-CUSTOMER-02",
+        "vardir=/var/lib/puppet",
+	"echo NETWORKING=yes > /etc/sysconfig/network",
+	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
+	"echo 127.0.0.1   $HOSTNAME localhost localhost.localdomain localhost4 localhost4.localdomain4 > /etc/hosts",
+	"echo ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6 >> /etc/hosts",
+	"echo [main] > /etc/puppet/puppet.conf",
+	"echo logdir = /var/log/puppet >> /etc/puppet/puppet.conf",
+	"echo rundir = /var/run/puppet >> /etc/puppet/puppet.conf",
+	"echo ssldir = $vardir/ssl >> /etc/puppet/puppet.conf",
+	"echo server = PUPPETSERVER >> /etc/puppet/puppet.conf",
+	"echo pluginsync = true >> /etc/puppet/puppet.conf",
+
+	"echo [agent] >> /etc/puppet/puppet.conf",
+	"echo classfile = $vardir/classes.txt >> /etc/puppet/puppet.conf",
+	"echo environment = swisscom >> /etc/puppet/puppet.conf",
+	"echo certname = ${HOSTNAME}.ubiquitybc.net >> /etc/puppet/puppet.conf",
+	"echo runinterval = 5m >> /etc/puppet/puppet.conf",
+	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
+        "echo database:",  { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] },
+        "find /var/lib/puppet -type f -exec rm '{}' \\; ",
+        "rm -f /var/lib/puppet/ssl/certs/*CUSTOMER*.pem",
+	"hostname $HOSTNAME",
+	"puppet agent -t --waitforcert 60",
+	"puppet agent -t",
+	"puppet agent -t"
+            ]
+           ]
+          }
+	},
+        "InstanceType": "m3.large",
+        "KernelId": "aki-eb7e26ae",
+        "KeyName": "ubiquity",
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "CLOUDNAME-sprocket-api-CUSTOMER-02"
+          }
+        ],
+        "Volumes": [
+          {
+            "Device": "/dev/sdb",
+            "VolumeId": {
+              "Ref": "SprocketAPIStage02Volume"
+            }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "DeviceIndex": 0,
+            "SubnetId": {
+              "Ref": "SprocketAZ1cSubnet"
+            },
+            "PrivateIpAddresses": [
+              {
+                "PrivateIpAddress": "172.31.15.12",
+                "Primary": "true"
+              }
+            ],
+            "GroupSet": [
+              {
+                "Ref": "sgApplicationServer"
+              }
+            ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "SprocketSearchStage": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "FALSE",
+        "ImageId": "ami-8a093bcf",
+        "UserData": {
+         "Fn::Base64": {
+          "Fn::Join": [
+            "\n",
+            [
+             "#!/bin/sh",
+	"HOSTNAME=CLOUDNAME-sprocket-search-CUSTOMER",
+        "vardir=/var/lib/puppet",
+	"echo NETWORKING=yes > /etc/sysconfig/network",
+	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
+	"echo 127.0.0.1   $HOSTNAME localhost localhost.localdomain localhost4 localhost4.localdomain4 > /etc/hosts",
+	"echo ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6 >> /etc/hosts",
+	"echo [main] > /etc/puppet/puppet.conf",
+	"echo logdir = /var/log/puppet >> /etc/puppet/puppet.conf",
+	"echo rundir = /var/run/puppet >> /etc/puppet/puppet.conf",
+	"echo ssldir = $vardir/ssl >> /etc/puppet/puppet.conf",
+	"echo server = PUPPETSERVER >> /etc/puppet/puppet.conf",
+	"echo pluginsync = true >> /etc/puppet/puppet.conf",
+
+	"echo [agent] >> /etc/puppet/puppet.conf",
+	"echo classfile = $vardir/classes.txt >> /etc/puppet/puppet.conf",
+	"echo environment = swisscom >> /etc/puppet/puppet.conf",
+	"echo certname = ${HOSTNAME}.ubiquitybc.net >> /etc/puppet/puppet.conf",
+	"echo runinterval = 5m >> /etc/puppet/puppet.conf",
+	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
+        "echo database:",  { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] },
+        "find /var/lib/puppet -type f -exec rm '{}' \\; ",
+        "rm -f /var/lib/puppet/ssl/certs/*CUSTOMER*.pem",
+	"hostname $HOSTNAME",
+	"puppet agent -t --waitforcert 60",
+	"puppet agent -t",
+	"puppet agent -t"
+            ]
+           ]
+          }
+	},
+        "InstanceType": "m3.large",
+        "KernelId": "aki-eb7e26ae",
+        "KeyName": "ubiquity",
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "CLOUDNAME-sprocket-search-CUSTOMER"
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": {
+              "Ref": "SprocketAZ1cSubnet"
+            },
+            "PrivateIpAddresses": [
+              {
+                "PrivateIpAddress": "172.31.15.13",
+                "Primary": "true"
+              }
+            ],
+            "GroupSet": [
+              {
+                "Ref": "sgApplicationServer"
+              }
+            ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "SprocketRabbitMQStage01": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "FALSE",
+        "ImageId": "ami-8a093bcf",
+        "UserData": {
+         "Fn::Base64": {
+          "Fn::Join": [
+            "\n",
+            [
+             "#!/bin/sh",
+	"HOSTNAME=CLOUDNAME-sprocket-rabbitmq-CUSTOMER-01",
+        "vardir=/var/lib/puppet",
+	"echo NETWORKING=yes > /etc/sysconfig/network",
+	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
+	"echo 127.0.0.1   $HOSTNAME localhost localhost.localdomain localhost4 localhost4.localdomain4 > /etc/hosts",
+	"echo ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6 >> /etc/hosts",
+	"echo [main] > /etc/puppet/puppet.conf",
+	"echo logdir = /var/log/puppet >> /etc/puppet/puppet.conf",
+	"echo rundir = /var/run/puppet >> /etc/puppet/puppet.conf",
+	"echo ssldir = $vardir/ssl >> /etc/puppet/puppet.conf",
+	"echo server = PUPPETSERVER >> /etc/puppet/puppet.conf",
+	"echo pluginsync = true >> /etc/puppet/puppet.conf",
+
+	"echo [agent] >> /etc/puppet/puppet.conf",
+	"echo classfile = $vardir/classes.txt >> /etc/puppet/puppet.conf",
+	"echo environment = swisscom >> /etc/puppet/puppet.conf",
+	"echo certname = ${HOSTNAME}.ubiquitybc.net >> /etc/puppet/puppet.conf",
+	"echo runinterval = 5m >> /etc/puppet/puppet.conf",
+	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
+        "echo database:",  { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] },
+        "find /var/lib/puppet -type f -exec rm '{}' \\; ",
+        "rm -f /var/lib/puppet/ssl/certs/*CUSTOMER*.pem",
+	"hostname $HOSTNAME",
+	"puppet agent -t --waitforcert 60",
+	"puppet agent -t",
+	"puppet agent -t"
+            ]
+           ]
+          }
+	},
+        "InstanceType": "m3.large",
+        "KernelId": "aki-eb7e26ae",
+        "KeyName": "ubiquity",
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "CLOUDNAME-sprocket-rabbitmq-CUSTOMER-01"
+          }
+        ],
+        "Volumes": [
+          {
+            "Device": "/dev/sdb",
+            "VolumeId": {
+              "Ref": "SprocketRabbitMQStage01Volume"
+            }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "DeviceIndex": 0,
+            "SubnetId": {
+              "Ref": "SprocketAZ1cSubnet"
+            },
+            "PrivateIpAddresses": [
+              {
+                "PrivateIpAddress": "172.31.15.14",
+                "Primary": "true"
+              }
+            ],
+            "GroupSet": [
+              {
+                "Ref": "sgRabbitMQ"
+              }
+            ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "SprocketRedisStage01": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "FALSE",
+        "ImageId": "ami-8a093bcf",
+        "UserData": {
+         "Fn::Base64": {
+          "Fn::Join": [
+            "\n",
+            [
+             "#!/bin/sh",
+	"HOSTNAME=CLOUDNAME-sprocket-redis-CUSTOMER-01",
+        "vardir=/var/lib/puppet",
+	"echo NETWORKING=yes > /etc/sysconfig/network",
+	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
+	"echo 127.0.0.1   $HOSTNAME localhost localhost.localdomain localhost4 localhost4.localdomain4 > /etc/hosts",
+	"echo ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6 >> /etc/hosts",
+	"echo [main] > /etc/puppet/puppet.conf",
+	"echo logdir = /var/log/puppet >> /etc/puppet/puppet.conf",
+	"echo rundir = /var/run/puppet >> /etc/puppet/puppet.conf",
+	"echo ssldir = $vardir/ssl >> /etc/puppet/puppet.conf",
+	"echo server = PUPPETSERVER >> /etc/puppet/puppet.conf",
+	"echo pluginsync = true >> /etc/puppet/puppet.conf",
+
+	"echo [agent] >> /etc/puppet/puppet.conf",
+	"echo classfile = $vardir/classes.txt >> /etc/puppet/puppet.conf",
+	"echo environment = swisscom >> /etc/puppet/puppet.conf",
+	"echo certname = ${HOSTNAME}.ubiquitybc.net >> /etc/puppet/puppet.conf",
+	"echo runinterval = 5m >> /etc/puppet/puppet.conf",
+	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
+        "echo database:",  { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] },
+        "find /var/lib/puppet -type f -exec rm '{}' \\; ",
+        "rm -f /var/lib/puppet/ssl/certs/*CUSTOMER*.pem",
+	"hostname $HOSTNAME",
+	"puppet agent -t --waitforcert 60",
+	"puppet agent -t",
+	"puppet agent -t"
+            ]
+           ]
+          }
+	},
+        "InstanceType": "m3.large",
+        "KernelId": "aki-eb7e26ae",
+        "KeyName": "ubiquity",
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "CLOUDNAME-sprocket-redis-CUSTOMER-01"
+          }
+        ],
+        "Volumes": [
+          {
+            "Device": "/dev/sdb",
+            "VolumeId": {
+              "Ref": "SprocketRedisStage01Volume"
+            }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "DeviceIndex": 0,
+            "SubnetId": {
+              "Ref": "SprocketAZ1cSubnet"
+            },
+            "PrivateIpAddresses": [
+              {
+                "PrivateIpAddress": "172.31.15.15",
+                "Primary": "true"
+              }
+            ],
+            "GroupSet": [
+              {
+                "Ref": "sgRedis"
+              }
+            ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "SprocketWorkerStage01": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "FALSE",
+        "ImageId": "ami-8a093bcf",
+        "UserData": {
+         "Fn::Base64": {
+          "Fn::Join": [
+            "\n",
+            [
+             "#!/bin/sh",
+	"HOSTNAME=CLOUDNAME-sprocket-worker-CUSTOMER-01",
+        "vardir=/var/lib/puppet",
+	"echo NETWORKING=yes > /etc/sysconfig/network",
+	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
+	"echo 127.0.0.1   $HOSTNAME localhost localhost.localdomain localhost4 localhost4.localdomain4 > /etc/hosts",
+	"echo ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6 >> /etc/hosts",
+	"echo [main] > /etc/puppet/puppet.conf",
+	"echo logdir = /var/log/puppet >> /etc/puppet/puppet.conf",
+	"echo rundir = /var/run/puppet >> /etc/puppet/puppet.conf",
+	"echo ssldir = $vardir/ssl >> /etc/puppet/puppet.conf",
+	"echo server = PUPPETSERVER >> /etc/puppet/puppet.conf",
+	"echo pluginsync = true >> /etc/puppet/puppet.conf",
+
+	"echo [agent] >> /etc/puppet/puppet.conf",
+	"echo classfile = $vardir/classes.txt >> /etc/puppet/puppet.conf",
+	"echo environment = swisscom >> /etc/puppet/puppet.conf",
+	"echo certname = ${HOSTNAME}.ubiquitybc.net >> /etc/puppet/puppet.conf",
+	"echo runinterval = 5m >> /etc/puppet/puppet.conf",
+	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
+        "echo database:",  { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] },
+        "find /var/lib/puppet -type f -exec rm '{}' \\; ",
+        "rm -f /var/lib/puppet/ssl/certs/*CUSTOMER*.pem",
+	"hostname $HOSTNAME",
+	"puppet agent -t --waitforcert 60",
+	"puppet agent -t",
+	"puppet agent -t"
+            ]
+           ]
+          }
+	},
+        "InstanceType": "m3.large",
+        "KernelId": "aki-eb7e26ae",
+        "KeyName": "ubiquity",
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "CLOUDNAME-sprocket-worker-CUSTOMER-01"
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "DeviceIndex": 0,
+            "SubnetId": {
+              "Ref": "SprocketAZ1cSubnet"
+            },
+            "PrivateIpAddresses": [
+              {
+                "PrivateIpAddress": "172.31.15.16",
+                "Primary": "true"
+              }
+            ],
+            "GroupSet": [
+              {
+                "Ref": "sglaunchwizard1"
+              }
+            ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "SprocketWorkerStage02": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "FALSE",
+        "ImageId": "ami-8a093bcf",
+        "UserData": {
+         "Fn::Base64": {
+          "Fn::Join": [
+            "\n",
+            [
+             "#!/bin/sh",
+	"HOSTNAME=CLOUDNAME-sprocket-worker-CUSTOMER-02",
+        "vardir=/var/lib/puppet",
+	"echo NETWORKING=yes > /etc/sysconfig/network",
+	"echo HOSTNAME=$HOSTNAME >> /etc/sysconfig/network",
+	"echo 127.0.0.1   $HOSTNAME localhost localhost.localdomain localhost4 localhost4.localdomain4 > /etc/hosts",
+	"echo ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6 >> /etc/hosts",
+	"echo [main] > /etc/puppet/puppet.conf",
+	"echo logdir = /var/log/puppet >> /etc/puppet/puppet.conf",
+	"echo rundir = /var/run/puppet >> /etc/puppet/puppet.conf",
+	"echo ssldir = $vardir/ssl >> /etc/puppet/puppet.conf",
+	"echo server = PUPPETSERVER >> /etc/puppet/puppet.conf",
+	"echo pluginsync = true >> /etc/puppet/puppet.conf",
+
+	"echo [agent] >> /etc/puppet/puppet.conf",
+	"echo classfile = $vardir/classes.txt >> /etc/puppet/puppet.conf",
+	"echo environment = swisscom >> /etc/puppet/puppet.conf",
+	"echo certname = ${HOSTNAME}.ubiquitybc.net >> /etc/puppet/puppet.conf",
+	"echo runinterval = 5m >> /etc/puppet/puppet.conf",
+	"echo localconfig = $vardir/localconfig >> /etc/puppet/puppet.conf",
+        "echo database:",  { "Fn::GetAtt" : [ "rdsdatabase", "Endpoint.Address" ] },
+        "find /var/lib/puppet -type f -exec rm '{}' \\; ",
+        "rm -f /var/lib/puppet/ssl/certs/*CUSTOMER*.pem",
+	"hostname $HOSTNAME",
+	"puppet agent -t --waitforcert 60",
+	"puppet agent -t",
+	"puppet agent -t"
+            ]
+           ]
+          }
+	},
+        "InstanceType": "m3.large",
+        "KernelId": "aki-eb7e26ae",
+        "KeyName": "ubiquity",
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "CLOUDNAME-sprocket-worker-CUSTOMER-02"
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "DeviceIndex": 0,
+            "SubnetId": {
+              "Ref": "SprocketAZ1cSubnet"
+            },
+            "PrivateIpAddresses": [
+              {
+                "PrivateIpAddress": "172.31.15.17",
+                "Primary": "true"
+              }
+            ],
+            "GroupSet": [
+              {
+                "Ref": "sglaunchwizard1"
+              }
+            ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "SprocketAPIStage01Volume": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": "us-west-1c",
+        "Size": "100",
+        "VolumeType": "gp2"
+      }
+    },
+    "SprocketAPIStage02Volume": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": "us-west-1c",
+        "Size": "100",
+        "VolumeType": "gp2"
+      }
+    },
+    "SprocketRabbitMQStage01Volume": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": "us-west-1c",
+        "Size": "100",
+        "VolumeType": "gp2"
+      }
+    },
+    "SprocketRedisStage01Volume": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": "us-west-1c",
+        "Size": "100",
+        "VolumeType": "gp2"
+      }
+    },
+    "rdsinitvolume": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": "us-west-1c",
+        "Size": "100",
+        "VolumeType": "gp2"
+      }
+    },
+    "rdsdatabase": {
+      "Type": "AWS::RDS::DBInstance",
+      "Properties": {
+        "AutoMinorVersionUpgrade": "true",
+        "DBInstanceClass": "db.t2.micro",
+        "Port": "3306",
+        "AllocatedStorage": "100",
+        "BackupRetentionPeriod": "1",
+        "DBName": "sprocket",
+        "Engine": "mysql",
+        "EngineVersion": "5.6.17",
+        "LicenseModel": "general-public-license",
+        "MasterUsername": "root",
+        "MasterUserPassword": "xX1029384756",
+        "PreferredBackupWindow": "06:42-07:12",
+        "PreferredMaintenanceWindow": "sat:12:29-sat:12:59",
+        "MultiAZ": "true",
+        "VPCSecurityGroups": [
+          {
+            "Ref": "sgRDS"
+          }
+        ],
+        "DBSubnetGroupName": {
+          "Ref": "dbsubnetdefault"
+        },
+        "Tags": [
+          {
+            "Key": "workload-type",
+            "Value": "production"
+          }
+        ]
+      }
+    },
+    "dbsubnetdefault": {
+      "Type": "AWS::RDS::DBSubnetGroup",
+      "Properties": {
+        "DBSubnetGroupDescription": "default",
+        "SubnetIds": [
+          {
+            "Ref": "SprocketAZ1cSubnet"
+          },
+          {
+            "Ref": "SprocketAZ1aSubnet"
+          }
+        ]
+      }
+    },
+    "sgRabbitMQ": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "RabbitMQ",
+        "VpcId": {
+          "Ref": "SprocketVPC"
+        },
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "5666",
+            "ToPort": "5666",
+            "CidrIp": "172.16.0.0/12"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "4639",
+            "ToPort": "4639",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "5672",
+            "ToPort": "5672",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "icmp",
+            "FromPort": "-1",
+            "ToPort": "-1",
+            "CidrIp": "172.16.0.0/12"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "5667",
+            "ToPort": "5667",
+            "CidrIp": "172.16.0.0/12"
+          }
+        ],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "sgApplicationServer": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Application Server",
+        "VpcId": {
+          "Ref": "SprocketVPC"
+        },
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "3306",
+            "ToPort": "3306",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "8090",
+            "ToPort": "8090",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "8081",
+            "ToPort": "8081",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "8080",
+            "ToPort": "8080",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "5666",
+            "ToPort": "5666",
+            "CidrIp": "172.0.0.0/10"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "icmp",
+            "FromPort": "-1",
+            "ToPort": "-1",
+            "CidrIp": "172.0.0.0/10"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "5667",
+            "ToPort": "5667",
+            "CidrIp": "172.0.0.0/10"
+          }
+        ],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "sgdefault": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "default VPC security group",
+        "VpcId": {
+          "Ref": "SprocketVPC"
+        },
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "sgRedis": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Redis (All Ports Open)",
+        "VpcId": {
+          "Ref": "SprocketVPC"
+        },
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "6379",
+            "ToPort": "6379",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "5666",
+            "ToPort": "5667",
+            "CidrIp": "172.16.0.0/12"
+          },
+          {
+            "IpProtocol": "icmp",
+            "FromPort": "-1",
+            "ToPort": "-1",
+            "CidrIp": "172.16.0.0/12"
+          }
+        ],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "sgRDS": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "RDS",
+        "VpcId": {
+          "Ref": "SprocketVPC"
+        },
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "3306",
+            "ToPort": "3306",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "icmp",
+            "FromPort": "-1",
+            "ToPort": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "sglaunchwizard1": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "launch-wizard-1 created on Saturday, April 19, 2014 12:35:33 PM UTC-7",
+        "VpcId": {
+          "Ref": "SprocketVPC"
+        },
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "5666",
+            "ToPort": "5666",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "icmp",
+            "FromPort": "-1",
+            "ToPort": "-1",
+            "CidrIp": "172.31.12.243/32"
+          },
+          {
+            "IpProtocol": "icmp",
+            "FromPort": "-1",
+            "ToPort": "-1",
+            "CidrIp": "54.183.80.254/32"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "5667",
+            "ToPort": "5667",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "acl3": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "SprocketACL"
+        }
+      }
+    },
+    "acl4": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "SprocketACL"
+        }
+      }
+    },
+    "subnetacl3": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "SprocketACL"
+        },
+        "SubnetId": {
+          "Ref": "SprocketAZ1cSubnet"
+        }
+      }
+    },
+    "subnetacl4": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "SprocketACL"
+        },
+        "SubnetId": {
+          "Ref": "SprocketAZ1aSubnet"
+        }
+      }
+    },
+    "gw2": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "SprocketVPC"
+        },
+        "InternetGatewayId": {
+          "Ref": "SprocketGateway"
+        }
+      }
+    },
+    "route2": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "SprocketRouteTable"
+        },
+        "GatewayId": {
+          "Ref": "SprocketGateway"
+        }
+      },
+      "DependsOn": "gw2"
+    },
+    "dchpassoc2": {
+      "Type": "AWS::EC2::VPCDHCPOptionsAssociation",
+      "Properties": {
+        "VpcId": {
+          "Ref": "SprocketVPC"
+        },
+        "DhcpOptionsId": {
+          "Ref": "SprocketDHCPOptions"
+        }
+      }
+    },
+    "ingress2": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgdefault"
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Ref": "sgdefault"
+        },
+        "SourceSecurityGroupOwnerId": "881946585260"
+      }
+    },
+    "subnet1rtassoc": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "SprocketRouteTable"
+        },
+        "SubnetId": {
+          "Ref": "SprocketAZ1cSubnet"
+        }
+      }
+    },
+    "subnet2rtassoc": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "SprocketRouteTable"
+        },
+        "SubnetId": {
+          "Ref": "SprocketAZ1aSubnet"
+        }
+      }
+    }
+  },
+  "Description": "CloudFormation Sprocket Environment"
+}

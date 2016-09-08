@@ -1,108 +1,61 @@
 package com.ubiquity.sprocket.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ubiquity.sprocket.domain.Event;
-import com.ubiquity.sprocket.domain.EventType;
+import com.ubiquity.integration.domain.AgeRange;
+import com.ubiquity.integration.domain.ExternalNetwork;
+import com.ubiquity.integration.domain.Gender;
+import com.ubiquity.integration.factory.TestActivityFactory;
+import com.ubiquity.sprocket.analytics.recommendation.factory.TestProfileFactory;
+import com.ubiquity.sprocket.domain.Content;
+import com.ubiquity.sprocket.domain.Profile;
+import com.ubiquity.sprocket.domain.factory.ContentFactory;
 
 public class AnalyticsServiceTest {
 
 	private static AnalyticsService analyticsService;
-	private static Event event;
-
-	private Logger log = LoggerFactory.getLogger(getClass());
 	
+	@SuppressWarnings("unused")
+	private Logger log = LoggerFactory.getLogger(getClass());
+
 	@BeforeClass
 	public static void setUp() throws Exception {
 		Configuration config = new PropertiesConfiguration("test.properties");
-		analyticsService = new AnalyticsService(config);	
-		
-		// clear db
-		analyticsService.clearAllByType(EventType.Search);
-		analyticsService.clearAllByType(EventType.UserAddedIdentity);
-
-		
-		event = new Event(EventType.Search);
-		event.getProperties().put("term", UUID.randomUUID());
-	}
-
-	@Test
-	public void testBasicTrack() {
-		analyticsService.track(event);
-		
-		
-		String expected = event.getProperties().get("term").toString();
-		
-		List<Event> trackedEvents = analyticsService.findAllByType(EventType.Search);
-		Boolean isFound = Boolean.FALSE;
-		for(Event tracked : trackedEvents) {
-			log.debug("tracked {}", tracked);
-			
-			String trackedTerm = tracked.getProperties().get("term").toString();
-			if(expected.equals(trackedTerm)) {
-				isFound = Boolean.TRUE;
-				break;
-			}
-		}
-		Assert.assertTrue(isFound);
-		
-		
+		analyticsService = new AnalyticsService(config);
 	}
 	
 	@Test
-	public void testGetTopOccurances() {
+	public void testRecommendActivities() {
+		Profile jack = TestProfileFactory.createProfileAndIdentity(Math.abs(new java.util.Random().nextLong()),
+				ExternalNetwork.Facebook, Gender.Male, new AgeRange(21, 35), 34.0522300, -118.2436800);
+		Profile john = TestProfileFactory.createProfileAndIdentity(Math.abs(new java.util.Random().nextLong()),
+				ExternalNetwork.Facebook, Gender.Male, new AgeRange(55, 65), 34.1234567, -118.2412345);
+		Profile joe = TestProfileFactory.createProfileAndIdentity(Math.abs(new java.util.Random().nextLong()),
+				ExternalNetwork.Facebook, Gender.Male, new AgeRange(55, 65), 34.1334567, -118.2499999);
+		Profile jill = TestProfileFactory.createProfileAndIdentity(Math.abs(new java.util.Random().nextLong()),
+				ExternalNetwork.Facebook, Gender.Female, new AgeRange(55, 65), -34.6131500, -58.3772300);
+		Profile jane = TestProfileFactory.createProfileAndIdentity(Math.abs(new java.util.Random().nextLong()),
+				ExternalNetwork.Facebook, Gender.Female, new AgeRange(55, 65), -34.6131500, -58.3772300);
 		
-		// add 3, and then add 2 random + 1 more than the max
-		String topTerm = UUID.randomUUID().toString();
-		event = new Event(EventType.Search);
-		event.getProperties().put("term", topTerm);
-		analyticsService.track(event);
+		// persist all of these records
+		analyticsService.createProfile(jack);
+		analyticsService.createProfile(john);
+		analyticsService.createProfile(joe);
+		analyticsService.createProfile(jill);
+		analyticsService.createProfile(jane);
 
-		event = new Event(EventType.Search);
-		event.getProperties().put("term", topTerm);
-		analyticsService.track(event);
-
-		event = new Event(EventType.Search);
-		event.getProperties().put("term", topTerm);
-		analyticsService.track(event);
-
-		event = new Event(EventType.Search);
-		event.getProperties().put("term", UUID.randomUUID().toString());
-		analyticsService.track(event);
-
-		event = new Event(EventType.Search);
-		event.getProperties().put("term", UUID.randomUUID().toString());
-		analyticsService.track(event);
-
-		event = new Event(EventType.Search);
-		event.getProperties().put("term", UUID.randomUUID().toString());
-		analyticsService.track(event);
-
-		Map<String, Long> occurances = analyticsService.getTopOccurancesOf(EventType.Search, "term", 5);
 		
-		// make sure we respect limit
-		Assert.assertTrue(occurances.size() == 5);
+		// create some public content and track it
+		Content content = ContentFactory.createContent(TestActivityFactory.createActivityWithMininumRequirements(null, ExternalNetwork.Facebook));
+		analyticsService.track(content, jack.getUserId(), System.currentTimeMillis(), null);
+		analyticsService.track(content, john.getUserId(), System.currentTimeMillis(), null);
 		
-		// should be 3
-		Assert.assertEquals(3l, occurances.get(topTerm).longValue());
-		
-		// the others should all be 1
-		for(String term : occurances.keySet()) {
-			if(!term.equals(topTerm))
-				Assert.assertEquals(1l, occurances.get(term).longValue());
-		}
-		
-		
+
 	}
 
 }

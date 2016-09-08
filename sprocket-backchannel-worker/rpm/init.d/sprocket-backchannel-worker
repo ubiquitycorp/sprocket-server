@@ -1,0 +1,94 @@
+#!/bin/sh
+#
+# sprocket-backchannel-worker        Init file for starting up Gift Sender Cron Service
+# 
+# chkconfig: 345 20 20  
+#
+### BEGIN INIT INFO
+# Provides: sprocket-backchannel-worker
+# Required-Start: $network $syslog
+# Required-Stop: $network $syslog
+# Description: Sprocket Datasync Worker 
+# Short-Description: Sprocket Datasync Worker
+### END INIT INFO
+
+. /etc/rc.d/init.d/functions
+
+exec="/usr/local/bin/sprocket-backchannel-worker"
+name="sprocket-backchannel-worker"
+lockfile=/var/lock/subsys/$name
+
+start() {
+    echo -n $"Starting $name: "
+
+    daemon --user jserviceusr nohup $exec > /dev/null 2>&1 & 
+    retval=$?
+    # report success / failure after touching the lockfile   
+    if [ $retval -eq 0 ]; then
+    	touch $lockfile
+    	success
+    else
+	failure
+    fi
+    echo
+    return $retval
+}
+
+stop() {
+    echo -n $"Stopping $name: "
+   
+    # check if service is running
+    if [ -e $lockfile ]; then
+     	:
+    else
+	success
+	echo
+	return 0	
+    fi    
+
+    #killproc $name 
+    kill `/usr/bin/pgrep -f ${name}.jar | xargs` > /dev/null 2>&1
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && rm -f $lockfile
+
+    kill `/usr/bin/pgrep -f ${name}.jar | xargs` > /dev/null 2>&1
+
+    return $retval
+}
+
+restart() {
+    stop
+    start
+}
+
+reload() {
+    false
+}
+
+case "$1" in
+    start)
+        $1
+        ;;
+    stop)
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    status)
+        PIDS=`pgrep -f ${name}.jar | xargs`
+        if [ "$PIDS" ]
+        then
+         echo "$name (pid $PIDS) is running..."
+         exit 0
+        else
+         echo $name is stopped
+         exit 3
+        fi
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart}"
+        exit 2
+esac
+exit $?
