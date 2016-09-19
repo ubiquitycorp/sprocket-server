@@ -400,10 +400,10 @@
 				</mq.queue.cacheinvalidate.username>
 				<mq.queue.cacheinvalidate.password>blackdeer
 				</mq.queue.cacheinvalidate.password>
-				<mq.queue.track.host>sprocket-rabbit-stage.ubiquitycorp.net</mq.queue.track.host>
+				<mq.queue.track.host>sprocket-rabbitmq-stage.ubiquitycorp.net</mq.queue.track.host>
 				<mq.queue.track.username>netappusr</mq.queue.track.username>
 				<mq.queue.track.password>blackdeer</mq.queue.track.password>
-				<mq.host>sprocket-rabbit-stage.ubiquitycorp.net</mq.host>
+				<mq.host>sprocket-rabbitmq-stage.ubiquitycorp.net</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
 				<!-- xmpp configuration -->
