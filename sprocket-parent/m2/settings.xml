@@ -294,17 +294,22 @@
 			<id>env-stage</id>
 			<properties>
 				<app.log.level>DEBUG</app.log.level>
-				<syslog.host>localhost</syslog.host>
 				<tomcat.processes>1</tomcat.processes>
 
-				<datasync.worker.processes>2</datasync.worker.processes>
-				<datasync.worker.size>2048</datasync.worker.size>
-
+				<datasync.worker.processes>1</datasync.worker.processes>
+				<datasync.worker.size>4096</datasync.worker.size>
+				<syslog.host>localhost</syslog.host>
 				<redis.host>sprocket-redis-stage.ubiquitycorp.net</redis.host>
-				<hibernate.debug>false</hibernate.debug>
+				<hibernate.debug>true</hibernate.debug>
 				<solr.api.host>sprocket-search-stage.ubiquitycorp.net</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
 				
+				<!--<social.facebook.api.host>http://localhost/sprocket-network-api/api/1.0/facebook</social.facebook.api.host>-->
+				<!--<social.googlePlus.api.host>http://localhost/sprocket-network-api/api/1.0/googleplus</social.googlePlus.api.host>-->
+				<!--<social.google.api.host>http://localhost/sprocket-network-api/api/1.0/googleplus</social.google.api.host>-->
+				<!--<content.youtube.api.host>http://localhost/sprocket-network-api/api/1.0/youtube</content.youtube.api.host>-->
+				<!--<social.reddit.oauth.api.host>http://localhost/sprocket-network-api/api/1.0/reddit</social.reddit.oauth.api.host>-->
+				<!--<social.reddit.ssl.api.host>http://localhost/sprocket-network-api/api/1.0/reddit</social.reddit.ssl.api.host>-->
 				<social.facebook.api.host>https://graph.facebook.com</social.facebook.api.host>
 				<social.googlePlus.api.host>https://www.googleapis.com/plus/v1</social.googlePlus.api.host>
 				<social.google.api.host>https://accounts.google.com</social.google.api.host>
@@ -312,90 +317,116 @@
 				<social.reddit.oauth.api.host>https://oauth.reddit.com</social.reddit.oauth.api.host>
 				<social.reddit.ssl.api.host>https://ssl.reddit.com</social.reddit.ssl.api.host>
 				
-				<social.twitter.app.consumerKey>f5cMrdDfL4mxP1eaUOwAvUtfJ </social.twitter.app.consumerKey>
-				<social.twitter.app.consumerSecret>Z7Q61m3kHejh09muK0aX97Ed1baamdF70svowkM2nKLYvh6EYp </social.twitter.app.consumerSecret>
-				<social.linkedin.app.consumerKey>77fa6kjljumj8x </social.linkedin.app.consumerKey>
-				<social.linkedin.app.consumerSecret>Qp7qxRm1usYix65e </social.linkedin.app.consumerSecret>
-				<social.facebook.consumerKey>581439761976706 </social.facebook.consumerKey>
-				<social.facebook.consumerSecret>5968babeab5c14f940ac925da686c63f </social.facebook.consumerSecret>
-
-<!-- 9/15				<social.google.android.apikey>AIzaSyC-EfEn6WHFEDg3UjuaNxb-ZhqsCzY1D84 </social.google.android.apikey>
-				<social.google.ios.apikey>AIzaSyDcW0lXISh704Z6tVwru78yLLuG6629bAk </social.google.ios.apikey>
-				<social.google.web.apikey>AIzaSyAAohwXAj4cwNQt5Gjylf7ZV7ObZiMZH_o </social.google.web.apikey>
-				<social.google.web.clientId>41815987463-mbca1f4ojnj29qed9abor6rjsbat61ld.apps.googleusercontent.com </social.google.web.clientId>
-				<social.google.web.clientSecret>apLfEWdotpcaonJRFaior5wn </social.google.web.clientSecret>
-				<social.google.android.clientId>518857244614-odu6ukf381cd2vmg8e0rphkp0hfksg9l.apps.googleusercontent.com </social.google.android.clientId>
-				<social.google.android.clientSecret>iLUKupqRjUl6gybpP7YYINE6 </social.google.android.clientSecret>
-				<social.google.ios.clientId>441395842147-p7a9cau2ptsv0ebvhea27n84u1cjcia9.apps.googleusercontent.com </social.google.ios.clientId>
-				<social.google.ios.clientSecret>y_5Qz6RSm7_LErx8TT8r_GCF </social.google.ios.clientSecret> -->
-
-				<social.google.android.apikey>AIzaSyC-EfEn6WHFEDg3UjuaNxb-ZhqsCzY1D84 </social.google.android.apikey>
-				<social.google.ios.apikey>AIzaSyCrTjAqBZK6DkGhFmuAu6-urDMABu0b_vk </social.google.ios.apikey>
-				<social.google.web.apikey>AIzaSyCY3woAWsatYnwhkYOeBqVjQ8V9hGa2vt8 </social.google.web.apikey>
-				<social.google.web.clientId>320470378854-06esrc32feq3nstb9t9ovp95jm50skvu.apps.googleusercontent.com </social.google.web.clientId>
-				<social.google.web.clientSecret>gI2eS5OH9zp_PPB089sDafjR </social.google.web.clientSecret>
-				<social.google.android.clientId>518857244614-odu6ukf381cd2vmg8e0rphkp0hfksg9l.apps.googleusercontent.com </social.google.android.clientId>
-				<social.google.android.clientSecret>iLUKupqRjUl6gybpP7YYINE6 </social.google.android.clientSecret>
-				<social.google.ios.clientId>74160880049-aji0lam7cfclo2a370ep2ugf7niii982.apps.googleusercontent.com </social.google.ios.clientId>
-				<social.google.ios.clientSecret>JZ52sjm4ifLV0sE1Lxwxk6pb </social.google.ios.clientSecret>
-
-				<content.vimeo.web.clientId>32de4824c358a86ff15b5f53f7b840b044317390 </content.vimeo.web.clientId>
-				<content.vimeo.web.clientSecret>ac0720d3536d96815996ed0da0471418a0c55524 </content.vimeo.web.clientSecret>
-				<content.vimeo.mobile.clientId>00a3112427cc0de8be5710eceb5bd83524001a6b </content.vimeo.mobile.clientId>
-				<content.vimeo.mobile.clientSecret>6814eea3b1195e9f8cd81688481c76688fea1120 </content.vimeo.mobile.clientSecret>
+				<social.twitter.app.consumerKey>eIxhGVt1wo8yNs7cTq0mNHsi0
+				</social.twitter.app.consumerKey>
+				<social.twitter.app.consumerSecret>qBTsSTelIlh0Lq4ILPlxgeTfhKk1GR8uetrlgaGExNulfxx37n
+				</social.twitter.app.consumerSecret>
+				<social.linkedin.app.consumerKey>77fa6kjljumj8x
+				</social.linkedin.app.consumerKey>
+				<social.linkedin.app.consumerSecret>Qp7qxRm1usYix65e
+				</social.linkedin.app.consumerSecret>
+				<social.facebook.consumerKey>581153318672017
+				</social.facebook.consumerKey>
+				<social.facebook.consumerSecret>0752b1dfd97a54334b53f3a22ee9b3ca
+				</social.facebook.consumerSecret>
+				<social.google.android.apikey>AIzaSyC-EfEn6WHFEDg3UjuaNxb-ZhqsCzY1D84
+				</social.google.android.apikey>
+				<social.google.ios.apikey>AIzaSyBLbSDsyGMBbXGVlnIUIpiSP3JKY706Gf0
+				</social.google.ios.apikey>
+				<social.google.web.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I
+				</social.google.web.apikey>
+				<social.google.apikey>AIzaSyCSxTEjWrO-WuY3vwBT9DRYXgFWvNXdd0I 
+				</social.google.apikey>
+				<social.google.web.clientId>963651180860-gdgpmd4pqpsetql8932mrgbif8f4t89p.apps.googleusercontent.com
+				</social.google.web.clientId>
+				<social.google.web.clientSecret>NRWmgbRuewuTUmL-IgMsuVzG
+				</social.google.web.clientSecret>
+				<social.google.android.clientId>518857244614-odu6ukf381cd2vmg8e0rphkp0hfksg9l.apps.googleusercontent.com
+				</social.google.android.clientId>
+				<social.google.android.clientSecret>iLUKupqRjUl6gybpP7YYINE6
+				</social.google.android.clientSecret>
+				<social.google.ios.clientId>798637804367-oeuq4acmf6jivul2gbqnig7pcspjirfu.apps.googleusercontent.com
+				</social.google.ios.clientId>
+				<social.google.ios.clientSecret>7ND3-wtvZg2GUZhWxZesE4qp
+				</social.google.ios.clientSecret>
+				<content.vimeo.web.clientId>8aa78eaeb615f47cdbc3806baa64e7b41ea7bb63
+				</content.vimeo.web.clientId>
+				<content.vimeo.web.clientSecret>631651bf50ecde53df4a5a3097e31acee3240ba6
+				</content.vimeo.web.clientSecret>
+				<content.vimeo.mobile.clientId>00a3112427cc0de8be5710eceb5bd83524001a6b
+				</content.vimeo.mobile.clientId>
+				<content.vimeo.mobile.clientSecret>6814eea3b1195e9f8cd81688481c76688fea1120
+				</content.vimeo.mobile.clientSecret>
+				<constants.resetUrl>http://192.168.12.118/sprocket-web/src/#/reset?token=
+				</constants.resetUrl>
 				<yelp.consumerKey>mnm5G8XclwYIwbED8HV4EQ</yelp.consumerKey>
-				<yelp.consumerSecret>3X5_IqGMVRE9dwb_pxV23FxS68k </yelp.consumerSecret>
+				<yelp.consumerSecret>3X5_IqGMVRE9dwb_pxV23FxS68k
+				</yelp.consumerSecret>
 				<yelp.token>wjVmlQFhPyMNYEPcyIyCenucRoBPPwJp</yelp.token>
 				<yelp.tokenSecret>w7oeFsjoVLEb4c8bUbgRiQ4smec</yelp.tokenSecret>
-				<social.tumblr.consumerKey>HXpAQmGwYutSonQNixGf23uy8SifTZU5WG2iALLwNgdzYhGYfs </social.tumblr.consumerKey>
-				<social.tumblr.consumerSecret>lbsptcaAFUhLExR2UllZZ1FqG0r0uIWeHD9UOP9lF5ywGCI92W </social.tumblr.consumerSecret>
-
-				<social.reddit.web.consumerKey>gTwisdAm0FV8DQ </social.reddit.web.consumerKey>
-				<social.reddit.web.consumerSecret>dJ-nLWxl_TuAoDnUnYXWkj3N9QM </social.reddit.web.consumerSecret>
-				<social.reddit.installed.consumerSecret>Fm2rYVyn5bVhmw </social.reddit.installed.consumerSecret>
-				<social.reddit.web.userAgent>web:com.ubiquiy.sprocketStageWeb:v1.0.1 (by /u/ubiquitybc) </social.reddit.web.userAgent>
-				<social.reddit.installed.userAgent>android:com.ubiquiy.sprocketStageMobile:v1.0.1 (by /u/ubiquitybc) </social.reddit.installed.userAgent>
-				<social.reddit.redirectUI>http://sprocket-web-stage.ubiquitycorp.com?nw=reddit</social.reddit.redirectUI>
-
-				<constants.resetUrl>http://sprocket-web-stage.ubiquitycorp.com/#/reset?token= </constants.resetUrl>
-				<db.pool.maxActive>50</db.pool.maxActive>
+				<social.tumblr.consumerKey>X4Jwwn3OaWgt9BlzaibfDw8ZFWcs1NUlgHTeitGSoC65cBXir3
+				</social.tumblr.consumerKey>
+				<social.tumblr.consumerSecret>s7CPOLZnwSsdJkyYYus2r7KByMcwwgFWtGyPxhtjDXnhkUBLhg
+				</social.tumblr.consumerSecret>
+				<social.reddit.web.consumerKey>yIhf9yZdXmU4_w
+				</social.reddit.web.consumerKey>
+				<social.reddit.web.consumerSecret>0rJkc9DYrC-WpiMCypl0hoy8S0c
+				</social.reddit.web.consumerSecret>
+				<social.reddit.installed.consumerSecret>NVMIMSbywkA7xA
+				</social.reddit.installed.consumerSecret>
+				<social.reddit.web.userAgent>web:com.ubiquiy.sprocketDevWeb:v1.0.1 (by /u/ubiquitybc)
+				</social.reddit.web.userAgent>
+				<social.reddit.installed.userAgent>android:com.ubiquiy.sprocketDevMobile:v1.0.1 (by /u/ubiquitybc)
+				</social.reddit.installed.userAgent>
+				<social.reddit.redirectUI>http://sprocketdemo.com?nw=reddit</social.reddit.redirectUI>
+				<db.pool.maxActive>240</db.pool.maxActive>
 				<db.pool.maxIdle>3</db.pool.maxIdle>
 				<db.pool.maxIdleTime>55</db.pool.maxIdleTime>
 				<db.pool.maxWait>10000</db.pool.maxWait>
-				<db.pool.idleConnectionTestPeriod>60 </db.pool.idleConnectionTestPeriod>
+				<db.pool.idleConnectionTestPeriod>60
+				</db.pool.idleConnectionTestPeriod>
 				<db.username>sprocketusr</db.username>
 				<db.password>sprocket9801</db.password>
 				<db.host>sprocket-mysql-stage.ubiquitycorp.net</db.host>
 				<hibernate.schema.auto>update</hibernate.schema.auto>
-				<stripe.api.client>pk_test_ujJiLWzAZymWRzD10MqT2tej </stripe.api.client>
-				<stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO </stripe.api.secret>
-				<repo.env>stage</repo.env>
-				<mq.queue.cacheinvalidate.host>sprocket-rabbitmq-stage.ubiquitycorp.net </mq.queue.cacheinvalidate.host>
-				<mq.queue.cacheinvalidate.username>netappusr </mq.queue.cacheinvalidate.username>
-				<mq.queue.cacheinvalidate.password>blackdeer </mq.queue.cacheinvalidate.password>
-				<mq.queue.track.host>sprocket-rabbitmq-stage.ubiquitycorp.net</mq.queue.track.host>
+				<stripe.api.client>pk_test_ujJiLWzAZymWRzD10MqT2tej
+				</stripe.api.client>
+				<stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO
+				</stripe.api.secret>
+				<repo.env>dev</repo.env>
+				<mq.queue.cacheinvalidate.host>sprocket-redis-stage.ubiquitycorp.net
+				</mq.queue.cacheinvalidate.host>
+				<mq.queue.cacheinvalidate.username>netappusr
+				</mq.queue.cacheinvalidate.username>
+				<mq.queue.cacheinvalidate.password>blackdeer
+				</mq.queue.cacheinvalidate.password>
+				<mq.queue.track.host>sprocket-rabbit-stage.ubiquitycorp.net</mq.queue.track.host>
 				<mq.queue.track.username>netappusr</mq.queue.track.username>
 				<mq.queue.track.password>blackdeer</mq.queue.track.password>
-				<mq.host>sprocket-rabbitmq-stage.ubiquitycorp.net</mq.host>
+				<mq.host>sprocket-rabbit-stage.ubiquitycorp.net</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
-				<xmpp.host>sprocket-ejabberd-stage.ubiquitycorp.net</xmpp.host>
+				<!-- xmpp configuration -->
+				<xmpp.host>sprocket-ejabberd-stage</xmpp.host>
 				<xmpp.port>5222</xmpp.port>
-				<xmpp.domain>sprocket-ejabberd-stage.ubiquitycorp.net</xmpp.domain>
+				<xmpp.domain>localhost</xmpp.domain>
 				<xmpp.user>bot</xmpp.user>
 				<xmpp.password>sprocket9801</xmpp.password>
-				<xmpp.resource>sprocket-ejabberd-stage.ubiquitycorp.net</xmpp.resource>
+				<xmpp.resource>localhost</xmpp.resource>
 				<!-- mail configuration -->
-				<mail.host>sprocket-smtp-relay.ubiquitycorp.net</mail.host>
+				<mail.host>email-smtp.us-west-2.amazonaws.com</mail.host>
 				<mail.port>465</mail.port>
 				<mail.from>no-reply\@sprocketlive.com</mail.from>
 				<mail.username>AKIAIBIMFN7QRWAVFV2A</mail.username>
 				<mail.password>AjJEA/pBTFxolvU0bO1ivVpRNeLoJM0KTh7yC7cBMTWA
 				</mail.password>
 				<!-- recommendation engine -->
-				<recommendation.engine.appname>Sprocket </recommendation.engine.appname>
-				<recommendation.engine.hadoop.master>local </recommendation.engine.hadoop.master>
-				<recommendation.engine.alg.kmeans.iterations>5 </recommendation.engine.alg.kmeans.iterations>
+				<recommendation.engine.appname>Sprocket
+				</recommendation.engine.appname>
+				<recommendation.engine.hadoop.master>local
+				</recommendation.engine.hadoop.master>
+				<recommendation.engine.alg.kmeans.iterations>5
+				</recommendation.engine.alg.kmeans.iterations>
 				<!-- folder repository for uploaded files -->
 				<repo.files>/usr/etc/files/</repo.files>
 			</properties>
