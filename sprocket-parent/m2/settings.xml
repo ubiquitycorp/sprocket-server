@@ -393,7 +393,7 @@
 				</stripe.api.client>
 				<stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO
 				</stripe.api.secret>
-				<repo.env>dev</repo.env>
+				<repo.env>stage</repo.env>
 				<mq.queue.cacheinvalidate.host>sprocket-redis-stage.ubiquitycorp.net
 				</mq.queue.cacheinvalidate.host>
 				<mq.queue.cacheinvalidate.username>netappusr
