@@ -297,19 +297,13 @@
 				<tomcat.processes>1</tomcat.processes>
 
 				<datasync.worker.processes>1</datasync.worker.processes>
-				<datasync.worker.size>4096</datasync.worker.size>
+				<datasync.worker.size>2048</datasync.worker.size>
 				<syslog.host>localhost</syslog.host>
 				<redis.host>sprocket-redis-stage.ubiquitycorp.net</redis.host>
 				<hibernate.debug>true</hibernate.debug>
 				<solr.api.host>sprocket-search-stage.ubiquitycorp.net</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
 				
-				<!--<social.facebook.api.host>http://localhost/sprocket-network-api/api/1.0/facebook</social.facebook.api.host>-->
-				<!--<social.googlePlus.api.host>http://localhost/sprocket-network-api/api/1.0/googleplus</social.googlePlus.api.host>-->
-				<!--<social.google.api.host>http://localhost/sprocket-network-api/api/1.0/googleplus</social.google.api.host>-->
-				<!--<content.youtube.api.host>http://localhost/sprocket-network-api/api/1.0/youtube</content.youtube.api.host>-->
-				<!--<social.reddit.oauth.api.host>http://localhost/sprocket-network-api/api/1.0/reddit</social.reddit.oauth.api.host>-->
-				<!--<social.reddit.ssl.api.host>http://localhost/sprocket-network-api/api/1.0/reddit</social.reddit.ssl.api.host>-->
 				<social.facebook.api.host>https://graph.facebook.com</social.facebook.api.host>
 				<social.googlePlus.api.host>https://www.googleapis.com/plus/v1</social.googlePlus.api.host>
 				<social.google.api.host>https://accounts.google.com</social.google.api.host>
@@ -407,7 +401,7 @@
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
 				<!-- xmpp configuration -->
-				<xmpp.host>sprocket-ejabberd-stage</xmpp.host>
+				<xmpp.host>sprocket-ejabberd-stage.ubiquitycorp.net</xmpp.host>
 				<xmpp.port>5222</xmpp.port>
 				<xmpp.domain>localhost</xmpp.domain>
 				<xmpp.user>bot</xmpp.user>
