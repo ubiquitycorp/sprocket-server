@@ -300,7 +300,7 @@
 				<datasync.worker.size>2048</datasync.worker.size>
 				<syslog.host>localhost</syslog.host>
 				<redis.host>sprocket-redis-stage.ubiquitycorp.net</redis.host>
-				<hibernate.debug>true</hibernate.debug>
+				<hibernate.debug>false</hibernate.debug>
 				<solr.api.host>sprocket-search-stage.ubiquitycorp.net</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
 				
