@@ -301,7 +301,7 @@
 				<datasync.worker.processes>1</datasync.worker.processes>
 				<datasync.worker.size>2048</datasync.worker.size>
 				<syslog.host>localhost</syslog.host>
-				<redis.host>sprocket-redis-stage.ubiquitycorp.net</redis.host>
+				<redis.host>localhost</redis.host>
 				<hibernate.debug>false</hibernate.debug>
 				<solr.api.host>sprocket-search-stage.ubiquitycorp.net</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
@@ -400,20 +400,20 @@
 				<stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO
 				</stripe.api.secret>
 				<repo.env>stage</repo.env>
-				<mq.queue.cacheinvalidate.host>sprocket-rabbitmq-stage.ubiquitycorp.net
+				<mq.queue.cacheinvalidate.host>localhost
 				</mq.queue.cacheinvalidate.host>
 				<mq.queue.cacheinvalidate.username>netappusr
 				</mq.queue.cacheinvalidate.username>
 				<mq.queue.cacheinvalidate.password>blackdeer
 				</mq.queue.cacheinvalidate.password>
-				<mq.queue.track.host>sprocket-rabbitmq-stage.ubiquitycorp.net</mq.queue.track.host>
+				<mq.queue.track.host>localhost</mq.queue.track.host>
 				<mq.queue.track.username>netappusr</mq.queue.track.username>
 				<mq.queue.track.password>blackdeer</mq.queue.track.password>
-				<mq.host>sprocket-rabbitmq-stage.ubiquitycorp.net</mq.host>
+				<mq.host>localhost</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
 				<!-- xmpp configuration -->
-				<xmpp.host>sprocket-ejabberd-stage.ubiquitycorp.net</xmpp.host>
+				<xmpp.host>localhost</xmpp.host>
 				<xmpp.port>5222</xmpp.port>
 				<xmpp.domain>localhost</xmpp.domain>
 				<xmpp.user>bot</xmpp.user>
