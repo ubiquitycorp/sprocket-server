@@ -295,14 +295,14 @@
 		<profile>
 			<id>env-stage</id>
 			<properties>
-				<app.log.level>DEBUG</app.log.level>
+				<app.log.level>INFO</app.log.level>
 				<tomcat.processes>1</tomcat.processes>
 
 				<datasync.worker.processes>1</datasync.worker.processes>
 				<datasync.worker.size>2048</datasync.worker.size>
 				<syslog.host>localhost</syslog.host>
 				<redis.host>sprocket-redis-stage.ubiquitycorp.net</redis.host>
-				<hibernate.debug>true</hibernate.debug>
+				<hibernate.debug>false</hibernate.debug>
 				<solr.api.host>sprocket-search-stage.ubiquitycorp.net</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
 				<social.facebook.api.host>https://graph.facebook.com</social.facebook.api.host>
@@ -565,14 +565,14 @@
 		<profile>
 			<id>env-prod</id>
 			<properties>
-				<app.log.level>DEBUG</app.log.level>
+				<app.log.level>INFO</app.log.level>
 				<tomcat.processes>1</tomcat.processes>
 
 				<datasync.worker.processes>1</datasync.worker.processes>
 				<datasync.worker.size>2048</datasync.worker.size>
 				<syslog.host>localhost</syslog.host>
 				<redis.host>sprocket-redis.ubiquitycorp.net</redis.host>
-				<hibernate.debug>true</hibernate.debug>
+				<hibernate.debug>false</hibernate.debug>
 				<solr.api.host>sprocket-search.ubiquitycorp.net</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
 				<social.facebook.api.host>https://graph.facebook.com</social.facebook.api.host>
