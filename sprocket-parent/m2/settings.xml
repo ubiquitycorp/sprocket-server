@@ -163,7 +163,7 @@
 				<datasync.worker.processes>1</datasync.worker.processes>
 				<datasync.worker.size>1024</datasync.worker.size>
 
-				<redis.host>localhost</redis.host>
+				<redis.host>sprocket-dev.ubiquitycorp.net</redis.host>
 				<hibernate.debug>false</hibernate.debug>
 				<solr.api.host>localhost</solr.api.host>
 				<solr.api.port>8080</solr.api.port>
@@ -242,31 +242,31 @@
 				</db.pool.idleConnectionTestPeriod>
 				<db.username>sprocketusr</db.username>
 				<db.password>sprocket9801</db.password>
-				<db.host>localhost</db.host>
+				<db.host>sprocket-dev.ubiquitycorp.net</db.host>
 				<hibernate.schema.auto>update</hibernate.schema.auto>
 				<stripe.api.client>pk_test_ujJiLWzAZymWRzD10MqT2tej
 				</stripe.api.client>
 				<stripe.api.secret>sk_test_TnUECtSTe28lDumdFPQVTRJO
 				</stripe.api.secret>
 				<repo.env>qa</repo.env>
-				<mq.queue.cacheinvalidate.host>localhost
+				<mq.queue.cacheinvalidate.host>sprocket-dev.ubiquitycorp.net
 				</mq.queue.cacheinvalidate.host>
 				<mq.queue.cacheinvalidate.username>netappusr
 				</mq.queue.cacheinvalidate.username>
 				<mq.queue.cacheinvalidate.password>blackdeer
 				</mq.queue.cacheinvalidate.password>
-				<mq.queue.track.host>localhost</mq.queue.track.host>
+				<mq.queue.track.host>sprocket-dev.ubiquitycorp.net</mq.queue.track.host>
 				<mq.queue.track.username>netappusr</mq.queue.track.username>
 				<mq.queue.track.password>blackdeer</mq.queue.track.password>
-				<mq.host>localhost</mq.host>
+				<mq.host>sprocket-dev.ubiquitycorp.net</mq.host>
 				<mq.username>netappusr</mq.username>
 				<mq.password>blackdeer</mq.password>
-				<xmpp.host>localhost</xmpp.host>
+				<xmpp.host>sprocket-dev.ubiquitycorp.net</xmpp.host>
 				<xmpp.port>5222</xmpp.port>
-				<xmpp.domain>localhost</xmpp.domain>
+				<xmpp.domain>sprocket-dev.ubiquitycorp.net</xmpp.domain>
 				<xmpp.user>bot</xmpp.user>
 				<xmpp.password>sprocket9801</xmpp.password>
-				<xmpp.resource>localhost</xmpp.resource>
+				<xmpp.resource>sprocket-dev.ubiquitycorp.net</xmpp.resource>
 				<!-- mail configuration -->
 				<mail.host>email-smtp.us-west-2.amazonaws.com</mail.host>
 				<mail.port>465</mail.port>
